@@ -123,36 +123,34 @@ class CMS.Views.ModuleEdit extends Backbone.View
     return @$el.find('.wrapper-comp-editor').length > 0
 
   selectMode: (mode) =>
-    dataEditor = @$el.find('.wrapper-comp-editor')
-    settingsEditor = @$el.find('.wrapper-comp-settings')
-    subtitlesEditor = @$el.find('.wrapper-comp-subtitles')
-    editorModeButton =  @$el.find('#editor-mode').find("a")
-    settingsModeButton = @$el.find('#settings-mode').find("a")
-    subtitlesModeButton = @$el.find('#subtitles-mode').find("a")
+    tabs = @$el.find('.component-edit-modes .module-editor').find('> div, > section > div')
+    buttons =  @$el.find('.nav-edit-modes .mode').find("a")
 
-    if mode == @editorMode
-      # Because of CodeMirror editor, cannot hide the data editor when it is first loaded. Therefore
-      # we have to use a class of is-inactive instead of is-active.
-      dataEditor.removeClass('is-inactive')
-      editorModeButton.addClass('is-set')
-      settingsEditor.removeClass('is-active')
-      settingsModeButton.removeClass('is-set')
-      subtitlesEditor.removeClass('is-active')
-      subtitlesModeButton.removeClass('is-set')
-    else if mode == @settingsMode
-      dataEditor.addClass('is-inactive')
-      editorModeButton.removeClass('is-set')
-      settingsEditor.addClass('is-active')
-      settingsModeButton.addClass('is-set')
-      subtitlesEditor.removeClass('is-active')
-      subtitlesModeButton.removeClass('is-set')
-    else
-      dataEditor.addClass('is-inactive')
-      editorModeButton.removeClass('is-set')
-      settingsEditor.removeClass('is-active')
-      settingsModeButton.removeClass('is-set')
-      subtitlesEditor.addClass('is-active')
-      subtitlesModeButton.addClass('is-set')
+    console.log tabs, buttons
+
+    # if mode == @editorMode
+    #   # Because of CodeMirror editor, cannot hide the data editor when it is first loaded. Therefore
+    #   # we have to use a class of is-inactive instead of is-active.
+    #   dataEditor.removeClass('is-inactive')
+    #   editorModeButton.addClass('is-set')
+    #   settingsEditor.removeClass('is-active')
+    #   settingsModeButton.removeClass('is-set')
+    #   subtitlesEditor.removeClass('is-active')
+    #   subtitlesModeButton.removeClass('is-set')
+    # else if mode == @settingsMode
+    #   dataEditor.addClass('is-inactive')
+    #   editorModeButton.removeClass('is-set')
+    #   settingsEditor.addClass('is-active')
+    #   settingsModeButton.addClass('is-set')
+    #   subtitlesEditor.removeClass('is-active')
+    #   subtitlesModeButton.removeClass('is-set')
+    # else
+    #   dataEditor.addClass('is-inactive')
+    #   editorModeButton.removeClass('is-set')
+    #   settingsEditor.removeClass('is-active')
+    #   settingsModeButton.removeClass('is-set')
+    #   subtitlesEditor.addClass('is-active')
+    #   subtitlesModeButton.addClass('is-set')
 
 
 
