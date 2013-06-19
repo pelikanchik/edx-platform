@@ -10,7 +10,6 @@ from xblock.runtime import KeyValueStore, InvalidScopeError
 from xmodule.modulestore import Location
 from xmodule.modulestore.mongo import MongoModuleStore, MongoKeyValueStore
 from xmodule.modulestore.xml_importer import import_from_xml
-from xmodule.templates import update_templates
 
 from .test_modulestore import check_path_to_location
 from . import DATA_DIR
@@ -50,7 +49,6 @@ class TestMongoModuleStore(object):
         # Explicitly list the courses to load (don't want the big one)
         courses = ['toy', 'simple']
         import_from_xml(store, DATA_DIR, courses)
-        update_templates(store)
         return store
 
     @staticmethod
