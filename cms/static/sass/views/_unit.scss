@@ -733,21 +733,25 @@ body.course.unit {
     padding: 20px;
   }
 
-
   .orange-button{
-    @include orange-button;
-    display: block;
-    width: 70%;
-    margin: 0 auto;
-    text-align: center;
-  }
+      @include orange-button;
+    }
 }
 
-.subtitles-import-variants{
+.comp-subtitles-entry{
+  text-align: center;
+
   .comp-import-variants{
     > li{
       display: block;
       margin: $baseline/2 0px $baseline/2 0;
+    }
+
+    .orange-button{
+      display: block;
+      width: 70%;
+      margin: 0 auto;
+      text-align: center;
     }
   }
 }
