@@ -3,7 +3,7 @@
 
 <script type="text/javascript" src="/static/coffee/src/views/videoalpha/subtitles_import.js"></script>
 
-<script id="subtitles-import-variants-tpl" type="text/template">
+<script id="subtitles-import-variants-${component_location}-tpl" type="text/template">
     <ul class="comp-import-variants">
         <li>
             <a href="#" class="orange-button">${_("Upload from file")}</a>
@@ -14,7 +14,7 @@
     </ul>
 </script>
 
-<script id="subtitles-message-warn-tpl" type="text/template">
+<script id="subtitles-message-warn-${component_location}-tpl" type="text/template">
     <div class="message-warn">
         <p>If subtitles for the video already exist, importing again will overwrite them.</p>
         <p>Are you sure that you want to import the subtitle file
@@ -26,7 +26,7 @@
     </div>
 </script>
 
-<script id="subtitles-message-success-tpl" type="text/template">
+<script id="subtitles-message-success-${component_location}-tpl" type="text/template">
     <div class="message-success">
         <p>Subtitles were successfully imported.</p>
         <div class="row message-actions">
@@ -35,7 +35,7 @@
     </div>
 </script>
 
-<script id="subtitles-message-error-tpl" type="text/template">
+<script id="subtitles-message-error-${component_location}-tpl" type="text/template">
     <div class="message-error">
         <p>Import failed!</p>
         <div class="row message-actions">
@@ -44,9 +44,9 @@
     </div>
 </script>
 
-<script id="subtitles-message-wait-tpl" type="text/template">
+<script id="subtitles-message-wait-${component_location}-tpl" type="text/template">
     <div class="message-wait">
-        <p>Please wait while import will be finished</p>
+        <p>Please wait for the subtitles to download</p>
     </div>
 </script>
 
@@ -56,11 +56,11 @@
         new CMS.Views.SubtitlesImport({
             el: $('#comp-subtitles-${component_location}'),
             tpl: {
-                warn: _.template($('#subtitles-message-warn-tpl').text()),
-                success: _.template($('#subtitles-message-success-tpl').text()),
-                error: _.template($('#subtitles-message-error-tpl').text()),
-                wait: _.template($('#subtitles-message-wait-tpl').text()),
-                variants: _.template($('#subtitles-import-variants-tpl').text())
+                warn: _.template($('#subtitles-message-warn-${component_location}-tpl').text()),
+                success: _.template($('#subtitles-message-success-${component_location}-tpl').text()),
+                error: _.template($('#subtitles-message-error-${component_location}-tpl').text()),
+                wait: _.template($('#subtitles-message-wait-${component_location}-tpl').text()),
+                variants: _.template($('#subtitles-import-variants-${component_location}-tpl').text())
             }
         });
     });
