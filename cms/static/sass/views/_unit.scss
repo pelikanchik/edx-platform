@@ -743,10 +743,12 @@ body.course.unit {
   }
 }
 
-.comp-subtitles-entry{
-  > li{
-    display: block;
-    margin: $baseline/2 0px $baseline/2 0;
+.subtitles-import-variants{
+  .comp-import-variants{
+    > li{
+      display: block;
+      margin: $baseline/2 0px $baseline/2 0;
+    }
   }
 }
 

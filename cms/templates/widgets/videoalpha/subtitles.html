@@ -1,9 +1,64 @@
 <%! from django.utils.translation import ugettext as _ %>
-<ul class="field comp-subtitles-entry">
-    <!-- <li>
-        <a href="#" class="orange-button ">${_("Upload from file")}</a>
-    </li> -->
-    <li>
-        <a href="#" class="orange-button">${_("Import from Youtube")}</a>
-    </li>
-</ul>
+<%namespace name='static' file='static_content.html'/>
+<div class="field comp-subtitles-entry">
+
+</div>
+
+<script type="text/javascript" src="/static/coffee/src/views/videoalpha/subtitles_import.js"></script>
+
+<script id="subtitles-import-variants-tpl" type="text/template">
+    <ul class="comp-import-variants">
+        <li>
+            <a href="#" class="orange-button ">${_("Upload from file")}</a>
+        </li>
+        <li>
+           <a href="#" id="import-from-youtube" class="orange-button">${_("Import from Youtube")}</a>
+        </li>
+    </ul>
+</script>
+
+<script id="subtitles-message-warn-tpl" type="text/template">
+    <div class="message-warn">
+        <p>If subtitles for the video already exist, importing again will overwrite them.</p>
+        <p>Are you sure that you want to import the subtitle file
+        found on YouTube?</p>
+        <div class="row message-actions">
+            <a href="#" class="import-true-button">${_("Yes")}</a>
+            <a href="#" class="import-false-button">${_("No")}</a>
+        </div>
+    </div>
+</script>
+
+<script id="subtitles-message-success-tpl" type="text/template">
+    <div class="message-warn">
+        <p>Subtitles were successfully imported.</p>
+        <div class="row message-actions">
+            <a href="#" class="import-ok-button">${_("Ok")}</a>
+        </div>
+    </div>
+</script>
+
+<script id="subtitles-message-error-tpl" type="text/template">
+    <div class="message-warn">
+        <p>Import failed!</p>
+        <div class="row message-actions">
+            <a href="#" class="import-ok-button">${_("Ok")}</a>
+        </div>
+    </div>
+</script>
+
+
+<script type='text/javascript'>
+    $(document).ready(function(){
+        new CMS.Views.SubtitlesImport({
+            el: $('.comp-subtitles-entry'),
+            tpl: {
+                warn: _.template($('#subtitles-message-warn-tpl').text()),
+                success: _.template($('#subtitles-message-success-tpl').text()),
+                error: _.template($('#subtitles-message-error-tpl').text()),
+                variants: _.template($('#subtitles-import-variants-tpl').text())
+            }
+        });
+    });
+
+</script>
