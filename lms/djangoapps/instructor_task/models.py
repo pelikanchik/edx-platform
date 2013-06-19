@@ -23,6 +23,19 @@ from django.db import models, transaction
 QUEUING = 'QUEUING'
 PROGRESS = 'PROGRESS'
 
+class AlreadyRunningError(Exception):
+    """Exception indicating that a background task is already running"""
+    pass
+
+
+def _task_is_running(course_id, task_type, task_key):
+    """Checks if a particular task is already running"""
+    runningTasks = InstructorTask.objects.filter(course_id=course_id, task_type=task_type, task_key=task_key)
+    # exclude states that are "ready" (i.e. not "running", e.g. failure, success, revoked):
+    for state in READY_STATES:
+        runningTasks = runningTasks.exclude(task_state=state)
+    return len(runningTasks) > 0
+
 
 class InstructorTask(models.Model):
     """
@@ -70,8 +83,19 @@ class InstructorTask(models.Model):
     def __unicode__(self):
         return unicode(repr(self))
 
+
     @classmethod
-    def create(cls, course_id, task_type, task_key, task_input, requester):
+    def _create(cls, course_id, task_type, task_key, task_input, requester):
+        """
+        Create an instance of InstructorTask.
+
+        The InstructorTask.save_now method makes sure the InstructorTask entry is committed.
+        When called from any view that is wrapped by TransactionMiddleware,
+        and thus in a "commit-on-success" transaction, an autocommit buried within here
+        will cause any pending transaction to be committed by a successful
+        save here.  Any future database operations will take place in a
+        separate transaction.
+        """
         # create the task_id here, and pass it into celery:
         task_id = str(uuid4())
 
@@ -85,19 +109,28 @@ class InstructorTask(models.Model):
 
         # create the task, then save it:
         instructor_task = cls(course_id=course_id,
-                          task_type=task_type,
-                          task_id=task_id,
-                          task_key=task_key,
-                          task_input=json_task_input,
-                          task_state=QUEUING,
-                          requester=requester)
+                              task_type=task_type,
+                              task_id=task_id,
+                              task_key=task_key,
+                              task_input=json_task_input,
+                              task_state=QUEUING,
+                              requester=requester)
         instructor_task.save_now()
 
         return instructor_task
 
     @transaction.autocommit
     def save_now(self):
-        """Writes InstructorTask immediately, ensuring the transaction is committed."""
+        """
+        Writes InstructorTask immediately, ensuring the transaction is committed.
+
+        Autocommit annotation makes sure the database entry is committed.
+        When called from any view that is wrapped by TransactionMiddleware,
+        and thus in a "commit-on-success" transaction, this autocommit here
+        will cause any pending transaction to be committed by a successful
+        save here.  Any future database operations will take place in a
+        separate transaction.
+        """
         self.save()
 
     @staticmethod
