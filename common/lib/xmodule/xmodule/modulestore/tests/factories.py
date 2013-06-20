@@ -76,10 +76,9 @@ class XModuleItemFactory(Factory):
     display_name = factory.LazyAttributeSequence(lambda o, n: "{} {}".format(o.category, n))
 
     @staticmethod
-    def location(parent_location, category, display_name):
-        parent = Location(parent_location)
+    def location(parent, category, display_name):
         dest_name = display_name.replace(" ", "_") if display_name is not None else uuid4().hex
-        return parent._replace(category=category, name=dest_name)
+        return Location(parent).replace(category=category, name=dest_name)
 
     @classmethod
     def _create(cls, target_class, *args, **kwargs):
@@ -102,13 +101,15 @@ class XModuleItemFactory(Factory):
         """
 
         DETACHED_CATEGORIES = ['about', 'static_tab', 'course_info']
-
+        # catch any old style users before they get into trouble
+        assert not 'template' in kwargs
         parent_location = Location(kwargs.get('parent_location'))
         data = kwargs.get('data')
         category = kwargs.get('category')
         display_name = kwargs.get('display_name')
         metadata = kwargs.get('metadata', {})
         location = kwargs.get('location', XModuleItemFactory.location(parent_location, category, display_name))
+        assert location != parent_location
 
         store = modulestore('direct')
 
