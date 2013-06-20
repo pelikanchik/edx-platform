@@ -3,80 +3,86 @@ class CMS.Views.SubtitlesImport extends Backbone.View
   className: 'comp-subtitles-entry'
 
   events:
-    # "click .message-actions .import-cancel-button": 'clickNoButton'
-    # "click .message-actions .import-ok-button": 'clickOkButton'
-    # "click .message-actions .import-abort-button": 'clickAbortButton'
-    # "click .message-warn .message-actions .import-true-button": 'clickYesButton'
     "click #import-from-youtube": 'clickImportFromYoutube'
 
   initialize: ->
     _.bindAll(@)
-
+    @prompt = null
     @id = @$el.closest('.component').data('id')
-    @component = @$el.closest('.component-editor')
-    @componentBtns = @component.find('> .module-actions')
-    @onDelete = @options.onDelete
+    @models =
+      success: new CMS.Models.ConfirmationMessage(
+        title: gettext("Subtitles were successfully imported.")
+        actions:
+          primary:
+            text: gettext("Ok")
+            click: (view, e) ->
+              view.hide()
+              e.preventDefault()
+      )
+      warn: new CMS.Models.WarningMessage(
+        title: gettext("Are you sure that you want to import the subtitle file found on YouTube?")
+        message: gettext("If subtitles for the video already exist, importing again will overwrite them.")
+        actions:
+          primary:
+            text: gettext("Yes")
+            click: @importFromYoutubeHandler
+
+          secondary: [
+            text: gettext("No")
+            click: (view, e) ->
+              view.hide()
+              e.preventDefault()
+          ]
+      )
+      wait: new CMS.Models.WarningMessage(
+        title: gettext("Please wait for the subtitles to download")
+        message: '''
+          <div id="circle-preloader">
+            <div id="circle-preloader_1" class="circle-preloader"></div>
+            <div id="circle-preloader_2" class="circle-preloader"></div>
+            <div id="circle-preloader_3" class="circle-preloader"></div>
+          </div>
+        '''
+      )
+      error: new CMS.Models.ErrorMessage(
+        title: gettext("Import failed!")
+        actions:
+          primary:
+            text: gettext("Ok")
+            click: (view, e) ->
+              view.hide()
+              e.preventDefault()
+      )
+
     @showImportVariants()
 
   render: (type, params = {}) ->
     @$el.html(@options.tpl[type](params))
 
+  showPrompt: (model) ->
+    if @prompt
+      @prompt.model = model
+      @prompt.show()
+    else
+      @prompt = new CMS.Views.Prompt({model: model})
+
   showWarnMessage: ->
-
-    that = @
-
-    @msg = new CMS.Models.WarningMessage(
-        title: ""
-        message: "<p>If subtitles for the video already exist,
-        importing again will overwrite them.</p>
-        <p>Are you sure that you want to import the subtitle file
-        found on YouTube?</p>"
-        actions:
-          primary:
-            text: gettext("Yes")
-            click: (view) ->
-              view.hide()
-              that.importFromYoutube()
-          secondary: [
-            text: gettext("No")
-            click: (view) ->
-              view.hide()
-          ]
-    )
-    @view = new CMS.Views.Prompt({model: @msg})
+    model =  @models.warn
+    @showPrompt(model)
 
   showWaitMessage: ->
-    @msg = new CMS.Models.WarningMessage(
-        title: gettext("Please wait for the subtitles to download")
-    )
-    @view = new CMS.Views.Prompt({model: @msg})
+    model = @models.wait
+    @showPrompt(model)
 
   showSuccessMessage: ->
-    @msg = new CMS.Models.ConfirmationMessage(
-        title: gettext("Success")
-        message: "Subtitles were successfully imported."
-        actions:
-          primary:
-            text: gettext("Ok")
-            click: (view) ->
-              view.hide()
-    )
-    @view = new CMS.Views.Prompt({model: @msg})
+    model = @models.success
+    @showPrompt(model)
 
-  showErrorMessage: ->
-    that = @
-
-    @msg = new CMS.Models.ErrorMessage(
-        title: gettext("Error")
-        message: "Import failed!"
-        actions:
-          primary:
-            text: gettext("Ok")
-            click: (view) ->
-              view.hide()
-              that = null
-    )
-    @view = new CMS.Views.Prompt({model: @msg})
+  showErrorMessage: (title, message)->
+    model = @models.error
+    model.set('title', title) if title
+    model.set('message', message) if message
+    @showPrompt(model)
 
   showImportVariants: ->
     @render('variants')
@@ -85,11 +91,15 @@ class CMS.Views.SubtitlesImport extends Backbone.View
     event.preventDefault()
     @showWarnMessage()
 
+  importFromYoutubeHandler: (view, event)->
+      view.hide()
+      @importFromYoutube()
+      event.preventDefault()
+
   importFromYoutube: ->
     that = @
     @showWaitMessage()
-
-    @xhr = $.ajax(
+    $.ajax(
           url: "/import_subtitles"
           type: "POST"
           dataType: "json"
