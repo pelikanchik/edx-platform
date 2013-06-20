@@ -9,17 +9,20 @@ class CMS.Views.SubtitlesImport extends Backbone.View
     _.bindAll(@)
     @prompt = null
     @id = @$el.closest('.component').data('id')
-    @models =
-      success: new CMS.Models.ConfirmationMessage(
+    @types =
+      success:
+        intent: 'confirmation'
         title: gettext("Subtitles were successfully imported.")
+        message: null
         actions:
           primary:
             text: gettext("Ok")
             click: (view, e) ->
               view.hide()
               e.preventDefault()
-      )
-      warn: new CMS.Models.WarningMessage(
+          secondary: null
+      warn:
+        intent: 'warning'
         title: gettext("Are you sure that you want to import the subtitle file found on YouTube?")
         message: gettext("If subtitles for the video already exist, importing again will overwrite them.")
         actions:
@@ -33,8 +36,8 @@ class CMS.Views.SubtitlesImport extends Backbone.View
               view.hide()
               e.preventDefault()
           ]
-      )
-      wait: new CMS.Models.WarningMessage(
+      wait:
+        intent: 'warning'
         title: gettext("Please wait for the subtitles to download")
         message: '''
           <div id="circle-preloader">
@@ -43,46 +46,49 @@ class CMS.Views.SubtitlesImport extends Backbone.View
             <div id="circle-preloader_3" class="circle-preloader"></div>
           </div>
         '''
-      )
-      error: new CMS.Models.ErrorMessage(
+        actions: null
+      error:
+        intent: 'error'
         title: gettext("Import failed!")
+        message: null
         actions:
           primary:
             text: gettext("Ok")
             click: (view, e) ->
               view.hide()
               e.preventDefault()
-      )
+          secondary: null
 
     @showImportVariants()
 
   render: (type, params = {}) ->
     @$el.html(@options.tpl[type](params))
 
-  showPrompt: (model) ->
+  showPrompt: (type, data) ->
+    options = {}
+    msg =  @types[type] || {}
     if @prompt
-      @prompt.model = model
+      _.extend(@prompt.options, msg, data)
       @prompt.show()
     else
-      @prompt = new CMS.Views.Prompt({model: model})
+      options = {}
+      _.extend(options, msg, data)
+      @prompt = new CMS.Views.Prompt(options)
+      @prompt.show()
 
   showWarnMessage: ->
-    model =  @models.warn
-    @showPrompt(model)
+    @showPrompt('warn')
 
   showWaitMessage: ->
-    model = @models.wait
-    @showPrompt(model)
+    @showPrompt('wait')
 
   showSuccessMessage: ->
-    model = @models.success
-    @showPrompt(model)
+    @showPrompt('success')
 
-  showErrorMessage: (title, message)->
-    model = @models.error
-    model.set('title', title) if title
-    model.set('message', message) if message
-    @showPrompt(model)
+  showErrorMessage: (data)->
+    type = 'error'
+    options = data || {}
+    @showPrompt('error', options)
 
   showImportVariants: ->
     @render('variants')
