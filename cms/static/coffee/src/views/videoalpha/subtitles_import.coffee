@@ -1,6 +1,7 @@
 class CMS.Views.SubtitlesImport extends Backbone.View
   tagName: 'div'
   className: 'comp-subtitles-entry'
+  url: "/import_subtitles"
 
   events:
     "click #import-from-youtube": 'clickImportFromYoutube'
@@ -99,11 +100,22 @@ class CMS.Views.SubtitlesImport extends Backbone.View
       @importFromYoutube()
       event.preventDefault()
 
+  xhrSuccessHandler: (data) ->
+    if data.status is 'success'
+      @showSuccessMessage()
+    else
+      @showErrorMessage(data)
+
+  xhrErrorHandler: (data) ->
+    @showErrorMessage({
+      title: gettext("Import failed!")
+      message: gettext("Problems with connection.")
+    })
+
   importFromYoutube: ->
-    that = @
     @showWaitMessage()
     $.ajax(
-          url: "/import_subtitles"
+          url: @url
           type: "POST"
           dataType: "json"
           contentType: "application/json"
@@ -111,12 +123,5 @@ class CMS.Views.SubtitlesImport extends Backbone.View
               'id': @id
           )
       )
-      .success((data) ->
-        if data.status is 'success'
-          that.showSuccessMessage()
-        else
-          that.showErrorMessage(data)
-      )
-      .error((data) ->
-        that.showErrorMessage()
-      )
+      .success(@xhrSuccessHandler)
+      .error(@xhrErrorHandler)
