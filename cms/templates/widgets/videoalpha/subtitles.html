@@ -14,43 +14,6 @@
     </ul>
 </script>
 
-<script id="subtitles-message-warn-${component_location}-tpl" type="text/template">
-    <div class="message-warn">
-        <p>If subtitles for the video already exist, importing again will overwrite them.</p>
-        <p>Are you sure that you want to import the subtitle file
-        found on YouTube?</p>
-        <div class="row message-actions">
-            <a href="#" class="blue-button import-true-button">Yes</a>
-            <a href="#" class="blue-button import-cancel-button">No</a>
-        </div>
-    </div>
-</script>
-
-<script id="subtitles-message-success-${component_location}-tpl" type="text/template">
-    <div class="message-success">
-        <p>Subtitles were successfully imported.</p>
-        <div class="row message-actions">
-            <a href="#" class="blue-button import-ok-button">${_("Ok")}</a>
-        </div>
-    </div>
-</script>
-
-<script id="subtitles-message-error-${component_location}-tpl" type="text/template">
-    <div class="message-error">
-        <p>Import failed!</p>
-        <div class="row message-actions">
-            <a href="#" class="blue-button import-ok-button">${_("Ok")}</a>
-        </div>
-    </div>
-</script>
-
-<script id="subtitles-message-wait-${component_location}-tpl" type="text/template">
-    <div class="message-wait">
-        <p>Please wait for the subtitles to download</p>
-    </div>
-</script>
-
-
 <script type='text/javascript'>
     $(document).ready(function(){
         new CMS.Views.SubtitlesImport({
@@ -59,66 +22,5 @@
                 variants: _.template($('#subtitles-import-variants-${component_location}-tpl').text())
             }
         });
-
-    //  @models = {
-    //     success: new CMS.Models.ConfirmationMessage({
-    //         message: gettext("Subtitles were successfully imported."),
-    //         actions: {
-    //           primary: {
-    //             text: gettext("Ok"),
-    //             click: function(view, e){
-    //               view.hide();
-    //               e.preventDefault();
-    //             }
-    //           }
-    //         }
-    //     }),
-    //     warn: new CMS.Models.WarningMessage({
-    //         title: gettext("Are you sure that you want to import the subtitle file found on YouTube?"),
-    //         message: gettext("If subtitles for the video already exist, importing again will overwrite them."),
-    //         actions: {
-    //           primary: {
-    //             text: gettext("Yes"),
-    //             click: function(view, e){
-    //               view.hide();
-    //               e.preventDefault();
-    //             }
-    //           },
-    //           secondary: [{
-    //             text: gettext("No"),
-    //             click: function(view, e){
-    //               view.hide();
-    //               e.preventDefault();
-    //             }
-    //           }]
-    //         }
-    //     }),
-    //     wait: new CMS.Models.WarningMessage({
-    //         title: gettext("Please wait for the subtitles to download"),
-    //         message: [
-    //             '<div id=\"circlePreloader\">',
-    //             '<div id=\"circlePreloader_1\" class=\"circlePreloader\"></div>',
-    //             '<div id=\"circlePreloader_2\" class=\"circlePreloader\"></div>',
-    //             '<div id=\"circlePreloader_3\" class=\"circlePreloader\"></div>',
-    //             '</div>'
-    //         ].join('')
-    //     }),
-    //     error: new CMS.Models.ErrorMessage({
-    //         title: gettext("Import failed!"),
-    //         actions: {
-    //           primary: {
-    //             text: gettext("Ok"),
-    //             click: function(view, e){
-    //               view.hide();
-    //               e.preventDefault();
-    //             }
-    //           }
-    //         }
-    //     })
-    // };
-
-
-
     });
-
 </script>

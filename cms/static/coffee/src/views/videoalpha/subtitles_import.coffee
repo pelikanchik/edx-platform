@@ -58,7 +58,6 @@ class CMS.Views.SubtitlesImport extends Backbone.View
               view.hide()
               e.preventDefault()
           secondary: null
-
     @showImportVariants()
 
   render: (type, params = {}) ->
@@ -67,14 +66,12 @@ class CMS.Views.SubtitlesImport extends Backbone.View
   showPrompt: (type, data) ->
     options = {}
     msg =  @types[type] || {}
-    if @prompt
-      _.extend(@prompt.options, msg, data)
-      @prompt.show()
-    else
-      options = {}
-      _.extend(options, msg, data)
-      @prompt = new CMS.Views.Prompt(options)
-      @prompt.show()
+
+    options = if @prompt then @prompt.options  else {}
+    _.extend(options, msg, data)
+
+    @prompt = new CMS.Views.Prompt(options) if not @prompt
+    @prompt.show()
 
   showWarnMessage: ->
     @showPrompt('warn')
@@ -118,7 +115,7 @@ class CMS.Views.SubtitlesImport extends Backbone.View
         if data.status is 'success'
           that.showSuccessMessage()
         else
-          that.showErrorMessage()
+          that.showErrorMessage(data)
       )
       .error((data) ->
         that.showErrorMessage()
