@@ -37,14 +37,14 @@ class TestInstructorEnrollsStudent(ModuleStoreTestCase, LoginEnrollmentTestCase)
 
         for user in self.users:
             CourseEnrollmentFactory.create(user=user, course_id=self.course.id)
+            
+        # Empty the test outbox
+        mail.outbox = []
 
     def test_unenrollment_email_off(self):
         '''
         Do un-enrollment email off test
         '''
-
-        # Empty the test outbox
-        mail.outbox = []
 
         course = self.course
 
@@ -73,9 +73,6 @@ class TestInstructorEnrollsStudent(ModuleStoreTestCase, LoginEnrollmentTestCase)
         '''
         Do auto-enroll on, email off test
         '''
-
-        #Empty the test outbox
-        mail.outbox = []
 
         course = self.course
 
@@ -124,9 +121,6 @@ class TestInstructorEnrollsStudent(ModuleStoreTestCase, LoginEnrollmentTestCase)
         '''
         Do auto-enroll off, email off test
         '''
-
-        # Empty the test outbox
-        mail.outbox = []
 
         course = self.course
 
@@ -184,9 +178,6 @@ class TestInstructorEnrollsStudent(ModuleStoreTestCase, LoginEnrollmentTestCase)
         Do email on enroll test
         '''
 
-        # Empty the test outbox
-        mail.outbox = []
-
         course = self.course
 
         url = reverse('instructor_dashboard', kwargs={'course_id': course.id})
@@ -205,9 +196,6 @@ class TestInstructorEnrollsStudent(ModuleStoreTestCase, LoginEnrollmentTestCase)
         '''
         Do email on unenroll test
         '''
-
-        # Empty the test outbox
-        mail.outbox = []
 
         course = self.course
 
