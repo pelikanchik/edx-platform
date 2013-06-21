@@ -1,27 +1,24 @@
 class CMS.Views.SubtitlesImport extends Backbone.View
   tagName: 'div'
   className: 'comp-subtitles-entry'
-  url: "/import_subtitles"
+  urlYT: "/import_subtitles"
 
   events:
     "click #import-from-youtube": 'clickImportFromYoutube'
 
   initialize: ->
     _.bindAll(@)
-    @prompt = null
     @id = @$el.closest('.component').data('id')
-    @types =
+    @msg =
       success:
         intent: 'confirmation'
         title: gettext("Subtitles were successfully imported.")
-        message: null
         actions:
           primary:
             text: gettext("Ok")
             click: (view, e) ->
               view.hide()
               e.preventDefault()
-          secondary: null
       warn:
         intent: 'warning'
         title: gettext("Are you sure that you want to import the subtitle file found on YouTube?")
@@ -47,32 +44,29 @@ class CMS.Views.SubtitlesImport extends Backbone.View
             <div id="circle-preloader_3" class="circle-preloader"></div>
           </div>
         '''
-        actions: null
       error:
         intent: 'error'
         title: gettext("Import failed!")
-        message: null
         actions:
           primary:
             text: gettext("Ok")
             click: (view, e) ->
               view.hide()
               e.preventDefault()
-          secondary: null
     @showImportVariants()
 
   render: (type, params = {}) ->
-    @$el.html(@options.tpl[type](params))
+    tpl = @options.tpl[type];
+    if not tpl
+        console.error("Couldn't load #{tpl[type]} template")
+        return
+    @$el.html(tpl(params))
 
   showPrompt: (type, data) ->
-    options = {}
-    msg =  @types[type] || {}
-
-    options = if @prompt then @prompt.options  else {}
-    _.extend(options, msg, data)
-
-    @prompt = new CMS.Views.Prompt(options) if not @prompt
-    @prompt.show()
+    msg =  @msg[type] || {}
+    options = $.extend({}, CMS.Views.Prompt.prototype.options, msg)
+    prompt = new CMS.Views.Prompt(options)
+    prompt.show()
 
   showWarnMessage: ->
     @showPrompt('warn')
@@ -96,7 +90,6 @@ class CMS.Views.SubtitlesImport extends Backbone.View
     @showWarnMessage()
 
   importFromYoutubeHandler: (view, event)->
-      view.hide()
       @importFromYoutube()
       event.preventDefault()
 
@@ -115,10 +108,11 @@ class CMS.Views.SubtitlesImport extends Backbone.View
   importFromYoutube: ->
     @showWaitMessage()
     $.ajax(
-          url: @url
+          url: @urlYT
           type: "POST"
           dataType: "json"
           contentType: "application/json"
+          timeout: 1000*60
           data: JSON.stringify(
               'id': @id
           )
