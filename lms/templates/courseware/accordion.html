@@ -1,5 +1,7 @@
 <%! from django.core.urlresolvers import reverse %>
 <%! from xmodule.util.date_utils import get_default_time_display %>
+<%! import pprint %>
+<%! import json %>
 
 <%def name="make_chapter(chapter)">
   <div class="chapter">
@@ -9,19 +11,47 @@
         </a>
       </h3>
 
-    <ul>
-      % for section in chapter['sections']:
-          <li class="${'active' if 'active' in section and section['active'] else ''} ${'graded'  if 'graded' in section and section['graded'] else ''}">
-            <a href="${reverse('courseware_section', args=[course_id, chapter['url_name'], section['url_name']])}">
-              <p>${section['display_name']} ${'<span class="sr">, current section</span>' if 'active' in section and section['active'] else ''}</p>
-              <p class="subtitle">${section['format']} ${"due " + get_default_time_display(section['due'], show_timezone) if section.get('due') is not None else ''}</p>
-            </a>
-          </li>
+   <ul>
+     <% prev_score = 100 %>
+     % for section in chapter['sections']:
+           <%
+              score = json.loads(section['req_score'])['score']
+              if len(score) < 1:
+                score = 0
+              endif
+              score = int(score)
+              source_section_id = json.loads(section['req_score'])['source_section_id']
+      
+           %>   
+           
+            <!--<br>score: ${score}
+             <br>prev_score: ${prev_score}
+           -->
+   
+            % if prev_score >= score: 
+            
+          
+
+            <li class="${'active' if 'active' in section and section['active'] else ''} ${'graded'  if 'graded' in section and section['graded'] else ''}">
+              <a href="${reverse('courseware_section', args=[course_id, chapter['url_name'], section['url_name']])}">
+                <p>${section['display_name']} ${'<span class="sr">, current section</span>' if 'active' in section and section['active'] else ''}</p>
+                <p class="subtitle">${section['format']} ${"due " + get_default_time_display(section['due'], show_timezone) if section.get('due') is not None else ''}</p>
+              </a>
+              
+            </li>
+            % endif
+             <!-- ${source_section_id} -->
+          
+            <%
+             earned = section['section_total'].earned 
+             total = section['section_total'].possible
+             prev_score = int(earned/total*100)
+            %>
       % endfor
     </ul>
   </div>
 </%def>
 
-% for chapter in toc:
+% for chapter in courseware_summary:
     ${make_chapter(chapter)}
 % endfor

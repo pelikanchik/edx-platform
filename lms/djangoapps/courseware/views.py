@@ -88,6 +88,32 @@ def render_accordion(request, course, chapter, section, model_data_cache):
     Returns the html string
     """
 
+    staff_access = has_access(request.user, course, 'staff')
+
+    # NOTE: To make sure impersonation by instructor works, use
+    # student instead of request.user in the rest of the function.
+
+    # The pre-fetching of groups is done to make auth checks not require an
+    # additional DB lookup (this kills the Progress page in particular).
+    course_id = course.id
+    student_id = None
+    if student_id is None or student_id == request.user.id:
+        # always allowed to see your own profile
+        student = request.user
+    else:
+        # Requesting access to a different student's profile
+        if not staff_access:
+            raise Http404
+        student = User.objects.get(id=int(student_id))
+ 
+    student = User.objects.prefetch_related("groups").get(id=student.id)
+
+    model_data_cache = ModelDataCache.cache_for_descriptor_descendents(
+        course_id, student, course, depth=None)
+
+    courseware_summary = grades.progress_summary(student, request, course,
+                                                 model_data_cache)
+
     # grab the table of contents
     user = User.objects.prefetch_related("groups").get(id=request.user.id)
     request.user = user	# keep just one instance of User
@@ -96,7 +122,8 @@ def render_accordion(request, course, chapter, section, model_data_cache):
     context = dict([('toc', toc),
                     ('course_id', course.id),
                     ('csrf', csrf(request)['csrf_token']),
-                    ('show_timezone', course.show_timezone)] + template_imports.items())
+                    ('show_timezone', course.show_timezone),
+                    ('courseware_summary',courseware_summary),] + template_imports.items())
     return render_to_string('courseware/accordion.html', context)
 
 

@@ -32,7 +32,7 @@ from .discussionsettings import *
 
 ################################### FEATURES ###################################
 # The display name of the platform to be used in templates/emails/etc.
-PLATFORM_NAME = "edX"
+PLATFORM_NAME = "lutiX"
 
 COURSEWARE_ENABLED = True
 ENABLE_JASMINE = False
@@ -73,9 +73,9 @@ MITX_FEATURES = {
     'ENABLE_TEXTBOOK': True,
     'ENABLE_DISCUSSION_SERVICE': True,
 
-    'ENABLE_PSYCHOMETRICS': False,  # real-time psychometrics (eg item response theory analysis in instructor dashboard)
+    'ENABLE_PSYCHOMETRICS': True,  # real-time psychometrics (eg item response theory analysis in instructor dashboard)
 
-    'ENABLE_DJANGO_ADMIN_SITE': False,  # set true to enable django's admin site, even on prod (e.g. for course ops)
+    'ENABLE_DJANGO_ADMIN_SITE': True,  # set true to enable django's admin site, even on prod (e.g. for course ops)
     'ENABLE_SQL_TRACKING_LOGS': False,
     'ENABLE_LMS_MIGRATION': False,
     'ENABLE_MANUAL_GIT_RELOAD': False,
@@ -339,15 +339,15 @@ ROOT_URLCONF = 'lms.urls'
 IGNORABLE_404_ENDS = ('favicon.ico')
 
 # Email
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-DEFAULT_FROM_EMAIL = 'registration@edx.org'
-DEFAULT_FEEDBACK_EMAIL = 'feedback@edx.org'
-SERVER_EMAIL = 'devops@edx.org'
-TECH_SUPPORT_EMAIL = 'technical@edx.org'
-CONTACT_EMAIL = 'info@edx.org'
-BUGS_EMAIL = 'bugs@edx.org'
+EMAIL_BACKEND = 'django_ses.SESBackend'
+DEFAULT_FROM_EMAIL = 'registration@lutix.crabdance.com'
+DEFAULT_FEEDBACK_EMAIL = 'feedback@lutix.crabdance.com'
+SERVER_EMAIL = 'devops@lutix.crabdance.com'
+TECH_SUPPORT_EMAIL = 'technical@lutix.crabdance.com'
+CONTACT_EMAIL = 'info@lutix.crabdance.com'
+BUGS_EMAIL = 'bugs@lutix.crabdance.com'
 ADMINS = (
-    ('edX Admins', 'admin@edx.org'),
+    ('edX Admins', 'admin@lutix.crabdance.com'),
 )
 MANAGERS = ADMINS
 
@@ -719,7 +719,7 @@ INSTALLED_APPS = (
 
     # External auth (OpenID, shib)
     'external_auth',
-    'django_openid_auth',
+    # 'django_openid_auth',
 
     #For the wiki
     'wiki',  # The new django-wiki from benjaoming
