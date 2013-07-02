@@ -328,16 +328,13 @@ class AssignmentFormatGrader(CourseGrader):
                 summary_format = "{section_type} {index} - {name} - {percent:.0%} ({earned:.3n}/{possible:.3n})"
                 summary = summary_format.format(index=i + self.starting_index,
                                                 section_type=self.section_type,
-                                                name = section_name,
-                                             #   name = u'section_name',
+                                                name=section_name,
                                                 percent=percentage,
                                                 earned=float(earned),
-                                               #earned = 1.0,
                                                 possible=float(possible))
-                                               #possible = 1.0))
             else:
                 percentage = 0
-                summary = "{section_type} {index} Unreleased - 0% (?/?)".format(index=i + self.starting_index,
+                summary = "{section_type} {index} (не выполнено) - 0% (?/?)".format(index=i + self.starting_index,
                                                                                 section_type=self.section_type)
 
             short_label = "{short_label} {index:02d}".format(index=i + self.starting_index,
@@ -362,9 +359,9 @@ class AssignmentFormatGrader(CourseGrader):
             breakdown = [{'percent': total_percent, 'label': total_label,
                           'detail': total_detail, 'category': self.category, 'prominent': True}, ]
         else:
-            total_detail = "{section_type} Average = {percent:.0%}".format(percent=total_percent,
+            total_detail = "{section_type} (в среднем) = {percent:.0%}".format(percent=total_percent,
                                                                            section_type=self.section_type)
-            total_label = "{short_label} Avg".format(short_label=self.short_label)
+            total_label = "{short_label} (в среднем)".format(short_label=self.short_label)
 
             if self.show_only_average:
                 breakdown = []
