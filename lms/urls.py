@@ -37,7 +37,7 @@ urlpatterns = ('',  # nopep8
     url(r'^login_ajax$', 'student.views.login_user', name="login"),
     url(r'^login_ajax/(?P<error>[^/]*)$', 'student.views.login_user'),
     url(r'^logout$', 'student.views.logout_user', name='logout'),
-    url(r'^create_account$', 'student.views.create_account'),
+    url(r'^create_account$', 'student.views.create_account', name='create_account'),
     url(r'^activate/(?P<key>[^/]*)$', 'student.views.activate_account', name="activate"),
 
     url(r'^begin_exam_registration/(?P<course_id>[^/]+/[^/]+/[^/]+)$', 'student.views.begin_exam_registration', name="begin_exam_registration"),
@@ -428,6 +428,13 @@ urlpatterns += (
 if settings.MITX_FEATURES.get('ENABLE_DEBUG_RUN_PYTHON'):
     urlpatterns += (
         url(r'^debug/run_python', 'debug.views.run_python'),
+    )
+
+# Crowdsourced hinting instructor manager.
+if settings.MITX_FEATURES.get('ENABLE_HINTER_INSTRUCTOR_VIEW'):
+    urlpatterns += (
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/hint_manager$',
+            'instructor.hint_manager.hint_manager', name="hint_manager"),
     )
 
 urlpatterns = patterns(*urlpatterns)
