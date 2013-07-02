@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import abc
 import inspect
 import logging
@@ -181,7 +182,7 @@ class WeightedSubsectionsGrader(CourseGrader):
 
         for subgrader, category, weight in self.sections:
             subgrade_result = subgrader.grade(grade_sheet, generate_random_scores)
-
+           #subgrade_result = 20
             weighted_percent = subgrade_result['percent'] * weight
             section_detail = "{0} = {1:.1%} of a possible {2:.0%}".format(category, weighted_percent, weight)
 
@@ -330,6 +331,7 @@ class AssignmentFormatGrader(CourseGrader):
                                                 percent=percentage,
                                                 earned=float(earned),
                                                 possible=float(possible))
+                                               
             else:
                 percentage = 0
                 summary = "{section_type} {index} Unreleased - 0% (?/?)".format(index=i + self.starting_index,

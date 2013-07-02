@@ -103,6 +103,12 @@ class XModuleFields(object):
         scope=Scope.settings,
         default=None
     )
+    req_score = String(
+        display_name="Req Score",
+        help="Minimal score",
+        scope=Scope.settings,
+        default='{"source_section_id":"", "score":""}'
+    )
 
     # Please note that in order to be compatible with XBlocks more generally,
     # the LMS and CMS shouldn't be using this field. It's only for internal
@@ -166,6 +172,16 @@ class XModule(XModuleFields, HTMLSnippet, XBlock):
         if name is None:
             name = self.url_name.replace('_', ' ')
         return name
+
+    @property
+    def req_score_with_default(self):
+        '''
+        Return a req_score
+        '''
+        score = self.req_score
+        if score is None:
+           score = 0
+        return score
 
     def get_children(self):
         '''
@@ -404,6 +420,17 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
         if name is None:
             name = self.url_name.replace('_', ' ')
         return name
+
+    @property
+    def req_score_with_default(self):
+        '''
+        Return a req_score
+        '''
+        score = self.req_score
+        if score is None:
+            score = 0
+        return score
+
 
     def get_required_module_descriptors(self):
         """Returns a list of XModuleDescritpor instances upon which this module depends, but are
