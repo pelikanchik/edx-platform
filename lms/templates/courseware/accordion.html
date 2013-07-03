@@ -43,9 +43,15 @@
              <!-- ${source_section_id} -->
           
             <%
-             earned = section['section_total'].earned 
-             total = section['section_total'].possible
-             prev_score = int(earned/total*100)
+            earned = section['section_total'].earned 
+            total = section['section_total'].possible
+            
+            if total > 0.01:
+               prev_score = int(earned/total*100)
+            else:
+               prev_score = 0
+            endif
+            
             %>
       % endfor
     </ul>
