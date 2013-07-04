@@ -103,9 +103,9 @@ class XModuleFields(object):
         scope=Scope.settings,
         default=None
     )
-    req_score = String(
-        display_name="Req Score",
-        help="Minimal score",
+    unlock_term = String(
+        display_name="Unlock Term",
+        help="Term to unlock section",
         scope=Scope.settings,
         default='{"source_section_id":"", "score":""}'
     )
@@ -174,11 +174,11 @@ class XModule(XModuleFields, HTMLSnippet, XBlock):
         return name
 
     @property
-    def req_score_with_default(self):
+    def unlock_term_with_default(self):
         '''
-        Return a req_score
+        Return a unlock_term
         '''
-        score = self.req_score
+        score = self.unlock_term
         if score is None:
            score = 0
         return score
@@ -422,11 +422,11 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
         return name
 
     @property
-    def req_score_with_default(self):
+    def unlock_term_with_default(self):
         '''
-        Return a req_score
+        Return a unlock_term
         '''
-        score = self.req_score
+        score = self.unlock_term
         if score is None:
             score = 0
         return score
