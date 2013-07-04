@@ -116,7 +116,9 @@ def render_accordion(request, course, chapter, section, model_data_cache):
     courseware_summary = grades.progress_summary(student, request, course,
                                                  model_data_cache)
 
-
+    print("<-------------")
+    print(courseware_summary)
+    print("------------->")
 
     # grab the table of contents
     user = User.objects.prefetch_related("groups").get(id=request.user.id)
@@ -293,6 +295,7 @@ def index(request, course_id, chapter=None, section=None,
      - HTTPresponse
     """
     user = User.objects.prefetch_related("groups").get(id=request.user.id)
+
     request.user = user	# keep just one instance of User
     course = get_course_with_access(user, course_id, 'load', depth=2)
     staff_access = has_access(user, course, 'staff')
@@ -370,15 +373,14 @@ def index(request, course_id, chapter=None, section=None,
                 # they don't have access to.
                 raise Http404
 
+            model_data_cache_for_check = ModelDataCache.cache_for_descriptor_descendents(course_id, user, course, depth=None)
 
             courseware_summary = grades.progress_summary(user, request, course,
-                                                 model_data_cache)
+                                                 model_data_cache_for_check)
 
 
             is_section_unlocked = grades.return_section_by_id(section_module.url_name, courseware_summary)['unlocked']
-            print("<-------------")
-            print(is_section_unlocked)
-            print("------------->")
+
             # Save where we are in the chapter
             save_child_position(chapter_module, section)
 
