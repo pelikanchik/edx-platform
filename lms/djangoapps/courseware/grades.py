@@ -5,6 +5,7 @@ from __future__ import division
 import random
 import logging
 import json
+import simplejson
 
 from collections import defaultdict
 from django.conf import settings
@@ -44,34 +45,79 @@ def return_section_by_id(section_id,courseware):
     return None
 
 #  Проверка, является ли элемент с условием unlock_term открытым в курсе courseware
-def is_item_unlocked(unlock_term, courseware):
+def elementary_conjunction(term, courseware):
+    error_return = True
+    if len(term["source_section_id"]) == 0:
+        return error_return
+    if len(term["field"]) == 0:
+        return error_return
+    if len(term["sign"]) == 0:
+        return error_return
+    if len(term["value"]) == 0:
+        return error_return
 
-    term_score = json.loads(unlock_term)['score']
-    term_section_id = json.loads(unlock_term)['source_section_id']
-
-    if len(term_score) < 1:
-        return True
-
-    if len(term_section_id) < 1:
-        return True
-
-    term_score = int(term_score)
-
-    section = return_section_by_id(term_section_id, courseware)
+    section = return_section_by_id(term["source_section_id"], courseware)
 
     if not section:
-        return True
+        return error_return
+    value = 0
+    term["value"] = int(term["value"])
+
+    if term["field"]=="score_rel":
+        earned = section['section_total'].earned
+        possible = section['section_total'].possible
+
+        value = score_percent(earned,possible)
 
 
-    earned = section['section_total'].earned
-    possible = section['section_total'].possible
+    if term["field"]=="score_abs":
+        value = int(section['section_total'].earned)
 
-    if score_percent(earned,possible) < term_score:
-        return False
-    else:
-        return True
+    if term["sign"]== ">":
+        if value > term["value"]:
+            return True
+        else:
+            return False
+    if term["sign"]== ">=":
+        if value >= term["value"]:
+            return True
+        else:
+            return False
 
-    return True
+    if term["sign"]== "<":
+        if value < term["value"]:
+            return True
+        else:
+            return False
+
+    if term["sign"]== "<=":
+        if value <= term["value"]:
+            return True
+        else:
+            return False
+    if term["sign"]== "=":
+        if value == term["value"]:
+            return True
+        else:
+            return False
+
+    return error_return
+
+def is_item_unlocked(unlock_term, courseware):
+
+    term = json.loads(unlock_term)
+    print term
+
+
+    term_result = False
+    for disjunction in term["disjunctions"]:
+        conjunctions_result = True
+        for conjunction in disjunction["conjunctions"]:
+            conjunctions_result = conjunctions_result * elementary_conjunction(conjunction, courseware)
+
+        term_result = max(term_result, conjunctions_result)
+
+    return term_result
 
 #  Проставление локов в курсе courseware
 def set_locks(courseware):
