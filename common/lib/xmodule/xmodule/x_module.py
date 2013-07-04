@@ -107,7 +107,7 @@ class XModuleFields(object):
         display_name="Unlock Term",
         help="Term to unlock section",
         scope=Scope.settings,
-        default='{"source_section_id":"", "score":""}'
+        default='{"disjunctions": [{"conjunctions": [{"source_section_id": "", "field": "score_rel", "sign": ">", "value":""}]}]}'
     )
 
     # Please note that in order to be compatible with XBlocks more generally,
