@@ -1,8 +1,10 @@
+# -*- coding: utf-8 -*-
 # Compute grades using real division, with no integer truncation
 from __future__ import division
 
 import random
 import logging
+import json
 
 from collections import defaultdict
 from django.conf import settings
@@ -17,6 +19,71 @@ from xmodule.graders import Score
 from .models import StudentModule
 
 log = logging.getLogger("mitx.courseware")
+
+
+# Вычисляет процентное значение результата элемента
+def score_percent(earned, total):
+    if total > 0.0001:
+        score = int(earned/total*100)
+    else:
+        score = 0
+    return score
+
+
+#  вернуть раздел по идентификатору (url)
+def return_section_by_id(section_id,courseware):
+
+    for chapter in courseware:
+
+        for section in chapter['sections']:
+
+            if section['url_name'] == section_id:
+
+                return section
+
+    return None
+
+#  Проверка, является ли элемент с условием unlock_term открытым в курсе courseware
+def is_item_unlocked(unlock_term, courseware):
+
+    term_score = json.loads(unlock_term)['score']
+    term_section_id = json.loads(unlock_term)['source_section_id']
+
+    if len(term_score) < 1:
+        return True
+
+    if len(term_section_id) < 1:
+        return True
+
+    term_score = int(term_score)
+
+    section = return_section_by_id(term_section_id, courseware)
+
+    if not section:
+        return True
+
+
+    earned = section['section_total'].earned
+    possible = section['section_total'].possible
+
+    if score_percent(earned,possible) < term_score:
+        return False
+    else:
+        return True
+
+    return True
+
+#  Проставление локов в курсе courseware
+def set_locks(courseware):
+
+    for chapter in courseware:
+
+        for section in chapter['sections']:
+
+            if is_item_unlocked(section['unlock_term'], courseware) == False:
+                 section['unlocked'] = False
+
+    return courseware
 
 
 def yield_module_descendents(module):
@@ -257,6 +324,7 @@ def grade_for_percentage(grade_cutoffs, percentage):
 # TODO: This method is not very good. It was written in the old course style and
 # then converted over and performance is not good. Once the progress page is redesigned
 # to not have the progress summary this method should be deleted (so it won't be copied).
+
 def progress_summary(student, request, course, model_data_cache):
     """
     This pulls a summary of all problems in the course.
@@ -295,11 +363,11 @@ def progress_summary(student, request, course, model_data_cache):
 
         sections = []
         for section_module in chapter_module.get_display_items():
+
             # Skip if the section is hidden
             if section_module.lms.hide_from_toc:
                 continue
 
-            # Same for sections
             graded = section_module.lms.graded
             scores = []
 
@@ -309,10 +377,13 @@ def progress_summary(student, request, course, model_data_cache):
 
                 course_id = course.id
                 (correct, total) = get_score(course_id, student, module_descriptor, module_creator, model_data_cache)
+
                 if correct is None and total is None:
                     continue
 
                 scores.append(Score(correct, total, graded, module_descriptor.display_name_with_default))
+
+
 
             scores.reverse()
             section_total, _ = graders.aggregate_scores(
@@ -323,9 +394,10 @@ def progress_summary(student, request, course, model_data_cache):
                 'display_name': section_module.display_name_with_default,
                 'url_name': section_module.url_name,
                 'scores': scores,
-                'req_score': section_module.req_score,
-	        'section_total': section_total,
+                'unlock_term': section_module.unlock_term,
+	            'section_total': section_total,
                 'format': module_format,
+                'unlocked': True,
                 'due': section_module.lms.due,
                 'graded': graded,
             })
@@ -334,7 +406,7 @@ def progress_summary(student, request, course, model_data_cache):
                          'display_name': chapter_module.display_name_with_default,
                          'url_name': chapter_module.url_name,
                          'sections': sections})
-
+    chapters = set_locks(chapters)
     return chapters
 
 

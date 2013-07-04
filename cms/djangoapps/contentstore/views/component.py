@@ -86,7 +86,7 @@ def edit_subsection(request, location):
         (field.name, field.read_from(item))
         for field
         in item.fields
-        if field.name not in ['display_name', 'start', 'due', 'format', 'req_score'] and field.scope == Scope.settings
+        if field.name not in ['display_name', 'start', 'due', 'format', 'unlock_term'] and field.scope == Scope.settings
     )
 
     can_view_live = False
@@ -206,6 +206,8 @@ def edit_unit(request, location):
         index=index)
 
     unit_state = compute_unit_state(item)
+
+    print (item)
 
     return render_to_response('unit.html', {
         'context_course': course,

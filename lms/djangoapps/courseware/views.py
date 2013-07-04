@@ -1,5 +1,7 @@
+# -*- coding: utf-8 -*-
 import logging
 import urllib
+import json
 
 from functools import partial
 
@@ -113,6 +115,8 @@ def render_accordion(request, course, chapter, section, model_data_cache):
 
     courseware_summary = grades.progress_summary(student, request, course,
                                                  model_data_cache)
+
+
 
     # grab the table of contents
     user = User.objects.prefetch_related("groups").get(id=request.user.id)
@@ -341,6 +345,7 @@ def index(request, course_id, chapter=None, section=None,
 
         if section is not None:
             section_descriptor = chapter_descriptor.get_child_by(lambda m: m.url_name == section)
+
             if section_descriptor is None:
                 # Specifically asked-for section doesn't exist
                 if masq=='student':  # if staff is masquerading as student be kinder, don't 404
@@ -365,6 +370,15 @@ def index(request, course_id, chapter=None, section=None,
                 # they don't have access to.
                 raise Http404
 
+
+            courseware_summary = grades.progress_summary(user, request, course,
+                                                 model_data_cache)
+
+
+            is_section_unlocked = grades.return_section_by_id(section_module.url_name, courseware_summary)['unlocked']
+            print("<-------------")
+            print(is_section_unlocked)
+            print("------------->")
             # Save where we are in the chapter
             save_child_position(chapter_module, section)
 
@@ -382,10 +396,14 @@ def index(request, course_id, chapter=None, section=None,
                 # add in the appropriate timer information to the rendering context:
                 context.update(check_for_active_timelimit_module(request, course_id, course))
 
-            context['content'] = section_module.get_html()
+            if not is_section_unlocked:
+                context['content'] = u'Раздел вам пока не доступен'
+            else:
+                context['content'] = section_module.get_html()
         else:
             # section is none, so display a message
             prev_section = get_current_child(chapter_module)
+
             if prev_section is None:
                 # Something went wrong -- perhaps this chapter has no sections visible to the user
                 raise Http404
