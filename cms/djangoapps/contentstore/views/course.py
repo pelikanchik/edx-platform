@@ -153,7 +153,7 @@ def course_info(request, org, course, name, provided_id=None):
     course_module = modulestore().get_item(location)
 
     # get current updates
-    location = ['i4x', org, course, 'course_info', "updates"]
+    location = Location(['i4x', org, course, 'course_info', "updates"])
 
     return render_to_response('course_info.html', {
         'active_tab': 'courseinfo-tab',
@@ -228,7 +228,8 @@ def get_course_settings(request, org, course, name):
                                        "course": course,
                                        "name": name,
                                        "section": "details"}),
-        'about_page_editable': not settings.MITX_FEATURES.get('ENABLE_MKTG_SITE', False)
+        #'about_page_editable': not settings.MITX_FEATURES.get('ENABLE_MKTG_SITE', False)
+        'about_page_editable': False       
     })
 
 

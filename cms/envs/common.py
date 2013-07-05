@@ -54,7 +54,11 @@ MITX_FEATURES = {
     'ENABLE_SERVICE_STATUS': False,
 
     # Don't autoplay videos for course authors
-    'AUTOPLAY_VIDEOS': False
+    'AUTOPLAY_VIDEOS': False,
+
+    # If set to True, new Studio users won't be able to author courses unless
+    # edX has explicitly added them to the course creator group.
+    'ENABLE_CREATOR_GROUP': False
 }
 ENABLE_JASMINE = False
 
@@ -170,12 +174,12 @@ ROOT_URLCONF = 'cms.urls'
 IGNORABLE_404_ENDS = ('favicon.ico')
 
 # Email
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-DEFAULT_FROM_EMAIL = 'registration@edx.org'
-DEFAULT_FEEDBACK_EMAIL = 'feedback@edx.org'
-SERVER_EMAIL = 'devops@edx.org'
+EMAIL_BACKEND = 'django_ses.SESBackend'
+DEFAULT_FROM_EMAIL = 'registration@lutix.crabdance.com'
+DEFAULT_FEEDBACK_EMAIL = 'feedback@lutix.crabdance.com'
+SERVER_EMAIL = 'devops@lutix.crabdance.com'
 ADMINS = (
-    ('edX Admins', 'admin@edx.org'),
+    ('lutiX Admins', 'admin@lutix.crabdance.com'),
 )
 MANAGERS = ADMINS
 

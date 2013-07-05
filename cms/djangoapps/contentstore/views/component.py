@@ -38,7 +38,8 @@ __all__ = ['OPEN_ENDED_COMPONENT_TYPES',
 
 log = logging.getLogger(__name__)
 
-COMPONENT_TYPES = ['customtag', 'discussion', 'html', 'problem', 'video']
+# NOTE: edit_unit assumes this list is disjoint from ADVANCED_COMPONENT_TYPES
+COMPONENT_TYPES = ['discussion', 'html', 'problem', 'video']
 
 OPEN_ENDED_COMPONENT_TYPES = ["combinedopenended", "peergrading"]
 NOTE_COMPONENT_TYPES = ['notes']
@@ -85,7 +86,7 @@ def edit_subsection(request, location):
         (field.name, field.read_from(item))
         for field
         in item.fields
-        if field.name not in ['display_name', 'start', 'due', 'format'] and field.scope == Scope.settings
+        if field.name not in ['display_name', 'start', 'due', 'format', 'unlock_term'] and field.scope == Scope.settings
     )
 
     can_view_live = False
@@ -206,6 +207,8 @@ def edit_unit(request, location):
 
     unit_state = compute_unit_state(item)
 
+    print (item)
+
     return render_to_response('unit.html', {
         'context_course': course,
         'active_tab': 'courseware',
@@ -220,7 +223,7 @@ def edit_unit(request, location):
         'section': containing_section,
         'create_new_unit_template': Location('i4x', 'edx', 'templates', 'vertical', 'Empty'),
         'unit_state': unit_state,
-        'published_date': item.cms.published_date.strftime('%B %d, %Y') if item.cms.published_date is not None else None,
+        'published_date': get_default_time_display(item.cms.published_date) if item.cms.published_date is not None else None
     })
 
 
