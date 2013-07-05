@@ -72,5 +72,3 @@ class @Hinter
       JavascriptLoader.executeModuleScripts @el, () =>
         @bind()
       @$('#previous-answer-0').css('display', 'inline')
-    else
-      @el.hide()

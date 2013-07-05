@@ -211,11 +211,11 @@
 
           % if course.id in show_courseware_links_for:
             <a href="${course_target}" class="cover">
-              <img src="${course_image_url(course)}" alt="${course.number} ${course.display_name_with_default} Cover Image" />
+              <img src="${course_image_url(course)}" />
             </a>
           % else:
             <div class="cover">
-              <img src="${course_image_url(course)}" alt="${course.number} ${course.display_name_with_default} Cover Image" />
+              <img src="${course_image_url(course)}" />
             </div>
           % endif
 

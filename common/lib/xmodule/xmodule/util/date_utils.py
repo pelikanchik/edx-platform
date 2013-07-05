@@ -1,7 +1,3 @@
-"""
-Convenience methods for working with datetime objects
-"""
-
 import datetime
 def get_default_time_display(dt, show_timezone=True):
     """

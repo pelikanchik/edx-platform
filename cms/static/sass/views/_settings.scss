@@ -316,12 +316,6 @@ body.course.settings {
 
           .link-courseURL {
             @extend .t-copy-lead1;
-            @include box-sizing(border-box);
-            display: block;
-            width: 100%;
-            overflow: hidden;
-            white-space: nowrap;
-            text-overflow: ellipsis;
 
             &:hover {
 

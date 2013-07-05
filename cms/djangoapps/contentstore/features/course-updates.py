@@ -60,7 +60,8 @@ def change_date(_step, new_date):
 @step(u'I should see the date "([^"]*)"$')
 def check_date(_step, date):
     date_css = 'span.date-display'
-    assert date == world.css_html(date_css)
+    date_html = world.css_find(date_css)
+    assert date == date_html.html
 
 
 @step(u'I modify the handout to "([^"]*)"$')
@@ -73,7 +74,8 @@ def edit_handouts(_step, text):
 @step(u'I see the handout "([^"]*)"$')
 def check_handout(_step, handout):
     handout_css = 'div.handouts-content'
-    assert handout in world.css_html(handout_css)
+    handouts = world.css_find(handout_css)
+    assert handout in handouts.html
 
 
 def change_text(text):

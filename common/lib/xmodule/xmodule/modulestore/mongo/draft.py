@@ -1,11 +1,3 @@
-"""
-A ModuleStore that knows about a special version 'draft'. Modules
-marked as 'draft' are read in preference to modules without the 'draft'
-version by this ModuleStore (so, access to i4x://org/course/cat/name
-returns the i4x://org/course/cat/name@draft object if that exists,
-and otherwise returns i4x://org/course/cat/name).
-"""
-
 from datetime import datetime
 
 from xmodule.modulestore import Location, namedtuple_to_son
@@ -225,6 +217,7 @@ class DraftModuleStore(MongoModuleStore):
 
     def _query_children_for_cache_children(self, items):
         # first get non-draft in a round-trip
+        queried_children = []
         to_process_non_drafts = super(DraftModuleStore, self)._query_children_for_cache_children(items)
 
         to_process_dict = {}
@@ -250,6 +243,7 @@ class DraftModuleStore(MongoModuleStore):
                 to_process_dict[draft_as_non_draft_loc] = draft
 
         # convert the dict - which is used for look ups - back into a list
-        queried_children = to_process_dict.values()
+        for key, value in to_process_dict.iteritems():
+            queried_children.append(value)
 
         return queried_children

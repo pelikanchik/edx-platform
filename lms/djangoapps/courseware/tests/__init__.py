@@ -32,11 +32,13 @@ class BaseTestXmodule(ModuleStoreTestCase):
         1. TEMPLATE_NAME
         2. DATA
         3. MODEL_DATA
+        4. COURSE_DATA and USER_COUNT if needed
 
     This class should not contain any tests, because TEMPLATE_NAME
     should be defined in child class.
     """
     USER_COUNT = 2
+    COURSE_DATA = {}
 
     # Data from YAML common/lib/xmodule/xmodule/templates/NAME/default.yaml
     TEMPLATE_NAME = ""
@@ -45,7 +47,7 @@ class BaseTestXmodule(ModuleStoreTestCase):
 
     def setUp(self):
 
-        self.course = CourseFactory.create()
+        self.course = CourseFactory.create(data=self.COURSE_DATA)
 
         # Turn off cache.
         modulestore().request_cache = None

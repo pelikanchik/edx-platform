@@ -1,7 +1,3 @@
-"""
-Provide names as exported by older mongo.py module
-"""
-
 from xmodule.modulestore.mongo.base import MongoModuleStore, MongoKeyValueStore, MongoUsage
 
 # Backwards compatibility for prod systems that refererence
