@@ -104,7 +104,7 @@ function goto( mode)
   <section class="instructor-dashboard-content">
     <h1>Instructor Dashboard</h1>
 
-    <h2>[ <a href="#" onclick="goto('Grades');" class="${modeflag.get('Grades')}">Grades</a> |
+    <h2 class="navbar">[ <a href="#" onclick="goto('Grades');" class="${modeflag.get('Grades')}">Grades</a> |
           %if settings.MITX_FEATURES.get('ENABLE_PSYCHOMETRICS'):
             <a href="#" onclick="goto('Psychometrics');" class="${modeflag.get('Psychometrics')}">Psychometrics</a> |
           %endif
@@ -597,7 +597,7 @@ function goto( mode)
 
 %endif
 
-##----------------------------------------------------------------------------- 
+##-----------------------------------------------------------------------------
 
 %if datatable and modeflag.get('Psychometrics') is None:
 
@@ -609,7 +609,7 @@ function goto( mode)
       <table class="stat_table">
         <tr>
 	%for hname in datatable['header']:
-	  <th>${hname | h}</th>
+	  <th>${hname.decode("utf-8") | h}</th>
 	%endfor
 	</tr>
         %for row in datatable['data']:
