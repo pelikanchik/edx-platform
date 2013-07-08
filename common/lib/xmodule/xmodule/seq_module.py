@@ -8,7 +8,7 @@ from xmodule.xml_module import XmlDescriptor
 from xmodule.x_module import XModule
 from xmodule.progress import Progress
 from xmodule.exceptions import NotFoundError
-from xblock.core import Integer, Scope
+from xblock.core import Integer, Scope, String
 from pkg_resources import resource_string
 
 log = logging.getLogger(__name__)
@@ -20,7 +20,12 @@ class_priority = ['video', 'problem']
 
 class SequenceFields(object):
     has_children = True
-
+    unlock_term = String(
+        display_name="Unlock Term",
+        help="Term to unlock section",
+        scope=Scope.settings,
+        default='{"disjunctions": [{"conjunctions": [{"source_section_id": "", "field": "score_rel", "sign": ">", "value":""}]}]}'
+    )
     # NOTE: Position is 1-indexed.  This is silly, but there are now student
     # positions saved on prod, so it's not easy to fix.
     position = Integer(help="Last tab viewed in this sequence", scope=Scope.user_state)
@@ -116,6 +121,16 @@ class SequenceModule(SequenceFields, XModule):
                 new_class = c
         return new_class
 
+    @property
+    def unlock_term_with_default(self):
+        '''
+        Return a unlock_term
+        '''
+        score = self.unlock_term
+        if score is None:
+           score = 0
+        return score
+
 
 class SequenceDescriptor(SequenceFields, MakoModuleDescriptor, XmlDescriptor):
     mako_template = 'widgets/sequence-edit.html'
@@ -143,3 +158,13 @@ class SequenceDescriptor(SequenceFields, MakoModuleDescriptor, XmlDescriptor):
             xml_object.append(
                 etree.fromstring(child.export_to_xml(resource_fs)))
         return xml_object
+
+    @property
+    def unlock_term_with_default(self):
+        '''
+        Return a unlock_term
+        '''
+        score = self.unlock_term
+        if score is None:
+           score = 0
+        return score
