@@ -141,7 +141,6 @@ def yield_module_descendents(module):
         stack.extend(next_module.get_display_items())
         yield next_module
 
-
 def yield_dynamic_descriptor_descendents(descriptor, module_creator):
     """
     This returns all of the descendants of a descriptor. If the descriptor
