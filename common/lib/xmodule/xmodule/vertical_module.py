@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from xmodule.x_module import XModule
 from xmodule.seq_module import SequenceDescriptor
 from xmodule.progress import Progress
@@ -11,11 +12,11 @@ class_priority = ['video', 'problem']
 
 class VerticalFields(object):
     has_children = True
-    unlock_term = String(
-        display_name="Unlock Term",
-        help="Term to unlock section",
+    direct_term = String(
+        display_name="Условие для перенаправления",
+        help="Условие для перенаправления в другой юнит",
         scope=Scope.settings,
-        default='{"disjunctions": [{"conjunctions": [{"source_section_id": "", "field": "score_rel", "sign": ">", "value":""}]}]}'
+        default='empty'
     )
 
 class VerticalModule(VerticalFields, XModule):
@@ -51,11 +52,11 @@ class VerticalModule(VerticalFields, XModule):
                 new_class = c
         return new_class
     @property
-    def unlock_term_with_default(self):
+    def direct_term_with_default(self):
         '''
-        Return a unlock_term
+        Return a direct_term
         '''
-        score = self.unlock_term
+        score = self.direct_term
         if score is None:
            score = 0
         return score
@@ -68,11 +69,11 @@ class VerticalDescriptor(VerticalFields, SequenceDescriptor):
     js_module_name = "VerticalDescriptor"
 
     @property
-    def unlock_term_with_default(self):
+    def direct_term_with_default(self):
         '''
-        Return a unlock_term
+        Return a direct_term
         '''
-        score = self.unlock_term
+        score = self.direct_term
         if score is None:
            score = 0
         return score

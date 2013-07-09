@@ -228,7 +228,7 @@ class CMS.Views.UnitEdit.NameEdit extends Backbone.View
     # Treat the metadata dictionary as immutable
     metadata = $.extend({}, @model.get('metadata'))
     metadata.display_name = $('.unit-display-name-input').val()
-    metadata.unlock_term = $('.unit-unlock-term-input').val()
+    metadata.direct_term = $('.unit-direct-term-input').val()
     @model.save(metadata: metadata)
     # Update name shown in the right-hand side location summary.
     $('.unit-location .editing .unit-name').html(metadata.display_name)
@@ -241,7 +241,7 @@ class CMS.Views.UnitEdit.NameEdit extends Backbone.View
 
 class CMS.Views.UnitEdit.TermEdit extends Backbone.View
   events:
-    'change .unit-unlock-term-input': 'saveTerm'
+    'change .unit-direct-term-input': 'saveTerm'
 
   initialize: =>
     @model.on('change:metadata', @render)
@@ -251,27 +251,27 @@ class CMS.Views.UnitEdit.TermEdit extends Backbone.View
     @$spinner = $('<span class="spinner-in-field-icon"></span>');
 
   render: =>
-    @$('.unit-unlock-term-input').val(@model.get('metadata').unlock_term)
+    @$('.unit-direct-term-input').val(@model.get('metadata').direct_term)
 
   setEnabled: =>
     disabled = @model.get('state') == 'public'
     if disabled
-      @$('.unit-unlock-term-input').attr('disabled', true)
+      @$('.unit-direct-term-input').attr('disabled', true)
     else
-      @$('.unit-unlock-term-input').removeAttr('disabled')
+      @$('.unit-direct-term-input').removeAttr('disabled')
 
   saveTerm: =>
     # Saving a term
     metadata = $.extend({}, @model.get('metadata'))
     metadata.display_name = $('.unit-display-name-input').val()
-    metadata.unlock_term = $('.unit-unlock-term-input').val()
+    metadata.direct_term = $('.unit-direct-term-input').val()
     @model.save(metadata: metadata)
     # Update term
-    $('.unit-location .editing .unit-term').html(metadata.unlock_term)
+    $('.unit-location .editing .unit-term').html(metadata.direct_term)
     analytics.track "Edited Unit Term",
       course: course_location_analytics
       unit_id: unit_location_analytics
-      unlock_term: metadata.unlock_term
+      direct_term: metadata.direct_term
 
 
 class CMS.Views.UnitEdit.LocationState extends Backbone.View

@@ -78,7 +78,7 @@ def clone_item(request):
     template = Location(request.POST['template'])
 
     display_name = request.POST.get('display_name')
-    unlock_term = request.POST.get('unlock_term')
+    direct_term = request.POST.get('direct_term')
 
     if not has_access(request.user, parent_location):
         raise PermissionDenied()
@@ -92,8 +92,8 @@ def clone_item(request):
     if display_name is not None:
         new_item.display_name = display_name
 
-    if unlock_term is not None:
-        new_item.unlock_term = unlock_term
+    if direct_term is not None:
+        new_item.direct_term = direct_term
 
     get_modulestore(template).update_metadata(new_item.location.url(), own_metadata(new_item))
 
