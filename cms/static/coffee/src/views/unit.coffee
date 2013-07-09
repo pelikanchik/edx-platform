@@ -227,7 +227,8 @@ class CMS.Views.UnitEdit.NameEdit extends Backbone.View
   saveName: =>
     # Treat the metadata dictionary as immutable
     metadata = $.extend({}, @model.get('metadata'))
-    metadata.display_name = @$('.unit-display-name-input').val()
+    metadata.display_name = $('.unit-display-name-input').val()
+    metadata.unlock_term = $('.unit-unlock-term-input').val()
     @model.save(metadata: metadata)
     # Update name shown in the right-hand side location summary.
     $('.unit-location .editing .unit-name').html(metadata.display_name)
@@ -262,7 +263,8 @@ class CMS.Views.UnitEdit.TermEdit extends Backbone.View
   saveTerm: =>
     # Treat the metadata dictionary as immutable
     metadata = $.extend({}, @model.get('metadata'))
-    metadata.unlock_term = @$('.unit-unlock-term-input').val()
+    metadata.display_name = $('.unit-display-name-input').val()
+    metadata.unlock_term = $('.unit-unlock-term-input').val()
     @model.save(metadata: metadata)
     # Update name shown in the right-hand side location summary.
     $('.unit-location .editing .unit-term').html(metadata.unlock_term)
