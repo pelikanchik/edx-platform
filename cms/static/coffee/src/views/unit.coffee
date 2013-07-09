@@ -261,12 +261,12 @@ class CMS.Views.UnitEdit.TermEdit extends Backbone.View
       @$('.unit-unlock-term-input').removeAttr('disabled')
 
   saveTerm: =>
-    # Treat the metadata dictionary as immutable
+    # Saving a term
     metadata = $.extend({}, @model.get('metadata'))
     metadata.display_name = $('.unit-display-name-input').val()
     metadata.unlock_term = $('.unit-unlock-term-input').val()
     @model.save(metadata: metadata)
-    # Update name shown in the right-hand side location summary.
+    # Update term
     $('.unit-location .editing .unit-term').html(metadata.unlock_term)
     analytics.track "Edited Unit Term",
       course: course_location_analytics
