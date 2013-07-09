@@ -103,12 +103,6 @@ class XModuleFields(object):
         scope=Scope.settings,
         default=None
     )
-    unlock_term = String(
-        display_name="Unlock Term",
-        help="Term to unlock section",
-        scope=Scope.settings,
-        default='{"disjunctions": [{"conjunctions": [{"source_section_id": "", "field": "score_rel", "sign": ">", "value":""}]}]}'
-    )
 
     # Please note that in order to be compatible with XBlocks more generally,
     # the LMS and CMS shouldn't be using this field. It's only for internal
@@ -172,16 +166,6 @@ class XModule(XModuleFields, HTMLSnippet, XBlock):
         if name is None:
             name = self.url_name.replace('_', ' ')
         return name
-
-    @property
-    def unlock_term_with_default(self):
-        '''
-        Return a unlock_term
-        '''
-        score = self.unlock_term
-        if score is None:
-           score = 0
-        return score
 
     def get_children(self):
         '''
@@ -421,15 +405,6 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
             name = self.url_name.replace('_', ' ')
         return name
 
-    @property
-    def unlock_term_with_default(self):
-        '''
-        Return a unlock_term
-        '''
-        score = self.unlock_term
-        if score is None:
-            score = 0
-        return score
 
 
     def get_required_module_descriptors(self):

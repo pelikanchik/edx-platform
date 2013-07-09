@@ -18,11 +18,11 @@
     <div class="main-column">
       <article class="subsection-body window" data-id="${subsection.location}">
         <div class="subsection-name-input">
-          <label>Display Name:</label>
+          <label>Название раздела:</label>
           <input type="text" value="${subsection.display_name_with_default | h}" class="subsection-display-name-input" data-metadata-name="display_name"/>
         </div>
         <div class="subsection-name-input">
-          <label>Requested score to get access:</label>
+          <label>Условие для разблокировки раздела</label>
           <input type="text" value="${subsection.unlock_term_with_default | h}" class="subsection-display-name-input" data-metadata-name="unlock_term"/>
         </div>
         <div class="sortable-unit-list">

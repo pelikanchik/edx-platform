@@ -2,6 +2,7 @@ from xmodule.x_module import XModule
 from xmodule.seq_module import SequenceDescriptor
 from xmodule.progress import Progress
 from pkg_resources import resource_string
+from xblock.core import Integer, Scope, String
 
 # HACK: This shouldn't be hard-coded to two types
 # OBSOLETE: This obsoletes 'type'
@@ -10,7 +11,12 @@ class_priority = ['video', 'problem']
 
 class VerticalFields(object):
     has_children = True
-
+    unlock_term = String(
+        display_name="Unlock Term",
+        help="Term to unlock section",
+        scope=Scope.settings,
+        default='{"disjunctions": [{"conjunctions": [{"source_section_id": "", "field": "score_rel", "sign": ">", "value":""}]}]}'
+    )
 
 class VerticalModule(VerticalFields, XModule):
     ''' Layout module for laying out submodules vertically.'''
@@ -44,6 +50,15 @@ class VerticalModule(VerticalFields, XModule):
             if c in child_classes:
                 new_class = c
         return new_class
+    @property
+    def unlock_term_with_default(self):
+        '''
+        Return a unlock_term
+        '''
+        score = self.unlock_term
+        if score is None:
+           score = 0
+        return score
 
 
 class VerticalDescriptor(VerticalFields, SequenceDescriptor):
@@ -51,6 +66,16 @@ class VerticalDescriptor(VerticalFields, SequenceDescriptor):
 
     js = {'coffee': [resource_string(__name__, 'js/src/vertical/edit.coffee')]}
     js_module_name = "VerticalDescriptor"
+
+    @property
+    def unlock_term_with_default(self):
+        '''
+        Return a unlock_term
+        '''
+        score = self.unlock_term
+        if score is None:
+           score = 0
+        return score
 
     # TODO (victor): Does this need its own definition_to_xml method?  Otherwise it looks
     # like verticals will get exported as sequentials...

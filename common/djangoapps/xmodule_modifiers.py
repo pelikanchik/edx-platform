@@ -35,7 +35,6 @@ def wrap_xmodule(get_html, module, template, context=None):
             'content': get_html(),
             'display_name': module.display_name,
             'class_': module.__class__.__name__,
-            'unlock_term': module.unlock_term,
             'module_name': module.js_module_name
         })
 
