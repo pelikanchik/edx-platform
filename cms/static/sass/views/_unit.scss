@@ -44,6 +44,20 @@ body.course.unit {
       }
     }
 
+
+    .unit-term-input {
+      padding: $baseline 2*$baseline;
+
+      label {
+        display: block;
+      }
+
+      input {
+        width: 100%;
+        font-size: 20px;
+      }
+    }
+
     .breadcrumbs {
       border-radius: 3px 3px 0 0;
       border-bottom: 1px solid #cbd1db;

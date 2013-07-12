@@ -24,7 +24,7 @@ class SequenceFields(object):
         display_name="Unlock Term",
         help="Term to unlock section",
         scope=Scope.settings,
-        default='{"disjunctions": [{"conjunctions": [{"source_section_id": "", "field": "score_rel", "sign": ">", "value":""}]}]}'
+        default='{"disjunctions":[]}'
     )
     # NOTE: Position is 1-indexed.  This is silly, but there are now student
     # positions saved on prod, so it's not easy to fix.
@@ -126,10 +126,10 @@ class SequenceModule(SequenceFields, XModule):
         '''
         Return a unlock_term
         '''
-        score = self.unlock_term
-        if score is None:
-           score = 0
-        return score
+        unlock_term = self.unlock_term
+        if unlock_term is None:
+           unlock_term = 0
+        return unlock_term
 
 
 class SequenceDescriptor(SequenceFields, MakoModuleDescriptor, XmlDescriptor):
@@ -164,7 +164,8 @@ class SequenceDescriptor(SequenceFields, MakoModuleDescriptor, XmlDescriptor):
         '''
         Return a unlock_term
         '''
-        score = self.unlock_term
-        if score is None:
-           score = 0
-        return score
+        unlock_term = self.unlock_term
+        if unlock_term is None:
+           unlock_term = 0
+        return unlock_term
+

@@ -46,8 +46,8 @@
       </div>
       <div class="main-column">
         <article class="unit-body window">
-          <p class="unit-name-input"><label>Display Name:</label><input type="text" value="${unit.display_name_with_default | h}" class="unit-display-name-input" /></p>
-          <p class="unit-term-input"><label>Unlock term:</label><input type="text" value="${unit.unlock_term_with_default | h}" class="unit-unlock-term-input" /></p>
+          <p class="unit-name-input"><label>Название юнита:</label><input type="text" value="${unit.display_name_with_default | h}" class="unit-display-name-input" /></p>
+          <p class="unit-term-input"><label>Условие для перенаправления:</label><input type="text" value="${unit.direct_term_with_default | h}" class="unit-direct-term-input" /></p>
             <ol class="components">
             % for id in components:
             <li class="component" data-id="${id}"/>
