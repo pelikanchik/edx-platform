@@ -211,6 +211,38 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
         return groupString;
       });
 
+
+      //intro for MSUP
+      xml = xml.replace(/(^\s*[I]:.*)+/gm, function(match, p) {
+        return "";
+      });
+      xml = xml.replace(/(^\s*[S]:.*)+/gm, function(match, p) {
+        var value = match.split(/^\s*[S]:\s*/)[1];
+        return value;
+      });
+
+
+      // group check answers for MSUP
+      xml = xml.replace(/(^\s*[+-]:.*?$\n*)+/gm, function(match, p) {
+        var groupString = '<choiceresponse>\n';
+        groupString += '  <checkboxgroup direction="vertical">\n';
+        var options = match.split('\n');
+        for(var i = 0; i < options.length; i++) {
+          if(options[i].length > 0) {
+            var value = options[i].split(/^\s*[+-]:\s*/)[1];
+            var correct = /^\s*\+:/i.test(options[i]);
+            groupString += '    <choice correct="' + correct + '">' + value + '</choice>\n';
+          }
+        }
+        groupString += '  </checkboxgroup>\n';
+        groupString += '</choiceresponse>\n\n';
+        return groupString;
+      });
+
+
+
+
+
       // group check answers
       xml = xml.replace(/(^\s*\[.?\].*?$\n*)+/gm, function(match, p) {
         var groupString = '<choiceresponse>\n';
