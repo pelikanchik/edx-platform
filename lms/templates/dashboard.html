@@ -8,7 +8,7 @@
 
 <%namespace name='static' file='static_content.html'/>
 
-<%block name="title"><title>Dashboard</title></%block>
+<%block name="title"><title>Мой кабинет</title></%block>
 
 <%block name="js_extra">
   <script type="text/javascript">
@@ -67,7 +67,7 @@
           $("#unenroll_course_id").val() + "&enrollment_action=unenroll";
       } else {
         $('#unenroll_error').html(
-          xhr.responseText ? xhr.responseText : "An error occurred. Please try again later."
+          xhr.responseText ? xhr.responseText : "Ошибка! Попробуйте ещё раз немного позже."
         ).stop().css("display", "block");
       }
     });
@@ -88,10 +88,8 @@
                {"new_email" : new_email, "password" : new_password},
                function(data) {
                  if (data.success) {
-                   $("#change_email_title").html("Please verify your new email");
-                   $("#change_email_form").html("<p>You'll receive a confirmation in your " +
-                                                "in-box. Please click the link in the " +
-                                                "email to confirm the email change.</p>");
+                   $("#change_email_title").html("Пожалуйста, подтвердите ваш e-mail");
+                   $("#change_email_form").html("<p>Вы получите письмо на ваш e-mail. Перейдите по указанной в письме ссылке</p>");
                  } else {
                    $("#change_email_error").html(data.error).stop().css("display", "block");
                  }
@@ -135,19 +133,19 @@
     <section class="user-info">
       <ul>
         <li>
-          <span class="title"><div class="icon name-icon"></div>Full Name (<a href="#apply_name_change" rel="leanModal" class="edit-name">edit</a>)</span> <span class="data">${ user.profile.name | h }</span>
+          <span class="title"><div class="icon name-icon"></div>Полное имя (<a href="#apply_name_change" rel="leanModal" class="edit-name">изменить</a>)</span> <span class="data">${ user.profile.name | h }</span>
         </li>
         <li>
           <span class="title"><div class="icon email-icon"></div>Email
             % if external_auth_map is None or 'shib' not in external_auth_map.external_domain:
-            (<a href="#change_email" rel="leanModal" class="edit-email">edit</a>)
+            (<a href="#change_email" rel="leanModal" class="edit-email">изменить</a>)
             % endif
           </span> <span class="data">${ user.email | h }</span>
         </li>
 
         % if external_auth_map is None or 'shib' not in external_auth_map.external_domain:
         <li>
-          <span class="title"><a href="#password_reset_complete" rel="leanModal" id="pwd_reset_button">Reset Password</a></span>
+          <span class="title"><a href="#password_reset_complete" rel="leanModal" id="pwd_reset_button">Изменить пароль</a></span>
           <form id="password_reset_form" method="post" data-remote="true" action="${reverse('password_reset')}">
             <input id="id_email" type="hidden" name="email" maxlength="75" value="${user.email}" />
             <!-- <input type="submit" id="pwd_reset_button" value="Reset Password" /> -->
@@ -160,10 +158,10 @@
 
     ## `news` should be `None` whenever a non-edX theme is enabled:
     ## see common/djangoapps/student/views.py#_get_news
-    %if news:
+    %if not news:
     <article class="news-carousel">
       <header>
-        <h4>edX News</h4>
+        <h4>Новости</h4>
         <nav class="page-dots">
           <ol>
             <li><a href="#" class="page-dot current"></a></li>
@@ -185,7 +183,7 @@
             %if entry.summary:
             <p>${entry.summary}</p>
             %endif
-            <p><a href="${entry.link}">Learn More ›</a></p>
+            <p><a href="${entry.link}">Подробнее ›</a></p>
           </div>
         </section>
         %endfor
@@ -196,7 +194,7 @@
 
   <section class="my-courses">
     <header>
-      <h2>Current Courses</h2>
+      <h2>Текущие курсы</h2>
     </header>
 
     % if len(courses) > 0:
@@ -223,11 +221,11 @@
             <hgroup>
               <p class="date-block">
               % if course.has_ended():
-              Course Completed - ${course.end_date_text}
+              Курс окончен ${course.end_date_text}
               % elif course.has_started():
-              Course Started - ${course.start_date_text}
+              Курс начался ${course.start_date_text}
               % else:   # hasn't started yet
-              Course Starts - ${course.start_date_text}
+              Начало курса: ${course.start_date_text}
               % endif
               </p>
               <h2 class="university">${get_course_about_section(course, 'university')}</h2>
@@ -302,7 +300,7 @@
                            ${"{0:.0f}%".format(float(course.lowest_passing_grade)*100)}</span>.
                       % elif cert_status['status'] == 'restricted':
                           <p class="message-copy">
-                          Your certificate is being held pending confirmation that the issuance of your certificate is in compliance with strict U.S. embargoes on Iran, Cuba, Syria and Sudan. If you think our system has mistakenly identified you as being connected with one of those countries, please let us know by contacting <a class="contact-link" href="mailto:${settings.CONTACT_EMAIL}">${settings.CONTACT_EMAIL}</a>.
+                          Ошибка
                           </p>
                       % endif
                       </p>
@@ -312,12 +310,12 @@
                   <ul class="actions">
                     % if cert_status['show_disabled_download_button']:
                       <li class="action"><span class="disabled">
-                          Your Certificate is Generating</span></li>
+                          Ваш сертификат генерируется</span></li>
                     % elif cert_status['show_download_url']:
                       <li class="action">
                       <a class="btn" href="${cert_status['download_url']}"
                          title="This link will open/download a PDF document">
-                         Download Your PDF Certificate</a></li>
+                         Скачать сертификат в PDF</a></li>
                     % endif
 
                     % if cert_status['show_survey_button']:
@@ -332,12 +330,12 @@
 
             % if course.id in show_courseware_links_for:
               % if course.has_ended():
-                <a href="${course_target}" class="enter-course archived">View Archived Course</a>
+                <a href="${course_target}" class="enter-course archived">Посмотреть архивный курса</a>
               % else:
-                <a href="${course_target}" class="enter-course">View Course</a>
+                <a href="${course_target}" class="enter-course">Посмотреть курс</a>
               % endif
             % endif
-            <a href="#unenroll-modal" class="unenroll" rel="leanModal" data-course-id="${course.id}" data-course-number="${course.number}">Unregister</a>
+            <a href="#unenroll-modal" class="unenroll" rel="leanModal" data-course-id="${course.id}" data-course-number="${course.number}">Не участвовать в курсе</a>
           </section>
         </article>
 
@@ -346,16 +344,16 @@
       % endfor
     % else:
       <section class="empty-dashboard-message">
-        <p>Looks like you haven't registered for any courses yet.</p>
+        <p>По всей видимости, вы ещё не зарегистрированы ни на один курс.</p>
         <a href="${marketing_link('COURSES')}">
-            Find courses now!
+            Найти курс!
         </a>
       </section>
     % endif
 
     % if staff_access and len(errored_courses) > 0:
       <div id="course-errors">
-        <h2>Course-loading errors</h2>
+        <h2>Ошибка при загрузке курса</h2>
 
       % for course_dir, errors in errored_courses.items():
          <h3>${course_dir | h}</h3>
@@ -374,7 +372,7 @@
 <section id="unenroll-modal" class="modal unenroll-modal">
   <div class="inner-wrapper">
     <header>
-      <h2>Are you sure you want to unregister from <span id="unenroll_course_number"></span>?</h2>
+      <h2>Вы действительно хотите <span id="unenroll_course_number"></span>?</h2>
       <hr/>
     </header>
 
@@ -384,7 +382,7 @@
       <input name="course_id" id="unenroll_course_id" type="hidden" />
       <input name="enrollment_action" type="hidden" value="unenroll" />
       <div class="submit">
-        <input name="submit" type="submit" value="Unregister" />
+        <input name="submit" type="submit" value="Не участвовать в курсе" />
       </div>
     </form>
 
@@ -399,13 +397,13 @@
 <section id="password_reset_complete" class="modal">
   <div class="inner-wrapper">
     <header>
-      <h2>Password Reset Email Sent</h2>
+      <h2>Письмо о смене пароля отправлено</h2>
       <hr/>
     </header>
     <div>
       <form> <!-- Here for styling reasons -->
         <section>
-          <p>An email has been sent to ${user.email}. Follow the link in the email to change your password.</p>
+          <p>Письмо было отправлено на адрес: ${user.email}. Перейдите по указанной в письме ссылке для смены пароля.</p>
         </section>
       </form>
     </div>
@@ -420,7 +418,7 @@
 <section id="change_email" class="modal">
   <div class="inner-wrapper">
     <header>
-      <h2><span id="change_email_title">Change Email</span></h2>
+      <h2><span id="change_email_title">Изменить e-mail</span></h2>
       <hr/>
     </header>
     <div id="change_email_body">
@@ -428,16 +426,16 @@
         <div id="change_email_error" class="modal-form-error"> </div>
         <fieldset>
           <div class="input-group">
-            <label>Please enter your new email address:</label>
+            <label>Пожалуйста, введите новый e-mail:</label>
             <input id="new_email_field" type="email" value="" />
-            <label>Please confirm your password:</label>
+            <label>Подтвердите пароль:</label>
             <input id="new_email_password" value="" type="password" />
           </div>
           <section>
-            <p>We will send a confirmation to both ${user.email} and your new email as part of the process.</p>
+            <p>Мы отправим подтверждение на оба адреса: на ${user.email} и новый e-mail.</p>
           </section>
           <div class="submit">
-            <input type="submit" id="submit_email_change" value="Change Email"/>
+            <input type="submit" id="submit_email_change" value="Изменить"/>
           </div>
         </fieldset>
       </form>
@@ -453,23 +451,23 @@
 <section id="apply_name_change" class="modal">
   <div class="inner-wrapper">
     <header>
-      <h2>Change your name</h2>
+      <h2>Изменить имя</h2>
       <hr/>
     </header>
     <div id="change_name_body">
       <form id="change_name_form">
         <div id="change_name_error" class="modal-form-error"> </div>
-        <p>To uphold the credibility of ${settings.PLATFORM_NAME} certificates, all name changes will be logged and recorded.</p>
+
         <br/>
         <fieldset>
           <div class="input-group">
-            <label>Enter your desired full name, as it will appear on the ${settings.PLATFORM_NAME} certificates: </label>
+            <label>Введите ваше полное имя: </label>
             <input id="new_name_field" value="" type="text" />
-            <label>Reason for name change:</label>
+            <label>Причина смены имени:</label>
             <textarea id="name_rationale_field" value=""></textarea>
           </div>
           <div class="submit">
-            <input type="submit" id="submit" value="Change My Name">
+            <input type="submit" id="submit" value="Изменить">
           </div>
         </fieldset>
       </form>

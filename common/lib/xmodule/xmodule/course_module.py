@@ -653,7 +653,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
                 if result is None:
                     result = text.title()
                 else:
-                    result = result.strftime("%b %d, %Y")
+                    result = result.strftime("%d.%m.%Y")
             except ValueError:
                 result = text.title()
 
@@ -664,7 +664,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         elif self.advertised_start is None and self.start is None:
             return 'TBD'
         else:
-            return (self.advertised_start or self.start).strftime("%b %d, %Y")
+            return (self.advertised_start or self.start).strftime("%d.%m.%Y")
 
     @property
     def end_date_text(self):
@@ -673,7 +673,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
 
         If the course does not have an end date set (course.end is None), an empty string will be returned.
         """
-        return '' if self.end is None else self.end.strftime("%b %d, %Y")
+        return '' if self.end is None else self.end.strftime("%d.%m.%Y")
 
     @property
     def forum_posts_allowed(self):
@@ -753,11 +753,11 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
 
         @property
         def first_eligible_appointment_date_text(self):
-            return self.first_eligible_appointment_date.strftime("%b %d, %Y")
+            return self.first_eligible_appointment_date.strftime("%d.%m.%Y")
 
         @property
         def last_eligible_appointment_date_text(self):
-            return self.last_eligible_appointment_date.strftime("%b %d, %Y")
+            return self.last_eligible_appointment_date.strftime("%d.%m.%Y")
 
         @property
         def registration_end_date_text(self):
