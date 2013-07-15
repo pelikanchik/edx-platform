@@ -213,14 +213,9 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
 
 
       //intro for MSUP
-      xml = xml.replace(/(^\s*[I]:.*)+/gm, function(match, p) {
-        return "";
+      xml = xml.replace(/(^\s*[I]:.*\n\s*[S]:.*)+/gm, function(match, p) {
+         return match.split(/^\s*[I]:.*\n\s*[S]:\s*/)[1];
       });
-      xml = xml.replace(/(^\s*[S]:.*)+/gm, function(match, p) {
-        var value = match.split(/^\s*[S]:\s*/)[1];
-        return value;
-      });
-
 
       // group check answers for MSUP
       xml = xml.replace(/(^\s*[+-]:.*?$\n*)+/gm, function(match, p) {
@@ -238,10 +233,6 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
         groupString += '</choiceresponse>\n\n';
         return groupString;
       });
-
-
-
-
 
       // group check answers
       xml = xml.replace(/(^\s*\[.?\].*?$\n*)+/gm, function(match, p) {
