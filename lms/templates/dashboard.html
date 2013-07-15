@@ -221,11 +221,11 @@
             <hgroup>
               <p class="date-block">
               % if course.has_ended():
-              Курс окончен ${course.end_date_text}
+              Занятия окончились ${course.end_date_text}
               % elif course.has_started():
-              Курс начался ${course.start_date_text}
+              Занятия начались ${course.start_date_text}
               % else:   # hasn't started yet
-              Начало курса: ${course.start_date_text}
+              Начало занятий: ${course.start_date_text}
               % endif
               </p>
               <h2 class="university">${get_course_about_section(course, 'university')}</h2>
@@ -372,7 +372,7 @@
 <section id="unenroll-modal" class="modal unenroll-modal">
   <div class="inner-wrapper">
     <header>
-      <h2>Вы действительно хотите <span id="unenroll_course_number"></span>?</h2>
+      <h2>Вы твердо решили больше не участвовать в курсе?</h2>
       <hr/>
     </header>
 
@@ -382,7 +382,7 @@
       <input name="course_id" id="unenroll_course_id" type="hidden" />
       <input name="enrollment_action" type="hidden" value="unenroll" />
       <div class="submit">
-        <input name="submit" type="submit" value="Не участвовать в курсе" />
+        <input name="submit" type="submit" value="Да" />
       </div>
     </form>
 
