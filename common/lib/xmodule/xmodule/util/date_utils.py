@@ -24,7 +24,7 @@ def get_default_time_display(dt, show_timezone=True):
                 timezone = dt.strftime('%z')
         else:
             timezone = " UTC"
-    return dt.strftime("%b %d, %Y at %H:%M") + timezone
+    return dt.strftime("%d.%m.%Y - %H:%M") + timezone
 
 
 def almost_same_datetime(dt1, dt2, allowed_delta=datetime.timedelta(minutes=1)):
