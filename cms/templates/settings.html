@@ -64,47 +64,47 @@ from contentstore import utils
       <form id="settings_details" class="settings-details" method="post" action="">
         <section class="group-settings basic">
           <header>
-            <h2 class="title-2">${_("Basic Information")}</h2>
-            <span class="tip">${_("The nuts and bolts of your course")}</span>
+            <h2 class="title-2">Базовая информация</h2>
+            <span class="tip"></span>
           </header>
 
           <ol class="list-input">
             <li class="field text is-not-editable" id="field-course-organization">
-              <label for="course-organization">${_("Organization")}</label>
+              <label for="course-organization">Издатель</label>
               <input title="${_('This field is disabled: this information cannot be changed.')}" type="text" class="long" id="course-organization" value="[Course Organization]" readonly />
             </li>
 
             <li class="field text is-not-editable" id="field-course-number">
-              <label for="course-number">${_("Course Number")}</label>
+              <label for="course-number">Номер курса</label>
               <input title="${_('This field is disabled: this information cannot be changed.')}" type="text" class="short" id="course-number" value="[Course No.]" readonly>
             </li>
 
             <li class="field text is-not-editable" id="field-course-name">
-              <label for="course-name">${_("Course Name")}</label>
+              <label for="course-name">Название курса</label>
               <input title="${_('This field is disabled: this information cannot be changed.')}" type="text" class="long" id="course-name" value="[Course Name]" readonly />
             </li>
           </ol>
 
-          <div class="note note-promotion note-promotion-courseURL has-actions">
-            <h3 class="title">${_("Course Summary Page")} <span class="tip">${_("(for student enrollment and access)")}</span></h3>
-            <div class="copy">
-              <p><a class="link-courseURL" rel="external" href="https:${utils.get_lms_link_for_about_page(course_location)}" />https:${utils.get_lms_link_for_about_page(course_location)}</a></p>
-            </div>
+         ## <div class="note note-promotion note-promotion-courseURL has-actions">
+         ##   <h3 class="title">${_("Course Summary Page")} <span class="tip">${_("(for student enrollment and access)")}</span></h3>
+        ##    <div class="copy">
+        ##      <p><a class="link-courseURL" rel="external" href="https:${utils.get_lms_link_for_about_page(course_location)}" />https:${utils.get_lms_link_for_about_page(course_location)}</a></p>
+        ##    </div>
 
-            <ul class="list-actions">
-              <li class="action-item">
-                <a title="${_('Send a note to students via email')}" href="mailto:someone@domain.com?Subject=Enroll%20in%20${context_course.display_name_with_default}&body=The%20course%20&quot;${context_course.display_name_with_default}&quot;,%20provided%20by%20edX,%20is%20open%20for%20enrollment.%20Please%20navigate%20to%20this%20course%20at%20https:${utils.get_lms_link_for_about_page(course_location)}%20to%20enroll." class="action action-primary"><i class="icon-envelope-alt icon-inline"></i>${_("Invite your students")}</a>
-              </li>
-            </ul>
-          </div>
+       ##     <ul class="list-actions">
+       ##       <li class="action-item">
+       ##         <a title="${_('Send a note to students via email')}" href="mailto:someone@domain.com?Subject=Enroll%20in%20${context_course.display_name_with_default}&body=The%20course%20&quot;${context_course.display_name_with_default}&quot;,%20provided%20by%20edX,%20is%20open%20for%20enrollment.%20Please%20navigate%20to%20this%20course%20at%20https:${utils.get_lms_link_for_about_page(course_location)}%20to%20enroll." class="action action-primary"><i class="icon-envelope-alt icon-inline"></i>${_("Invite your students")}</a>
+       ##       </li>
+       ##     </ul>
+       ##   </div>
 
           % if not about_page_editable:
-          <div class="notice notice-incontext notice-workflow">
-            <h3 class="title">${_("Promoting Your Course with edX")}</h3>
-            <div class="copy">
-              <p>${_('Your course summary page will not be viewable until your course has been announced. To provide content for the page and preview it, follow the instructions provided by your <abbr title="Program Manager">PM</abbr> or Conrad Warre <a rel="email" class="action action-email" href="mailto:conrad@edx.org">(conrad@edx.org)</a>.')}</p>
-            </div>
-          </div>
+      ##    <div class="notice notice-incontext notice-workflow">
+       ##     <h3 class="title">${_("Promoting Your Course with edX")}</h3>
+       ##     <div class="copy">
+       ##       <p>${_('Your course summary page will not be viewable until your course has been announced. To provide content for the page and preview it, follow the instructions provided by your <abbr title="Program Manager">PM</abbr> or Conrad Warre <a rel="email" class="action action-email" href="mailto:conrad@edx.org">(conrad@edx.org)</a>.')}</p>
+       ##     </div>
+      ##    </div>
           % endif
         </section>
 
@@ -113,7 +113,7 @@ from contentstore import utils
         <section class="group-settings schedule">
           <header>
             <h2 class="title-2">Расписание</h2>
-            <span class="tip">${_('Dates that control when your course can be viewed.')}</span>
+            <span class="tip">Даты, определяющие время работы курса</span>
           </header>
 
           <ol class="list-input">
