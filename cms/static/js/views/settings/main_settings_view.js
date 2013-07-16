@@ -21,7 +21,7 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
         this.$el.find("#course-name").val(this.model.get('location').get('name'));
         this.$el.find("#course-organization").val(this.model.get('location').get('org'));
         this.$el.find("#course-number").val(this.model.get('location').get('course'));
-        this.$el.find('.set-date').datepicker({ 'dateFormat': 'm/d/yy' });
+        this.$el.find('.set-date').datepicker({ 'dateFormat': 'd.m.yy' });
 
         var dateIntrospect = new Date();
         this.$el.find('#timezone').html("(" + dateIntrospect.getTimezone() + ")");
