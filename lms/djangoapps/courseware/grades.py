@@ -73,29 +73,29 @@ def elementary_conjunction(term, courseware):
     if term["field"]=="score_abs":
         value = int(section['section_total'].earned)
 
-    if term["sign"]== ">":
+    if term["sign"]== "more":
         if value > term["value"]:
             return True
         else:
             return False
-    if term["sign"]== ">=":
+    if term["sign"]== "more-equals":
         if value >= term["value"]:
             return True
         else:
             return False
 
-    if term["sign"]== "<":
+    if term["sign"]== "less":
         if value < term["value"]:
             return True
         else:
             return False
 
-    if term["sign"]== "<=":
+    if term["sign"]== "less-equals":
         if value <= term["value"]:
             return True
         else:
             return False
-    if term["sign"]== "=":
+    if term["sign"]== "equals":
         if value == term["value"]:
             return True
         else:
@@ -108,11 +108,17 @@ def is_item_unlocked(unlock_term, courseware):
     term = json.loads(unlock_term)
     print term
 
-
     term_result = False
+    if not term["disjunctions"]:
+        return True
     for disjunction in term["disjunctions"]:
+
+        if not disjunction["conjunctions"]:
+            return True
+
         conjunctions_result = True
         for conjunction in disjunction["conjunctions"]:
+
             conjunctions_result = conjunctions_result * elementary_conjunction(conjunction, courseware)
 
         term_result = max(term_result, conjunctions_result)
@@ -126,8 +132,7 @@ def set_locks(courseware):
 
         for section in chapter['sections']:
 
-            if is_item_unlocked(section['unlock_term'], courseware) == False:
-                 section['unlocked'] = False
+            section['unlocked'] = is_item_unlocked(section['unlock_term'], courseware)
 
     return courseware
 
@@ -140,7 +145,6 @@ def yield_module_descendents(module):
         next_module = stack.pop()
         stack.extend(next_module.get_display_items())
         yield next_module
-
 
 def yield_dynamic_descriptor_descendents(descriptor, module_creator):
     """
