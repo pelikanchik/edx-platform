@@ -1,8 +1,11 @@
+# -*- coding: utf-8 -*-
 # Compute grades using real division, with no integer truncation
 from __future__ import division
 
 import random
 import logging
+import json
+import simplejson
 
 from collections import defaultdict
 from django.conf import settings
@@ -19,6 +22,121 @@ from .models import StudentModule
 log = logging.getLogger("mitx.courseware")
 
 
+# Вычисляет процентное значение результата элемента
+def score_percent(earned, total):
+    if total > 0.0001:
+        score = int(earned/total*100)
+    else:
+        score = 0
+    return score
+
+
+#  вернуть раздел по идентификатору (url)
+def return_section_by_id(section_id,courseware):
+
+    for chapter in courseware:
+
+        for section in chapter['sections']:
+
+            if section['url_name'] == section_id:
+
+                return section
+
+    return None
+
+#  Проверка, является ли элемент с условием unlock_term открытым в курсе courseware
+def elementary_conjunction(term, courseware):
+    error_return = True
+    if len(term["source_section_id"]) == 0:
+        return error_return
+    if len(term["field"]) == 0:
+        return error_return
+    if len(term["sign"]) == 0:
+        return error_return
+    if len(term["value"]) == 0:
+        return error_return
+
+    section = return_section_by_id(term["source_section_id"], courseware)
+
+    if not section:
+        return error_return
+    value = 0
+    term["value"] = int(term["value"])
+
+    if term["field"]=="score_rel":
+        earned = section['section_total'].earned
+        possible = section['section_total'].possible
+
+        value = score_percent(earned,possible)
+
+
+    if term["field"]=="score_abs":
+        value = int(section['section_total'].earned)
+
+    if term["sign"]== "more":
+        if value > term["value"]:
+            return True
+        else:
+            return False
+    if term["sign"]== "more-equals":
+        if value >= term["value"]:
+            return True
+        else:
+            return False
+
+    if term["sign"]== "less":
+        if value < term["value"]:
+            return True
+        else:
+            return False
+
+    if term["sign"]== "less-equals":
+        if value <= term["value"]:
+            return True
+        else:
+            return False
+    if term["sign"]== "equals":
+        if value == term["value"]:
+            return True
+        else:
+            return False
+
+    return error_return
+
+def is_item_unlocked(unlock_term, courseware):
+
+    term = json.loads(unlock_term)
+    print term
+
+    term_result = False
+    if not term["disjunctions"]:
+        return True
+    for disjunction in term["disjunctions"]:
+
+        if not disjunction["conjunctions"]:
+            return True
+
+        conjunctions_result = True
+        for conjunction in disjunction["conjunctions"]:
+
+            conjunctions_result = conjunctions_result * elementary_conjunction(conjunction, courseware)
+
+        term_result = max(term_result, conjunctions_result)
+
+    return term_result
+
+#  Проставление локов в курсе courseware
+def set_locks(courseware):
+
+    for chapter in courseware:
+
+        for section in chapter['sections']:
+
+            section['unlocked'] = is_item_unlocked(section['unlock_term'], courseware)
+
+    return courseware
+
+
 def yield_module_descendents(module):
     stack = module.get_display_items()
     stack.reverse()
@@ -27,7 +145,6 @@ def yield_module_descendents(module):
         next_module = stack.pop()
         stack.extend(next_module.get_display_items())
         yield next_module
-
 
 def yield_dynamic_descriptor_descendents(descriptor, module_creator):
     """
@@ -257,6 +374,7 @@ def grade_for_percentage(grade_cutoffs, percentage):
 # TODO: This method is not very good. It was written in the old course style and
 # then converted over and performance is not good. Once the progress page is redesigned
 # to not have the progress summary this method should be deleted (so it won't be copied).
+
 def progress_summary(student, request, course, model_data_cache):
     """
     This pulls a summary of all problems in the course.
@@ -295,11 +413,11 @@ def progress_summary(student, request, course, model_data_cache):
 
         sections = []
         for section_module in chapter_module.get_display_items():
+
             # Skip if the section is hidden
             if section_module.lms.hide_from_toc:
                 continue
 
-            # Same for sections
             graded = section_module.lms.graded
             scores = []
 
@@ -309,10 +427,13 @@ def progress_summary(student, request, course, model_data_cache):
 
                 course_id = course.id
                 (correct, total) = get_score(course_id, student, module_descriptor, module_creator, model_data_cache)
+
                 if correct is None and total is None:
                     continue
 
                 scores.append(Score(correct, total, graded, module_descriptor.display_name_with_default))
+
+
 
             scores.reverse()
             section_total, _ = graders.aggregate_scores(
@@ -323,8 +444,10 @@ def progress_summary(student, request, course, model_data_cache):
                 'display_name': section_module.display_name_with_default,
                 'url_name': section_module.url_name,
                 'scores': scores,
-                'section_total': section_total,
+                'unlock_term': section_module.unlock_term,
+	            'section_total': section_total,
                 'format': module_format,
+                'unlocked': True,
                 'due': section_module.lms.due,
                 'graded': graded,
             })
@@ -333,7 +456,7 @@ def progress_summary(student, request, course, model_data_cache):
                          'display_name': chapter_module.display_name_with_default,
                          'url_name': chapter_module.url_name,
                          'sections': sections})
-
+    chapters = set_locks(chapters)
     return chapters
 
 
