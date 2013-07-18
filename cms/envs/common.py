@@ -174,12 +174,12 @@ ROOT_URLCONF = 'cms.urls'
 IGNORABLE_404_ENDS = ('favicon.ico')
 
 # Email
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-DEFAULT_FROM_EMAIL = 'registration@edx.org'
-DEFAULT_FEEDBACK_EMAIL = 'feedback@edx.org'
-SERVER_EMAIL = 'devops@edx.org'
+EMAIL_BACKEND = 'django_ses.SESBackend'
+DEFAULT_FROM_EMAIL = 'registration@lutix.crabdance.com'
+DEFAULT_FEEDBACK_EMAIL = 'feedback@lutix.crabdance.com'
+SERVER_EMAIL = 'devops@lutix.crabdance.com'
 ADMINS = (
-    ('edX Admins', 'admin@edx.org'),
+    ('lutiX Admins', 'admin@lutix.crabdance.com'),
 )
 MANAGERS = ADMINS
 

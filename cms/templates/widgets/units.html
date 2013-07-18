@@ -26,8 +26,8 @@ This def will enumerate through a passed in subsection and list all of the units
       </a>
       % if actions:
       <div class="item-actions">
-	<a href="#" data-tooltip="Delete this unit" class="delete-button" data-id="${unit.location}"><span class="delete-icon"></span></a>
-	<a href="#" data-tooltip="Drag to sort" class="drag-handle"></a>
+	<a href="#" data-tooltip="Удалить элемент" class="delete-button" data-id="${unit.location}"><span class="delete-icon"></span></a>
+	<a href="#" data-tooltip="Перетащите для пересортировки" class="drag-handle"></a>
       </div>
       % endif
     </div>
@@ -35,7 +35,7 @@ This def will enumerate through a passed in subsection and list all of the units
   % endfor
   <li>
     <a href="#" class="new-unit-item" data-template="${create_new_unit_template}" data-parent="${subsection.location}">
-      <span class="new-unit-icon"></span>New Unit
+      <span class="new-unit-icon"></span>Добавить элемент
     </a>
   </li>
 </ol>
