@@ -7,7 +7,7 @@
 
 <%namespace name="progress_graph" file="/courseware/progress_graph.js"/>
 
-<%block name="title"><title>${course.number} Progress</title></%block>
+<%block name="title"><title>${course.display_name_with_default} | Оценки</title></%block>
 
 <%!
     from django.core.urlresolvers import reverse
@@ -31,7 +31,7 @@ ${progress_graph.body(grade_summary, course.grade_cutoffs, "grade-detail-graph",
 
     <section class="course-info">
       <header>
-        <h1>Course Progress for Student '${student.username}' (${student.email})</h1>
+        <h1>Мои успехи</h1>
       </header>
 
       %if not course.disable_progress_graph:
@@ -76,14 +76,14 @@ ${progress_graph.body(grade_summary, course.grade_cutoffs, "grade-detail-graph",
 
               <section class="scores">
                 %if len(section['scores']) > 0:
-                  <h3> ${ "Problem Scores: " if section['graded'] else "Practice Scores: "} </h3>
+                  <h3>Результат</h3>
                   <ol>
                     %for score in section['scores']:
                     <li>${"{0:.3n}/{1:.3n}".format(float(score.earned),float(score.possible))}</li>
                     %endfor
                   </ol>
                 %else:
-                  <h3 class="no-scores"> No problem scores in this section </h3>
+                  <h3 class="no-scores"> В этой секции нет результатов </h3>
                 %endif
               </section>
 

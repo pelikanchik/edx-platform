@@ -202,7 +202,7 @@ def _parse_youtube(data):
     into a dictionary. Necessary for backwards compatibility with
     XML-based courses.
     """
-    ret = {'0.75': '', '1.00': '', '1.25': '', '1.50': ''}
+    ret = {'0.75': 'slow', '1.00': 'norm', '1.25': 'fast', '1.50': 'xfast'}
     if data == '':
         return ret
     videos = data.split(',')

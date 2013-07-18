@@ -7,23 +7,23 @@
 
   <section class="message">
     %if not already_active:
-      <h1 class="valid">Activation Complete!</h1>
+      <h1 class="valid">Активация завершена!</h1>
     %else:
-      <h1>Account already active!</h1>
+      <h1>Аккаунт уже активирован!</h1>
     %endif
     <hr class="horizontal-divider">
     
     <p>
       %if not already_active:
-        Thanks for activating your account. 
+        Спасибо за активацию аккаунта.
       %else:
-        This account has already been activated.
+        Аккаунт уже был активирован ранее.
       %endif
       
       %if user_logged_in:
-        Visit your <a href="${reverse('dashboard')}">dashboard</a> to see your courses.
+        Посетите ваш <a href="${reverse('dashboard')}">кабинет</a>, чтобы увидеть ваши курсы.
       %else:
-        You can now <a href="${reverse('signin_user')}">log in</a>.
+        Теперь вы можете <a href="${reverse('signin_user')}">войти</a>.
       %endif
     </p>
   </section>
