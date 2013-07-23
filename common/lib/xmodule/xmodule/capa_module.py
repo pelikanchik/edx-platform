@@ -17,6 +17,9 @@ from capa.util import convert_files_to_filenames
 from .progress import Progress
 from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
+from xmodule.vertical_module import VerticalFields, VerticalDescriptor
+from xmodule.seq_module import SequenceFields
+from xmodule.seq_module import SequenceModule
 from xmodule.exceptions import NotFoundError, ProcessingError
 from xblock.core import Scope, String, Boolean, Dict, Integer, Float
 from .fields import Timedelta, Date
@@ -77,6 +80,7 @@ class CapaFields(object):
     """
     Define the possible fields for a Capa problem
     """
+
     attempts = Integer(help="Number of attempts taken by the student on this problem",
                        default=0, scope=Scope.user_state)
     max_attempts = Integer(
@@ -313,7 +317,7 @@ class CapaModule(CapaFields, XModule):
             'element_id': self.location.html_id(),
             'id': self.id,
             'ajax_url': self.system.ajax_url,
-            'progress': Progress.to_js_status_str(self.get_progress())
+            'progress': Progress.to_js_detail_str(self.get_progress()),
         })
 
     def check_button_name(self):
@@ -497,7 +501,6 @@ class CapaModule(CapaFields, XModule):
                    'html': html,
                    'weight': self.weight,
                    }
-
         context = {'problem': content,
                    'id': self.id,
                    'check_button': check_button,
@@ -508,6 +511,7 @@ class CapaModule(CapaFields, XModule):
                    'attempts_used': self.attempts,
                    'attempts_allowed': self.max_attempts,
                    'progress': self.get_progress(),
+                   'progress_detail': Progress.to_js_detail_str(self.get_progress())
                    }
 
         html = self.system.render_template('problem.html', context)
@@ -556,8 +560,11 @@ class CapaModule(CapaFields, XModule):
 
         result.update({
             'progress_changed': after != before,
-            'progress_status': Progress.to_js_status_str(after),
+            'progress_status': Progress.to_js_detail_str(after),
         })
+        print ("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+        print (result['progress_status'])
+        print ("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
 
         return json.dumps(result, cls=ComplexEncoder)
 
@@ -889,11 +896,16 @@ class CapaModule(CapaFields, XModule):
             self.system.psychometrics_handler(self.get_state_for_lcp())
 
         # render problem into HTML
+        #self.id = 'input_i4x-Yandex-1-problem-528707f13bbf4f2a85f720b7dd15fde9_2_1'
+        # self.id = "ac8c5016c3af4e66ab38123ab0f0260b"
+        #self.id = "i4x://Yandex/1/problem/6903bf4724c5465597d02c58d5777c59"
+        #i4x://Yandex/1/problem/ac8c5016c3af4e66ab38123ab0f0260b
         html = self.get_problem_html(encapsulate=False)
 
         return {'success': success,
                 'contents': html,
                 }
+
 
     def rescore_problem(self):
         """
@@ -1084,6 +1096,8 @@ class CapaDescriptor(CapaFields, RawDescriptor):
     # is the attribute `attempts`. This will do that conversion
     metadata_translations = dict(RawDescriptor.metadata_translations)
     metadata_translations['attempts'] = 'max_attempts'
+
+
 
     def get_context(self):
         _context = RawDescriptor.get_context(self)

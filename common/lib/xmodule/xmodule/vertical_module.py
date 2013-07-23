@@ -30,7 +30,9 @@ class VerticalModule(VerticalFields, XModule):
         if self.contents is None:
             self.contents = [{
                 'id': child.id,
-                'content': child.get_html()
+                'content': child.get_html(),
+                'direct_term': self.direct_term,
+                'progress_detail': Progress.to_js_detail_str(self.get_progress())
             } for child in self.get_display_items()]
 
         return self.system.render_template('vert_module.html', {

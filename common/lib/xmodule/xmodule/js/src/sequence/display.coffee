@@ -5,6 +5,7 @@ class @Sequence
     @num_contents = @contents.length
     @id = @el.data('id')
     @modx_url = @el.data('course_modx_root')
+    @parse_progress()
     @initProgress()
     @bind()
     @render parseInt(@el.data('position'))
@@ -15,8 +16,23 @@ class @Sequence
   bind: ->
     @$('#sequence-list a').click @goto
 
+  #Example 0/1 1/2 5/7 percenta = (0+1+5)/(1+2+7) = 0.6
+
+  parse_progress: ->
+    earned = 0
+    possible = 0
+    $('.problems-wrapper').each (index) ->
+      progress = $(this).attr 'progress'
+      earned += parseInt(progress.substring(0,progress.indexOf('/')))
+      possible += parseInt(progress.substring(progress.indexOf('/')+1))
+    percenta = 1
+    if possible != 0
+      percenta = earned/possible
+    return percenta
+
+
   initProgress: ->
-    @progressTable = {}  # "#problem_#{id}" -> progress
+    @progressTable = {} # "#problem_#{id}" -> progress
 
 
   hookUpProgressEvent: ->
@@ -44,9 +60,13 @@ class @Sequence
   updateProgress: =>
     new_progress = "NA"
     _this = this
-    $('.problems-wrapper').each (index) ->
-      progress = $(this).attr 'progress'
-      new_progress = _this.mergeProgress progress, new_progress
+    percenta = @parse_progress()
+    progress = "in_progress"
+    if percenta == 0
+      progress = "none"
+    if percenta == 1
+      progress = "done"
+    new_progress = _this.mergeProgress progress, new_progress
 
     @progressTable[@position] = new_progress
     @setProgress(new_progress, @link_for(@position))
@@ -64,6 +84,7 @@ class @Sequence
 
   toggleArrows: =>
     @$('.sequence-nav-buttons a').unbind('click')
+    @$('.sequence-nav-buttons .godynamo a').removeClass('disabled').click(@godynamo)
 
     if @contents.length == 0
       @$('.sequence-nav-buttons .prev a').addClass('disabled')
@@ -120,7 +141,7 @@ class @Sequence
         target_sequential: new_position
 
       # On Sequence change, destroy any existing polling thread
-      #   for queued submissions, see ../capa/display.coffee
+      # for queued submissions, see ../capa/display.coffee
       if window.queuePollerID
         window.clearTimeout(window.queuePollerID)
         delete window.queuePollerID
@@ -140,7 +161,7 @@ class @Sequence
     analytics.track "Accessed Next Sequential",
       sequence_id: @id
       current_sequential: @position
-      target_sequential: new_position 
+      target_sequential: new_position
 
     @render new_position
 
@@ -148,6 +169,29 @@ class @Sequence
     event.preventDefault()
     new_position = @position - 1
     Logger.log "seq_prev", old: @position, new: new_position, id: @id
+
+    analytics.pageview @id
+
+    # navigation using the previous arrow
+    analytics.track "Accessed Previous Sequential",
+      sequence_id: @id
+      current_sequential: @position
+      target_sequential: new_position
+
+    @render new_position
+
+
+  godynamo: (event) =>
+    event.preventDefault()
+    @term = @contents.eq(@position - 1).data('direct_term')
+    percenta = @parse_progress()
+    good = parseInt(@term.substring(0,@term.indexOf(',')))
+    bad = parseInt(@term.substring(@term.indexOf(',')+1))
+    if percenta > 0.5
+      new_position = good
+    else
+      new_position = bad
+    Logger.log "seq_godynamo", old: @position, new: new_position, id: @id
 
     analytics.pageview @id
 

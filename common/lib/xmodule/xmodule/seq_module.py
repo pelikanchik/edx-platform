@@ -97,6 +97,7 @@ class SequenceModule(SequenceFields, XModule):
                 'progress_detail': Progress.to_js_detail_str(progress),
                 'type': child.get_icon_class(),
                 'id': child.id,
+                'direct_term': child.direct_term_with_default
             }
             if childinfo['title'] == '':
                 childinfo['title'] = child.display_name_with_default
