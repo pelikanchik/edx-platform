@@ -60,7 +60,8 @@ section.problem {
         width: 150px;
         float:right;
         p {
-          font: none;
+          text-indent: 9999px!important;
+          overflow: hidden;
         }
         div {
           text-align: right;
