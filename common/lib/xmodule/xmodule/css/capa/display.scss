@@ -59,7 +59,9 @@ section.problem {
       section {
         width: 150px;
         float:right;
-
+        p {
+          font: none;
+        }
         div {
           text-align: right;
         }
@@ -157,7 +159,6 @@ section.problem {
       &.status {
         text-indent: -9999px;
         margin: 8px 0 0 10px;
-        font-size:0px;
       }
     }
 
