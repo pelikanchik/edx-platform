@@ -39,7 +39,37 @@ section.problem {
       page-break-inside: avoid;
     }
   }
+  ul.sorting {
+    list-style: none!important;
 
+    li {
+      @include clearfix;
+
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      background-color: #eef;
+      background: url(../images/drag-handle.png) no-repeat 10px 50%,-webkit-gradient(linear, left top, left bottom, color-stop(0%, #f4f4ff), color-stop(15%, #e0e0f0));
+      vertical-align: middle;
+      cursor: move;
+      padding: 5px;
+      padding-left:30px;
+      min-height: 36px;
+      line-height: 31px;
+
+      section {
+        width: 150px;
+        float:right;
+
+        div {
+          text-align: right;
+        }
+      }
+    }
+    li:hover{
+      background-color: #dde;
+      background: url(../images/drag-handle.png) no-repeat 10px 50%,-webkit-gradient(linear, left top, left bottom, color-stop(0%, #eaeafa), color-stop(15%, #dadaea));
+    }
+  }
   .inline {
       display: inline;
   }
@@ -127,6 +157,7 @@ section.problem {
       &.status {
         text-indent: -9999px;
         margin: 8px 0 0 10px;
+        font-size:0px;
       }
     }
 

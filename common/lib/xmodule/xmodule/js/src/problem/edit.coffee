@@ -212,16 +212,18 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
 
 
       //intro for MSUP
-      xml = xml.replace(/(^\s*[I]:.*\n\s*[S]:.*)+/gm, function(match, p) {
-         return match.split(/^\s*[I]:.*\n\s*[S]:\s*/)[1];
-      });
+      //xml = xml.replace(/(^\s*[I]:.*\n\s*[S]:.*)+/gm, function(match, p) {
+      //   return match.split(/^\s*[I]:.*\n\s*[S]:\s*/)[1];
+      //});
 
       // group check answers for MSUP
-      xml = xml.replace(/(^\s*[+-]:.*?$\n*)+/gm, function(match, p) {
-        var groupString = '<choiceresponse>\n';
-        groupString += '  <checkboxgroup direction="vertical">\n';
+      xml = xml.replace(/(^\s*[I]:.*\n\s*[S]:.*\n\s*[+-]:.*?$\n(\s*[+-]:.*?$)*)+/gm, function(match, p) {
         var options = match.split('\n');
-        for(var i = 0; i < options.length; i++) {
+        var groupString = options[1].split(/^\s*[S]:\s*/)[1] + '\n';
+        groupString += '<choiceresponse>\n';
+        groupString += '  <checkboxgroup direction="vertical">\n';
+
+        for(var i = 2; i < options.length; i++) {
           if(options[i].length > 0) {
             var value = options[i].split(/^\s*[+-]:\s*/)[1];
             var correct = /^\s*\+:/i.test(options[i]);
@@ -232,6 +234,78 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
         groupString += '</choiceresponse>\n\n';
         return groupString;
       });
+
+       // sorting answers for MSUP
+      xml = xml.replace(/(^\s*[I]:.*\n\s*[S]:.*\n\s*\d*:.*?$\n(\s*\d*:.*?$)*)+/gm, function(match, p) {
+
+        var answer = [];
+        var single_answer;
+        var uniq_class;
+        var ms;
+        Today = new Date();
+        ms = Today.getTime();
+
+        uniq_class = "st"+ Math.floor(Math.random( )*9999999) + "_" + ms;
+
+
+        var list_elements = "";
+        var options = match.split('\n');
+        var groupString = options[1].split(/^\s*[S]:\s*/)[1] + '\n';
+        for(var i = 2; i < options.length; i++) {
+          if(options[i].length > 0) {
+            var text = options[i].split(/^\s*\d*:\s*/)[1];
+            single_answer = options[i].split(':')[0];
+            answer.push(String(single_answer-1));
+            list_elements += '    <li>' + text + '<textline hidden = "1" correct_answer = "'+single_answer+'" /></li>\n';
+          }
+        }
+        answer = JSON.stringify(answer);
+        //alert (answer);
+        groupString +=  '<script type="loncapa/python">\n';
+        groupString += 'def sorting_check_' + uniq_class + '(expect, ans):\n';
+        groupString += '   try:\n';
+        groupString += '      return expect == ans\n';
+        groupString += '   except ValueError:\n';
+        groupString += '      return False\n';
+        groupString += 'def sorting_' + uniq_class + '(expect, ans):\n';
+        groupString += '   return sorting_check_' + uniq_class + '(';
+        groupString +=  answer;
+        groupString += ', ans)\n';
+        groupString += '</script>\n';
+
+        groupString += '<customresponse cfn="sorting_' + uniq_class + '">\n';
+        groupString += '   <ul class = "sorting '+uniq_class+'"> \n';
+        groupString += list_elements;
+        groupString += '  </ul>\n';
+        groupString += '</customresponse>\n\n';
+        //groupString += '<script type = "text/javascript">\n';
+        //groupString += 'var uniq_class = '+uniq_class+';\n';
+        //groupString += '</script>\n';
+        //
+        groupString += '<script type = "text/javascript">\n';
+        groupString += "$('ul.sorting." + uniq_class + "').each(function () {var selectedValue = $('ul.sorting." + uniq_class + "').val(); $(this).html($('li', $(this)).sort(function (a, b) {var arel = parseInt($(a).children('section').children('div').children('input').attr('value'));var brel = parseInt($(b).children('section').children('div').children('input').attr('value'));return arel == brel ? 0 : arel != Math.max(arel,brel) ? -1 : 1}));$(this).val(selectedValue);});\n";
+        groupString += ' function enumerate_' + uniq_class + '() {\n';
+        groupString += '    $(\'ul.sorting.'+uniq_class+' input\').each(function (i, elem) {\n';
+        groupString += '       $(elem).val(i);\n';
+        groupString += '    });\n';
+        groupString += ' };\n\n';
+        groupString += ' enumerate_' + uniq_class + '();\n';
+
+        groupString += ' $(".sorting.'+uniq_class+'").sortable({\n';
+        groupString += '    placeholder: "ui-state-highlight",';
+        groupString += '    stop: function (event, ui) {\n';
+        groupString += '       enumerate_' + uniq_class + '();\n';
+        groupString += '    }\n';
+        groupString += ' });\n';
+
+        groupString += ' $(".sorting.'+uniq_class+'").disableSelection();\n';
+
+        groupString += '</script>\n';
+
+
+        return groupString;
+      });
+
 
       // group check answers
       xml = xml.replace(/(^\s*\[.?\].*?$\n*)+/gm, function(match, p) {
