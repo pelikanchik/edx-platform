@@ -210,12 +210,6 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
         return groupString;
       });
 
-
-      //intro for MSUP
-      //xml = xml.replace(/(^\s*[I]:.*\n\s*[S]:.*)+/gm, function(match, p) {
-      //   return match.split(/^\s*[I]:.*\n\s*[S]:\s*/)[1];
-      //});
-
       // group check answers for MSUP
       xml = xml.replace(/(^\s*[I]:.*\n\s*[S]:.*\n\s*[+-]:.*?$\n(\s*[+-]:.*?$)*)+/gm, function(match, p) {
         var options = match.split('\n');
@@ -322,6 +316,30 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
         groupString += '  </checkboxgroup>\n';
         groupString += '</choiceresponse>\n\n';
         return groupString;
+      });
+
+      //(\s*[I]:.*\n\s*[S]:.*\n\s*[+]:.*?$)(?!(\n\s*[+-]:.*?$))
+      // replace string and numerical for msup
+      xml = xml.replace(/^(\s*[I]:.*\n\s*[S]:.*\n\s*[+]:.*?$)(?!(\n\s*[+-]:.*?$))/gm, function(match, p) {
+        var string;
+        var options = match.split('\n');
+        var groupString = options[1].split(/^\s*[S]:\s*/)[1] + '\n';
+        var answer = options[2].split(/^\s*[+]:\s*/)[1];
+        var floatValue = parseFloat(answer);
+        if(!isNaN(floatValue)) {
+          var params = /(.*?)\+\-\s*(.*?$)/.exec(answer);
+          if(params) {
+            string = '<numericalresponse answer="' + floatValue + '">\n';
+            string += '  <responseparam type="tolerance" default="' + params[2] + '" />\n';
+          } else {
+            string = '<numericalresponse answer="' + floatValue + '">\n';
+          }
+          string += '  <textline />\n';
+          string += '</numericalresponse>\n\n';
+        } else {
+          string = '<stringresponse answer="' + answer + '" type="ci">\n  <textline size="20"/>\n</stringresponse>\n\n';
+        }
+        return string;
       });
 
       // replace string and numerical
