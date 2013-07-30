@@ -210,20 +210,30 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
         return groupString;
       });
 
-      // group check answers for MSUP
-      xml = xml.replace(/(^\s*[I]:.*\n\s*[S]:.*\n\s*[+-]:.*?$\n(\s*[+-]:.*?$)*)+/gm, function(match, p) {
-        var options = match.split('\n');
-        var groupString = options[1].split(/^\s*[S]:\s*/)[1] + '\n';
-        groupString += '<choiceresponse>\n';
-        groupString += '  <checkboxgroup direction="vertical">\n';
 
-        for(var i = 2; i < options.length; i++) {
-          if(options[i].length > 0) {
+      // group check answers for MSUP
+
+      xml = xml.replace(/(^\s*[I]:.*\n\s*[S]:.*\n\s*[+-]:.*?$\n\s*[+-]:.*?$(\s*[+-]:.*?$)*)+/gm, function(match, p) {
+        var options = match.split('\n');
+        var groupString = "";
+        var string = "";
+        var intro_reg = /^\s*[S]:.*?/;
+        var item_reg = /^\s*[+-]:.*?/;
+
+        for(var i = 0; i < options.length; i++) {
+
+          if(intro_reg.test(options[i])) {
+            groupString += options[i].split(/^\s*[S]:\s*/)[1] + '\n'
+          }
+          if(item_reg.test(options[i])) {
             var value = options[i].split(/^\s*[+-]:\s*/)[1];
             var correct = /^\s*\+:/i.test(options[i]);
-            groupString += '    <choice correct="' + correct + '">' + value + '</choice>\n';
+            string += '    <choice correct="' + correct + '">' + value + '</choice>\n';
           }
         }
+        groupString += '<choiceresponse>\n';
+        groupString += '  <checkboxgroup direction="vertical">\n';
+        groupString +=  string;
         groupString += '  </checkboxgroup>\n';
         groupString += '</choiceresponse>\n\n';
         return groupString;
@@ -239,14 +249,22 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
         Today = new Date();
         ms = Today.getTime();
 
+        var intro_reg = /^\s*[S]:.*?/;
+        var item_reg = /^\s*\d*:.*?/;
+
         uniq_class = "st"+ Math.floor(Math.random( )*9999999) + "_" + ms;
 
 
         var list_elements = "";
         var options = match.split('\n');
-        var groupString = options[1].split(/^\s*[S]:\s*/)[1] + '\n';
-        for(var i = 2; i < options.length; i++) {
-          if(options[i].length > 0) {
+        var groupString = "";
+        for(var i = 0; i < options.length; i++) {
+
+          if(intro_reg.test(options[i])) {
+             groupString = options[i].split(/^\s*[S]:\s*/)[1] + '\n';
+          }
+
+          if(item_reg.test(options[i])) {
             var text = options[i].split(/^\s*\d*:\s*/)[1];
             single_answer = options[i].split(':')[0];
             answer.push(String(single_answer-1));
@@ -301,6 +319,139 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       });
 
 
+
+      // LR-question for MSUP
+      xml = xml.replace(/(^\s*[I]:.*?$\n\s*[S]:.*?$\n\s*[LR]\d*:.*?$\n(\s*[LR]\d*:.*?$)*)+/gm, function(match, p) {
+
+        var answer = [];
+        var single_answer;
+        var uniq_class;
+        var ms;
+        var llist = "";
+        var rlist = "";
+        var lvalues = [];
+        var rvalues = [];
+        Today = new Date();
+        ms = Today.getTime();
+
+        uniq_class = "lr"+ Math.floor(Math.random( )*9999999) + "_" + ms;
+
+
+        var list_elements = "";
+        var options = match.split('\n');
+        var groupString = "";
+        //var groupString = options[1] + '\n';
+        var l_iterator = 0;
+        var r_iterator = 0;
+        var intro_reg = /^\s*[S]:.*?/;
+        var l_reg = /^\s*[L]\d*:.*?/;
+        var r_reg = /^\s*[R]\d*:.*?/;
+
+
+        for(var i = 0; i < options.length; i++) {
+          if(intro_reg.test(options[i])) {
+            groupString = options[i].split(/^\s*[S]:\s*/)[1] + '\n';
+          }
+
+          if(l_reg.test(options[i])) {
+
+            lvalues[l_iterator] = [];
+            lvalues[l_iterator]["text"] = options[i].split(/^\s*[L]\d*:\s*/)[1];
+            lvalues[l_iterator]["value"] = options[i].split(/^\s*[L]/)[1].split(":")[0];
+
+            llist += '<li rel = "'+l_iterator+'">' + lvalues[l_iterator]["text"] + '</li>\n';
+            //groupString += lvalues[l_iterator]["value"] + '\n';
+            l_iterator++;
+
+          }
+        }
+
+        var correct_answer;
+        for(var i = 0; i < options.length; i++) {
+          if(r_reg.test(options[i])) {
+
+            rvalues[r_iterator] = [];
+            rvalues[r_iterator]["text"] = options[i].split(/^\s*[R]\d*:\s*/)[1];
+            rvalues[r_iterator]["value"] = options[i].split(/^\s*[R]/)[1].split(":")[0];
+            rvalues[r_iterator]["answer"] = [];
+            rvalues[r_iterator]["answer_text"] = [];
+            for (var j = 0; j < lvalues.length; j++){
+                if (lvalues[j]["value"]==rvalues[r_iterator]["value"]){
+                    rvalues[r_iterator]["answer"].push(j);
+                    rvalues[r_iterator]["answer_text"].push(lvalues[j]["text"]);
+                }
+            }
+
+            //groupString += rvalues[r_iterator]["text"] + '\n';
+            //groupString += rvalues[r_iterator]["value"] + '\n';
+            //groupString += rvalues[r_iterator]["answer"] + '\n';
+            //correct_answer = String(rvalues[r_iterator]["answer"]+1);
+            rlist += '<li>' + rvalues[r_iterator]["text"] + '<textline hidden = "1" size = "2" correct_answer = "' + rvalues[r_iterator]["answer_text"]  + '" /><ul class = "receiver '+uniq_class+'"></ul></li>\n';
+            answer.push(JSON.stringify(rvalues[r_iterator]["answer"]));
+            r_iterator++;
+
+          }
+        }
+
+        answer = JSON.stringify(answer);
+        //alert (answer);
+        groupString += '<script type="loncapa/python">\n';
+        groupString += 'def sort_list_' + uniq_class + '(input_array):\n';
+        groupString += '   output_array = [] \n';
+        groupString += '   for element in input_array: \n';
+        groupString += '       output_array.append(sorted(eval(element)))\n';
+        groupString += '   return output_array  \n';
+
+        groupString += 'def check_lr_question_' + uniq_class + '(expect, ans):\n';
+        groupString += '   correct = '+answer+'\n';
+        groupString += '   answ = []\n';
+        groupString += '   if isinstance (ans, list):\n';
+        groupString += '       answ = ans\n';
+        groupString += '   else:\n';
+        groupString += '       answ.append(ans)\n';
+        groupString += '   answ = sort_list_' + uniq_class + '(answ)\n';
+        groupString += '   correct = sort_list_' + uniq_class + '(correct)\n';
+        groupString += '   try:\n';
+        groupString += '      return correct == answ\n';
+        groupString += '   except ValueError:\n';
+        groupString += '      return False\n';
+        groupString += '</script>\n';
+
+        groupString += '<customresponse cfn="check_lr_question_' + uniq_class + '">\n';
+        groupString += '  <table class = "lr-question" width = "100%">\n';
+        groupString += '  <tr>\n';
+        groupString += '  <td width = "50%">\n';
+        groupString += '  <ul id = "host" class = "'+uniq_class+'">\n';
+        groupString +=  llist;
+        groupString += '  </ul>\n';
+        groupString += '  </td>\n';
+        groupString += '  <td>\n';
+        groupString += '  <ul class = "boxes">\n';
+        groupString +=  rlist;
+        groupString += '  </ul>\n';
+        groupString += '  </td>\n';
+        groupString += '  </tr>\n';
+        groupString += '  </table>\n';
+        groupString += '</customresponse>\n\n';
+        groupString += '<script type = "text/javascript">\n';
+        groupString += 'function initialize_'+uniq_class+'(arr){$(".receiver.'+uniq_class+'").each(function(){self = this; var input_values = $(self).prev().children("div").children("input").attr("value"); if (input_values) {input_values = JSON.parse(input_values);}else{$(self).prev().children("div").children("input").val("[]");} for(var i =0; i + 1 == Math.min(i+1,input_values.length);i++){ $("<li rel = " + input_values[i] + ">"+arr[input_values[i]]+"</li>").appendTo($(self));}; });}\n\n';
+        //groupString += 'var uniq_class = '+uniq_class+';\n';
+        groupString += 'var init_arr = [];\n';
+        groupString += '$("#host.'+uniq_class+' li").each(function(){ init_arr[parseInt($(this).attr("rel"))] = $(this).text();});\n\n';
+        groupString += 'initialize_'+uniq_class+'(init_arr);\n\n';
+        groupString += 'function clean_array_'+uniq_class+'(arr){arr = jQuery.grep(arr, function(n, i){return (n !== ""); });arr = jQuery.unique(arr);return arr;}\n\n';
+        groupString += 'function json_into_input_'+uniq_class+'(self){var example = $(self).sortable("toArray", {attribute: "rel" }); example = clean_array_'+uniq_class+'(example); example = example.sort(); for(var i = 0; i+1 == Math.min(i+1, example.length); i++){ example[i] = parseInt(example[i], 10); } if (Math.min(example.length, 1) == 1) { json_value = JSON.stringify(example); }else{ json_value = "[]"; }  $(self).prev().children("div").children("input").val(json_value);}\n\n';
+        groupString += 'removeIntent = false;\n\n';
+        groupString += '$(".receiver.'+uniq_class+'").sortable({connectWith: ".receiver.'+uniq_class+'", opacity:0.8, placeholder: "ui-state-highlight",update: function () {json_into_input_'+uniq_class+'(this);},over: function () {removeIntent = false;}, out: function () {removeIntent = true;}, beforeStop: function (event, ui) { if (removeIntent === true) { ui.item.remove(); json_into_input_'+uniq_class+'(this); } }});\n\n';
+        groupString += '$("#host.'+uniq_class+' li").draggable({ connectToSortable: ".receiver.'+uniq_class+'",helper: "clone", opacity:0.8, revert: "invalid"});\n\n';
+
+        groupString += '</script>\n';
+
+
+        return groupString;
+      });
+
+
       // group check answers
       xml = xml.replace(/(^\s*\[.?\].*?$\n*)+/gm, function(match, p) {
         var groupString = '<choiceresponse>\n';
@@ -320,24 +471,36 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
 
       //(\s*[I]:.*\n\s*[S]:.*\n\s*[+]:.*?$)(?!(\n\s*[+-]:.*?$))
       // replace string and numerical for msup
-      xml = xml.replace(/^(\s*[I]:.*\n\s*[S]:.*\n\s*[+]:.*?$)(?!(\n\s*[+-]:.*?$))/gm, function(match, p) {
-        var string;
+      xml = xml.replace(/^(\s*[I]:.*?$\n\s*[S]:.*?$\n\s*[+]:.*?$)(?!(\n\s*[+-]:.*?$))/gm, function(match, p) {
+        var string = "";
         var options = match.split('\n');
-        var groupString = options[1].split(/^\s*[S]:\s*/)[1] + '\n';
-        var answer = options[2].split(/^\s*[+]:\s*/)[1];
+        var intro_reg = /^\s*[S]:.*?/;
+        var item_reg = /^\s*[+]:.*?/;
+
+        for(var i = 0; i < options.length; i++) {
+
+          if(intro_reg.test(options[i])) {
+             string += options[i].split(/^\s*[S]:\s*/)[1] + '\n';
+          }
+
+          if(item_reg.test(options[i])) {
+             var answer = options[i].split(/^\s*[+]:\s*/)[1];
+          }
+        }
+
         var floatValue = parseFloat(answer);
         if(!isNaN(floatValue)) {
           var params = /(.*?)\+\-\s*(.*?$)/.exec(answer);
           if(params) {
-            string = '<numericalresponse answer="' + floatValue + '">\n';
+            string += '<numericalresponse answer="' + floatValue + '">\n';
             string += '  <responseparam type="tolerance" default="' + params[2] + '" />\n';
           } else {
-            string = '<numericalresponse answer="' + floatValue + '">\n';
+            string += '<numericalresponse answer="' + floatValue + '">\n';
           }
           string += '  <textline />\n';
           string += '</numericalresponse>\n\n';
         } else {
-          string = '<stringresponse answer="' + answer + '" type="ci">\n  <textline size="20"/>\n</stringresponse>\n\n';
+          string += '<stringresponse answer="' + answer + '" type="ci">\n  <textline size="20"/>\n</stringresponse>\n\n';
         }
         return string;
       });

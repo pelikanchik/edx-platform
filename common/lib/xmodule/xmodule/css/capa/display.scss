@@ -39,6 +39,83 @@ section.problem {
       page-break-inside: avoid;
     }
   }
+  table.lr-question {
+    td {
+
+      vertical-align:top;
+      ul {
+
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+        min-height: 35px;
+
+      }
+
+      ul.boxes li{
+        margin-bottom: 1.4em;
+        line-height:1em;
+
+        section {
+          float:none;
+          div {
+            text-align: right;
+            p.status{
+              color: transparent;
+              float: right;
+              margin-top: -4px;
+            }
+            p.answer{
+              font-size:10px;
+            }
+          }
+        }
+      }
+
+      ul.receiver, ul#host {
+        li {
+
+            margin: 5px;
+            padding: 5px;
+            width: 200px;
+            cursor: move;
+        }
+      }
+      ul.receiver{
+        background-color: #f9f9ff;
+        border: 1px solid #eee;
+        li {
+          @include clearfix;
+          font-size: 12px;
+          color:#888;
+          background: url(../images/drag-handle.png) no-repeat 5px;
+          padding-left: 25px;
+          line-height:1em;
+        }
+      }
+      ul#host{
+        li {
+          border: 1px solid #ddd;
+          border-radius: 5px;
+          background-color: #e8e8f8;
+          background: url(../images/drag-handle.png) no-repeat 10px 50%,-webkit-gradient(linear, left top, left bottom, color-stop(0%, #f4f4ff), color-stop(15%, #e8e8f8));
+          padding-left: 30px;
+          color:#888;
+        }
+        li:hover{
+          background-color: #f0f0ff;
+          background: url(../images/drag-handle.png) no-repeat 10px 50%,-webkit-gradient(linear, left top, left bottom, color-stop(0%, #f7f7ff), color-stop(15%, #f0f0ff));
+
+        }
+      }
+    }
+
+    .ui-state-highlight {
+      height: 1.5em;
+      line-height: 1.2em;
+      width: 130px;
+    }
+  }
   ul.sorting {
     list-style: none!important;
 
@@ -61,6 +138,9 @@ section.problem {
         float:right;
         div {
           text-align: right;
+          p.status{
+            color: transparent;
+          }
         }
       }
     }
@@ -219,7 +299,7 @@ section.problem {
       margin-left: 10px;
 
       &:before {
-        content: "Answer: ";
+        content: "Ответ: ";
         font-weight: bold;
         display: inline;
 
