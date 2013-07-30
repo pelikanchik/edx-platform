@@ -25,6 +25,10 @@ class CMS.Views.UnitEdit extends Backbone.View
       el: @$('.unit-name-input')
       model: @model
     )
+    @termView = new CMS.Views.UnitEdit.TermEdit(
+      el: @$('.unit-term-input')
+      model: @model
+    )
 
     @model.on('change:state', @render)
 
@@ -223,7 +227,8 @@ class CMS.Views.UnitEdit.NameEdit extends Backbone.View
   saveName: =>
     # Treat the metadata dictionary as immutable
     metadata = $.extend({}, @model.get('metadata'))
-    metadata.display_name = @$('.unit-display-name-input').val()
+    metadata.display_name = $('.unit-display-name-input').val()
+    metadata.direct_term = $('.unit-direct-term-input').val()
     @model.save(metadata: metadata)
     # Update name shown in the right-hand side location summary.
     $('.unit-location .editing .unit-name').html(metadata.display_name)
@@ -231,6 +236,42 @@ class CMS.Views.UnitEdit.NameEdit extends Backbone.View
       course: course_location_analytics
       unit_id: unit_location_analytics
       display_name: metadata.display_name
+
+
+
+class CMS.Views.UnitEdit.TermEdit extends Backbone.View
+  events:
+    'change .unit-direct-term-input': 'saveTerm'
+
+  initialize: =>
+    @model.on('change:metadata', @render)
+    @model.on('change:state', @setEnabled)
+    @setEnabled()
+    @saveTerm
+    @$spinner = $('<span class="spinner-in-field-icon"></span>');
+
+  render: =>
+    @$('.unit-direct-term-input').val(@model.get('metadata').direct_term)
+
+  setEnabled: =>
+    disabled = @model.get('state') == 'public'
+    if disabled
+      @$('.unit-direct-term-input').attr('disabled', true)
+    else
+      @$('.unit-direct-term-input').removeAttr('disabled')
+
+  saveTerm: =>
+    # Saving a term
+    metadata = $.extend({}, @model.get('metadata'))
+    metadata.display_name = $('.unit-display-name-input').val()
+    metadata.direct_term = $('.unit-direct-term-input').val()
+    @model.save(metadata: metadata)
+    # Update term
+    $('.unit-location .editing .unit-term').html(metadata.direct_term)
+    analytics.track "Edited Unit Term",
+      course: course_location_analytics
+      unit_id: unit_location_analytics
+      direct_term: metadata.direct_term
 
 
 class CMS.Views.UnitEdit.LocationState extends Backbone.View

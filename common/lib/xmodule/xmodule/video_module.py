@@ -128,6 +128,13 @@ class VideoDescriptor(VideoFields,
         _parse_video_xml(video, xml_data)
         return video
 
+    def definition_to_xml(self, resource_fs):
+        """
+        Override the base implementation. We don't actually have anything in the 'data' field
+        (it's an empty string), so we just return a simple XML element
+        """
+        return etree.fromstring('<video />')
+
 
 def _parse_video_xml(video, xml_data):
     """
@@ -195,7 +202,7 @@ def _parse_youtube(data):
     into a dictionary. Necessary for backwards compatibility with
     XML-based courses.
     """
-    ret = {'0.75': '', '1.00': '', '1.25': '', '1.50': ''}
+    ret = {'0.75': 'slow', '1.00': 'norm', '1.25': 'fast', '1.50': 'xfast'}
     if data == '':
         return ret
     videos = data.split(',')

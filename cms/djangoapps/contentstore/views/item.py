@@ -23,16 +23,6 @@ DETACHED_CATEGORIES = ['about', 'static_tab', 'course_info']
 @login_required
 @expect_json
 def save_item(request):
-    """
-    Will carry a json payload with these possible fields
-    :id (required): the id
-    :data (optional): the new value for the data
-    :metadata (optional): new values for the metadata fields.
-        Any whose values are None will be deleted not set to None! Absent ones will be left alone
-    :nullout (optional): which metadata fields to set to None
-    """
-    # The nullout is a bit of a temporary copout until we can make module_edit.coffee and the metadata editors a
-    # little smarter and able to pass something more akin to {unset: [field, field]}
     item_location = request.POST['id']
 
     # check permissions for this user within this course
@@ -52,25 +42,30 @@ def save_item(request):
         children = request.POST['children']
         store.update_children(item_location, children)
 
-    # cdodge: also commit any metadata which might have been passed along
-    if request.POST.get('nullout') is not None or request.POST.get('metadata') is not None:
-        # the postback is not the complete metadata, as there's system metadata which is
-        # not presented to the end-user for editing. So let's fetch the original and
-        # 'apply' the submitted metadata, so we don't end up deleting system metadata
+    # cdodge: also commit any metadata which might have been passed along in the
+    # POST from the client, if it is there
+    # NOTE, that the postback is not the complete metadata, as there's system metadata which is
+    # not presented to the end-user for editing. So let's fetch the original and
+    # 'apply' the submitted metadata, so we don't end up deleting system metadata
+    if request.POST.get('metadata') is not None:
+        posted_metadata = request.POST['metadata']
+        # fetch original
         existing_item = modulestore().get_item(item_location)
-        for metadata_key in request.POST.get('nullout', []):
-            setattr(existing_item, metadata_key, None)
 
         # update existing metadata with submitted metadata (which can be partial)
-        # IMPORTANT NOTE: if the client passed 'null' (None) for a piece of metadata that means 'remove it'. If
-        # the intent is to make it None, use the nullout field
-        for metadata_key, value in request.POST.get('metadata', {}).items():
+        # IMPORTANT NOTE: if the client passed pack 'null' (None) for a piece of metadata that means 'remove it'
+        for metadata_key, value in posted_metadata.items():
 
-            if value is None:
-                delattr(existing_item, metadata_key)
+            if posted_metadata[metadata_key] is None:
+                # remove both from passed in collection as well as the collection read in from the modulestore
+                if metadata_key in existing_item._model_data:
+                    del existing_item._model_data[metadata_key]
+                del posted_metadata[metadata_key]
             else:
-                setattr(existing_item, metadata_key, value)
+                existing_item._model_data[metadata_key] = value
+
         # commit to datastore
+        # TODO (cpennington): This really shouldn't have to do this much reaching in to get the metadata
         store.update_metadata(item_location, own_metadata(existing_item))
 
     return HttpResponse()
@@ -83,6 +78,7 @@ def create_item(request):
     category = request.POST['category']
 
     display_name = request.POST.get('display_name')
+    direct_term = request.POST.get('direct_term')
 
     if not has_access(request.user, parent_location):
         raise PermissionDenied()
@@ -105,8 +101,12 @@ def create_item(request):
     if display_name is not None:
         metadata['display_name'] = display_name
 
+    if direct_term is not None:
+        new_item.direct_term = direct_term
+
     get_modulestore(category).create_and_save_xmodule(dest_location, definition_data=data,
         metadata=metadata, system=parent.system)
+
 
     if category not in DETACHED_CATEGORIES:
         get_modulestore(parent.location).update_children(parent_location, parent.children + [dest_location.url()])
