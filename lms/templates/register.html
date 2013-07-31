@@ -141,32 +141,32 @@
         </div>
 
         <ol class="list-input">
-          
+
           % if ask_for_email:
 
           <li class="field required text" id="field-email">
             <label for="email">E-mail</label>
             <input class="" id="email" type="email" name="email" value="" placeholder="например: username@domain.com" />
           </li>
-          
+
           % endif
-          
+
           <li class="field required text" id="field-username">
             <label for="username">Имя пользователя</label>
             <input id="username" type="text" name="username" value="${extauth_username}" placeholder="например: JaneDoe" required aria-required="true" />
             <span class="tip tip-input">Публичный юзернейм, будет использоватья в дискуссиях, на форуме и т.п.</span>
           </li>
-          
+
           % if ask_for_fullname:
-          
+
           <li class="field required text" id="field-name">
             <label for="name">Полное имя</label>
             <input id="name" type="text" name="name" value="" placeholder="example: Jane Doe" />
             <span class="tip tip-input">Необходимо для получения сертификата <strong>(не может быть изменено!)</strong></span>
           </li>
-          
+
           % endif
-          
+
         </ol>
 
         % endif
@@ -283,7 +283,7 @@
         </a>
       </p>
     </div>
-      
+
     % endif
 
     ## TODO: Use a %block tag or something to allow themes to
