@@ -34,7 +34,7 @@ CMS.Views.OverviewAssignmentGrader = Backbone.View.extend({
 		this.template = _.template(
 				// TODO move to a template file
 				'<h4 class="status-label"><%= assignmentType %></h4>' +
-				'<a data-tooltip="Mark/unmark this subsection as graded" class="menu-toggle" href="#">' +
+				'<a data-tooltip="Способ оценивания" class="menu-toggle" href="#">' +
 					'<% if (!hideSymbol) {%><i class="icon-ok"></i><%};%>' +
 				'</a>' +
 				'<ul class="menu">' +

@@ -12,15 +12,12 @@
 <%def name="stanford_theme_enabled()">
   <% return theme_enabled() and getattr(settings, "THEME_NAME") == "stanford" %>
 </%def>
-
 <!DOCTYPE html>
 <html>
 <head>
   <%block name="title">
-    % if stanford_theme_enabled():
-      <title>Home | class.stanford.edu</title>
-    % else:
-      <title>edX</title>
+
+      <title>Пеликан</title>
       
       <script type="text/javascript">
         /* immediately break out of an iframe if coming from the marketing website */
@@ -30,7 +27,7 @@
           }
         })(this);
       </script>
-    % endif
+
   </%block>
 
   <link rel="icon" type="image/x-icon" href="${static.url(settings.FAVICON_PATH)}" />
@@ -52,14 +49,6 @@
   <![endif]-->
   <meta name="path_prefix" content="${MITX_ROOT_URL}">
   <meta name="google-site-verification" content="_mipQ4AtZQDNmbtOkwehQDOgCxUUV2fb_C0b6wbiRHY" />
-
-  % if not course:
-    % if theme_enabled():
-      <%include file="theme-google-analytics.html" />
-    % else:
-      <%include file="google_analytics.html" />
-    % endif
-  % endif
 
   <%include file="widgets/segment-io.html" />
 

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import cgi
 import datetime
 import hashlib
@@ -348,7 +349,7 @@ class CapaModule(CapaFields, XModule):
         else:
             final_check = False
 
-        return "Final Check" if final_check else "Check"
+        return u'Окончательный ответ' if final_check else u'Проверить'
 
     def should_show_check_button(self):
         """

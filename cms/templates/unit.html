@@ -2,7 +2,7 @@
 <%inherit file="base.html" />
 <%! from django.core.urlresolvers import reverse %>
 <%namespace name="units" file="widgets/units.html" />
-<%block name="title">${_("Individual Unit")}</%block>
+<%block name="title">Редактирование элемента</%block>
 <%block name="bodyclass">is-signedin course unit</%block>
 
 <%block name="jsextra">
@@ -33,26 +33,30 @@
 
 </%block>
 <%block name="content">
+
   <div class="main-wrapper edit-state-${unit_state}" data-id="${unit_location}">
+
     <div class="inner-wrapper">
       <div class="alert editing-draft-alert">
-        <p class="alert-message"><strong>${_("You are editing a draft.")}</strong>
+        <p class="alert-message"><strong>Вы редактируете черновик.</strong>
         % if published_date:
-        ${_("This unit was originally published on {date}.").format(date=published_date)}
+        Элемент будет опубликован ${published_date}.
         % endif
         </p>
-        <a href="${published_preview_link}" target="_blank" class="alert-action secondary">${_("View the Live Version")}</a>
+        ##<a href="${published_preview_link}" target="_blank" class="alert-action secondary">View the Live Version</a>
       </div>
       <div class="main-column">
         <article class="unit-body window">
-        <p class="unit-name-input"><label>${_("Display Name:")}</label><input type="text" value="${unit.display_name_with_default | h}" class="unit-display-name-input" /></p>
-          <ol class="components">
+          <p class="unit-name-input"><label>Название элемента:</label><input type="text" value="${unit.display_name_with_default | h}" class="unit-display-name-input" /></p>
+          <p class="unit-term-input"><label>Условие для перенаправления:</label><input type="text" value="${unit.direct_term_with_default | h}" class="unit-direct-term-input" /></p>
+            <ol class="components">
             % for id in components:
             <li class="component" data-id="${id}"/>
             % endfor
             <li class="new-component-item adding">
               <div class="new-component">
-                <h5>${_("Add New Component")}</h5>
+
+                <h5>Добавить компонент</h5>
                 <ul class="new-component-type">
                   % for type, templates in sorted(component_templates.items()):
                   <li>
@@ -74,14 +78,16 @@
                   % if len(templates) > 1 or type == 'advanced':
                 <div class="new-component-templates new-component-${type}">
                     % if type == "problem":
+
                     <div class="tab-group tabs">
                             <ul class="problem-type-tabs nav-tabs">
                               <li class="current">
-                                <a class="link-tab" href="#tab1">${_("Common Problem Types")}</a>
+                                <a class="link-tab" href="#tab1">Общие задания</a>
                               </li>
                               <li>
-                                <a class="link-tab" href="#tab2">${_("Advanced")}</a>
+                                <a class="link-tab" href="#tab2">Продвинутые задания</a>
                               </li>
+
                             </ul>
                     % endif
                     <div class="tab current" id="tab1">
@@ -136,40 +142,37 @@
 
       <div class="sidebar">
         <div class="unit-settings window">
-          <h4 class="header">${_("Unit Settings")}</h4>
+
+          <h4 class="header">Настройки элемента</h4>
           <div class="window-contents">
             <div class="row visibility">
-              <label class="inline-label">${_("Visibility:")}</label>
+              <label class="inline-label">Приватность:</label>
               <select class='visibility-select'>
-                <option value="public">${_("Public")}</option>
-                <option value="private">${_("Private")}</option>
+                <option value="public">Публично</option>
+                <option value="private">Приватно</option>
               </select>
             </div>
             <div class="row published-alert">
-              <p class="edit-draft-message">${_('This unit has been published. To make changes, you must {link_start}edit a draft{link_end}.').format(link_start='<a href="#" class="create-draft">', link_end='</a>')}</p>
-              <p class="publish-draft-message">${_('This is a draft of the published unit. To update the live version, you must {link_start}replace it with this draft{link_end}.').format(link_start='<a href="#" class="publish-draft">', link_end='</a>')}</p>
+              <p class="edit-draft-message">Элемент опубликован. Чтобы произвести изменения, нужно <a href="#" class="create-draft">отредактировать черновик</a>.</p>
+              <p class="publish-draft-message">Это черновик опубликованного элемента. Чтобы обновить публичную версию, <a href="#" class="publish-draft">замените её черновиком</a>.</p>
             </div>
             <div class="row status">
-              <p>${_("This unit is scheduled to be released to <strong>students</strong>")}
+              <p>Этот элемент будет доступен <strong>студентам</strong>
               % if release_date is not None:
-                ${_(u"on {date}").format(date=u"<strong>{}</strong>".format(release_date))}
+                  <strong>${release_date}</strong>
               % endif
-              ${_("with the subsection {link_start}{name}{link_end}").format(
-                  name=subsection.display_name_with_default,
-                  link_start='<a href="{url}">'.format(url=reverse('edit_subsection', kwargs={'location': subsection.location})),
-                  link_end='</a>',
-                )}
-              </p>
+              в подразделе <a href="${reverse('edit_subsection', kwargs={'location': subsection.location})}">"${subsection.display_name_with_default}"</a></p>
             </div>
             <div class="row unit-actions">
-              <a href="#" class="delete-draft delete-button">${_("Delete Draft")}</a>
-              <a href="${draft_preview_link}" target="_blank" class="preview-button">${_("Preview")}</a>
-              <a href="${published_preview_link}" target="_blank" class="view-button">${_("View Live")}</a>
+              <a href="#" class="delete-draft delete-button">Удалить черновик</a>
+              ##<a href="${draft_preview_link}" target="_blank" class="preview-button">Preview</a>
+              ##<a href="${published_preview_link}" target="_blank" class="view-button">View Live</a>
+
             </div>
           </div>
         </div>
         <div class="window unit-location">
-          <h4 class="header">${_("Unit Location")}</h4>
+          <h4 class="header">Расположение элемента</h4>
           <div class="window-contents">
             <div class="row wrapper-unit-id">
               <p class="unit-id">

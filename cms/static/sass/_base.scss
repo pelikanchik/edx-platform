@@ -905,3 +905,19 @@ body.hide-wip {
     display: none;
   }
 }
+
+
+.termConstructor {
+
+    padding: 1em; max-width: 655px;
+
+    input.value {width: 5em!important; border: 1px solid #ccc;}
+    p { margin-top: 0.9em; margin-bottom: 0.9em; }
+    select{font-size:0.8em; border:1px solid #ccc;padding: 2px; padding-right: 0px; }
+    img {cursor:pointer; padding:0; margin:0;}
+    TABLE, .liveExample TD, .liveExample TH { padding: 3px!important; border-width: 0; margin: 0; }
+    TD {padding: 3px!important;}
+    table.termEditor > tbody > TR { border-bottom: 1px solid silver; }
+    td input { font-size:0.8em!important;padding: 1px 4px;}
+
+}
