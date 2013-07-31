@@ -4,6 +4,7 @@ from collections import defaultdict
 
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_http_methods
 from django.core.exceptions import PermissionDenied
 from django_future.csrf import ensure_csrf_cookie
 from django.conf import settings
@@ -15,7 +16,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.util.date_utils import get_default_time_display
 
 from xblock.core import Scope
-from util.json_request import expect_json
+from util.json_request import expect_json, JsonResponse
 
 from contentstore.module_info_model import get_module_info, set_module_info
 from contentstore.utils import get_modulestore, get_lms_link_for_item, \
@@ -23,8 +24,10 @@ from contentstore.utils import get_modulestore, get_lms_link_for_item, \
 
 from models.settings.course_grading import CourseGradingModel
 
-from .requests import get_request_method, _xmodule_recurse
+from .requests import _xmodule_recurse
 from .access import has_access
+from xmodule.x_module import XModuleDescriptor
+from xblock.plugin import PluginMissingError
 
 __all__ = ['OPEN_ENDED_COMPONENT_TYPES',
            'ADVANCED_COMPONENT_POLICY_KEY',
@@ -46,6 +49,16 @@ NOTE_COMPONENT_TYPES = ['notes']
 ADVANCED_COMPONENT_TYPES = ['annotatable', 'word_cloud', 'videoalpha'] + OPEN_ENDED_COMPONENT_TYPES + NOTE_COMPONENT_TYPES
 ADVANCED_COMPONENT_CATEGORY = 'advanced'
 ADVANCED_COMPONENT_POLICY_KEY = 'advanced_modules'
+
+
+# checking if section with id = section_id doesn't exist in sections
+def is_section_exist(section_id, sections):
+    for section in sections:
+       for subsection in section.get_children():
+           if subsection.url_name == section_id:
+                return True
+
+    return False
 
 
 @login_required
@@ -79,6 +92,14 @@ def edit_subsection(request, location):
 
     # this should blow up if we don't find any parents, which would be erroneous
     parent = modulestore().get_item(parent_locs[0])
+    sections = modulestore().get_item(course.location, depth=3).get_children()
+
+    #for section in sections:
+    #   print section.display_name_with_default
+    #    subsections = section.get_children()
+    #    for subsection in subsections:
+    #        print subsection.display_name_with_default
+
 
     # remove all metadata from the generic dictionary that is presented in a more normalized UI
 
@@ -88,6 +109,18 @@ def edit_subsection(request, location):
         in item.fields
         if field.name not in ['display_name', 'start', 'due', 'format', 'unlock_term'] and field.scope == Scope.settings
     )
+
+    #item.unlock_term = '{"disjunctions":[]}'
+    term = json.loads(item.unlock_term)
+
+
+    # updating if term has links to already not existed sections
+    for disjunction in term["disjunctions"]:
+        for conjunction in disjunction["conjunctions"]:
+            if not is_section_exist(conjunction["source_section_id"], sections):
+                disjunction["conjunctions"].remove(conjunction)
+
+    item.unlock_term = json.dumps(term)
 
     can_view_live = False
     subsection_units = item.get_children()
@@ -100,7 +133,7 @@ def edit_subsection(request, location):
     return render_to_response('edit_subsection.html',
                               {'subsection': item,
                                'context_course': course,
-                               'create_new_unit_template': Location('i4x', 'edx', 'templates', 'vertical', 'Empty'),
+                               'new_unit_category': 'vertical',
                                'lms_link': lms_link,
                                'preview_link': preview_link,
                                'course_graders': json.dumps(CourseGradingModel.fetch(course.location).graders),
@@ -108,6 +141,7 @@ def edit_subsection(request, location):
                                'parent_item': parent,
                                'policy_metadata': policy_metadata,
                                'subsection_units': subsection_units,
+                               'sections': sections,
                                'can_view_live': can_view_live
                                })
 
@@ -133,10 +167,26 @@ def edit_unit(request, location):
         item = modulestore().get_item(location, depth=1)
     except ItemNotFoundError:
         return HttpResponseBadRequest()
-
     lms_link = get_lms_link_for_item(item.location, course_id=course.location.course_id)
 
     component_templates = defaultdict(list)
+    for category in COMPONENT_TYPES:
+        component_class = XModuleDescriptor.load_class(category)
+        # add the default template
+        component_templates[category].append((
+            component_class.display_name.default or 'Blank',
+            category,
+            False,  # No defaults have markdown (hardcoded current default)
+            None  # no boilerplate for overrides
+        ))
+        # add boilerplates
+        for template in component_class.templates():
+            component_templates[category].append((
+                template['metadata'].get('display_name'),
+                category,
+                template['metadata'].get('markdown') is not None,
+                template.get('template_id')
+            ))
 
     # Check if there are any advanced modules specified in the course policy. These modules
     # should be specified as a list of strings, where the strings are the names of the modules
@@ -144,28 +194,28 @@ def edit_unit(request, location):
     course_advanced_keys = course.advanced_modules
 
     # Set component types according to course policy file
-    component_types = list(COMPONENT_TYPES)
     if isinstance(course_advanced_keys, list):
-        course_advanced_keys = [c for c in course_advanced_keys if c in ADVANCED_COMPONENT_TYPES]
-        if len(course_advanced_keys) > 0:
-            component_types.append(ADVANCED_COMPONENT_CATEGORY)
+        for category in course_advanced_keys:
+            if category in ADVANCED_COMPONENT_TYPES:
+                # Do I need to allow for boilerplates or just defaults on the class? i.e., can an advanced
+                # have more than one entry in the menu? one for default and others for prefilled boilerplates?
+                try:
+                    component_class = XModuleDescriptor.load_class(category)
+
+                    component_templates['advanced'].append((
+                        component_class.display_name.default or category,
+                        category,
+                        False,
+                        None  # don't override default data
+                        ))
+                except PluginMissingError:
+                    # dhm: I got this once but it can happen any time the course author configures
+                    # an advanced component which does not exist on the server. This code here merely
+                    # prevents any authors from trying to instantiate the non-existent component type
+                    # by not showing it in the menu
+                    pass
     else:
         log.error("Improper format for course advanced keys! {0}".format(course_advanced_keys))
-
-    templates = modulestore().get_items(Location('i4x', 'edx', 'templates'))
-    for template in templates:
-        category = template.location.category
-
-        if category in course_advanced_keys:
-            category = ADVANCED_COMPONENT_CATEGORY
-
-        if category in component_types:
-            # This is a hack to create categories for different xmodules
-            component_templates[category].append((
-                template.display_name_with_default,
-                template.location.url(),
-                hasattr(template, 'markdown') and template.markdown is not None
-            ))
 
     components = [
         component.location.url()
@@ -207,11 +257,8 @@ def edit_unit(request, location):
 
     unit_state = compute_unit_state(item)
 
-    print (item)
-
     return render_to_response('unit.html', {
         'context_course': course,
-        'active_tab': 'courseware',
         'unit': item,
         'unit_location': location,
         'components': components,
@@ -221,7 +268,7 @@ def edit_unit(request, location):
         'subsection': containing_subsection,
         'release_date': get_default_time_display(containing_subsection.lms.start) if containing_subsection.lms.start is not None else None,
         'section': containing_section,
-        'create_new_unit_template': Location('i4x', 'edx', 'templates', 'vertical', 'Empty'),
+        'new_unit_category': 'vertical',
         'unit_state': unit_state,
         'published_date': get_default_time_display(item.cms.published_date) if item.cms.published_date is not None else None
     })
@@ -236,14 +283,12 @@ def assignment_type_update(request, org, course, category, name):
     '''
     location = Location(['i4x', org, course, category, name])
     if not has_access(request.user, location):
-        raise HttpResponseForbidden()
+        return HttpResponseForbidden()
 
     if request.method == 'GET':
-        return HttpResponse(json.dumps(CourseGradingModel.get_section_grader_type(location)),
-                            mimetype="application/json")
+        return JsonResponse(CourseGradingModel.get_section_grader_type(location))
     elif request.method == 'POST':  # post or put, doesn't matter.
-        return HttpResponse(json.dumps(CourseGradingModel.update_section_grader_type(location, request.POST)),
-                            mimetype="application/json")
+        return JsonResponse(CourseGradingModel.update_section_grader_type(location, request.POST))
 
 
 @login_required
@@ -257,7 +302,7 @@ def create_draft(request):
 
     # This clones the existing item location to a draft location (the draft is implicit,
     # because modulestore is a Draft modulestore)
-    modulestore().clone_item(location, location)
+    modulestore().convert_to_draft(location)
 
     return HttpResponse()
 
@@ -293,6 +338,7 @@ def unpublish_unit(request):
 
 
 @expect_json
+@require_http_methods(("GET", "POST", "PUT"))
 @login_required
 @ensure_csrf_cookie
 def module_info(request, module_location):
@@ -302,8 +348,6 @@ def module_info(request, module_location):
     if not has_access(request.user, location):
         raise PermissionDenied()
 
-    real_method = get_request_method(request)
-
     rewrite_static_links = request.GET.get('rewrite_url_links', 'True') in ['True', 'true']
     logging.debug('rewrite_static_links = {0} {1}'.format(request.GET.get('rewrite_url_links', 'False'), rewrite_static_links))
 
@@ -311,9 +355,7 @@ def module_info(request, module_location):
     if not has_access(request.user, location):
         raise PermissionDenied()
 
-    if real_method == 'GET':
-        return HttpResponse(json.dumps(get_module_info(get_modulestore(location), location, rewrite_static_links=rewrite_static_links)), mimetype="application/json")
-    elif real_method == 'POST' or real_method == 'PUT':
-        return HttpResponse(json.dumps(set_module_info(get_modulestore(location), location, request.POST)), mimetype="application/json")
-    else:
-        return HttpResponseBadRequest()
+    if request.method == 'GET':
+        return JsonResponse(get_module_info(get_modulestore(location), location, rewrite_static_links=rewrite_static_links))
+    elif request.method in ("POST", "PUT"):
+        return JsonResponse(set_module_info(get_modulestore(location), location, request.POST))

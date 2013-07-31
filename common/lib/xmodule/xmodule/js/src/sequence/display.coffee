@@ -112,7 +112,7 @@ class @Sequence
       @$('#seq_content').html @contents.eq(new_position - 1).text()
       XModule.loadModules(@$('#seq_content'))
 
-      MathJax.Hub.Queue(["Typeset", MathJax.Hub, "seq_content"]) # NOTE: Actually redundant. Some other MathJax call also being performed
+      #MathJax.Hub.Queue(["Typeset", MathJax.Hub, "seq_content"]) # NOTE: Actually redundant. Some other MathJax call also being performed
       window.update_schematics() # For embedded circuit simulator exercises in 6.002x
 
       @position = new_position
@@ -183,25 +183,19 @@ class @Sequence
 
   godynamo: (event) =>
     event.preventDefault()
-    @term = @contents.eq(@position - 1).data('direct_term')
-    percenta = @parse_progress()
-    good = parseInt(@term.substring(0,@term.indexOf(',')))
-    bad = parseInt(@term.substring(@term.indexOf(',')+1))
-    if percenta > 0.5
-      new_position = good
-    else
-      new_position = bad
-    Logger.log "seq_godynamo", old: @position, new: new_position, id: @id
+    modx_full_url = @modx_url + '/' + @id + "/dynamo"
+    $.postWithPrefix modx_full_url, (response) =>
+      new_position = response.position
+      Logger.log "seq_godynamo", old: @position, new: new_position, id: @id
 
-    analytics.pageview @id
+      analytics.pageview @id
 
-    # navigation using the previous arrow
-    analytics.track "Accessed Previous Sequential",
-      sequence_id: @id
-      current_sequential: @position
-      target_sequential: new_position
+      analytics.track "Accessed Previous Sequential",
+        sequence_id: @id
+        current_sequential: @position
+        target_sequential: new_position
 
-    @render new_position
+      @render new_position
 
   link_for: (position) ->
     @$("#sequence-list a[data-element=#{position}]")
@@ -219,3 +213,6 @@ class @Sequence
     element.removeClass("inactive")
     .removeClass("visited")
     .addClass("active")
+
+  @inputAjax: (url, data, callback) ->
+    $.postWithPrefix "#{url}/input_ajax", data, callback

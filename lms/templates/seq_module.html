@@ -6,7 +6,7 @@
     <ul class="sequence-nav-buttons">
       <li class="prev"><a href="#">Previous</a></li>
     </ul>
-    
+
     <div class="sequence-list-wrapper">
       <ol id="sequence-list">
         % for idx, item in enumerate(items):
@@ -37,7 +37,6 @@
           data-progress_detail="${item['progress_detail']}">
       ${item['direct_term']}
       ${item['content'] | h}
-      ${item['progress_detail']}
   </div>
   % endfor
   <div id="seq_content"></div>

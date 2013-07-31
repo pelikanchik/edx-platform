@@ -123,9 +123,8 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
         }
     else
        {
-            data: @xml_editor.getValue()
-            metadata:
-               markdown: null
+          data: @xml_editor.getValue()
+          nullout: ['markdown']
        }
 
   @insertMultipleChoice: (selectedText) ->
@@ -208,6 +207,29 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
         }
         groupString += '  </choicegroup>\n';
         groupString += '</multiplechoiceresponse>\n\n';
+        return groupString;
+      });
+
+
+      //intro for MSUP
+      xml = xml.replace(/(^\s*[I]:.*\n\s*[S]:.*)+/gm, function(match, p) {
+         return match.split(/^\s*[I]:.*\n\s*[S]:\s*/)[1];
+      });
+
+      // group check answers for MSUP
+      xml = xml.replace(/(^\s*[+-]:.*?$\n*)+/gm, function(match, p) {
+        var groupString = '<choiceresponse>\n';
+        groupString += '  <checkboxgroup direction="vertical">\n';
+        var options = match.split('\n');
+        for(var i = 0; i < options.length; i++) {
+          if(options[i].length > 0) {
+            var value = options[i].split(/^\s*[+-]:\s*/)[1];
+            var correct = /^\s*\+:/i.test(options[i]);
+            groupString += '    <choice correct="' + correct + '">' + value + '</choice>\n';
+          }
+        }
+        groupString += '  </checkboxgroup>\n';
+        groupString += '</choiceresponse>\n\n';
         return groupString;
       });
 

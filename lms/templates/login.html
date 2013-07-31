@@ -5,7 +5,7 @@
 <%! from django.core.urlresolvers import reverse %>
 <%! from django.utils.translation import ugettext as _ %>
 
-<%block name="title"><title>Log into your ${settings.PLATFORM_NAME} Account</title></%block>
+<%block name="title"><title>${settings.PLATFORM_NAME} | Авторизация</title></%block>
 
 <%block name="js_extra">
   <script type="text/javascript">
@@ -38,13 +38,12 @@
         toggleSubmitButton(false);
       });
 
-      $('#login-form').on('ajax:complete', function() {
+      $('#login-form').on('ajax:error', function() {
         toggleSubmitButton(true);
       });
 
       $('#login-form').on('ajax:success', function(event, json, xhr) {
         if(json.success) {
-          $('.message.submission-error').removeClass('is-shown');
           var u=decodeURI(window.location.search);
           next=u.split("next=")[1];
           if (next) {
@@ -53,6 +52,7 @@
             location.href="${reverse('dashboard')}";
           }
         } else {
+          toggleSubmitButton(true);
           $('.message.submission-error').addClass('is-shown').focus();
           $('.message.submission-error .message-copy').html(json.value);
         }
@@ -66,7 +66,7 @@
         $submitButton.
           removeClass('is-disabled').
           removeProp('disabled').
-          html('Log into My ${settings.PLATFORM_NAME} Account <span class="orn-plus">+</span> Access My Courses');
+          html('Войти');
       }
       else {
         $submitButton.
@@ -79,9 +79,9 @@
 </%block>
 
 <section class="introduction">
-  <header>
+  <!--<header>
     <h1 class="sr">${_("Log Into Your Account")}</h1>
-  </header>
+  </header> -->
 </section>
 
 <section class="login container">
@@ -90,14 +90,13 @@
 
       <!-- status messages -->
       <div role="alert" class="status message">
-        <h3 class="message-title">We're Sorry, ${settings.PLATFORM_NAME} accounts are unavailable currently</h3>
-        <p class="message-copy">Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Lorem ipsum dolor sit amet, consectetuer adipiscing elit.</p>
-      </div>
+        <h3 class="message-title">К сожалению, авторизация сейчас не доступна</h3>
+        </div>
 
       <div role="alert" class="status message submission-error" tabindex="-1">
-        <h3 class="message-title">The following errors occured while logging you in: </h3>
+        <h3 class="message-title">Введенные данные некорректны: </h3>
         <ul class="message-copy">
-          <li>Your email or password is incorrect</li>
+          <li>Введённый e-mail или пароль неверен</li>
         </ul>
       </div>
 
@@ -106,30 +105,30 @@
       </p>
 
       <fieldset class="group group-form group-form-requiredinformation">
-        <legend class="sr">Required Information</legend>
+        <legend class="sr">Необходимая информация</legend>
 
         <ol class="list-input">
           <li class="field required text" id="field-email">
             <label for="email">E-mail</label>
-            <input class="" id="email" type="email" name="email" value="" placeholder="example: username@domain.com" required aria-required="true" />
+            <input class="" id="email" type="email" name="email" value="" placeholder="например: username@domain.com" required aria-required="true" />
           </li>
           <li class="field required password" id="field-password">
-            <label for="password">Password</label>
+            <label for="password">Пароль</label>
             <input id="password" type="password" name="password" value="" required aria-required="true" />
             <span class="tip tip-input">
-              <a href="#forgot-password-modal" rel="leanModal" class="pwd-reset action action-forgotpw">Forgot password?</a>
+              <a href="#forgot-password-modal" rel="leanModal" class="pwd-reset action action-forgotpw">Забыли пароль?</a>
             </span>
           </li>
         </ol>
       </fieldset>
 
       <fieldset class="group group-form group-form-secondary group-form-accountpreferences">
-        <legend class="sr">Account Preferences</legend>
+        <legend class="sr">Дополнительные опции</legend>
 
         <ol class="list-input">
           <li class="field required checkbox" id="field-remember">
             <input id="remember-yes" type="checkbox" name="remember" value="true" />
-            <label for="remember-yes">Remember me</label>
+            <label for="remember-yes">Запомнить меня</label>
           </li>
         </ol>
       </fieldset>
@@ -147,7 +146,7 @@
 
   <aside role="complementary">
     <header>
-      <h2 class="sr">Helpful Information</h2>
+      <h2 class="sr">Полезная информация</h2>
     </header>
 
     % if settings.MITX_FEATURES.get('AUTH_USE_OPENID'):
@@ -159,16 +158,16 @@
     % endif
 
     <div class="cta cta-help">
-      <h3>Not Enrolled?</h3>
-      <p><a href="${reverse('register_user')}">Sign up for ${settings.PLATFORM_NAME} today!</a></p>
+      <h3>Ещё не с нами?</h3>
+      <p><a href="${reverse('register_user')}">Присоединяйтесь!</a></p>
 
       ## Disable help unless the FAQ marketing link is enabled
       % if settings.MKTG_URL_LINK_MAP.get('FAQ'):
-        <h3>Need Help?</h3>
-        <p>Looking for help in logging in or with your ${settings.PLATFORM_NAME} account?
-        <a href="${marketing_link('FAQ')}">
-            View our help section for answers to commonly asked questions.
-        </a></p>
+        <h3>Не получается?</h3>
+        <p>Нужна помощь с авторизацией?
+
+            Воспользуйтесь <a href="${marketing_link('FAQ')}">списком часто задаваемых вопросов</a>
+        </p>
       % endif
     </div>
   </aside>
