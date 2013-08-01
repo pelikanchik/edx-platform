@@ -209,7 +209,6 @@ def get_module_for_descriptor_internal(user, descriptor, model_data_cache, cours
     # Short circuit--if the user shouldn't have access, bail without doing any work
     if not has_access(user, descriptor, 'load', course_id):
         return None
-
     # Setup system context for module instance
     ajax_url = reverse(
         'modx_dispatch',

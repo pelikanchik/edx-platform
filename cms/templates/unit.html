@@ -6,6 +6,11 @@
 <%block name="bodyclass">is-signedin course unit</%block>
 
 <%block name="jsextra">
+
+<script type='text/javascript' src='/static/js/knockout.js'></script>
+<script type='text/javascript' src='/static/js/knockout-mapping.js'></script>
+<script type='text/javascript' src='/static/js/numeric.js'></script>
+
   <script type='text/javascript'>
   $(document).ready(function() {
     new CMS.Views.UnitEdit({
@@ -49,6 +54,9 @@
         <article class="unit-body window">
           <p class="unit-name-input"><label>Название элемента:</label><input type="text" value="${unit.display_name_with_default | h}" class="unit-display-name-input" /></p>
           <p class="unit-term-input"><label>Условие для перенаправления:</label><input type="text" value="${unit.direct_term_with_default | h}" class="unit-direct-term-input" /></p>
+
+
+
             <ol class="components">
             % for id in components:
             <li class="component" data-id="${id}"/>

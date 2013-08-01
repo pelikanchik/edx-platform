@@ -1,4 +1,7 @@
-<div id="sequence_${element_id}" class="sequence" data-id="${item_id}" data-position="${position}" data-course_modx_root="/course/modx" >
+<div id="sequence_${element_id}" class="sequence"
+     data-id="${item_id}"
+     data-position="${position}"
+     data-course_modx_root="/course/modx" >
   <nav aria-label="Section Navigation" class="sequence-nav">
     <ul class="sequence-nav-buttons">
       <li class="prev"><a href="#">Previous</a></li>
@@ -29,9 +32,17 @@
   </nav>
 
   % for item in items:
-  <div class="seq_contents tex2jax_ignore asciimath2jax_ignore">${item['content'] | h}</div>
+  <div class="seq_contents tex2jax_ignore asciimath2jax_ignore"
+          data-direct_term="${item['direct_term']}"
+          data-progress_detail="${item['progress_detail']}">
+      ${item['content'] | h}
+  </div>
   % endfor
   <div id="seq_content"></div>
+
+  <ul class="sequence-nav-buttons">
+    <li class ="godynamo"><a href= "#">Вперед!</a></li>
+  </ul>
 
   <nav class="sequence-bottom">
     <ul aria-label="Section Navigation" class="sequence-nav-buttons">
