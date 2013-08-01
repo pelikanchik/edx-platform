@@ -437,7 +437,6 @@ it is fed into MathJax. Return 'false' if no preprocessor specified
 
     javascriptinput: (element, display) =>
       display.hideAnswer()
-      display.hideAnswer()
 
     choicetextgroup: (element, display) =>
       element = $(element)
