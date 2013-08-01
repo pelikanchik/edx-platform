@@ -32,7 +32,6 @@ class SequenceFields(object):
 
 def get_unit(unit_id, section):
         for child in section.get_children():
-            print child.id
             if unit_id in child.id:
                 return child
         return None
@@ -57,17 +56,13 @@ def elementary_conjunction(term, section):
 
         progress = unit.get_progress()
 
-        print "&&&&&&&&&&&&&&&&&???????????????????????????????????????????????????"
-
-        print Progress.to_js_detail_str(progress)
-
         if term["field"]=="score_rel":
             value = Progress.percent(progress)
 
 
         if term["field"]=="score_abs":
-            str_value = Progress.to_js_detail_str(progress)
-            value = str_value.substring(0, str_value.index_of('//'))
+            str_value = Progress.frac(progress)
+            value = str_value[0]
 
         if term["sign"]== "more":
             if value > term["value"]:
@@ -140,39 +135,37 @@ class SequenceModule(SequenceFields, XModule):
     def handle_ajax(self, dispatch, data):  # TODO: bounds checking
         ''' get = request.POST instance '''
         if dispatch == 'dynamo':
-            print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-            print self.id
             section = self
             cur_position = self.position
-            print cur_position
+            pos = 1
             for child in self.get_children():
-                term = json.loads(child.direct_term_with_default)
-                for element_term in term:
-                    print element_term
-                    print element_term["disjunctions"]
-                    if not element_term["disjunctions"]:
-                        return json.dumps({'position': cur_position})
-                    for disjunction in element_term["disjunctions"]:
-                        print element_term["direct_unit_id"]
-                        term_result = element_term["direct_unit_id"]
-                        if not disjunction["conjunctions"]:
-                            new_position = 1
-                            for check_child in self.get_children():
-                                if term_result in check_child.id:
-                                    return json.dumps({'position': new_position})
-                                new_position += 1
+                if pos == cur_position:
+                    term = json.loads(child.direct_term_with_default)
+                    for element_term in term:
+                        if not element_term["disjunctions"]:
+                            return json.dumps({'position': cur_position})
+                        for disjunction in element_term["disjunctions"]:
+                            term_result = element_term["direct_unit_id"]
+                            if not disjunction["conjunctions"]:
+                                new_position = 1
+                                for check_child in self.get_children():
+                                    if term_result in check_child.id:
 
-                        conjunctions_result = True
-                        for conjunction in disjunction["conjunctions"]:
+                                        return json.dumps({'position': new_position})
+                                    new_position += 1
 
-                            conjunctions_result = conjunctions_result * elementary_conjunction(conjunction, section)
+                            conjunctions_result = True
+                            for conjunction in disjunction["conjunctions"]:
 
-                        if conjunctions_result == True:
-                            new_position = 1
-                            for check_child in self.get_children():
-                                if term_result in check_child.id:
-                                    return json.dumps({'position': new_position})
-                                new_position += 1
+                                conjunctions_result = conjunctions_result * elementary_conjunction(conjunction, section)
+
+                            if conjunctions_result == True:
+                                new_position = 1
+                                for check_child in self.get_children():
+                                    if term_result in check_child.id:
+                                        return json.dumps({'position': new_position})
+                                    new_position += 1
+                pos += 1
         if dispatch == 'goto_position':
             self.position = int(data['position'])
             return json.dumps({'success': True})

@@ -5,7 +5,6 @@ class @Sequence
     @num_contents = @contents.length
     @id = @el.data('id')
     @modx_url = @el.data('course_modx_root')
-    @parse_progress()
     @initProgress()
     @bind()
     @render parseInt(@el.data('position'))
@@ -15,20 +14,6 @@ class @Sequence
 
   bind: ->
     @$('#sequence-list a').click @goto
-
-  #Example 0/1 1/2 5/7 percenta = (0+1+5)/(1+2+7) = 0.6
-
-  parse_progress: ->
-    earned = 0
-    possible = 0
-    $('.problems-wrapper').each (index) ->
-      progress = $(this).attr 'progress'
-      earned += parseInt(progress.substring(0,progress.indexOf('/')))
-      possible += parseInt(progress.substring(progress.indexOf('/')+1))
-    percenta = 1
-    if possible != 0
-      percenta = earned/possible
-    return percenta
 
 
   initProgress: ->
@@ -60,13 +45,9 @@ class @Sequence
   updateProgress: =>
     new_progress = "NA"
     _this = this
-    percenta = @parse_progress()
-    progress = "in_progress"
-    if percenta == 0
-      progress = "none"
-    if percenta == 1
-      progress = "done"
-    new_progress = _this.mergeProgress progress, new_progress
+    $('.problems-wrapper').each (index) ->
+      progress = $(this).data 'progress_status'
+      new_progress = _this.mergeProgress progress, new_progress
 
     @progressTable[@position] = new_progress
     @setProgress(new_progress, @link_for(@position))

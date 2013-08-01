@@ -19,7 +19,7 @@
            data-id="${item['id']}"
            data-element="${idx+1}"
            href="javascript:void(0);">
-            <p class="sr">${item['title']}, ${item['type']}</p>
+            <p>${item['title']}<span class="sr">, ${item['type']}</span></p>
           </a>
         </li>
         % endfor
@@ -35,7 +35,6 @@
   <div class="seq_contents tex2jax_ignore asciimath2jax_ignore"
           data-direct_term="${item['direct_term']}"
           data-progress_detail="${item['progress_detail']}">
-      ${item['direct_term']}
       ${item['content'] | h}
   </div>
   % endfor
