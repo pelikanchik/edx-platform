@@ -11,7 +11,7 @@
 <%! from datetime import date %>
 <%! import calendar %>
 
-<%block name="title"><title>Register for ${settings.PLATFORM_NAME}</title></%block>
+<%block name="title"><title>${settings.PLATFORM_NAME} | Регистрация</title></%block>
 
 <%block name="js_extra">
   <script type="text/javascript">
@@ -45,16 +45,16 @@
         toggleSubmitButton(false);
       });
 
-      $('#register-form').on('ajax:complete', function() {
+      $('#register-form').on('ajax:error', function() {
         toggleSubmitButton(true);
       });
 
       $('#register-form').on('ajax:success', function(event, json, xhr) {
         if(json.success) {
-          $('.message.submission-error').removeClass('is-shown');
           location.href="${reverse('dashboard')}";
        } else {
-         $('.status.message.submission-error').addClass('is-shown');
+         toggleSubmitButton(true);
+         $('.status.message.submission-error').addClass('is-shown').focus();
          $('.status.message.submission-error .message-copy').html(json.value).stop().css("display", "block");
          $(".field-error").removeClass('field-error');
          $("[data-field='"+json.field+"']").addClass('field-error')
@@ -69,22 +69,22 @@
         $submitButton.
           removeClass('is-disabled').
           removeProp('disabled').
-          html('Create my ${settings.PLATFORM_NAME} Account');
+          html('Создать аккаунт');
       }
       else {
         $submitButton.
           addClass('is-disabled').
           prop('disabled', true).
-          html('Processing your account information &hellip;');
+          html('Создание аккаунта &hellip;');
       }
     }
   </script>
 </%block>
 
 <section class="introduction">
-  <header>
+  <!--<header>
     <h1 class="sr">${_("Welcome! Register below to create your %(platform_name)s account") % {'platform_name': settings.PLATFORM_NAME}}</h1>
-  </header>
+  </header> -->
 </section>
 
 <section class="register container">
@@ -97,88 +97,88 @@
         <p class="message-copy">Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Lorem ipsum dolor sit amet, consectetuer adipiscing elit.</p>
       </div>
 
-      <div role="alert" class="status message submission-error">
-        <h3 class="message-title">The following errors occured while processing your registration: </h3>
+      <div role="alert" class="status message submission-error" tabindex="-1">
+        <h3 class="message-title">Ошибка: </h3>
         <ul class="message-copy"> </ul>
       </div>
 
       <p class="instructions">
-        Please complete the following fields to register for an account. <br />
-        Required fields are noted by <strong class="indicator">bold text and an asterisk (*)</strong>.
+        Пожалуйста, заполните, следующие поля для регистрации.<br />
+        Необходимые для заполнения поля помечены <strong class="indicator">жирным текстом и звездочкой (*)</strong>.
       </p>
 
       <fieldset class="group group-form group-form-requiredinformation">
-        <legend class="sr">Required Information</legend>
+        <legend class="sr">Необходимая информация</legend>
 
         % if has_extauth_info is UNDEFINED:
 
         <ol class="list-input">
           <li class="field required text" id="field-email">
             <label for="email">E-mail</label>
-            <input class="" id="email" type="email" name="email" value="" placeholder="example: username@domain.com" required aria-required="true" />
+            <input class="" id="email" type="email" name="email" value="" placeholder="например: username@domain.com" required aria-required="true" />
           </li>
           <li class="field required password" id="field-password">
-            <label for="password">Password</label>
+            <label for="password">Пароль</label>
             <input id="password" type="password" name="password" value="" required aria-required="true" />
           </li>
           <li class="field required text" id="field-username">
-            <label for="username">Public Username</label>
-            <input id="username" type="text" name="username" value="" placeholder="example: JaneDoe" required aria-required="true" />
-            <span class="tip tip-input">Will be shown in any discussions or forums you participate in</span>
+            <label for="username">Имя пользователя</label>
+            <input id="username" type="text" name="username" value="" placeholder="например: VPetrov" required aria-required="true" />
+            <span class="tip tip-input">Публичное имя, будет использоватья в дискуссиях, на форуме и т.п.</span>
           </li>
           <li class="field required text" id="field-name">
-            <label for="name">Full Name</label>
-            <input id="name" type="text" name="name" value="" placeholder="example: Jane Doe" required aria-required="true" />
-            <span class="tip tip-input">Needed for any certificates you may earn <strong>(cannot be changed later)</strong></span>
+            <label for="name">Полное имя</label>
+            <input id="name" type="text" name="name" value="" placeholder="например: Василий Петров" required aria-required="true" />
+            <span class="tip tip-input">Необходимо для получения сертификата <strong>(не может быть изменено!)</strong></span>
           </li>
         </ol>
 
         % else:
 
         <div class="message">
-          <h3 class="message-title">Welcome ${extauth_id}</h3>
-          <p class="message-copy">Enter a public username:</p>
+          <h3 class="message-title">Здравствуйте ${extauth_id}</h3>
+          <p class="message-copy">Введите ваше имя пользователя:</p>
         </div>
 
         <ol class="list-input">
-          
+
           % if ask_for_email:
 
           <li class="field required text" id="field-email">
             <label for="email">E-mail</label>
-            <input class="" id="email" type="email" name="email" value="" placeholder="example: username@domain.com" />
+            <input class="" id="email" type="email" name="email" value="" placeholder="например: username@domain.com" />
           </li>
-          
+
           % endif
-          
+
           <li class="field required text" id="field-username">
-            <label for="username">Public Username</label>
-            <input id="username" type="text" name="username" value="${extauth_username}" placeholder="example: JaneDoe" required aria-required="true" />
-            <span class="tip tip-input">Will be shown in any discussions or forums you participate in</span>
+            <label for="username">Имя пользователя</label>
+            <input id="username" type="text" name="username" value="${extauth_username}" placeholder="например: JaneDoe" required aria-required="true" />
+            <span class="tip tip-input">Публичный юзернейм, будет использоватья в дискуссиях, на форуме и т.п.</span>
           </li>
-          
+
           % if ask_for_fullname:
-          
+
           <li class="field required text" id="field-name">
-            <label for="name">Full Name</label>
+            <label for="name">Полное имя</label>
             <input id="name" type="text" name="name" value="" placeholder="example: Jane Doe" />
-            <span class="tip tip-input">Needed for any certificates you may earn <strong>(cannot be changed later)</strong></span>
+            <span class="tip tip-input">Необходимо для получения сертификата <strong>(не может быть изменено!)</strong></span>
           </li>
-          
+
           % endif
-          
+
         </ol>
 
         % endif
       </fieldset>
 
       <fieldset class="group group-form group-form-secondary group-form-personalinformation">
-        <legend class="sr">Optional Personal Information</legend>
+        <legend class="sr">Дополнительная информация</legend>
 
         <ol class="list-input">
           <li class="field-group">
             <div class="field select" id="field-education-level">
-              <label for="education-level">Highest Level of Education Completed</label>
+              <label for="education-level">Образование</label>
               <select id="education-level" name="level_of_education">
                 <option value="">--</option>
                 %for code, ed_level in UserProfile.LEVEL_OF_EDUCATION_CHOICES:
@@ -188,7 +188,7 @@
             </div>
 
             <div class="field select" id="field-gender">
-              <label for="gender">Gender</label>
+              <label for="gender">Пол</label>
               <select id="gender" name="gender">
                 <option value="">--</option>
                 %for code, gender in UserProfile.GENDER_CHOICES:
@@ -198,7 +198,7 @@
             </div>
 
             <div class="field select" id="field-yob">
-              <label for="yob">Year of Birth</label>
+              <label for="yob">Год рождения</label>
               <select id="yob" name="year_of_birth">
                 <option value="">--</option>
                 %for year in UserProfile.VALID_YEARS:
@@ -211,18 +211,19 @@
       </fieldset>
 
       <fieldset class="group group-form group-form-personalinformation2">
-        <legend class="sr">Optional Personal Information</legend>
+        <legend class="sr">Дополнительная информация </legend>
 
         <ol class="list-input">
           <li class="field text" id="field-address-mailing">
-            <label for="address-mailing">Mailing Address</label>
+            <label for="address-mailing">Почтовый адрес</label>
             <textarea id="address-mailing" name="mailing_address" value=""></textarea>
           </li>
-
+          <!--
           <li class="field text" id="field-goals">
             <label for="goals">Please share with us your reasons for registering with ${settings.PLATFORM_NAME}</label>
             <textarea id="goals" name="goals" value=""></textarea>
           </li>
+          -->
         </ol>
       </fieldset>
 
@@ -236,7 +237,7 @@
 
             <div class="field required checkbox" id="field-tos">
               <input id="tos-yes" type="checkbox" name="terms_of_service" value="true" required aria-required="true" />
-              <label for="tos-yes">I agree to the <a href="${marketing_link('TOS')}" class="new-vp">Terms of Service</a></label>
+              <label for="tos-yes">Я согласен с <a href="${marketing_link('TOS')}" class="new-vp">правилами пользования</a></label>
             </div>
 
             % endif
@@ -250,7 +251,7 @@
                 else:
                   honor_code_path = marketing_link('HONOR')
               %>
-              <label for="honorcode-yes">I agree to the <a href="${honor_code_path}" class="new-vp">Honor Code</a></label>
+              <label for="honorcode-yes">Я согласен с <a href="${honor_code_path}" class="new-vp">Honor Code</a></label>
             </div>
           </li>
         </ol>
@@ -262,7 +263,7 @@
 % endif
 
       <div class="form-actions">
-        <button name="submit" type="submit" id="submit" class="action action-primary action-update">Register <span class="orn-plus">+</span> Create My Account</button>
+        <button name="submit" type="submit" id="submit" class="action action-primary action-update">Register <span class="orn-plus">+</span> Создать аккаунт</button>
       </div>
     </form>
   </section>
@@ -275,42 +276,42 @@
     % if has_extauth_info is UNDEFINED:
 
     <div class="cta">
-      <h3>Already registered?</h3>
+      <h3>Уже зарегистрированы?</h3>
       <p class="instructions">
         <a href="${reverse('signin_user')}${login_query()}">
-          Click here to log in.
+          Войти.
         </a>
       </p>
     </div>
-      
+
     % endif
 
     ## TODO: Use a %block tag or something to allow themes to
     ##       override in a more generalizable fashion.
     % if not self.stanford_theme_enabled():
       <div class="cta cta-welcome">
-        <h3>Welcome to ${settings.PLATFORM_NAME}</h3>
-        <p>Registering with ${settings.PLATFORM_NAME} gives you access to all of our current and future free courses. Not ready to take a course just yet? Registering puts you on our mailing list – we will update you as courses are added.</p>
+        <h3>Добро пожаловать!</h3>
+        <p>Регистрация даёт вам доступ ко всем открытым курсам сейчас и в будущем. Ещё не выбрали курс? После регистрации вы можете подписаться на рассылку для оповещения о появляющихся курсах.</p>
       </div>
     % endif
 
     <div class="cta cta-nextsteps">
-      <h3>Next Steps</h3>
+      <h3>Что дальше?</h3>
       % if self.stanford_theme_enabled():
         <p>You will receive an activation email.  You must click on the activation link to complete the process.  Don’t see the email?  Check your spam folder and mark emails from class.stanford.edu as ‘not spam’, since you'll want to be able to receive email from your courses.</p>
       % else:
-      <p>As part of joining ${settings.PLATFORM_NAME}, you will receive an activation email.  You must click on the activation link to complete the process.  Don’t see the email?  Check your spam folder and mark ${settings.PLATFORM_NAME} emails as ‘not spam’.  At ${settings.PLATFORM_NAME}, we communicate mostly through email.</p>
+      <p>Вы получите на e-mail письмо со ссылкой для активации аккаунта. Для завершения регистрации перейдите по этой ссылке. Не получили письмо?  Проверьте папку со спамом и пометьте письма от нас как "не спам".</p>
       % endif
     </div>
 
     % if settings.MKTG_URL_LINK_MAP.get('FAQ'):
       <div class="cta cta-help">
-        <h3>Need Help?</h3>
-        <p>Need help in registering with ${settings.PLATFORM_NAME}?
+        <h3>Нужна помощь?</h3>
+        <p>Нужна помощь с регистрацией?
           <a href="${marketing_link('FAQ')}">
-              View our FAQs for answers to commonly asked questions.
+              Перейдите в раздел часто задаваемых вопросов.
           </a>
-          Once registered, most questions can be answered in the course specific discussion forums or through the FAQs.</p>
+        </p>
       </div>
     % endif
   </aside>

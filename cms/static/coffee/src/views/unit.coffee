@@ -25,6 +25,10 @@ class CMS.Views.UnitEdit extends Backbone.View
       el: @$('.unit-name-input')
       model: @model
     )
+    @termView = new CMS.Views.UnitEdit.TermEdit(
+      el: @$('.unit-term-input')
+      model: @model
+    )
 
     @model.on('change:state', @render)
 
@@ -67,8 +71,8 @@ class CMS.Views.UnitEdit extends Backbone.View
     type = $(event.currentTarget).data('type')
     @$newComponentTypePicker.slideUp(250)
     @$(".new-component-#{type}").slideDown(250)
-    $('html, body').animate({ 
-      scrollTop: @$(".new-component-#{type}").offset().top 
+    $('html, body').animate({
+      scrollTop: @$(".new-component-#{type}").offset().top
     }, 500)
 
   closeNewComponent: (event) =>
@@ -89,9 +93,9 @@ class CMS.Views.UnitEdit extends Backbone.View
 
     @$newComponentItem.before(editor.$el)
 
-    editor.cloneTemplate(
+    editor.createItem(
       @$el.data('id'),
-      $(event.currentTarget).data('location')
+      $(event.currentTarget).data()
     )
 
     analytics.track "Added a Component",
@@ -115,27 +119,43 @@ class CMS.Views.UnitEdit extends Backbone.View
     @model.save()
 
   deleteComponent: (event) =>
-    if not confirm 'Are you sure you want to delete this component? This action cannot be undone.'
-      return
-    $component = $(event.currentTarget).parents('.component')
-    $.post('/delete_item', {
-      id: $component.data('id')
-    }, =>
-      analytics.track "Deleted a Component",
-        course: course_location_analytics
-        unit_id: unit_location_analytics
-        id: $component.data('id')
+    msg = new CMS.Views.Prompt.Warning(
+      title: gettext('Delete this component?'),
+      message: gettext('Deleting this component is permanent and cannot be undone.'),
+      actions:
+        primary:
+          text: gettext('Yes, delete this component'),
+          click: (view) =>
+            view.hide()
+            deleting = new CMS.Views.Notification.Mini
+              title: gettext('Deleting') + '&hellip;',
+            deleting.show()
+            $component = $(event.currentTarget).parents('.component')
+            $.post('/delete_item', {
+              id: $component.data('id')
+            }, =>
+              deleting.hide()
+              analytics.track "Deleted a Component",
+                course: course_location_analytics
+                unit_id: unit_location_analytics
+                id: $component.data('id')
 
-      $component.remove()
-      # b/c we don't vigilantly keep children up to date
-      # get rid of it before it hurts someone
-      # sorry for the js, i couldn't figure out the coffee equivalent
-      `_this.model.save({children: _this.components()},
-          {success: function(model) {
-              model.unset('children');
-          }}
-      );`
+              $component.remove()
+              # b/c we don't vigilantly keep children up to date
+              # get rid of it before it hurts someone
+              # sorry for the js, i couldn't figure out the coffee equivalent
+              `_this.model.save({children: _this.components()},
+                {success: function(model) {
+                model.unset('children');
+                }}
+              );`
+            )
+        secondary:
+          text: gettext('Cancel'),
+          click: (view) ->
+            view.hide()
     )
+    msg.show()
 
   deleteDraft: (event) ->
     @wait(true)
@@ -223,7 +243,8 @@ class CMS.Views.UnitEdit.NameEdit extends Backbone.View
   saveName: =>
     # Treat the metadata dictionary as immutable
     metadata = $.extend({}, @model.get('metadata'))
-    metadata.display_name = @$('.unit-display-name-input').val()
+    metadata.display_name = $('.unit-display-name-input').val()
+    metadata.direct_term = $('.unit-direct-term-input').val()
     @model.save(metadata: metadata)
     # Update name shown in the right-hand side location summary.
     $('.unit-location .editing .unit-name').html(metadata.display_name)
@@ -233,10 +254,46 @@ class CMS.Views.UnitEdit.NameEdit extends Backbone.View
       display_name: metadata.display_name
 
 
+
+class CMS.Views.UnitEdit.TermEdit extends Backbone.View
+  events:
+    'change .unit-direct-term-input': 'saveTerm'
+
+  initialize: =>
+    @model.on('change:metadata', @render)
+    @model.on('change:state', @setEnabled)
+    @setEnabled()
+    @saveTerm
+    @$spinner = $('<span class="spinner-in-field-icon"></span>');
+
+  render: =>
+    @$('.unit-direct-term-input').val(@model.get('metadata').direct_term)
+
+  setEnabled: =>
+    disabled = @model.get('state') == 'public'
+    if disabled
+      @$('.unit-direct-term-input').attr('disabled', true)
+    else
+      @$('.unit-direct-term-input').removeAttr('disabled')
+
+  saveTerm: =>
+    # Saving a term
+    metadata = $.extend({}, @model.get('metadata'))
+    metadata.display_name = $('.unit-display-name-input').val()
+    metadata.direct_term = $('.unit-direct-term-input').val()
+    @model.save(metadata: metadata)
+    # Update term
+    $('.unit-location .editing .unit-term').html(metadata.direct_term)
+    analytics.track "Edited Unit Term",
+      course: course_location_analytics
+      unit_id: unit_location_analytics
+      direct_term: metadata.direct_term
+
+
 class CMS.Views.UnitEdit.LocationState extends Backbone.View
   initialize: =>
     @model.on('change:state', @render)
-  
+
   render: =>
     @$el.toggleClass("#{@model.previous('state')}-item #{@model.get('state')}-item")
 

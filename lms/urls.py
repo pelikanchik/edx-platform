@@ -59,6 +59,8 @@ urlpatterns = ('',  # nopep8
         name='auth_password_reset_done'),
 
     url(r'^heartbeat$', include('heartbeat.urls')),
+
+    url(r'^user_api/', include('user_api.urls')),
 )
 
 # University profiles only make sense in the default edX context
@@ -175,6 +177,8 @@ if settings.COURSEWARE_ENABLED:
     urlpatterns += (
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/jump_to/(?P<location>.*)$',
             'courseware.views.jump_to', name="jump_to"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/jump_to_id/(?P<module_id>.*)$',
+            'courseware.views.jump_to_id', name="jump_to_id"),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/modx/(?P<location>.*?)/(?P<dispatch>[^/]*)$',
             'courseware.module_render.modx_dispatch',
             name='modx_dispatch'),
@@ -214,8 +218,6 @@ if settings.COURSEWARE_ENABLED:
         url(r'^mktg/(?P<course_id>.*)$',
             'courseware.views.mktg_course_about', name="mktg_about_course"),
 
-
-
         #Inside the course
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/$',
             'courseware.views.course_info', name="course_root"),
@@ -223,27 +225,26 @@ if settings.COURSEWARE_ENABLED:
             'courseware.views.course_info', name="info"),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/syllabus$',
             'courseware.views.syllabus', name="syllabus"),   # TODO arjun remove when custom tabs in place, see courseware/courses.py
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/book/(?P<book_index>[^/]*)/$',
+
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/book/(?P<book_index>\d+)/$',
             'staticbook.views.index', name="book"),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/book/(?P<book_index>[^/]*)/(?P<page>[^/]*)$',
-            'staticbook.views.index'),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/book-shifted/(?P<page>[^/]*)$',
-            'staticbook.views.index_shifted'),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/book/(?P<book_index>\d+)/(?P<page>\d+)$',
+            'staticbook.views.index', name="book"),
 
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/pdfbook/(?P<book_index>[^/]*)/$',
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/pdfbook/(?P<book_index>\d+)/$',
             'staticbook.views.pdf_index', name="pdf_book"),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/pdfbook/(?P<book_index>[^/]*)/(?P<page>[^/]*)$',
-            'staticbook.views.pdf_index'),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/pdfbook/(?P<book_index>\d+)/(?P<page>\d+)$',
+            'staticbook.views.pdf_index', name="pdf_book"),
 
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/pdfbook/(?P<book_index>[^/]*)/chapter/(?P<chapter>[^/]*)/$',
-            'staticbook.views.pdf_index'),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/pdfbook/(?P<book_index>[^/]*)/chapter/(?P<chapter>[^/]*)/(?P<page>[^/]*)$',
-            'staticbook.views.pdf_index'),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/pdfbook/(?P<book_index>\d+)/chapter/(?P<chapter>\d+)/$',
+            'staticbook.views.pdf_index', name="pdf_book"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/pdfbook/(?P<book_index>\d+)/chapter/(?P<chapter>\d+)/(?P<page>\d+)$',
+            'staticbook.views.pdf_index', name="pdf_book"),
 
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/htmlbook/(?P<book_index>[^/]*)/$',
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/htmlbook/(?P<book_index>\d+)/$',
             'staticbook.views.html_index', name="html_book"),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/htmlbook/(?P<book_index>[^/]*)/chapter/(?P<chapter>[^/]*)/$',
-            'staticbook.views.html_index'),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/htmlbook/(?P<book_index>\d+)/chapter/(?P<chapter>\d+)/$',
+            'staticbook.views.html_index', name="html_book"),
 
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/courseware/?$',
             'courseware.views.index', name="courseware"),
@@ -332,7 +333,11 @@ if settings.COURSEWARE_ENABLED:
             url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/news$',
                 'courseware.views.news', name="news"),
             url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/discussion/',
-                include('django_comment_client.urls'))
+                include('django_comment_client.urls')),
+            url(r'^notification_prefs/enable/', 'notification_prefs.views.ajax_enable'),
+            url(r'^notification_prefs/disable/', 'notification_prefs.views.ajax_disable'),
+            url(r'^notification_prefs/status/', 'notification_prefs.views.ajax_status'),
+            url(r'^notification_prefs/unsubscribe/(?P<token>[a-zA-Z0-9-_=]+)/', 'notification_prefs.views.unsubscribe'),
         )
     urlpatterns += (
         # This MUST be the last view in the courseware--it's a catch-all for custom tabs.
@@ -435,6 +440,12 @@ if settings.MITX_FEATURES.get('ENABLE_HINTER_INSTRUCTOR_VIEW'):
     urlpatterns += (
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/hint_manager$',
             'instructor.hint_manager.hint_manager', name="hint_manager"),
+    )
+
+# enable automatic login
+if settings.MITX_FEATURES.get('AUTOMATIC_AUTH_FOR_LOAD_TESTING'):
+    urlpatterns += (
+        url(r'^auto_auth$', 'student.views.auto_auth'),
     )
 
 urlpatterns = patterns(*urlpatterns)

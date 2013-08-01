@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Unit tests for masquerade
 
@@ -5,7 +6,7 @@ Based on (and depends on) unit tests for courseware.
 
 Notes for running by hand:
 
-django-admin.py test --settings=lms.envs.test --pythonpath=. lms/djangoapps/courseware
+./manage.py lms --settings test test lms/djangoapps/courseware
 """
 
 from django.test.utils import override_settings
@@ -106,7 +107,7 @@ class TestStaffMasqueradeAsStudent(LoginEnrollmentTestCase):
         resp = self.get_problem()
         html = json.loads(resp.content)['html']
         print html
-        sabut = '<button class="show"><span class="show-label">Show Answer(s)</span> <span class="sr">(for question(s) above - adjacent to each field)</span></button>'
+        sabut = u'<button class="show"><span class="show-label">Показать ответ(ы)</span> <span class="sr">(для вопросов выше - рядом с каждым полем)</span></button>'
         self.assertTrue(sabut in html)
 
     def test_no_showanswer_for_student(self):
@@ -117,5 +118,5 @@ class TestStaffMasqueradeAsStudent(LoginEnrollmentTestCase):
         resp = self.get_problem()
         html = json.loads(resp.content)['html']
         print html
-        sabut = '<button class="show"><span class="show-label">Show Answer(s)</span> <span class="sr">(for question(s) above - adjacent to each field)</span></button>'
+        sabut = u'<button class="show"><span class="show-label">Показать ответ(ы)</span> <span class="sr">(для вопросов выше - рядом с каждым полем)</span></button>'
         self.assertFalse(sabut in html)

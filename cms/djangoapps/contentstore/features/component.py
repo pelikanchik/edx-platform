@@ -2,6 +2,7 @@
 #pylint: disable=W0621
 
 from lettuce import world, step
+from nose.tools import assert_true
 
 DATA_LOCATION = 'i4x://edx/templates'
 
@@ -26,7 +27,7 @@ def add_components(step):
 def check_components(step):
     for component in [step_hash['Component'] for step_hash in step.hashes]:
         assert component in COMPONENT_DICTIONARY
-        assert COMPONENT_DICTIONARY[component]['found_func']()
+        assert_true(COMPONENT_DICTIONARY[component]['found_func'](), "{} couldn't be found".format(component))
 
 
 @step(u'I delete all components')
@@ -38,6 +39,17 @@ def delete_all_components(step):
 @step(u'I see no components')
 def see_no_components(steps):
     assert world.is_css_not_present('li.component')
+
+
+@step(u'I delete a component')
+def delete_one_component(step):
+    world.css_click('a.delete-button')
+
+
+@step(u'I edit and save a component')
+def edit_and_save_component(step):
+    world.css_click('.edit-button')
+    world.css_click('.save-button')
 
 
 def step_selector_list(data_type, path, index=1):
@@ -60,10 +72,6 @@ COMPONENT_DICTIONARY = {
     'Discussion': {
         'steps': step_selector_list('discussion', None),
         'found_func': found_css_func('section.xmodule_DiscussionModule')
-    },
-    'Announcement': {
-        'steps': step_selector_list('html', 'Announcement'),
-        'found_func': found_text_func('Heading of document')
     },
     'Blank HTML': {
         'steps': step_selector_list('html', 'Blank_HTML_Page'),

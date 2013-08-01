@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Tabs configuration.  By the time the tab is being rendered, it's just a name,
 link, and css class (CourseTab tuple).  Tabs are specified in course policy.
@@ -58,25 +59,25 @@ TabImpl = namedtuple('TabImpl', 'validator generator')
 
 def _courseware(tab, user, course, active_page):
     link = reverse('courseware', args=[course.id])
-    return [CourseTab('Courseware', link, active_page == "courseware")]
+    return [CourseTab(u'Содержание', link, active_page == "courseware")]
 
 
 def _course_info(tab, user, course, active_page):
     link = reverse('info', args=[course.id])
-    return [CourseTab(tab['name'], link, active_page == "info")]
+    return [CourseTab(u'Информация', link, active_page == "info")]
 
 
 def _progress(tab, user, course, active_page):
     if user.is_authenticated():
         link = reverse('progress', args=[course.id])
-        return [CourseTab(tab['name'], link, active_page == "progress")]
+        return [CourseTab(u'Оценки', link, active_page == "progress")]
     return []
 
 
 def _wiki(tab, user, course, active_page):
     if settings.WIKI_ENABLED:
         link = reverse('course_wiki', args=[course.id])
-        return [CourseTab(tab['name'], link, active_page == 'wiki')]
+        return [CourseTab(u'Вики', link, active_page == 'wiki')]
     return []
 
 
@@ -87,7 +88,7 @@ def _discussion(tab, user, course, active_page):
     if settings.MITX_FEATURES.get('ENABLE_DISCUSSION_SERVICE'):
         link = reverse('django_comment_client.forum.views.forum_form_discussion',
                               args=[course.id])
-        return [CourseTab(tab['name'], link, active_page == 'discussion')]
+        return [CourseTab(u'Форум', link, active_page == 'discussion')]
     return []
 
 
@@ -287,7 +288,7 @@ def get_course_tabs(user, course, active_page):
 
     # Instructor tab is special--automatically added if user is staff for the course
     if has_access(user, course, 'staff'):
-        tabs.append(CourseTab('Instructor',
+        tabs.append(CourseTab(u'Администрирование',
                               reverse('instructor_dashboard', args=[course.id]),
                               active_page == 'instructor'))
     return tabs
@@ -371,6 +372,6 @@ def get_static_tab_contents(request, course, tab):
     html = ''
 
     if tab_module is not None:
-        html = tab_module.get_html()
+        html = tab_module.runtime.render(tab_module, None, 'student_view').content
 
     return html
