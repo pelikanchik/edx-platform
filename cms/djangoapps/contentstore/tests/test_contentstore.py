@@ -87,6 +87,8 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         self.user.is_active = True
         # Staff has access to view all courses
         self.user.is_staff = True
+
+        # Save the data that we've just changed to the db.
         self.user.save()
 
         self.client = Client()
@@ -117,6 +119,10 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         course.advanced_modules = component_types
 
+        # Save the data that we've just changed to the underlying
+        # MongoKeyValueStore before we update the mongo datastore.
+        course.save()
+
         store.update_metadata(course.location, own_metadata(course))
 
         # just pick one vertical
@@ -134,7 +140,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         self.check_components_on_page(ADVANCED_COMPONENT_TYPES, ['Video Alpha',
                                                                  'Word cloud',
                                                                  'Annotation',
-                                                                 'Open Ended Grading',
+                                                                 'Open Response Assessment',
                                                                  'Peer Grading Interface'])
 
     def test_advanced_components_require_two_clicks(self):
@@ -239,6 +245,9 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         self.assertNotIn('graceperiod', own_metadata(html_module))
         html_module.lms.graceperiod = new_graceperiod
+        # Save the data that we've just changed to the underlying
+        # MongoKeyValueStore before we update the mongo datastore.
+        html_module.save()
         self.assertIn('graceperiod', own_metadata(html_module))
         self.assertEqual(html_module.lms.graceperiod, new_graceperiod)
 
@@ -302,6 +311,23 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         course = module_store.get_item(Location(['i4x', 'edX', 'toy', 'course', '2012_Fall', None]))
 
         self.assertGreater(len(course.textbooks), 0)
+
+    def test_default_tabs_on_create_course(self):
+        module_store = modulestore('direct')
+        CourseFactory.create(org='edX', course='999', display_name='Robot Super Course')
+        course_location = Location(['i4x', 'edX', '999', 'course', 'Robot_Super_Course', None])
+
+        course = module_store.get_item(course_location)
+
+        expected_tabs = []
+        expected_tabs.append({u'type': u'courseware'})
+        expected_tabs.append({u'type': u'course_info', u'name': u'Course Info'})
+        expected_tabs.append({u'type': u'textbooks'})
+        expected_tabs.append({u'type': u'discussion', u'name': u'Discussion'})
+        expected_tabs.append({u'type': u'wiki', u'name': u'Wiki'})
+        expected_tabs.append({u'type': u'progress', u'name': u'Progress'})
+
+        self.assertEqual(course.tabs, expected_tabs)
 
     def test_static_tab_reordering(self):
         module_store = modulestore('direct')
@@ -816,12 +842,9 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         self.assertGreater(len(verticals), 0)
 
-        new_component_location = Location('i4x', 'edX', 'toy', 'video', 'new_component')
-        source_template_location = Location('i4x', 'edx', 'templates', 'video', 'default')
-
-        module_store.clone_item(source_template_location, new_component_location)
         parent = verticals[0]
-        module_store.update_children(parent.location, parent.children + [new_component_location.url()])
+
+        ItemFactory.create(parent_location=parent.location, category="video", display_name="untitled")
 
         root_dir = path(mkdtemp_clean())
 
@@ -831,6 +854,68 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         export_to_xml(module_store, content_store, location, root_dir, 'test_export', draft_modulestore=draft_store)
 
         shutil.rmtree(root_dir)
+
+    def test_export_course_with_metadata_only_word_cloud(self):
+        """
+        Similar to `test_export_course_with_metadata_only_video`.
+        """
+        module_store = modulestore('direct')
+        draft_store = modulestore('draft')
+        content_store = contentstore()
+
+        import_from_xml(module_store, 'common/test/data/', ['word_cloud'])
+        location = CourseDescriptor.id_to_location('HarvardX/ER22x/2013_Spring')
+
+        verticals = module_store.get_items(['i4x', 'HarvardX', 'ER22x', 'vertical', None, None])
+
+        self.assertGreater(len(verticals), 0)
+
+        parent = verticals[0]
+
+        ItemFactory.create(parent_location=parent.location, category="word_cloud", display_name="untitled")
+
+        root_dir = path(mkdtemp_clean())
+
+        print 'Exporting to tempdir = {0}'.format(root_dir)
+
+        # export out to a tempdir
+        export_to_xml(module_store, content_store, location, root_dir, 'test_export', draft_modulestore=draft_store)
+
+        shutil.rmtree(root_dir)
+
+    def test_empty_data_roundtrip(self):
+        """
+        Test that an empty `data` field is preserved through
+        export/import.
+        """
+        module_store = modulestore('direct')
+        draft_store = modulestore('draft')
+        content_store = contentstore()
+
+        import_from_xml(module_store, 'common/test/data/', ['toy'])
+        location = CourseDescriptor.id_to_location('edX/toy/2012_Fall')
+
+        verticals = module_store.get_items(['i4x', 'edX', 'toy', 'vertical', None, None])
+
+        self.assertGreater(len(verticals), 0)
+
+        parent = verticals[0]
+
+        # Create a module, and ensure that its `data` field is empty
+        word_cloud = ItemFactory.create(parent_location=parent.location, category="word_cloud", display_name="untitled")
+        del word_cloud.data
+        self.assertEquals(word_cloud.data, '')
+
+        # Export the course
+        root_dir = path(mkdtemp_clean())
+        export_to_xml(module_store, content_store, location, root_dir, 'test_roundtrip', draft_modulestore=draft_store)
+
+        # Reimport and get the video back
+        import_from_xml(module_store, root_dir)
+        imported_word_cloud = module_store.get_item(Location(['i4x', 'edX', 'toy', 'word_cloud', 'untitled', None]))
+
+        # It should now contain empty data
+        self.assertEquals(imported_word_cloud.data, '')
 
     def test_course_handouts_rewrites(self):
         module_store = modulestore('direct')
@@ -886,6 +971,9 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         # add a bool piece of unknown metadata so we can verify we don't throw an exception
         metadata['new_metadata'] = True
 
+        # Save the data that we've just changed to the underlying
+        # MongoKeyValueStore before we update the mongo datastore.
+        course.save()
         module_store.update_metadata(location, metadata)
 
         print 'Exporting to tempdir = {0}'.format(root_dir)
@@ -1141,7 +1229,9 @@ class ContentStoreTest(ModuleStoreTestCase):
 
         # manage users
         resp = self.client.get(reverse('manage_users',
-                                       kwargs={'location': loc.url()}))
+                                       kwargs={'org': loc.org,
+                                               'course': loc.course,
+                                               'name': loc.name}))
         self.assertEqual(200, resp.status_code)
 
         # course info
@@ -1302,6 +1392,7 @@ class ContentStoreTest(ModuleStoreTestCase):
         # now let's define an override at the leaf node level
         #
         new_module.lms.graceperiod = timedelta(1)
+        new_module.save()
         module_store.update_metadata(new_module.location, own_metadata(new_module))
 
         # flush the cache and refetch
@@ -1332,3 +1423,63 @@ class ContentStoreTest(ModuleStoreTestCase):
         self.assertEqual(course.textbooks, fetched_course.textbooks)
         # is this test too strict? i.e., it requires the dicts to be ==
         self.assertEqual(course.checklists, fetched_course.checklists)
+
+
+class MetadataSaveTestCase(ModuleStoreTestCase):
+    """
+    Test that metadata is correctly decached.
+    """
+
+    def setUp(self):
+        sample_xml = '''
+        <video display_name="Test Video"
+                youtube="1.0:p2Q6BrNhdh8,0.75:izygArpw-Qo,1.25:1EeWXzPdhSA,1.5:rABDYkeK0x8"
+                show_captions="false"
+                from="00:00:01"
+                to="00:01:00">
+            <source src="http://www.example.com/file.mp4"/>
+            <track src="http://www.example.com/track"/>
+        </video>
+        '''
+        CourseFactory.create(org='edX', course='999', display_name='Robot Super Course')
+        course_location = Location(['i4x', 'edX', '999', 'course', 'Robot_Super_Course', None])
+
+        model_data = {'data': sample_xml}
+        self.descriptor = ItemFactory.create(parent_location=course_location, category='video', data=model_data)
+
+    def test_metadata_persistence(self):
+        """
+        Test that descriptors which set metadata fields in their
+        constructor are correctly persisted.
+        """
+        # We should start with a source field, from the XML's <source/> tag
+        self.assertIn('source', own_metadata(self.descriptor))
+        attrs_to_strip = {
+            'show_captions',
+            'youtube_id_1_0',
+            'youtube_id_0_75',
+            'youtube_id_1_25',
+            'youtube_id_1_5',
+            'start_time',
+            'end_time',
+            'source',
+            'track'
+        }
+        # We strip out all metadata fields to reproduce a bug where
+        # constructors which set their fields (e.g. Video) didn't have
+        # those changes persisted. So in the end we have the XML data
+        # in `descriptor.data`, but not in the individual fields
+        fields = self.descriptor.fields
+        for field in fields:
+            if field.name in attrs_to_strip:
+                field.delete_from(self.descriptor)
+
+        # Assert that we correctly stripped the field
+        self.assertNotIn('source', own_metadata(self.descriptor))
+        get_modulestore(self.descriptor.location).update_metadata(
+            self.descriptor.location,
+            own_metadata(self.descriptor)
+        )
+        module = get_modulestore(self.descriptor.location).get_item(self.descriptor.location)
+        # Assert that get_item correctly sets the metadata
+        self.assertIn('source', own_metadata(module))

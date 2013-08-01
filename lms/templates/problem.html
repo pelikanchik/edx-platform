@@ -1,9 +1,11 @@
 <%namespace name='static' file='static_content.html'/>
-<h2 class="problem-header">${ problem['name'] }
-  % if problem['weight'] != 1 and problem['weight'] is not None:
-    <br>Число баллов: ${ problem['weight'] }
-  % endif
+
+<h2 class="problem-header">
+  ${ problem['name'] }
 </h2>
+
+<section class="problem-progress">
+</section>
 
 <section class="problem">
   ${ problem['html'] }
