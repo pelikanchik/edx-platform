@@ -38,7 +38,7 @@ def get_unit(unit_id, section):
 
 def elementary_conjunction(term, section):
         error_return = True
-        if len(term["source_unit_id"]) == 0:
+        if len(term["source_element_id"]) == 0:
             return error_return
         if len(term["field"]) == 0:
             return error_return
@@ -47,7 +47,7 @@ def elementary_conjunction(term, section):
         if len(term["value"]) == 0:
             return error_return
 
-        unit = get_unit(term["source_unit_id"], section)
+        unit = get_unit(term["source_element_id"], section)
 
         if not unit:
             return error_return
@@ -145,7 +145,7 @@ class SequenceModule(SequenceFields, XModule):
                         if not element_term["disjunctions"]:
                             return json.dumps({'position': cur_position})
                         for disjunction in element_term["disjunctions"]:
-                            term_result = element_term["direct_unit_id"]
+                            term_result = element_term["direct_element_id"]
                             if not disjunction["conjunctions"]:
                                 new_position = 1
                                 for check_child in self.get_children():
