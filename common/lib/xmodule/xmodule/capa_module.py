@@ -117,6 +117,13 @@ class CapaFields(object):
             {"display_name": "Past Due", "value": "past_due"},
             {"display_name": "Never", "value": "never"}]
     )
+    showbuttonanswer = Integer(
+        display_name="Delay for button Show Answer",
+        help=("in seconds"),
+        values={"min": 0},
+        scope = Scope.settings,
+        default=0
+    )
     force_save_button = Boolean(
         help="Whether to force the save button to appear on the page",
         scope=Scope.settings,
@@ -529,6 +536,7 @@ class CapaModule(CapaFields, XModule):
                    'answer_available': self.answer_available(),
                    'attempts_used': self.attempts,
                    'attempts_allowed': self.max_attempts,
+                   'delay_answers': self.showbuttonanswer,
                    'progress': self.get_progress(),
                    'progress_detail': Progress.to_js_detail_str(self.get_progress())
                    }
