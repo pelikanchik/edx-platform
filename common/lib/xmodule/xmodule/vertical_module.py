@@ -16,7 +16,7 @@ class VerticalFields(object):
         display_name="Условие для перенаправления",
         help="Условие для перенаправления в другой юнит",
         scope=Scope.settings,
-        default='{"direct_element_id": "", "disjunctions": [{"conjunctions": [{"source_element_id": "", "field": "score_rel", "sign": "more", "value":""}]}]}'
+        default='[]'
     )
 
 class VerticalModule(VerticalFields, XModule):

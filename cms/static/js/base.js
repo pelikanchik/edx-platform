@@ -312,11 +312,14 @@ function saveSubsection() {
     metadata['due'] = getEdxTimeFromDateTimeInputs('due_date', 'due_time');
 
     $.ajax({
-       url: "/save_item",
+        url: "/save_item",
         type: "POST",
         dataType: "json",
         contentType: "application/json",
-        data: '{"id":"i4x://Yandex/1/vertical/4f208a438b8342fd89fd5eb72f55279e","state":"draft","metadata":{"display_name":"asdgfasdasddfv","direct_term":"[{\"direct_element_id\":\"4f208a438b8342fd89fd5eb72f55279e\",\"disjunctions\":[{\"conjunctions\":[{\"source_element_id\":\"4f208a438b8342fd89fd5eb72f55279e\",\"field\":\"score_rel\",\"sign\":\"less\",\"value\":\"111\"},{\"source_element_id\":\"4f208a438b8342fd89fd5eb72f55279e\",\"field\":\"score_rel\",\"sign\":\"more\",\"value\":\"0\"},{\"source_element_id\":\"4f208a438b8342fd89fd5eb72f55279e\",\"field\":\"score_abs\",\"sign\":\"more\",\"value\":\"0\"}]}]}]"}}',
+        data: JSON.stringify({
+            'id': id,
+            'metadata': metadata
+        }),
         success: function() {
             $spinner.delay(500).fadeOut(150);
             $changedInput = null;
