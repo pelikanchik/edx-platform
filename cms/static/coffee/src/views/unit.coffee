@@ -257,7 +257,7 @@ class CMS.Views.UnitEdit.NameEdit extends Backbone.View
 
 class CMS.Views.UnitEdit.TermEdit extends Backbone.View
   events:
-    'change .unit-direct-term-input': 'saveTerm'
+    'click .save-term': 'saveTerm'
 
   initialize: =>
     @model.on('change:metadata', @render)
@@ -278,10 +278,16 @@ class CMS.Views.UnitEdit.TermEdit extends Backbone.View
 
   saveTerm: =>
     # Saving a term
+
+    $('.save-term').val("сохраняется...")
+    $('.save-term').addClass("save-term-active")
+
     metadata = $.extend({}, @model.get('metadata'))
     metadata.display_name = $('.unit-display-name-input').val()
     metadata.direct_term = $('.unit-direct-term-input').val()
     @model.save(metadata: metadata)
+
+    setTimeout('$(".save-term").val("Сохранить"); $(".save-term").removeClass("save-term-active");', 500)
     # Update term
     $('.unit-location .editing .unit-term').html(metadata.direct_term)
     analytics.track "Edited Unit Term",
