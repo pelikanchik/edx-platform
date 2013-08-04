@@ -65,7 +65,7 @@
       
       ${'<% if (obj.courseware_url) { %>'}
       <div class="post-context">
-          (this post is about <a href="${'<%- courseware_url%>'}">${'<%- courseware_title %>'}</a>)
+          (сообщение относится к <a href="${'<%- courseware_url%>'}">${'<%- courseware_title %>'}</a>)
       </div>
       ${'<% } %>'}
 
@@ -92,7 +92,7 @@
     ##<div class="form-row">
     ##  <input type="text" class="edit-post-tags" name="tags" placeholder="Tags" value="${"<%- tags %>"}">
     ##</div>
-    <input type="submit" class="post-update" value="Update post">
+    <input type="submit" class="post-update" value="Сохранить">
     <a href="#" class="post-cancel">Отмена</a>
   </div>
 </script>
@@ -152,7 +152,7 @@
     <div class="response-body">${'<%- body %>'}</div>
     <div class="discussion-flag-abuse notflagged" data-role="thread-flag" data-tooltip="Report Misuse">                
       <i class="icon icon-flag"></i><span class="flag-label"></span></div> 
-    <p class="posted-details">&ndash;опубликован <span class="timeago" title="${'<%- created_at %>'}">${'<%- created_at %>'}</span> by
+    <p class="posted-details">&ndash;опубликован <span class="timeago" title="${'<%- created_at %>'}">${'<%- created_at %>'}</span> -
         ${"<% if (obj.username) { %>"}
         <a href="${'<%- user_url %>'}" class="profile-link">${'<%- username %>'}</a>
         ${"<% } else {print('anonymous');} %>"}
