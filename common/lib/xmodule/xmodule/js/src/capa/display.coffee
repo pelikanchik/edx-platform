@@ -39,16 +39,16 @@ class @Problem
     detail = @el.data('progress_detail')
     status = @el.data('progress_status')
     # i18n
-    progress = "(#{detail} points)"
+    progress = "(#{detail} баллов)"
     if status == 'none' and detail? and detail.indexOf('/') > 0
         a = detail.split('/')
         possible = parseInt(a[1])
         if possible == 1
             # i18n
-            progress = "(#{possible} point possible)"
+            progress = "(#{possible} баллов возможно)"
         else
             # i18n
-            progress = "(#{possible} points possible)"
+            progress = "(#{possible} баллов возможно)"
     @$('.problem-progress').html(progress)
 
   updateProgress: (response) =>
@@ -168,7 +168,7 @@ class @Problem
           if e.name == "Waitfor Exception"
             alert e.message
           else
-            alert "Could not grade your answer. The submission was aborted."
+            alert "Невозможно сохранить ваш ответ. Отправка прервана."
           throw e
 
 
@@ -186,7 +186,7 @@ class @Problem
       return
 
     if not window.FormData
-      alert "Submission aborted! Sorry, your browser does not support file uploads. If you can, please use Chrome or Safari which have been verified to support file uploads."
+      alert "Отправка прервана! Ваш браузер, к сожалению, не поддерживает загрузку файлов. Используйте, пожалуйста, Chrome, Яндекс.Браузер или FireFox."
       return
 
     fd = new FormData()
