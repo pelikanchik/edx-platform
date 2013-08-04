@@ -9,10 +9,10 @@ CMS.Views.ValidatingView = Backbone.View.extend({
 
     errorTemplate : _.template('<span class="message-error"><%= message %></span>'),
 
-    save_title: gettext("You've made some changes"),
-    save_message: gettext("Your changes will not take effect until you save your progress."),
-    error_title: gettext("You've made some changes, but there are some errors"),
-    error_message: gettext("Please address the errors on this page first, and then save your progress."),
+    save_title: gettext("Вы внесли изменения"),
+    save_message: gettext("Изменения не вступят в силу пока вы их не сохраните."),
+    error_title: gettext("Вы сделали несколько изменений, но во введённых данных есть ошибки"),
+    error_message: gettext("Пожалуйста исправьте ошибки и попробуйте ещё раз."),
 
     events : {
         "change input" : "clearValidationErrors",
@@ -100,7 +100,7 @@ CMS.Views.ValidatingView = Backbone.View.extend({
             message: message,
             actions: {
                 primary: {
-                    "text": gettext("Save Changes"),
+                    "text": gettext("Сохранить изменения"),
                     "class": "action-save",
                     "click": function() {
                         primaryClick();
@@ -109,7 +109,7 @@ CMS.Views.ValidatingView = Backbone.View.extend({
                     }
                 },
                 secondary: [{
-                    "text": gettext("Cancel"),
+                    "text": gettext("Отмена"),
                     "class": "action-cancel",
                     "click": function() {
                         if(secondaryClick) {
@@ -128,7 +128,7 @@ CMS.Views.ValidatingView = Backbone.View.extend({
     },
 
     showSavedBar: function(title, message) {
-        var defaultTitle = gettext('Your changes have been saved.');
+        var defaultTitle = gettext('Изменения успешно сохранены.');
         this.saved = new CMS.Views.Alert.Confirmation({
             title: title || defaultTitle,
             message: message,

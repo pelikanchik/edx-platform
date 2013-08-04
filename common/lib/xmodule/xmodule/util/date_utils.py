@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Convenience methods for working with datetime objects
 """
@@ -26,7 +27,7 @@ def get_default_time_display(dt, show_timezone=True):
                 timezone = dt.strftime('%z')
         else:
             timezone = u" UTC"
-    return unicode(dt.strftime(u"%d.%m.%Y {at} %H:%M{tz}")).format(at=_(u"at"), tz=timezone).strip()
+    return unicode(dt.strftime(u"%d.%m.%Y {at} %H:%M")).format(at=_(u"в")).strip()
 
 
 def almost_same_datetime(dt1, dt2, allowed_delta=timedelta(minutes=1)):

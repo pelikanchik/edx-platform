@@ -140,7 +140,7 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
     onDelete: function(event) {
         event.preventDefault();
 
-        if (!confirm('Are you sure you want to delete this update? This action cannot be undone.')) {
+        if (!confirm('Вы действительно хотите удалить новость?')) {
             return;
         }
 

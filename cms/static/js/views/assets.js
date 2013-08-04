@@ -10,8 +10,8 @@ function removeAsset(e){
 
     var that = this;
     var msg = new CMS.Views.Prompt.Warning({
-        title: gettext("Delete File Confirmation"),
-        message: gettext("Are you sure you wish to delete this item. It cannot be reversed!\n\nAlso any content that links/refers to this item will no longer work (e.g. broken images and/or links)"),
+        title: gettext("Подтверждение удаления"),
+        message: gettext("Вы действительно хотите удалить файл?\n\nСсылки, которые ведут на этот файл, перестанут работать"),
         actions: {
             primary: {
                 text: gettext("OK"),
@@ -24,7 +24,7 @@ function removeAsset(e){
                         function() {
                             // show the post-commit confirmation
                             var deleted = new CMS.Views.Notification.Confirmation({
-                                title: gettext("Your file has been deleted."),
+                                title: gettext("Файл удален."),
                                 closeIcon: false,
                                 maxShown: 2000
                             });
@@ -40,7 +40,7 @@ function removeAsset(e){
                 }
             },
             secondary: [{
-                text: gettext("Cancel"),
+                text: gettext("Отмена"),
                 click: function(view) {
                     view.hide();
                 }
@@ -67,7 +67,7 @@ function startUpload(e) {
     if (files.length === 0)
         return;
 
-    $('.upload-modal h1').html(gettext('Uploading…'));
+    $('.upload-modal h1').html(gettext('Загружается…'));
     $('.upload-modal .file-name').html(files[0].name);
     $('.upload-modal .file-chooser').ajaxSubmit({
         beforeSend: resetUploadBar,
@@ -100,7 +100,7 @@ function displayFinishedUpload(xhr) {
     $('.upload-modal .embeddable').show();
     $('.upload-modal .file-name').hide();
     $('.upload-modal .progress-fill').html(resp.msg);
-    $('.upload-modal .choose-file-button').html(gettext('Load Another File')).show();
+    $('.upload-modal .choose-file-button').html(gettext('Загрузить ещё один файл')).show();
     $('.upload-modal .progress-fill').width('100%');
 
     // see if this id already exists, if so, then user must have updated an existing piece of content

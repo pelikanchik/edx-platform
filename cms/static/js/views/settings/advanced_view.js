@@ -52,7 +52,7 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
                 instance.save();
                 // this event's being called even when there's no change :-(
                 if (instance.getValue() !== oldValue) {
-                    var message = gettext("Your changes will not take effect until you save your progress. Take care with key and value formatting, as validation is not implemented.");
+                    var message = gettext("Ваши изменения не вступят в силу пока вы их не сохраните.");
                     self.showNotificationBar(message,
                                              _.bind(self.saveView, self),
                                              _.bind(self.revertView, self));
@@ -101,8 +101,8 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
         this.model.save({}, {
             success : function() {
                 self.render();
-                var title = gettext("Your policy changes have been saved.");
-                var message = gettext("Please note that validation of your policy key and value pairs is not currently in place yet. If you are having difficulties, please review your policy pairs.");
+                var title = gettext("Ваши изменения сохранены.");
+                var message = gettext("Пожалуйста, обратите внимание, что проверки пар ключей и значений в настоящее время еще нет. Если у вас возникли трудности, пожалуйста, пересмотрите политику пар.");
                 self.showSavedBar(title, message);
                 analytics.track('Saved Advanced Settings', {
                     'course': course_location_analytics

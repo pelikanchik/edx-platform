@@ -71,38 +71,38 @@ from contentstore import utils
           <ol class="list-input">
             <li class="field text is-not-editable" id="field-course-organization">
               <label for="course-organization">Издатель</label>
-              <input title="${_('This field is disabled: this information cannot be changed.')}" type="text" class="long" id="course-organization" value="[Course Organization]" readonly />
+              <input title="${_(u'This field is disabled: this information cannot be changed.')}" type="text" class="long" id="course-organization" value="[Course Organization]" readonly />
             </li>
 
             <li class="field text is-not-editable" id="field-course-number">
               <label for="course-number">Номер курса</label>
-              <input title="${_('This field is disabled: this information cannot be changed.')}" type="text" class="short" id="course-number" value="[Course No.]" readonly>
+              <input title="${_(u'This field is disabled: this information cannot be changed.')}" type="text" class="short" id="course-number" value="[Course No.]" readonly>
             </li>
 
             <li class="field text is-not-editable" id="field-course-name">
               <label for="course-name">Название курса</label>
-              <input title="${_('This field is disabled: this information cannot be changed.')}" type="text" class="long" id="course-name" value="[Course Name]" readonly />
+              <input title="${_(u'This field is disabled: this information cannot be changed.')}" type="text" class="long" id="course-name" value="[Course Name]" readonly />
             </li>
           </ol>
 
          ## <div class="note note-promotion note-promotion-courseURL has-actions">
-         ##   <h3 class="title">${_("Course Summary Page")} <span class="tip">${_("(for student enrollment and access)")}</span></h3>
+         ##   <h3 class="title">${_(u"Course Summary Page")} <span class="tip">${_(u"(for student enrollment and access)")}</span></h3>
         ##    <div class="copy">
         ##      <p><a class="link-courseURL" rel="external" href="https:${utils.get_lms_link_for_about_page(course_location)}" />https:${utils.get_lms_link_for_about_page(course_location)}</a></p>
         ##    </div>
 
        ##     <ul class="list-actions">
        ##       <li class="action-item">
-       ##         <a title="${_('Send a note to students via email')}" href="mailto:someone@domain.com?Subject=Enroll%20in%20${context_course.display_name_with_default}&body=The%20course%20&quot;${context_course.display_name_with_default}&quot;,%20provided%20by%20edX,%20is%20open%20for%20enrollment.%20Please%20navigate%20to%20this%20course%20at%20https:${utils.get_lms_link_for_about_page(course_location)}%20to%20enroll." class="action action-primary"><i class="icon-envelope-alt icon-inline"></i>${_("Invite your students")}</a>
+       ##         <a title="${_(u'Send a note to students via email')}" href="mailto:someone@domain.com?Subject=Enroll%20in%20${context_course.display_name_with_default}&body=The%20course%20&quot;${context_course.display_name_with_default}&quot;,%20provided%20by%20edX,%20is%20open%20for%20enrollment.%20Please%20navigate%20to%20this%20course%20at%20https:${utils.get_lms_link_for_about_page(course_location)}%20to%20enroll." class="action action-primary"><i class="icon-envelope-alt icon-inline"></i>${_(u"Invite your students")}</a>
        ##       </li>
        ##     </ul>
        ##   </div>
 
           % if not about_page_editable:
       ##    <div class="notice notice-incontext notice-workflow">
-       ##     <h3 class="title">${_("Promoting Your Course with edX")}</h3>
+       ##     <h3 class="title">${_(u"Promoting Your Course with edX")}</h3>
        ##     <div class="copy">
-       ##       <p>${_('Your course summary page will not be viewable until your course has been announced. To provide content for the page and preview it, follow the instructions provided by your <abbr title="Program Manager">PM</abbr> or Conrad Warre <a rel="email" class="action action-email" href="mailto:conrad@edx.org">(conrad@edx.org)</a>.')}</p>
+       ##       <p>${_(u'Your course summary page will not be viewable until your course has been announced. To provide content for the page and preview it, follow the instructions provided by your <abbr title="Program Manager">PM</abbr> or Conrad Warre <a rel="email" class="action action-email" href="mailto:conrad@edx.org">(conrad@edx.org)</a>.')}</p>
        ##     </div>
       ##    </div>
           % endif
@@ -180,9 +180,9 @@ from contentstore import utils
 
           % if not about_page_editable:
           <div class="notice notice-incontext notice-workflow">
-            <h3 class="title">${_("These Dates Are Not Used When Promoting Your Course")}</h3>
+            <h3 class="title">${_(u"Эти даты не могут быть использованы для продвижения вашего курса")}</h3>
             <div class="copy">
-              <p>${_('These dates impact <strong>when your courseware can be viewed</strong>, but they are <strong>not the dates shown on your course summary page</strong>.  To provide the course start and registration dates as shown on your course summary page, follow the instructions provided by your <abbr title="Program Manager">PM</abbr> or Conrad Warre <a rel="email" class="action action-email" href="mailto:conrad@edx.org">(conrad@edx.org)</a>.')}</p>
+              <p>${_(u'Эти даты влияют <strong> на то, когда ваши курсы будут показаны </strong>, но они <strong>не показываются на странице сводки курса </strong>. ')}</p>
             </div>
           </div>
           % endif
@@ -215,7 +215,7 @@ from contentstore import utils
                       <iframe width="618" height="350" src="" frameborder="0" allowfullscreen></iframe>
                     </div>
                     <div class="actions">
-                      <a href="#" class="remove-item remove-course-introduction-video remove-video-data"><span class="delete-icon"></span>${_("Delete Current Video")}</a>
+                      <a href="#" class="remove-item remove-course-introduction-video remove-video-data"><span class="delete-icon"></span>${_(u"Удалить видео")}</a>
                     </div>
                   </div>
 
@@ -249,21 +249,21 @@ from contentstore import utils
     <aside class="content-supplementary" role="complimentary">
      <div class="bit">
         <h3 class="title-3">Как настройки будут использоваться</h3>
-        <p>${_("Your course's schedule settings determine when students can enroll in and begin a course.")}</p>
+        <p>${_(u"Настройки расписания вашего курса определяют, когда студенты смогут зарегистрироваться и начать прохождение курса.")}</p>
 
-        <p>${_("Additionally, details provided on this page are also used in edX's catalog of courses, which new and returning students use to choose new courses to study.")}</p>
+        <p>${_(u"Кроме того, данные указанные на этой странице, также используются в каталоге edX о курсах, которые студенты используют для выбора новых курсов")}</p>
       </div>
 
       <div class="bit">
       % if context_course:
       <% ctx_loc = context_course.location %>
       <%! from django.core.urlresolvers import reverse %>
-        <h3 class="title-3">${_("Other Course Settings")}</h3>
+        <h3 class="title-3">${_(u"Другие настройки курса")}</h3>
         <nav class="nav-related">
           <ul>
-            <li class="nav-item"><a href="${reverse('contentstore.views.course_config_graders_page', kwargs={'org' : ctx_loc.org, 'course' : ctx_loc.course, 'name': ctx_loc.name})}">${_("Grading")}</a></li>
-            <li class="nav-item"><a href="${reverse('manage_users', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">${_("Course Team")}</a></li>
-            <li class="nav-item"><a href="${reverse('course_advanced_settings', kwargs={'org' : ctx_loc.org, 'course' : ctx_loc.course, 'name': ctx_loc.name})}">${_("Advanced Settings")}</a></li>
+            <li class="nav-item"><a href="${reverse('contentstore.views.course_config_graders_page', kwargs={'org' : ctx_loc.org, 'course' : ctx_loc.course, 'name': ctx_loc.name})}">${_(u"Оценивание")}</a></li>
+            <li class="nav-item"><a href="${reverse('manage_users', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">${_(u"Команда курса")}</a></li>
+            <li class="nav-item"><a href="${reverse('course_advanced_settings', kwargs={'org' : ctx_loc.org, 'course' : ctx_loc.course, 'name': ctx_loc.name})}">${_(u"Специализированные настройки")}</a></li>
           </ul>
         </nav>
       % endif

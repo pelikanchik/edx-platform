@@ -14,7 +14,7 @@ $(function() {
 
 	$('.datepair input.date').each(function(){
 		var $this = $(this);
-		$this.datepicker({ 'dateFormat': 'd.m.yy' });
+		$this.datepicker({ 'dateFormat': 'm/d/yy' });
 
 		if ($this.hasClass('start') || $this.hasClass('end')) {
 			$this.on('changeDate change', doDatepair);
@@ -111,10 +111,10 @@ $(function() {
 				newDelta = 0;
 
 				if (target.hasClass('start')) {
-					end.val(startDate.format('d.m.Y'));
+					end.val(startDate.format('m/d/Y'));
 					end.datepicker('update');
 				} else if (target.hasClass('end')) {
-					start.val(endDate.format('d.m.Y'));
+					start.val(endDate.format('m/d/Y'));
 					start.datepicker('update');
 				}
 			}
@@ -197,7 +197,7 @@ $(function() {
 			if (dateDelta || dateDelta === 0) {
 				var endDate =  new Date(endInput.val());
 				var newEnd = new Date(endDate.getTime() + endDateAdvance);
-				endInput.val(newEnd.format('d.m.Y'));
+				endInput.val(newEnd.format('m/d/Y'));
 				endInput.datepicker('update');
 				container.data('dateDelta', dateDelta + endDateAdvance);
 			}

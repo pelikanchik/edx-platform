@@ -347,14 +347,14 @@
                   % for type, templates in sorted(component_templates.items()):
                   <li>
                   % if type == 'advanced' or len(templates) > 1:
-                    <a href="#" class="multiple-templates" data-type="${type}">
+                    <a href="#" class="multiple-templates" data-type="${type}"  style = "height:60px;">
                   % else:
                     % for __, category, __, __ in templates:
-                    <a href="#" class="single-template" data-type="${type}" data-category="${category}">
+                    <a href="#" class="single-template" data-type="${type}" data-category="${category}" style = "height:60px;">
                     % endfor
                   % endif
                       <span class="large-template-icon large-${type}-icon"></span>
-                      <span class="name">${type}</span>
+                      ##<span class="name">${type}</span>
                     </a>
                   </li>
                   % endfor
@@ -432,10 +432,10 @@
           <h4 class="header">Настройки элемента</h4>
           <div class="window-contents">
             <div class="row visibility">
-              <label class="inline-label">Приватность:</label>
+              <label class="inline-label">Общий доступ:</label>
               <select class='visibility-select'>
-                <option value="public">Публично</option>
-                <option value="private">Приватно</option>
+                <option value="public">Публичный</option>
+                <option value="private">Непубличный</option>
               </select>
             </div>
             <div class="row published-alert">
@@ -462,7 +462,7 @@
           <div class="window-contents">
             <div class="row wrapper-unit-id">
               <p class="unit-id">
-                <span class="label">${_("Unit Identifier:")}</span>
+                <span class="label">${_(u"Идентификатор элемента:")}</span>
                 <input type="text" class="url value" value="${unit.location.name}" disabled />
               </p>
             </div>

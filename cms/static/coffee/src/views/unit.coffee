@@ -120,15 +120,15 @@ class CMS.Views.UnitEdit extends Backbone.View
 
   deleteComponent: (event) =>
     msg = new CMS.Views.Prompt.Warning(
-      title: gettext('Delete this component?'),
-      message: gettext('Deleting this component is permanent and cannot be undone.'),
+      title: gettext('Удалить компонент?'),
+      message: gettext('Удаление компонента нельзя будет отменить. Никогда. Вообще.'),
       actions:
         primary:
-          text: gettext('Yes, delete this component'),
+          text: gettext('Да, удалить'),
           click: (view) =>
             view.hide()
             deleting = new CMS.Views.Notification.Mini
-              title: gettext('Deleting') + '&hellip;',
+              title: gettext('Удаление...') + '&hellip;',
             deleting.show()
             $component = $(event.currentTarget).parents('.component')
             $.post('/delete_item', {
@@ -151,7 +151,7 @@ class CMS.Views.UnitEdit extends Backbone.View
               );`
             )
         secondary:
-          text: gettext('Cancel'),
+          text: gettext('Отмена'),
           click: (view) ->
             view.hide()
     )
