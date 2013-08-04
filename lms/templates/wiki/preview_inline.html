@@ -10,16 +10,16 @@
     <div class="main-article">
       {% if revision %}
         <div class="alert alert-info">
-          <strong>{% trans "Previewing revision" %}:</strong>
+          <strong>Предпросмотр:</strong>
           {% include "wiki/includes/revision_info.html" %}
         </div>
       {% endif %}
 
       {% if merge %}
         <div class="alert alert-info">
-          <strong>{% trans "Previewing merge between" %}:</strong>
+          <strong>Предпросмотр объединения:</strong>
           {% include "wiki/includes/revision_info.html" with revision=merge1 %}
-          <strong>{% trans "and" %}</strong>
+          <strong>и</strong>
           {% include "wiki/includes/revision_info.html" with revision=merge2 %}
         </div>
       {% endif %}
