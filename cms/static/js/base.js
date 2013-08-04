@@ -80,10 +80,10 @@ $(document).ready(function() {
     });
 
     // general link management - new window/tab
-    $('a[rel="external"]').attr('title', gettext('This link will open in a new browser window/tab')).bind('click', linkNewWindow);
+    $('a[rel="external"]').attr('title', gettext('Эта ссылка откроется в новом окне или в новой вкладке браузера')).bind('click', linkNewWindow);
 
     // general link management - lean modal window
-    $('a[rel="modal"]').attr('title', gettext('This link will open in a modal window')).leanModal({
+    $('a[rel="modal"]').attr('title', gettext('Эта ссылка откроется в новом модальном окне')).leanModal({
         overlay: 0.50,
         closeButton: '.action-modal-close'
     });
@@ -201,9 +201,9 @@ function toggleSections(e) {
     sectionCount = $section.length;
     $button = $(this);
     $labelCollapsed = $('<i class="icon-arrow-up"></i> <span class="label">' +
-        gettext('Collapse All Sections') + '</span>');
+        gettext('Свернуть все разделы') + '</span>');
     $labelExpanded = $('<i class="icon-arrow-down"></i> <span class="label">' +
-        gettext('Expand All Sections') + '</span>');
+        gettext('Разернуть все разделы') + '</span>');
 
     var buttonLabel = $button.hasClass('is-activated') ? $labelCollapsed : $labelExpanded;
     $button.toggleClass('is-activated').html(buttonLabel);
@@ -242,7 +242,7 @@ function showImportSubmit(e) {
         $('.submit-button').show();
         $('.progress').show();
     } else {
-        $('.error-block').html(gettext('File format not supported. Please upload a file with a <code>tar.gz</code> extension.')).show();
+        $('.error-block').html(gettext('Формат не поддерживается. Загружайте в формате <code>tar.gz</code>.')).show();
     }
 }
 
@@ -325,7 +325,7 @@ function saveSubsection() {
             $changedInput = null;
         },
         error: function() {
-            showToastMessage(gettext('There has been an error while saving your changes.'));
+            showToastMessage(gettext('Произошла ошибка во время сохранения.'));
         }
     });
 }
@@ -372,11 +372,11 @@ function deleteSection(e) {
 
 function _deleteItem($el, type) {
     var confirm = new CMS.Views.Prompt.Warning({
-        title: gettext('Delete this ' + type + '?'),
-        message: gettext('Deleting this ' + type + ' is permanent and cannot be undone.'),
+        title: gettext('Удалить ' + type + '?'),
+        message: gettext('Удаляется ' + type + ' is permanent and cannot be undone.'),
         actions: {
             primary: {
-                text: gettext('Yes, delete this ' + type),
+                text: gettext('Да, удалить ' + type),
                 click: function(view) {
                     view.hide();
 
@@ -388,7 +388,7 @@ function _deleteItem($el, type) {
                     });
 
                     var deleting = new CMS.Views.Notification.Mini({
-                        title: gettext('Deleting') + '&hellip;'
+                        title: gettext('Удаляется') + '&hellip;'
                     });
                     deleting.show();
 
@@ -404,7 +404,7 @@ function _deleteItem($el, type) {
                 }
             },
             secondary: {
-                text: gettext('Cancel'),
+                text: gettext('Отмена'),
                 click: function(view) {
                     view.hide();
                 }
@@ -452,9 +452,9 @@ function toggleSock(e) {
     });
 
     if ($sock.hasClass('is-shown')) {
-        $btnLabel.text(gettext('Hide Studio Help'));
+        $btnLabel.text(gettext('Скрыть'));
     } else {
-        $btnLabel.text(gettext('Looking for Help with Studio?'));
+        $btnLabel.text(gettext('Нужна помощь со студией?'));
     }
 }
 
@@ -619,7 +619,7 @@ function saveNewCourse(e) {
     var display_name = $newCourse.find('.new-course-name').val();
 
     if (org == '' || number == '' || display_name == '') {
-        alert(gettext('You must specify all fields in order to create a new course.'));
+        alert(gettext('Для создания нового кура нужно заполнить все поля.'));
         return;
     }
 
@@ -732,7 +732,7 @@ function saveSetSectionScheduleDate(e) {
     });
 
     var saving = new CMS.Views.Notification.Mini({
-        title: gettext("Saving") + "&hellip;",
+        title: gettext("Сохраняется") + "&hellip;",
     });
     saving.show();
     // call into server to commit the new order
@@ -751,11 +751,11 @@ function saveSetSectionScheduleDate(e) {
         var $thisSection = $('.courseware-section[data-id="' + id + '"]');
         var html = _.template(
             '<span class="published-status">' +
-                '<strong>' + gettext("Will Release:") + '&nbsp;</strong>' +
+                '<strong>' + gettext("Начало") + '&nbsp;</strong>' +
                 gettext("<%= date %> at <%= time %> UTC") +
             '</span>' +
             '<a href="#" class="edit-button" data-date="<%= date %>" data-time="<%= time %>" data-id="<%= id %>">' +
-                gettext("Edit") +
+                gettext("Редактировать") +
             '</a>',
             {date: input_date, time: input_time, id: id});
         $thisSection.find('.section-published-date').html(html);

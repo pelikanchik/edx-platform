@@ -26,16 +26,16 @@ CMS.Views.ShowTextbook = Backbone.View.extend({
         if(e && e.preventDefault) { e.preventDefault(); }
         var textbook = this.model, collection = this.model.collection;
         var msg = new CMS.Views.Prompt.Warning({
-            title: _.template(gettext("Delete “<%= name %>”?"),
+            title: _.template(gettext("Удалить “<%= name %>”?"),
                 {name: textbook.escape('name')}),
-            message: gettext("Deleting a textbook cannot be undone and once deleted any reference to it in your courseware's navigation will also be removed."),
+            message: gettext("Удаление учебника нельзя отменить."),
             actions: {
                 primary: {
-                    text: gettext("Delete"),
+                    text: gettext("Удалить"),
                     click: function(view) {
                         view.hide();
                         var delmsg = new CMS.Views.Notification.Mini({
-                            title: gettext("Deleting") + "&hellip;"
+                            title: gettext("Удаляется") + "&hellip;"
                         }).show();
                         textbook.destroy({
                             complete: function() {
@@ -45,7 +45,7 @@ CMS.Views.ShowTextbook = Backbone.View.extend({
                     }
                 },
                 secondary: {
-                    text: gettext("Cancel"),
+                    text: gettext("Отмена"),
                     click: function(view) {
                         view.hide();
                     }
@@ -122,7 +122,7 @@ CMS.Views.EditTextbook = Backbone.View.extend({
         this.setValues();
         if(!this.model.isValid()) { return; }
         var saving = new CMS.Views.Notification.Mini({
-            title: gettext("Saving") + "&hellip;"
+            title: gettext("Сохранение") + "&hellip;"
         }).show();
         var that = this;
         this.model.save({}, {
@@ -241,9 +241,9 @@ CMS.Views.EditChapter = Backbone.View.extend({
             asset_path: this.$("input.chapter-asset-path").val()
         });
         var msg = new CMS.Models.FileUpload({
-            title: _.template(gettext("Upload a new PDF to “<%= name %>”"),
+            title: _.template(gettext("Загрузить новый PDF-файл в “<%= name %>”"),
                 {name: section.escape('name')}),
-            message: "Files must be in PDF format."
+            message: "Файл должен быть в формате pdf."
         });
         var view = new CMS.Views.UploadDialog({model: msg, chapter: this.model});
         $(".wrapper-view").after(view.show().el);
@@ -356,7 +356,7 @@ CMS.Views.UploadDialog = Backbone.View.extend({
         this.model.set({
             "uploading": false,
             "uploadedBytes": 0,
-            "title": gettext("We're sorry, there was an error")
+            "title": gettext("Произошла ошибка")
         });
     }
 });

@@ -63,14 +63,14 @@
   <script type="text/template" id="new-section-template">
     <section class="courseware-section branch new-section">
       <header>
-      <a href="#"  data-tooltip="${_('Collapse/expand this section')}" class="expand-collapse-icon collapse"></a>
+      <a href="#"  data-tooltip="${_(u'Свернуть/развернуть раздел')}" class="expand-collapse-icon collapse"></a>
         <div class="item-details">
           <h3 class="section-name">
           <form class="section-name-form">
-            <input type="text" value="${_('New Section Name')}" class="new-section-name" />
+            <input type="text" value="${_(u'Название раздела')}" class="new-section-name" />
             <input type="submit" class="new-section-name-save" data-parent="${parent_location}"
-                   data-category="${new_section_category}" value="${_('Save')}" />
-            <input type="button" class="new-section-name-cancel" value="${_('Cancel')}" /></h3>
+                   data-category="${new_section_category}" value="${_(u'Сохранить')}" />
+            <input type="button" class="new-section-name-cancel" value="${_(u'Отмена')}" /></h3>
           </form>
         </div>
       </header>
@@ -80,7 +80,7 @@
   <script type="text/template" id="blank-slate-template">
     <section class="courseware-section branch new-section">
       <header>
-      <a href="#"  data-tooltip="${_('Collapse/expand this section')}" class="expand-collapse-icon collapse"></a>
+      <a href="#"  data-tooltip="${_(u'Свернуть/развернуть раздел')}" class="expand-collapse-icon collapse"></a>
         <div class="item-details">
           <h3 class="section-name">
           <span class="section-name-span">Нажмите, чтобы изменить название раздела</span>
@@ -139,7 +139,7 @@
       </h1>
 
       <nav class="nav-actions">
-        <h3 class="sr">${_("Page Actions")}</h3>
+        <h3 class="sr">${_(u"Действия")}</h3>
         <ul>
           <li class="nav-item">
 
@@ -148,9 +148,9 @@
           <li class="nav-item">
             <a href="#" class="button new-button new-courseware-section-button"><i class="icon-plus"></i>Добавить раздел</a>
           </li>
-          ##<li class="nav-item">
-          ##  <a href="${lms_link}" rel="external" class="button view-button view-live-button">View Live</a>
-          ##</li>
+          <li class="nav-item">
+            <a href="${lms_link}" rel="external" class="button view-button view-live-button">Live</a>
+          </li>
         </ul>
       </nav>
     </header>
@@ -162,7 +162,7 @@
         % for section in sections:
         <section class="courseware-section branch" data-id="${section.location}">
           <header>
-          <a href="#" data-tooltip="${_('Expand/collapse this section')}" class="expand-collapse-icon collapse"></a>
+          <a href="#" data-tooltip="${_(u'Свернуть/развернуть раздел')}" class="expand-collapse-icon collapse"></a>
 
             <div class="item-details" data-id="${section.location}">
               <h3 class="section-name" data-name="${section.display_name_with_default | h}"></h3>
@@ -208,7 +208,7 @@
               <li class="branch collapsed id-holder" data-id="${subsection.location}">
                 <div class="section-item">
                   <div class="details">
-                    <a href="#" data-tooltip="${_('Expand/collapse this subsection')}" class="expand-collapse-icon expand"></a>
+                    <a href="#" data-tooltip="${_(u'Свернуть/развернуть раздел')}" class="expand-collapse-icon expand"></a>
                     <a href="${reverse('edit_subsection', args=[subsection.location])}">
                       <span class="folder-icon"></span>
                       <span class="subsection-name"><span class="subsection-name-value">${subsection.display_name_with_default}</span></span>
@@ -240,14 +240,14 @@
   <div class="edit-subsection-publish-settings">
     <div class="settings">
 
-      <h3>${_("Section Release Date")}</h3>
+      <h3>${_(u"Дата начала")}</h3>
       <div class="picker datepair">
         <div class="field field-start-date">
           <label for="">День публикации</label>
-          <input class="start-date date" type="text" name="start_date" value="" placeholder="MM/DD/YYYY" class="date" size='15' autocomplete="off"/>
+          <input class="start-date date" type="text" name="start_date" value="" placeholder="DD.MM.YYYY" class="date" size='15' autocomplete="off"/>
         </div>
         <div class="field field-start-time">
-          <label for="">Время публикации (<abbr title="${_("Coordinated Universal Time")}">UTC</abbr>)</label>
+          <label for="">Время публикации</label>
 
           <input class="start-time time" type="text" name="start_time" value="" placeholder="HH:MM" class="time" size='10' autocomplete="off"/>
         </div>

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import logging
 from cStringIO import StringIO
 from math import exp
@@ -217,9 +218,9 @@ class CourseFields(object):
     has_children = True
     checklists = List(scope=Scope.settings,
         default=[
-            {"short_description" : "Getting Started With Studio",
-             "items" : [{"short_description": "Add Course Team Members",
-                         "long_description": "Grant your collaborators permission to edit your course so you can work together.",
+            {"short_description" : u"Начало работы со студией",
+             "items" : [{"short_description": u"Добавить членов курса",
+                         "long_description": u"Grant your collaborators permission to edit your course so you can work together.",
                          "is_checked": False,
                          "action_url": "ManageUsers",
                          "action_text": "Edit Course Team",
@@ -243,7 +244,7 @@ class CourseFields(object):
                          "action_text": "",
                          "action_external": False}]
             },
-            {"short_description" : "Draft a Rough Course Outline",
+            {"short_description" : u"Грубое заполнение курса",
              "items" : [{"short_description": "Create Your First Section and Subsection",
                           "long_description": "Use your course outline to build your first Section and Subsection.",
                           "is_checked": False,
@@ -287,7 +288,7 @@ class CourseFields(object):
                           "action_text": "Edit Course Outline",
                           "action_external": False}]
             },
-            {"short_description" : "Explore edX's Support Tools",
+            {"short_description" : u"Изучение способов поддержки студии",
              "items" : [{"short_description": "Explore the Studio Help Forum",
                           "long_description": "Access the Studio Help forum from the menu that appears when you click your user name in the top right corner of Studio.",
                           "is_checked": False,
@@ -307,7 +308,7 @@ class CourseFields(object):
                           "action_text": "Download Documentation",
                           "action_external": True}]
             },
-            {"short_description" : "Draft Your Course About Page",
+            {"short_description" : u"Заполнение общей информации о курсе",
              "items" : [{"short_description": "Draft a Course Description",
                           "long_description": "Courses on edX have an About page that includes a course video, description, and more. Draft the text students will read before deciding to enroll in your course.",
                           "is_checked": False,

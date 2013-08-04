@@ -82,7 +82,7 @@ CMS.Views.OverviewAssignmentGrader = Backbone.View.extend({
 	      this.removeMenu(e);
 
               var saving = new CMS.Views.Notification.Mini({
-                  title: gettext('Saving') + '&hellip;'
+                  title: gettext('Сохраняется') + '&hellip;'
               });
               saving.show();
 

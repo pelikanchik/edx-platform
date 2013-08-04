@@ -12,7 +12,7 @@
         <% ctx_loc = context_course.location %>
         ${context_course.display_name_with_default} |
         % endif
-        edX Studio
+        Пеликан
     </title>
 
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -37,6 +37,8 @@
     </script>
 
     ## javascript
+
+    ##<script type='text/javascript' src='/static/js/base.js'></script>
     <script type="text/javascript" src="${static.url('js/vendor/json2.js')}"></script>
     <script type="text/javascript" src="${static.url('js/vendor/underscore-min.js')}"></script>
     <script type="text/javascript" src="${static.url('js/vendor/underscore.string.min.js')}"></script>
@@ -44,6 +46,7 @@
     <script type="text/javascript" src="${static.url('js/vendor/backbone-associations-min.js')}"></script>
     <script type="text/javascript" src="${static.url('js/vendor/markitup/jquery.markitup.js')}"></script>
     <script type="text/javascript" src="${static.url('js/vendor/markitup/sets/wiki/set.js')}"></script>
+
 
     <%static:js group='main'/>
     <%static:js group='module-js'/>
