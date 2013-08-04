@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Instructor Views
 """
@@ -90,11 +91,11 @@ def instructor_dashboard(request, course_id):
 
     # assemble some course statistics for output to instructor
     def get_course_stats_table():
-        datatable = {'header': ['Statistic', 'Value'],
-                     'title': 'Course Statistics At A Glance',
+        datatable = {'header': [u'Параметр', u'Значение'],
+                     'title': u'Статистика курса. Краткий обзор',
                      }
-        data = [['# Enrolled', CourseEnrollment.objects.filter(course_id=course_id).count()]]
-        data += [['Date', timezone.now().isoformat()]]
+        data = [[u'# Приглашено', CourseEnrollment.objects.filter(course_id=course_id).count()]]
+        data += [[u'Время', timezone.now().isoformat()]]
         data += compute_course_stats(course).items()
         if request.user.is_staff:
             for field in course.fields:
