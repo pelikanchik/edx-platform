@@ -346,7 +346,7 @@ function createNewUnit(e) {
     $.post('/create_item', {
         'parent_location': parent,
         'category': category,
-        'display_name': 'New Unit'
+        'display_name': 'Новый элемент'
     },
 
     function(data) {
