@@ -3,7 +3,6 @@
 {% load url from future %}
 
 {% block pagetitle %}{% trans "Добавить новую статью" %}{% endblock %}
-
 {% block wiki_contents %}
 
   {% addtoblock "js" %}
@@ -27,19 +26,19 @@
   <article class="main-article new-article">
 
     {% include "wiki/includes/editormedia.html" %}
-    <h1 class="page-header">{% trans "Добавить новую статью" %}</h1>
-    
+    <h1 class="page-header">Добавить новую статью</h1>
+
     <form method="POST" class="form-horizontal">
       {% wiki_form create_form %}
       <div class="form-actions">
           <button type="submit" name="save_changes" class="btn btn-primary btn-large">
             <span class="icon-plus"></span>
-            {% trans "Создать статью" %}
+            Создать статью
           </button>
 
           <a href="{% url 'wiki:get' path=parent_urlpath.path %}" class="btn btn-large back">
             <span class="icon-circle-arrow-left"></span>
-            {% trans "Назад" %}
+            Назад
           </a>
       </div>  
       {% include "wiki/includes/cheatsheet.html" %}
