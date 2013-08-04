@@ -66,8 +66,10 @@ header.global.slim {
   padding: 5px 0 10px 0;
   border-bottom: 1px solid $outer-border-color;
   background: $header-bg;
-  a {
+  h1.logo {
+    a {
       margin-top:-7px;
+    }
   }
   .guest .secondary {
     margin-right: 0;
