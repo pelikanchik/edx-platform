@@ -28,13 +28,13 @@
         {% include "wiki/includes/article_menu.html" %}
       </ul>
       <div class="timestamp">
-        <span class="label">Последняя модификация</span><br />
+        <span class="label">Последнее изменение:</span><br />
         <span class="date">{{ article.current_revision.modified }}</span>
       </div>
 
       {% if urlpath %}
       <div class="see-children">
-        <a href="{% url 'wiki:dir' path=urlpath.path %}">Посмотреть всех потомков</a>
+        <a href="{% url 'wiki:dir' path=urlpath.path %}">Посмотреть все дочерние элементы</a>
       </div>
       {% endif %}
     </div>
