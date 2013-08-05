@@ -1,8 +1,8 @@
-Dear ${first_name} ${last_name}
+Уважаемый ${first_name} ${last_name}
 
-You have been enrolled in ${course_id} at ${site_name} by a member of the course staff. The course should now appear on your ${site_name} dashboard.
+Вы были подписаны на ${course_id} от ${site_name} одним из членов персонала курса. Курс ${site_name} будет теперь отображаться в вашем расписании.
 
-To start accessing course materials, please visit ${course_url}
+Для того, чтобы начать заниматься, перейдите по ссылке ${course_url}
 
 ----
-This email was automatically sent from ${site_name} to ${first_name} ${last_name}
+Письмо отпралено автоматически  ${site_name} для ${first_name} ${last_name}
