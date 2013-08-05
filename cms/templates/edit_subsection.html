@@ -20,6 +20,7 @@
 <script type='text/javascript' src='/static/js/knockout-mapping.js'></script>
 <script type='text/javascript' src='/static/js/numeric.js'></script>
 
+
 <div class="main-wrapper">
   <div class="inner-wrapper">
     <div class="main-column">
@@ -52,7 +53,7 @@
 
                                                 <td>
 
-                                                <select onchange="saveJSON()" data-bind='value: source_section_id, valueUpdate: "afterkeydown"'>
+                                                <select  data-bind='value: source_section_id, valueUpdate: "afterkeydown"'>
                                                     % for every_section in sections:
                                                       % for every_subsection in every_section.get_children():
                                                          % if subsection.url_name != every_subsection.url_name:
@@ -66,14 +67,14 @@
 
 
                                                 <td>
-                                                    <select onchange="saveJSON()" data-bind='value: field, valueUpdate: "afterkeydown"'>
+                                                    <select data-bind='value: field, valueUpdate: "afterkeydown"'>
                                                         <option value="score_abs">Результат (абсолютный)</option>
                                                         <option value="score_rel">Результат (относительный, %)</option>
                                                     </select>
                                                 </td>
                                                 <td>
 
-                                                    <select onchange="saveJSON()" data-bind='value: sign, valueUpdate: "afterkeydown"'>
+                                                    <select  data-bind='value: sign, valueUpdate: "afterkeydown"'>
                                                         <option value="more">&#62;</option>
                                                         <option value="more-equals">&#8805;</option>
                                                         <option value="equals">=</option>
@@ -82,7 +83,7 @@
                                                     </select>
 
                                                 </td>
-                                                <td><input onchange="saveJSON()" data-bind='value: value, valueUpdate: "afterkeydown"' class = "value" /></td>
+                                                <td><input  data-bind='value: value, valueUpdate: "afterkeydown"' class = "value" /></td>
                                                 <td style="vertical-align: middle"><img width="20" src = "/static/img/edit_remove.png"  data-bind='click: $root.removeConjunction' class = "del" /></td>
                                             </tr>
                                         </tbody>
@@ -99,9 +100,9 @@
                     <img class = "add" style="width:20px; margin: 3px;" src = "/static/img/plus_32.png" data-bind='click: addDisjunction' />
                 </div>
                 </div>
+                <p style = "text-align: center;"><input type = "button" class = "save-subsection-button" value="Сохранить"/></p>
 
-
-                <input disabled data-bind='value: term_string' style="font-size: 10px" class="subsection-display-name-input" data-metadata-name="unlock_term" >
+                <input disabled data-bind='value: term_string' style="font-size: 10px; display:none;" class="subsection-display-name-input" data-metadata-name="unlock_term">
 
         <script>
 
@@ -129,14 +130,13 @@
                         }])
                     });
 
-                    saveSubsection();
                     check_numeric();
                     hovers();
                 };
 
                 self.removeDisjunction = function(disjunction) {
                     self.disjunctions.remove(disjunction);
-                    saveSubsection();
+
 
                 };
 
@@ -147,14 +147,14 @@
                         sign: ko.observable("more"),
                         value: ko.observable("0")
                     });
-                    saveSubsection();
+
                     check_numeric();
                     hovers();
                 };
 
                 self.removeConjunction = function(conjunction) {
                     $.each(self.disjunctions(), function() { this.conjunctions.remove(conjunction) })
-                    saveSubsection();
+
 
                 };
 
@@ -172,11 +172,7 @@
             };
 
             ko.applyBindings(new DisjunctionsModel());
-
-            function saveJSON(){
-                setTimeout("saveSubsection()", 0);
-            }
-
+\
             function hovers(){
                 $("img.close").hover(
                     function () {

@@ -6,26 +6,7 @@
 <%block name="bodyclass">is-signedin course unit</%block>
 
 <%block name="jsextra">
-<style>
-    .save-term {
-        background-color: #009FE6;
-        background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0));
-        border: 1px solid #007FB8;
-        border-radius: 3px 3px 3px 3px;
-        box-shadow: 0 1px 0 rgba(255, 255, 255, 0.3) inset, 0 0 0 transparent;
-        color: white;
-        display: inline-block;
-        font-size: 1.4rem!important;
-        font-weight: 700;
-        padding: 4px 20px 5px;
-        transition: background-color 0.15s ease 0s, box-shadow 0.15s ease 0s;
 
-    }
-    .save-term-active {
-        background-color: #007Fc6;
-        background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.3));
-    }
-</style>
   <script type='text/javascript'>
   $(document).ready(function() {
     __this = new CMS.Views.UnitEdit({
@@ -85,7 +66,7 @@
                                 </td>
                                 <td>
                                      перейти в
-                                     <select onchange="saveJSON()" data-bind='value: direct_element_id, valueUpdate: "afterkeydown"'>
+                                     <select  data-bind='value: direct_element_id, valueUpdate: "afterkeydown"'>
 
                                          % for every_unit in subsection.get_children():
                                                 <option value="${every_unit.url_name}">${every_unit.display_name_with_default}</option>
@@ -106,7 +87,7 @@
 
                                                 <td>
 
-                                                <select onchange="saveJSON()" data-bind='value: source_element_id, valueUpdate: "afterkeydown"'>
+                                                <select data-bind='value: source_element_id, valueUpdate: "afterkeydown"'>
 
                                                       % for every_unit in subsection.get_children():
                                                             <option value="${every_unit.url_name}">${every_unit.display_name_with_default}</option>
@@ -118,14 +99,14 @@
 
 
                                                 <td>
-                                                    <select onchange="saveJSON()" data-bind='value: field, valueUpdate: "afterkeydown"'>
+                                                    <select  data-bind='value: field, valueUpdate: "afterkeydown"'>
                                                         <option value="score_abs">Результат (абсолютный)</option>
                                                         <option value="score_rel">Результат (относительный, %)</option>
                                                     </select>
                                                 </td>
                                                 <td>
 
-                                                    <select onchange="saveJSON()" data-bind='value: sign, valueUpdate: "afterkeydown"'>
+                                                    <select  data-bind='value: sign, valueUpdate: "afterkeydown"'>
                                                         <option value="more">&#62;</option>
                                                         <option value="more-equals">&#8805;</option>
                                                         <option value="equals">=</option>
@@ -134,7 +115,7 @@
                                                     </select>
 
                                                 </td>
-                                                <td><input onchange="saveJSON()" data-bind='value: value, valueUpdate: "afterkeydown"' class = "value" /></td>
+                                                <td><input data-bind='value: value, valueUpdate: "afterkeydown"' class = "value" /></td>
                                                 <td style="vertical-align: middle"><img width="20" src = "/static/img/edit_remove.png"  data-bind='click: $root.removeConjunction' class = "del" /></td>
                                             </tr>
                                         </tbody>
@@ -142,6 +123,8 @@
                                      <div style = "width:100%">
                                          <img class = "add" src  = "/static/img/plus_16.png" data-bind='click: $root.addConjunction' />
                                      </div>
+
+
                                 </td>
                             </tr>
                         </tbody>
@@ -203,14 +186,12 @@
                         }])
                     });
 
-                    //saveSubsection();
                     check_numeric();
                     hovers();
                 };
 
                 self.removeDisjunction = function(disjunction) {
                     self.disjunctions.remove(disjunction);
-                    //saveSubsection();
 
                 };
 
@@ -221,15 +202,12 @@
                         sign: ko.observable("more"),
                         value: ko.observable("0")
                     });
-                    //saveSubsection();
                     check_numeric();
                     hovers();
                 };
 
                 self.removeConjunction = function(conjunction) {
                     $.each(self.disjunctions(), function() { this.conjunctions.remove(conjunction) })
-                    //saveSubsection();
-
                 };
 
                 // объект, полученный на выходе после работы конструктора, преобразуется обратно в канонический вид.
@@ -282,13 +260,6 @@
 
             ko.applyBindings(new DisjunctionsModel());
 
-            function saveJSON(){
-
-               //console.log(__this);
-               //__this.constructor.NameEdit.prototype.saveName();
-               //console.log(window.unitEdit());
-               //setTimeout("CMS.Views.UnitEdit(saveDraft)", 0);
-            }
 
             function hovers(){
                 $("img.close").hover(
