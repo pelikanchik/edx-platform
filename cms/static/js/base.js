@@ -127,6 +127,19 @@ $(document).ready(function() {
     $('.new-subsection-item').bind('click', addNewSubsection);
     $('.delete-subsection-button').bind('click', deleteSubsection);
 
+    // save subsection
+    $('.save-subsection-button').bind('click', saveSubsectionOnButton);
+    function saveSubsectionOnButton(){
+
+      $('.save-subsection-button').val("сохраняется...");
+      $('.save-subsection-button').addClass("save-subsection-button-active");
+      saveSubsection();
+      setTimeout('$(".save-subsection-button").val("Сохранить"); $(".save-subsection-button").removeClass("save-subsection-button-active");', 1500);
+
+    }
+
+
+
     $('.sync-date').bind('click', syncReleaseDate);
 
     // import form setup
