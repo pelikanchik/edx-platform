@@ -2,8 +2,7 @@
 {% load wiki_tags i18n sekizai_tags %}
 {% load url from future %}
 
-{% block pagetitle %}Добавить статью{% endblock %}
-
+{% block pagetitle %}{% trans "Добавить новую статью" %}{% endblock %}
 {% block wiki_contents %}
 
   {% addtoblock "js" %}
@@ -28,7 +27,7 @@
 
     {% include "wiki/includes/editormedia.html" %}
     <h1 class="page-header">Добавить новую статью</h1>
-    
+
     <form method="POST" class="form-horizontal">
       {% wiki_form create_form %}
       <div class="form-actions">
