@@ -200,8 +200,8 @@
               <dt class="label">${_(u'Статус:')}</dt>
               <dd class="value">
                 <span class="status-indicator"></span>
-                <span class="value-formal">${_(u'Denied')}</span>
-                <span class="value-description">${_(u'Your request did not meet the criteria/guidelines specified by edX Staff.')}</span>
+                <span class="value-formal">${_(u'Недоступен')}</span>
+               ## <span class="value-description">${_(u'Your request did not meet the criteria/guidelines specified by edX Staff.')}</span>
               </dd>
             </dl>
           </div>
@@ -215,19 +215,19 @@
         </h3>
 
         <div class="notice notice-incontext notice-instruction notice-instruction-creationrights ui-toggle-target" id="instruction-creationrights">
-          <div class="copy">
-            <p>${_(u'edX Studio is a hosted solution for our xConsortium partners and selected guests. Courses for which you are a team member appear above for you to edit, while course creator privileges are granted by edX. Our team is currently  evaluating your request.')}</p>
-          </div>
+         ## <div class="copy">
+         ##   <p>${_(u'edX Studio is a hosted solution for our xConsortium partners and selected guests. Courses for which you are a team member appear above for you to edit, while course creator privileges are granted by edX. Our team is currently  evaluating your request.')}</p>
+         ## </div>
 
           <div class="status status-creationrights has-status is-pending">
-            <h4 class="title">${_(u'Your Course Creator Request Status:')}</h4>
+            <h4 class="title">${_(u'Ваш статус создателя курса:')}</h4>
 
             <dl class="status-update">
-              <dt class="label">${_(u'Your Course Creator request is:')}</dt>
+              <dt class="label">${_(u'Статус:')}</dt>
               <dd class="value">
                 <span class="status-indicator"></span>
-                <span class="value-formal">${_(u'Pending')}</span>
-                <span class="value-description">${_(u'Your request is currently being reviewed by edX staff and should be updated shortly.')}</span>
+                <span class="value-formal">${_(u'Обрабатывается')}</span>
+               ## <span class="value-description">${_(u'Your request is currently being reviewed by edX staff and should be updated shortly.')}</span>
               </dd>
             </dl>
           </div>
@@ -237,29 +237,29 @@
 
     </article>
 
-    <aside class="content-supplementary" role="complimentary">
-
-      % if course_creator_status=='disallowed_for_this_site' and settings.MITX_FEATURES.get('STUDIO_REQUEST_EMAIL',''):
-      <div class="bit">
-        <h3 class="title title-3">${_(u'Can I create courses in Studio?')}</h3>
-        <p>${_(u'In order to create courses in Studio, you must')} <a href="mailto:${settings.MITX_FEATURES.get('STUDIO_REQUEST_EMAIL','')}">${_(u"contact edX staff to help you create a course")}</a></p>
-      </div>
-      % endif
-
-      % if course_creator_status == "unrequested":
-      <div class="bit">
-        <h3 class="title title-3">${_(u'Can I create courses in Studio?')}</h3>
-        <p>${_(u'In order to create courses in Studio, you must have course creator privileges to create your own course.')}</p>
-      </div>
-
-      % elif course_creator_status == "denied":
-      <div class="bit">
-        <h3 class="title title-3">${_(u'Can I create courses in Studio?')}</h3>
-        <p>${_(u'Your request to author courses in studio has been denied. Please')} <a href="http://help.edge.edx.org/discussion/new" class="show-tender">${_(u'contact edX Staff with further questions')}</a></p>
-      </div>
-
-      % endif
-    </aside>
+    ##<aside class="content-supplementary" role="complimentary">
+ ##
+  ##     % if course_creator_status=='disallowed_for_this_site' and settings.MITX_FEATURES.get('STUDIO_REQUEST_EMAIL',''):
+  ##     <div class="bit">
+  ##       <h3 class="title title-3">${_(u'Can I create courses in Studio?')}</h3>
+  ##       <p>${_(u'In order to create courses in Studio, you must')} <a href="mailto:${settings.MITX_FEATURES.get('STUDIO_REQUEST_EMAIL','')}">${_(u"contact edX staff to help you create a course")}</a></p>
+  ##     </div>
+   ##    % endif
+ ##
+ ##      % if course_creator_status == "unrequested":
+  ##     <div class="bit">
+ ##        <h3 class="title title-3">${_(u'Can I create courses in Studio?')}</h3>
+ ##        <p>${_(u'In order to create courses in Studio, you must have course creator privileges to create your own course.')}</p>
+ ##      </div>
+ ##
+  ##     % elif course_creator_status == "denied":
+ ##      <div class="bit">
+  ##       <h3 class="title title-3">${_(u'Могу ли я создавать курсы?')}</h3>
+  ##       <p>${_(u'Ваш запрос отклонен')} <a href="http://help.edge.edx.org/discussion/new" class="show-tender">${_(u'свяжитесь с ')}</a></p>
+  ##     </div>
+ ##
+  ##     % endif
+ ##    </aside>
   </section>
 
 
