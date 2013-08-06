@@ -543,7 +543,27 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       
       // replace explanations
       xml = xml.replace(/\[explanation\]\n?([^\]]*)\[\/?explanation\]/gmi, function(match, p1) {
-          var selectString = '<solution>\n<div class="detailed-solution">\nExplanation\n\n' + p1 + '\n</div>\n</solution>';
+          var selectString = '<solution>\n<div class="detailed-solution">\nРешение\n\n' + p1 + '\n</div>\n</solution>';
+          return selectString;
+      });
+      // replace advices
+      xml = xml.replace(/\[advice.*?\]\n?([^\]]*)\[\/?advice\]/gmi, function(match, p1) {
+          var options = match.split('\n');
+          var inside_text_reg = /\[\/?advice.*?\]/gmi;
+
+          var inside_text = match.split(inside_text_reg);
+
+          var delay_string;
+          var delay_reg = /delay\s*=\s*\"?\'?/;
+          var delay_reg_right = /\"?\'?\]/;
+          var delay = 0;
+          if (delay_reg.test(options[0])){
+              delay_string = options[0].split(delay_reg)[1];
+              if (delay_reg_right.test(delay_string)){
+                  delay = delay_string.split(/\"?\'?\]/)[0];
+              };
+          };
+          var selectString = '\n<div class="advice-for-problem" rel = "' + delay + '">\n<span class ="title">Подсказка</span>\n<div class = "inner">\n' + inside_text[1] + '\n</div>\n</div>\n';
           return selectString;
       });
 
