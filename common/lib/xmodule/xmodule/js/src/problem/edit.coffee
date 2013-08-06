@@ -563,7 +563,8 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
                   delay = delay_string.split(/\"?\'?\]/)[0];
               };
           };
-          var selectString = '\n<div class="advice-for-problem" rel = "' + delay + '">\n<span class ="title">Подсказка</span>\n<div class = "inner">\n' + inside_text[1] + '\n</div>\n</div>\n';
+          var uniq_rel = 1 + Math.floor(Math.random() * 9999999);
+          var selectString = '\n<div class="advice-for-problem" rel = "' + delay + '">\n<span class ="title" rel = "'+uniq_rel+'">Подсказка</span>\n<div class = "inner">\n' + inside_text[1] + '\n</div>\n</div>\n';
           return selectString;
       });
 

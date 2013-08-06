@@ -28,7 +28,12 @@ class @Problem
 
     @$(".advice-for-problem").each ->
       showDelay = 1000 * parseInt($(this).attr("rel"))
-      $(this).delay(showDelay).fadeIn()
+      if $.cookie("advice" + $(this).children(".title").attr("rel"))
+        $(this).css("display","block")
+      else
+        $(this).delay(showDelay).fadeIn()
+        if $(this).children(".title").attr("rel")
+          $.cookie("advice" + $(this).children(".title").attr("rel"),"1");
 
     @$(".advice-for-problem .title").click ->
       $(this).next(".inner").stop().slideToggle()
