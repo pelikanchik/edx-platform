@@ -103,7 +103,7 @@ class CapaFields(object):
         scope=Scope.settings
     )
     showanswer = String(
-        display_name=u"Показать ответ",
+        display_name=u'Кнопка "Показать ответ"',
         help=(u"Определяет, когда активна кнопка показа ответа. "
               u"Значение по умолчанию может быть задано в разделе расширенных настроек."),
         scope=Scope.settings,
@@ -123,6 +123,15 @@ class CapaFields(object):
         values={"min": 0},
         scope = Scope.settings,
         default=0
+    )
+    checkanswer = Integer(
+        display_name=u"Проверка ответа",
+        help=(u"Можно ли узнать верность ответа"),
+        values=[
+            {"display_name": u"Да", "value": 1},
+            {"display_name": u"Нет", "value": 0}],
+        scope = Scope.settings,
+        default=1
     )
     force_save_button = Boolean(
         help=u"Вынудить ли кнопку сохранения появиться на странице",
@@ -536,6 +545,7 @@ class CapaModule(CapaFields, XModule):
                    'attempts_used': self.attempts,
                    'attempts_allowed': self.max_attempts,
                    'delay_answers': self.showbuttonanswer,
+                   'check_answer': self.checkanswer,
                    'progress': self.get_progress(),
                    'progress_detail': Progress.to_js_detail_str(self.get_progress())
                    }

@@ -61,6 +61,7 @@ def elementary_conjunction(term, section):
             if term["field"]=="score_rel":
                 value = Progress.percent(progress)
 
+
             if term["field"]=="score_abs":
                 str_value = Progress.frac(progress)
                 value = str_value[0]
