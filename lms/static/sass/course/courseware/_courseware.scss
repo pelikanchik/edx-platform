@@ -264,3 +264,35 @@ section.foldit {
 
    }
 }
+
+$godynamo-top-margin: 15px; // button is on same level with title of problem
+
+    div.godynamo {
+      width: 100px;
+      float:right;
+    }
+    .godynamo p{
+        margin-top: $godynamo-top-margin;
+        a{
+          text-align:center;
+          color: white;
+          font: normal 15px/1.6rem $sans-serif;
+          &:hover{
+            color:white;
+          }
+        }
+    }
+
+    .godynamo a{
+        @include button(simple, rgb(29, 157, 217)); // nice blue color
+    }
+    .godynamo-static p{
+
+        position: absolute;
+        top: 50px;
+    }
+    .godynamo-float p{
+
+        top: 0 - $godynamo-top-margin;  // should be lower to make for margin
+        position: fixed;
+    }
