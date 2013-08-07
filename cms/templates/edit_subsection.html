@@ -16,11 +16,10 @@
 
 <%block name="content">
 
-<script type='text/javascript' src='/static/js/base.js'></script>
-
 <script type='text/javascript' src='/static/js/knockout.js'></script>
 <script type='text/javascript' src='/static/js/knockout-mapping.js'></script>
 <script type='text/javascript' src='/static/js/numeric.js'></script>
+
 
 <div class="main-wrapper">
   <div class="inner-wrapper">
@@ -54,7 +53,7 @@
 
                                                 <td>
 
-                                                <select onchange="saveJSON()" data-bind='value: source_section_id, valueUpdate: "afterkeydown"'>
+                                                <select  data-bind='value: source_section_id, valueUpdate: "afterkeydown"'>
                                                     % for every_section in sections:
                                                       % for every_subsection in every_section.get_children():
                                                          % if subsection.url_name != every_subsection.url_name:
@@ -68,14 +67,14 @@
 
 
                                                 <td>
-                                                    <select onchange="saveJSON()" data-bind='value: field, valueUpdate: "afterkeydown"'>
+                                                    <select data-bind='value: field, valueUpdate: "afterkeydown"'>
                                                         <option value="score_abs">Результат (абсолютный)</option>
                                                         <option value="score_rel">Результат (относительный, %)</option>
                                                     </select>
                                                 </td>
                                                 <td>
 
-                                                    <select onchange="saveJSON()" data-bind='value: sign, valueUpdate: "afterkeydown"'>
+                                                    <select  data-bind='value: sign, valueUpdate: "afterkeydown"'>
                                                         <option value="more">&#62;</option>
                                                         <option value="more-equals">&#8805;</option>
                                                         <option value="equals">=</option>
@@ -84,7 +83,7 @@
                                                     </select>
 
                                                 </td>
-                                                <td><input onchange="saveJSON()" data-bind='value: value, valueUpdate: "afterkeydown"' class = "value" /></td>
+                                                <td><input  data-bind='value: value, valueUpdate: "afterkeydown"' class = "value" /></td>
                                                 <td style="vertical-align: middle"><img width="20" src = "/static/img/edit_remove.png"  data-bind='click: $root.removeConjunction' class = "del" /></td>
                                             </tr>
                                         </tbody>
@@ -101,9 +100,9 @@
                     <img class = "add" style="width:20px; margin: 3px;" src = "/static/img/plus_32.png" data-bind='click: addDisjunction' />
                 </div>
                 </div>
+                <p style = "text-align: center;"><input type = "button" class = "save-subsection-button" value="Сохранить"/></p>
 
-
-                <input disabled data-bind='value: term_string' style="font-size: 10px" class="subsection-display-name-input" data-metadata-name="unlock_term" >
+                <input disabled data-bind='value: term_string' style="font-size: 10px; display:none;" class="subsection-display-name-input" data-metadata-name="unlock_term">
 
         <script>
 
@@ -131,14 +130,13 @@
                         }])
                     });
 
-                    saveSubsection();
                     check_numeric();
                     hovers();
                 };
 
                 self.removeDisjunction = function(disjunction) {
                     self.disjunctions.remove(disjunction);
-                    saveSubsection();
+
 
                 };
 
@@ -149,14 +147,14 @@
                         sign: ko.observable("more"),
                         value: ko.observable("0")
                     });
-                    saveSubsection();
+
                     check_numeric();
                     hovers();
                 };
 
                 self.removeConjunction = function(conjunction) {
                     $.each(self.disjunctions(), function() { this.conjunctions.remove(conjunction) })
-                    saveSubsection();
+
 
                 };
 
@@ -174,10 +172,6 @@
             };
 
             ko.applyBindings(new DisjunctionsModel());
-
-            function saveJSON(){
-                setTimeout("saveSubsection()", 0);
-            }
 
             function hovers(){
                 $("img.close").hover(
@@ -238,13 +232,13 @@
         <div class="datepair" data-language="javascript">
           <div class="field field-start-date">
 
-            <label for="start_date">${_("Release Day")}</label>
+            <label for="start_date">${_(u"Дата начала")}</label>
             <input type="text" id="start_date" name="start_date"
-                value="${subsection.lms.start.strftime('%m/%d/%Y') if subsection.lms.start else ''}"
-                placeholder="MM/DD/YYYY" class="date" size='15' autocomplete="off"/>
+                value="${subsection.lms.start.strftime('%d.%m.%Y') if subsection.lms.start else ''}"
+                placeholder="DD.MM.YYYY" class="date" size='15' autocomplete="off"/>
           </div>
           <div class="field field-start-time">
-            <label for="start_time">${_("Release Time")} (<abbr title="${_("Coordinated Universal Time")}">${_("UTC")}</abbr>)</label>
+            <label for="start_time">${_(u"Время начала")} (<abbr title="${_(u"Coordinated Universal Time")}">${_(u"UTC")}</abbr>)</label>
             <input type="text" id="start_time" name="start_time"
                 value="${subsection.lms.start.strftime('%H:%M') if subsection.lms.start else ''}"
 
@@ -254,11 +248,11 @@
         % if subsection.lms.start and not almost_same_datetime(subsection.lms.start, parent_item.lms.start):
             % if parent_item.lms.start is None:
 
-            <p class="notice">${_("The date above differs from the release date of {name}, which is unset.").format(name=parent_item.display_name_with_default)}
+            <p class="notice">${_(u"Вышеуказанная дата отличается от даты конца  {name}, которая не задана.").format(name=parent_item.display_name_with_default)}
             % else:
-      <p class="notice">${_("The date above differs from the release date of {name} - {start_time}").format(name=parent_item.display_name_with_default, start_time=get_default_time_display(parent_item.lms.start))}.
+      <p class="notice">${_(u"Вышеуказанная дата отличается от даты начала {name} - {start_time}").format(name=parent_item.display_name_with_default, start_time=get_default_time_display(parent_item.lms.start))}.
             % endif
-      <a href="#" class="sync-date no-spinner">${_("Sync to {name}.").format(name=parent_item.display_name_with_default)}</a></p>
+      ##<a href="#" class="sync-date no-spinner">${_(u"Синхронизация с {name}.").format(name=parent_item.display_name_with_default)}</a></p>
 
         % endif
       </div>
@@ -272,27 +266,27 @@
 
     <div class="due-date-input row">
 
-      <a href="#" class="set-date">${_("Set a due date")}</a>
+      <a href="#" class="set-date">${_(u"Установите дату окончания")}</a>
       <div class="datepair date-setter">
         <div class="field field-start-date">
-        <label for="due_date">${_("Due Day")}</label>
+        <label for="due_date">${_(u"День окончания")}</label>
           <input type="text" id="due_date" name="due_date"
-          value="${subsection.lms.due.strftime('%m/%d/%Y') if subsection.lms.due else ''}"
-          placeholder="MM/DD/YYYY" class="date" size='15' autocomplete="off"/>
+          value="${subsection.lms.due.strftime('%d.%m.%Y') if subsection.lms.due else ''}"
+          placeholder="DD.MM.YYYY" class="date" size='15' autocomplete="off"/>
         </div>
         <div class="field field-start-time">
-        <label for="due_time">${_("Due Time")} (<abbr title="${_('Coordinated Universal Time')}">UTC</abbr>)</label>
+        <label for="due_time">${_(u"Время окончания")}</label>
           <input type="text" id="due_time" name="due_time"
             value="${subsection.lms.due.strftime('%H:%M') if subsection.lms.due else ''}"
             placeholder="HH:MM" class="time" size='10' autocomplete="off"/>
         </div>
-        <a href="#" class="remove-date">${_("Remove due date")}</a>
+        <a href="#" class="remove-date">${_(u"Удалить дату окончания")}</a>
       </div>
     </div>
     <div class="row unit-actions">
-      <a href="${preview_link}" target="_blank" class="preview-button">${_("Preview Drafts")}</a>
+      <a href="${preview_link}" target="_blank" class="preview-button">${_(u"Посмотреть черновик")}</a>
       %if can_view_live:
-      <a href="${lms_link}" target="_blank" class="preview-button">${_("View Live")}</a>
+      <a href="${lms_link}" target="_blank" class="preview-button">${_(u"Live")}</a>
       %endif
     </div>
 

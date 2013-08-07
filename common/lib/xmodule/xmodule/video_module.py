@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # pylint: disable=W0223
 """Video is ungraded Xmodule for support video content."""
 
@@ -22,28 +23,28 @@ log = logging.getLogger(__name__)
 class VideoFields(object):
     """Fields for `VideoModule` and `VideoDescriptor`."""
     display_name = String(
-        display_name="Display Name",
-        help="This name appears in the horizontal navigation at the top of the page.",
+        display_name=u"Отображаемое имя",
+        help=u"Это имя появляется в горизонтальной навигации наверху страницы.",
         scope=Scope.settings,
         # it'd be nice to have a useful default but it screws up other things; so,
         # use display_name_with_default for those
-        default="Video"
+        default=u"Видео"
     )
     data = String(
-        help="XML data for the problem",
+        help=u"XML-данные",
         default='',
         scope=Scope.content
     )
-    position = Integer(help="Current position in the video", scope=Scope.user_state, default=0)
-    show_captions = Boolean(help="This controls whether or not captions are shown by default.", display_name="Show Captions", scope=Scope.settings, default=True)
-    youtube_id_1_0 = String(help="This is the Youtube ID reference for the normal speed video.", display_name="Default Speed", scope=Scope.settings, default="OEoXaMPEzfM")
-    youtube_id_0_75 = String(help="The Youtube ID for the .75x speed video.", display_name="Speed: .75x", scope=Scope.settings, default="")
-    youtube_id_1_25 = String(help="The Youtube ID for the 1.25x speed video.", display_name="Speed: 1.25x", scope=Scope.settings, default="")
-    youtube_id_1_5 = String(help="The Youtube ID for the 1.5x speed video.", display_name="Speed: 1.5x", scope=Scope.settings, default="")
-    start_time = Float(help="Time the video starts", display_name="Start Time", scope=Scope.settings, default=0.0)
-    end_time = Float(help="Time the video ends", display_name="End Time", scope=Scope.settings, default=0.0)
-    source = String(help="The external URL to download the video. This appears as a link beneath the video.", display_name="Download Video", scope=Scope.settings, default="")
-    track = String(help="The external URL to download the subtitle track. This appears as a link beneath the video.", display_name="Download Track", scope=Scope.settings, default="")
+    position = Integer(help=u"Текущая позиция в видео", scope=Scope.user_state, default=0)
+    show_captions = Boolean(help=u"Управляет, показываются ли по умолчанию заголовки.", display_name=u"Показывать заголовки", scope=Scope.settings, default=True)
+    youtube_id_1_0 = String(help=u"YouTube ID для видео нормальной скорости.", display_name=u"Обычная скорость", scope=Scope.settings, default="OEoXaMPEzfM")
+    youtube_id_0_75 = String(help=u"Youtube ID для видео скорости 0.75x.", display_name=u"Скорость: .75x", scope=Scope.settings, default="")
+    youtube_id_1_25 = String(help=u"Youtube ID для видео скорости 1.25x", display_name=u"Скорость: 1.25x", scope=Scope.settings, default="")
+    youtube_id_1_5 = String(help=u"Youtube ID для видео скорости 1.5x", display_name=u"Скорость: 1.5x", scope=Scope.settings, default="")
+    start_time = Float(help=u"Время запуска видео", display_name=u"Время начала", scope=Scope.settings, default=0.0)
+    end_time = Float(help=u"Время, когда показ видео закончится", display_name=u"Время окончания", scope=Scope.settings, default=0.0)
+    source = String(help=u"Внешняя ссылка на видеофайл.", display_name=u"Скачать видео", scope=Scope.settings, default="")
+    track = String(help=u"Внешняя ссылка на субтитры.", display_name=u"Скачать субтитры", scope=Scope.settings, default="")
 
 
 class VideoModule(VideoFields, XModule):

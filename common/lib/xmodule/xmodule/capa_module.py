@@ -18,6 +18,9 @@ from capa.util import convert_files_to_filenames
 from .progress import Progress
 from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
+from xmodule.vertical_module import VerticalFields, VerticalDescriptor
+from xmodule.seq_module import SequenceFields
+from xmodule.seq_module import SequenceModule
 from xmodule.exceptions import NotFoundError, ProcessingError
 from xblock.core import Scope, String, Boolean, Dict, Integer, Float
 from .fields import Timedelta, Date
@@ -79,77 +82,92 @@ class CapaFields(object):
     Define the possible fields for a Capa problem
     """
     display_name = String(
-        display_name="Display Name",
-        help="This name appears in the horizontal navigation at the top of the page.",
+        display_name=u"Отображаемое название",
+        help=u"Будет видно при наведении в горизонтальном меню.",
         scope=Scope.settings,
         # it'd be nice to have a useful default but it screws up other things; so,
         # use display_name_with_default for those
-        default="Blank Advanced Problem"
+        default=u"Пустое продвинутое задание"
     )
-    attempts = Integer(help="Number of attempts taken by the student on this problem",
+    attempts = Integer(help=u"Максимальное допустимое количество попыток на задачу",
                        default=0, scope=Scope.user_state)
     max_attempts = Integer(
-        display_name="Maximum Attempts",
-        help=("Defines the number of times a student can try to answer this problem. "
-              "If the value is not set, infinite attempts are allowed."),
+        display_name=u"Максимальное число попыток",
+        help=(u"Максимальное допустимое количество попыток на задачу "
+              u"Если не задано, число попыток не ограничено."),
         values={"min": 0}, scope=Scope.settings
     )
-    due = Date(help="Date that this problem is due by", scope=Scope.settings)
+    due = Date(help=u"Дата, до которой на задание можно ответить", scope=Scope.settings)
     graceperiod = Timedelta(
-        help="Amount of time after the due date that submissions will be accepted",
+        help=u"Дата, до которой на задание можно ответить. После этого времени возможность отправки будет закрыта",
         scope=Scope.settings
     )
     showanswer = String(
-        display_name="Show Answer",
-        help=("Defines when to show the answer to the problem. "
-              "A default value can be set in Advanced Settings."),
+        display_name=u'Кнопка "Показать ответ"',
+        help=(u"Определяет, когда активна кнопка показа ответа. "
+              u"Значение по умолчанию может быть задано в разделе расширенных настроек."),
         scope=Scope.settings,
         default="finished",
         values=[
-            {"display_name": "Always", "value": "always"},
-            {"display_name": "Answered", "value": "answered"},
-            {"display_name": "Attempted", "value": "attempted"},
-            {"display_name": "Closed", "value": "closed"},
-            {"display_name": "Finished", "value": "finished"},
-            {"display_name": "Past Due", "value": "past_due"},
-            {"display_name": "Never", "value": "never"}]
+            {"display_name": u"Всегда", "value": "always"},
+            {"display_name": u"Отвечено", "value": "answered"},
+            {"display_name": u"При наличии попыток", "value": "attempted"},
+            {"display_name": u"Закрыто", "value": "closed"},
+            {"display_name": u"Завершено", "value": "finished"},
+            {"display_name": u"После даты окончания", "value": "past_due"},
+            {"display_name": u"Никогда", "value": "never"}]
+    )
+    showbuttonanswer = Integer(
+        display_name=u"Задержка для поля показа ответа",
+        help=(u"в секундах"),
+        values={"min": 0},
+        scope = Scope.settings,
+        default=0
+    )
+    checkanswer = Integer(
+        display_name=u"Проверка ответа",
+        help=(u"Можно ли узнать верность ответа"),
+        values=[
+            {"display_name": u"Да", "value": 1},
+            {"display_name": u"Нет", "value": 0}],
+        scope = Scope.settings,
+        default=1
     )
     force_save_button = Boolean(
-        help="Whether to force the save button to appear on the page",
+        help=u"Вынудить ли кнопку сохранения появиться на странице",
         scope=Scope.settings,
         default=False
     )
     rerandomize = Randomization(
-        display_name="Randomization",
-        help="Defines how often inputs are randomized when a student loads the problem. "
-             "This setting only applies to problems that can have randomly generated numeric values. "
-             "A default value can be set in Advanced Settings.",
+        display_name=u"Рандомизация",
+        help=u"Определяет, в каких случаях происходит случайный выбор заданий. "
+             u"Значение по умолчанию может быть задано в разделе расширенных настроек.",
         default="never",
         scope=Scope.settings,
         values=[
-            {"display_name": "Always", "value": "always"},
-            {"display_name": "On Reset", "value": "onreset"},
-            {"display_name": "Never", "value": "never"},
-            {"display_name": "Per Student", "value": "per_student"}
+            {"display_name": u"Всегда", "value": "always"},
+            {"display_name": u"При новом сохранении", "value": "onreset"},
+            {"display_name": u"Никогда", "value": "never"},
+            {"display_name": u"Для каждого студента своя комбинация", "value": "per_student"}
         ]
     )
-    data = String(help="XML data for the problem", scope=Scope.content, default="<problem></problem>")
-    correct_map = Dict(help="Dictionary with the correctness of current student answers",
+    data = String(help=u"XML-вид задания", scope=Scope.content, default="<problem></problem>")
+    correct_map = Dict(help=u"Словарь с правильностью ответов нынешнего студента",
                        scope=Scope.user_state, default={})
-    input_state = Dict(help="Dictionary for maintaining the state of inputtypes", scope=Scope.user_state)
-    student_answers = Dict(help="Dictionary with the current student responses", scope=Scope.user_state)
-    done = Boolean(help="Whether the student has answered the problem", scope=Scope.user_state)
-    seed = Integer(help="Random seed for this student", scope=Scope.user_state)
+    input_state = Dict(help=u"Словарь для того, чтобы поддержать состояние входных типов", scope=Scope.user_state)
+    student_answers = Dict(help=u"Словарь с ответами нынешнего студента", scope=Scope.user_state)
+    done = Boolean(help=u"Ответил ли студент на задание", scope=Scope.user_state)
+    seed = Integer(help=u"Случайный источник для этого студента", scope=Scope.user_state)
     weight = Float(
-        display_name="Problem Weight",
-        help=("Defines the number of points each problem is worth. "
-              "If the value is not set, each response field in the problem is worth one point."),
+        display_name=u"Вес задания",
+        help=(u"Определяет вес каждого задания. "
+              u"Если не задано, вес равен 1."),
         values={"min": 0, "step": .1},
         scope=Scope.settings
     )
-    markdown = String(help="Markdown source of this module", default=None, scope=Scope.settings)
+    markdown = String(help=u"Источник скидки с цены этого модуля", default=None, scope=Scope.settings)
     source_code = String(
-        help="Source code for LaTeX and Word problems. This feature is not well-supported.",
+        help=u"Исходный код для заданий в LaTeX или Word. Эта функция поддерживается неважно.",
         scope=Scope.settings
     )
 
@@ -333,6 +351,7 @@ class CapaModule(CapaFields, XModule):
             'element_id': self.location.html_id(),
             'id': self.id,
             'ajax_url': self.system.ajax_url,
+            'progress': Progress.to_js_detail_str(self.get_progress()),
             'progress_status': Progress.to_js_status_str(progress),
             'progress_detail': Progress.to_js_detail_str(progress),
         })
@@ -517,7 +536,6 @@ class CapaModule(CapaFields, XModule):
                    'html': html,
                    'weight': self.weight,
                    }
-
         context = {'problem': content,
                    'id': self.id,
                    'check_button': check_button,
@@ -526,6 +544,10 @@ class CapaModule(CapaFields, XModule):
                    'answer_available': self.answer_available(),
                    'attempts_used': self.attempts,
                    'attempts_allowed': self.max_attempts,
+                   'delay_answers': self.showbuttonanswer,
+                   'check_answer': self.checkanswer,
+                   'progress': self.get_progress(),
+                   'progress_detail': Progress.to_js_detail_str(self.get_progress())
                    }
 
         html = self.system.render_template('problem.html', context)
@@ -944,11 +966,16 @@ class CapaModule(CapaFields, XModule):
             self.system.psychometrics_handler(self.get_state_for_lcp())
 
         # render problem into HTML
+        #self.id = 'input_i4x-Yandex-1-problem-528707f13bbf4f2a85f720b7dd15fde9_2_1'
+        # self.id = "ac8c5016c3af4e66ab38123ab0f0260b"
+        #self.id = "i4x://Yandex/1/problem/6903bf4724c5465597d02c58d5777c59"
+        #i4x://Yandex/1/problem/ac8c5016c3af4e66ab38123ab0f0260b
         html = self.get_problem_html(encapsulate=False)
 
         return {'success': success,
                 'contents': html,
                 }
+
 
     def rescore_problem(self):
         """
@@ -1143,6 +1170,8 @@ class CapaDescriptor(CapaFields, RawDescriptor):
     # is the attribute `attempts`. This will do that conversion
     metadata_translations = dict(RawDescriptor.metadata_translations)
     metadata_translations['attempts'] = 'max_attempts'
+
+
 
     def get_context(self):
         _context = RawDescriptor.get_context(self)

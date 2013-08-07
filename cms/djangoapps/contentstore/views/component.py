@@ -115,8 +115,9 @@ def edit_subsection(request, location):
         if field.name not in ['display_name', 'start', 'due', 'format', 'unlock_term'] and field.scope == Scope.settings
     )
 
-
+    #item.unlock_term = '{"disjunctions":[]}'
     term = json.loads(item.unlock_term)
+
 
     # updating if term has links to already not existed sections
     for disjunction in term["disjunctions"]:
@@ -260,8 +261,6 @@ def edit_unit(request, location):
         index=index)
 
     unit_state = compute_unit_state(item)
-
-    print (item)
 
     return render_to_response('unit.html', {
         'context_course': course,

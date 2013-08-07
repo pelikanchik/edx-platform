@@ -43,7 +43,7 @@
                     <a href="${reverse('asset_index', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">Файлы, загрузки</a>
                   </li>
                      <li class="nav-item nav-course-courseware-textbooks">
-                    <a href="${reverse('textbook_index', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">${_("Textbooks")}</a>
+                    <a href="${reverse('textbook_index', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">Учебники</a>
                     </li>
                 </ul>
               </div>
@@ -59,16 +59,15 @@
                 <ul>
                   <li class="nav-item nav-course-settings-schedule">
 
-                    <a href="${reverse('contentstore.views.get_course_settings', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">Базовая информация</a>
+                    <a href="${reverse('contentstore.views.get_course_settings', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">Расписание & Детали</a>
                   </li>
                   <li class="nav-item nav-course-settings-grading">
                     <a href="${reverse('contentstore.views.course_config_graders_page', kwargs={'org' : ctx_loc.org, 'course' : ctx_loc.course, 'name': ctx_loc.name})}">Оценивание</a>
                   </li>
                   <li class="nav-item nav-course-settings-team">
 
-                    <a href="${reverse('manage_users', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">${_("Course Team")}</a>
+                    <a href="${reverse('manage_users', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">Команда курса</a>
 
-                  ##  <a href="${reverse('manage_users', kwargs=dict(location=ctx_loc))}">Команда курса</a>
                   </li>
                   <li class="nav-item nav-course-settings-advanced">
                     <a href="${reverse('course_advanced_settings', kwargs={'org' : ctx_loc.org, 'course' : ctx_loc.course, 'name': ctx_loc.name})}">Детальные настройки</a>
@@ -89,7 +88,7 @@
                 <ul>
                   <li class="nav-item nav-course-tools-checklists">
 
-                    <a href="${reverse('checklists', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">Чеклист</a>
+                    <a href="${reverse('checklists', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">Контрольные списки</a>
                   </li>
                   <li class="nav-item nav-course-tools-import">
                     <a href="${reverse('import_course', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">Импорт</a>
@@ -110,7 +109,7 @@
     <div class="wrapper wrapper-r">
       % if user.is_authenticated():
       <nav class="nav-account nav-is-signedin nav-dd ui-right">
-        <h2 class="sr">${_("Help &amp; Account Navigation")}</h2>
+        <h2 class="sr">${_(u"Помощь &amp; Навигация по аккаунту")}</h2>
 
         <ol>
           <li class="nav-item nav-account-help">
@@ -123,7 +122,7 @@
                 <ul>
                   <li class="nav-item nav-help-documentation">
 
-                    <a href="http://files.edx.org/Getting_Started_with_Studio.pdf" title="${_("This is a PDF Document")}">${_(u"Документация")}</a>
+                    <a href="http://files.edx.org/Getting_Started_with_Studio.pdf" title="${_(u"Это PDF")}">${_(u"Документация")}</a>
                   </li>
 
                 </ul>
@@ -161,7 +160,7 @@
         <h2 class="sr">${_(u"Вы ещё не вошли")}</h2>
         <ol>
           <li class="nav-item nav-not-signedin-hiw">
-            <a href="/">${_("How Studio Works")}</a>
+            <a href="/">${_(u"Как работает Студия")}</a>
           </li>
 
           <li class="nav-item nav-not-signedin-signup">

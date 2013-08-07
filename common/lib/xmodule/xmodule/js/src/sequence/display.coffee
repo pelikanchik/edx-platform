@@ -15,8 +15,9 @@ class @Sequence
   bind: ->
     @$('#sequence-list a').click @goto
 
+
   initProgress: ->
-    @progressTable = {}  # "#problem_#{id}" -> progress
+    @progressTable = {} # "#problem_#{id}" -> progress
 
 
   hookUpProgressEvent: ->
@@ -64,6 +65,7 @@ class @Sequence
 
   toggleArrows: =>
     @$('.sequence-nav-buttons a').unbind('click')
+    @$('.sequence-nav-buttons .godynamo a').removeClass('disabled').click(@godynamo)
 
     if @contents.length == 0
       @$('.sequence-nav-buttons .prev a').addClass('disabled')
@@ -91,7 +93,7 @@ class @Sequence
       @$('#seq_content').html @contents.eq(new_position - 1).text()
       XModule.loadModules(@$('#seq_content'))
 
-      MathJax.Hub.Queue(["Typeset", MathJax.Hub, "seq_content"]) # NOTE: Actually redundant. Some other MathJax call also being performed
+      #MathJax.Hub.Queue(["Typeset", MathJax.Hub, "seq_content"]) # NOTE: Actually redundant. Some other MathJax call also being performed
       window.update_schematics() # For embedded circuit simulator exercises in 6.002x
 
       @position = new_position
@@ -120,7 +122,7 @@ class @Sequence
         target_sequential: new_position
 
       # On Sequence change, destroy any existing polling thread
-      #   for queued submissions, see ../capa/display.coffee
+      # for queued submissions, see ../capa/display.coffee
       if window.queuePollerID
         window.clearTimeout(window.queuePollerID)
         delete window.queuePollerID
@@ -140,7 +142,7 @@ class @Sequence
     analytics.track "Accessed Next Sequential",
       sequence_id: @id
       current_sequential: @position
-      target_sequential: new_position 
+      target_sequential: new_position
 
     @render new_position
 
@@ -159,6 +161,23 @@ class @Sequence
 
     @render new_position
 
+
+  godynamo: (event) =>
+    event.preventDefault()
+    modx_full_url = @modx_url + '/' + @id + "/dynamo"
+    $.postWithPrefix modx_full_url, (response) =>
+      new_position = response.position
+      Logger.log "seq_godynamo", old: @position, new: new_position, id: @id
+
+      analytics.pageview @id
+
+      analytics.track "Accessed Previous Sequential",
+        sequence_id: @id
+        current_sequential: @position
+        target_sequential: new_position
+
+      @render new_position
+
   link_for: (position) ->
     @$("#sequence-list a[data-element=#{position}]")
 
@@ -175,3 +194,6 @@ class @Sequence
     element.removeClass("inactive")
     .removeClass("visited")
     .addClass("active")
+
+  @inputAjax: (url, data, callback) ->
+    $.postWithPrefix "#{url}/input_ajax", data, callback

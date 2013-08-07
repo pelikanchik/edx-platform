@@ -120,15 +120,15 @@ class CMS.Views.UnitEdit extends Backbone.View
 
   deleteComponent: (event) =>
     msg = new CMS.Views.Prompt.Warning(
-      title: gettext('Delete this component?'),
-      message: gettext('Deleting this component is permanent and cannot be undone.'),
+      title: gettext('Удалить компонент?'),
+      message: gettext('Удаление компонента нельзя будет отменить. Никогда. Вообще.'),
       actions:
         primary:
-          text: gettext('Yes, delete this component'),
+          text: gettext('Да, удалить'),
           click: (view) =>
             view.hide()
             deleting = new CMS.Views.Notification.Mini
-              title: gettext('Deleting') + '&hellip;',
+              title: gettext('Удаление...') + '&hellip;',
             deleting.show()
             $component = $(event.currentTarget).parents('.component')
             $.post('/delete_item', {
@@ -151,7 +151,7 @@ class CMS.Views.UnitEdit extends Backbone.View
               );`
             )
         secondary:
-          text: gettext('Cancel'),
+          text: gettext('Отмена'),
           click: (view) ->
             view.hide()
     )
@@ -257,7 +257,7 @@ class CMS.Views.UnitEdit.NameEdit extends Backbone.View
 
 class CMS.Views.UnitEdit.TermEdit extends Backbone.View
   events:
-    'change .unit-direct-term-input': 'saveTerm'
+    'click .save-term': 'saveTerm'
 
   initialize: =>
     @model.on('change:metadata', @render)
@@ -278,10 +278,16 @@ class CMS.Views.UnitEdit.TermEdit extends Backbone.View
 
   saveTerm: =>
     # Saving a term
+
+    $('.save-term').val("сохраняется...")
+    $('.save-term').addClass("save-term-active")
+
     metadata = $.extend({}, @model.get('metadata'))
     metadata.display_name = $('.unit-display-name-input').val()
     metadata.direct_term = $('.unit-direct-term-input').val()
     @model.save(metadata: metadata)
+
+    setTimeout('$(".save-term").val("Сохранить"); $(".save-term").removeClass("save-term-active");', 500)
     # Update term
     $('.unit-location .editing .unit-term').html(metadata.direct_term)
     analytics.track "Edited Unit Term",

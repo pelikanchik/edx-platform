@@ -24,11 +24,81 @@ class SequenceFields(object):
         display_name="Unlock Term",
         help="Term to unlock section",
         scope=Scope.settings,
-        default='{"disjunctions":[]}'
+        default='{"disjunctions": []}'
     )
     # NOTE: Position is 1-indexed.  This is silly, but there are now student
     # positions saved on prod, so it's not easy to fix.
     position = Integer(help="Last tab viewed in this sequence", scope=Scope.user_state)
+
+def get_unit(unit_id, section):
+        for child in section.get_children():
+            if unit_id in child.id:
+                return child
+        return None
+
+def elementary_conjunction(term, section):
+        error_return = True
+        if len(term["source_element_id"]) == 0:
+            return error_return
+        if len(term["field"]) == 0:
+            return error_return
+        if len(term["sign"]) == 0:
+            return error_return
+        if len(term["value"]) == 0:
+            return error_return
+
+        unit = get_unit(term["source_element_id"], section)
+
+        if not unit:
+            return error_return
+        value = 0
+        term["value"] = int(term["value"])
+
+        if unit.get_progress():
+
+            progress = unit.get_progress()
+
+            if term["field"]=="score_rel":
+                value = Progress.percent(progress)
+
+
+            if term["field"]=="score_abs":
+                str_value = Progress.frac(progress)
+                value = str_value[0]
+
+        else:
+            value = 0
+
+
+        if term["sign"]== "more":
+            if value > term["value"]:
+                return True
+            else:
+                return False
+        if term["sign"]== "more-equals":
+            if value >= term["value"]:
+                return True
+            else:
+                return False
+
+        if term["sign"]== "less":
+            if value < term["value"]:
+                return True
+            else:
+                return False
+
+        if term["sign"]== "less-equals":
+            if value <= term["value"]:
+                return True
+            else:
+                return False
+        if term["sign"]== "equals":
+            if value == term["value"]:
+                return True
+            else:
+                return False
+
+        return error_return
 
 
 class SequenceModule(SequenceFields, XModule):
@@ -53,6 +123,7 @@ class SequenceModule(SequenceFields, XModule):
     def get_instance_state(self):
         return json.dumps({'position': self.position})
 
+
     def get_html(self):
         self.render()
         return self.content
@@ -69,6 +140,38 @@ class SequenceModule(SequenceFields, XModule):
 
     def handle_ajax(self, dispatch, data):  # TODO: bounds checking
         ''' get = request.POST instance '''
+        if dispatch == 'dynamo':
+            section = self
+            cur_position = self.position
+            pos = 1
+            for child in self.get_children():
+                if pos == cur_position:
+                    term = json.loads(child.direct_term_with_default)
+                    for element_term in term:
+                        if not element_term["disjunctions"]:
+                            return json.dumps({'position': cur_position})
+                        for disjunction in element_term["disjunctions"]:
+                            term_result = element_term["direct_element_id"]
+                            if not disjunction["conjunctions"]:
+                                new_position = 1
+                                for check_child in self.get_children():
+                                    if term_result in check_child.id:
+
+                                        return json.dumps({'position': new_position})
+                                    new_position += 1
+
+                            conjunctions_result = True
+                            for conjunction in disjunction["conjunctions"]:
+
+                                conjunctions_result = conjunctions_result * elementary_conjunction(conjunction, section)
+
+                            if conjunctions_result == True:
+                                new_position = 1
+                                for check_child in self.get_children():
+                                    if term_result in check_child.id:
+                                        return json.dumps({'position': new_position})
+                                    new_position += 1
+                pos += 1
         if dispatch == 'goto_position':
             self.position = int(data['position'])
             return json.dumps({'success': True})
@@ -97,6 +200,7 @@ class SequenceModule(SequenceFields, XModule):
                 'progress_detail': Progress.to_js_detail_str(progress),
                 'type': child.get_icon_class(),
                 'id': child.id,
+                'direct_term': child.direct_term_with_default
             }
             if childinfo['title'] == '':
                 childinfo['title'] = child.display_name_with_default
@@ -168,4 +272,3 @@ class SequenceDescriptor(SequenceFields, MakoModuleDescriptor, XmlDescriptor):
         if unlock_term is None:
            unlock_term = 0
         return unlock_term
-

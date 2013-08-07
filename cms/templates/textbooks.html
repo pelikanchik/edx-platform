@@ -3,7 +3,7 @@
 <%! import json %>
 <%! from django.utils.translation import ugettext as _ %>
 
-<%block name="title">${_("Textbooks")}</%block>
+<%block name="title">${_(u"Учебники")}</%block>
 <%block name="bodyclass">is-signedin course textbooks</%block>
 
 <%block name="header_extras">
@@ -38,7 +38,7 @@ $(function() {
     $(window).on("beforeunload", function() {
         var dirty = textbooks.find(function(textbook) { return textbook.isDirty(); });
         if(dirty) {
-            return gettext("You have unsaved changes. Do you really want to leave this page?");
+            return gettext("У вас есть несохраненные изменения. Вы действительно хотите уйти со страницы?");
         }
     })
 })
@@ -49,15 +49,15 @@ $(function() {
   <div class="wrapper-mast wrapper">
     <header class="mast has-actions has-subtitle">
       <h1 class="page-header">
-        <small class="subtitle">${_("Content")}</small>
-        <span class="sr">&gt; </span>${_("Textbooks")}
+        <small class="subtitle">${_(u"Содержание")}</small>
+        <span class="sr">&gt; </span>${_(u"Учебники")}
       </h1>
 
       <nav class="nav-actions">
-        <h3 class="sr">${_("Page Actions")}</h3>
+        <h3 class="sr">${_(u"Действия")}</h3>
         <ul>
           <li class="nav-item">
-            <a href="#" class="button new-button"><i class="icon-plus"></i> ${_("New Textbook")}</a>
+            <a href="#" class="button new-button"><i class="icon-plus"></i> ${_(u"Новый учебник")}</a>
           </li>
         </ul>
       </nav>
@@ -71,12 +71,12 @@ $(function() {
       </article>
       <aside class="content-supplementary" role="complimentary">
         <div class="bit">
-          <h3 class="title-3">${_("Why should I break my text into chapters?")}</h3>
-          <p>${_("It's best practice to break your course's textbook into multiple chapters to reduce loading times for students. Breaking up textbooks into chapters can also help students more easily find topic-based information.")}</p>
+          <h3 class="title-3">${_(u"Почему я должен разделять мой курс на главы?")}</h3>
+          <p>${_(u"Это наиболее оптимальный вариант: разбить учебник вашего курса на несколько разделов, чтобы уменьшить время нагрузки на студентов. Разбиение учебников на разделы могут также помочь студентам легче найти информацию по опеределенной теме")}</p>
         </div>
         <div class="bit">
-          <h3 class="title-3">${_("What if my book isn't divided into chapters?")}</h3>
-          <p>${_("If you haven't broken your textbook into chapters, you can upload the entire text as Chapter 1.")}</p>
+          <h3 class="title-3">${_(u"Что делать, если моя книга не делится на главы?")}</h3>
+          <p>${_(u"Если вы не можете разделить ваш учебник на главы, вы можете загрузить текст как Раздел 1")}</p>
         </div>
       </aside>
     </section>

@@ -26,9 +26,9 @@ $ ->
       catch error
         message = _.str.truncate(jqXHR.responseText, 300)
     else
-      message = gettext("This may be happening because of an error with our server or your internet connection. Try refreshing the page or making sure you are online.")
+      message = gettext("Возможно, это связано с ошибкой на сервере или плохим интернет-сигналом. Попробуйте ещё раз.")
     msg = new CMS.Views.Notification.Error(
-      "title": gettext("Studio's having trouble saving your work")
+      "title": gettext("Возникли проблемы при сохранении")
       "message": message
     )
     msg.show()
