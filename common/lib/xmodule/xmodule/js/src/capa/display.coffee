@@ -26,6 +26,22 @@ class @Problem
     @$('section.action button.show').click @show
     @$('section.action input.save').click @save
 
+    @$(".advice-for-problem").each ->
+      showDelay = 1000 * parseInt($(this).attr("rel"))
+      if $.cookie("advice" + $(this).children(".title").attr("rel"))
+        $(this).css("display","block")
+      else
+        $(this).delay(showDelay).fadeIn()
+        if $(this).children(".title").attr("rel")
+          $.cookie("advice" + $(this).children(".title").attr("rel"),"1");
+
+    @$(".advice-for-problem .title").click ->
+      $(this).next(".inner").stop().slideToggle()
+      if $(this).parent().hasClass("active")
+         $(this).parent().removeClass "active"
+      else
+         $(this).parent().addClass "active"
+
     # Collapsibles
     Collapsible.setCollapsibles(@el)
 
@@ -442,3 +458,15 @@ it is fed into MathJax. Return 'false' if no preprocessor specified
       element = $(element)
       element.find("section[id^='forinput']").removeClass('choicetextgroup_show_correct')
 
+$ ->
+  $(".advice-for-problem").each ->
+    showDelay = 1000 * parseInt($(this).attr("rel"))
+    $(this).delay(showDelay).fadeIn()
+
+  $(".advice-for-problem .title").click ->
+    alert "!!"
+    $(this).next(".inner").stop().slideToggle()
+    if $(this).parent().hasClass("active")
+      $(this).parent().removeClass "active"
+    else
+      $(this).parent().addClass "active"

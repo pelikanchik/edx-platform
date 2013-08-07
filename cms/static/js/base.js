@@ -632,7 +632,7 @@ function saveNewCourse(e) {
     var display_name = $newCourse.find('.new-course-name').val();
 
     if (org == '' || number == '' || display_name == '') {
-        alert(gettext('Для создания нового кура нужно заполнить все поля.'));
+        alert(gettext('Для создания нового курса нужно заполнить все поля.'));
         return;
     }
 
