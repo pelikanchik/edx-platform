@@ -1,3 +1,5 @@
+<script type="text/javascript" src="/static/js/sticky-go-button.js" charset="utf-8"></script>
+
 <div id="sequence_${element_id}" class="sequence"
      data-id="${item_id}"
      data-position="${position}"
@@ -29,6 +31,11 @@
     <ul class="sequence-nav-buttons">
       <li class="next"><a href="#">Next</a></li>
     </ul>
+
+    <div class="sequence-nav-buttons go-button go-button-static">
+        <p class ="godynamo"><a href= "#">Продолжить</a></p>
+    </div>
+
   </nav>
 
   % for item in items:
@@ -38,11 +45,8 @@
       ${item['content'] | h}
   </div>
   % endfor
-  <div id="seq_content"></div>
 
-  <ul class="sequence-nav-buttons">
-    <li class ="godynamo"><a href= "#">Вперед!</a></li>
-  </ul>
+  <div id="seq_content"></div>
 
   <nav class="sequence-bottom">
     <ul aria-label="Section Navigation" class="sequence-nav-buttons">

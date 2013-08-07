@@ -1,8 +1,8 @@
-Dear ${first_name} ${last_name}
+Уважаемый ${first_name} ${last_name}
 
-You have been un-enrolled in ${course_id} at ${site_name} by a member of the course staff. The course will no longer appear on your ${site_name} dashboard.
+Вы отписаны от курса ${course_id} от ${site_name} одним из членов персонала курса. Курс больше не будет отображаться в вашем расписании на ${site_name}.
 
-Your other courses have not been affected.
+С остальными курсами ничего не произошло.
 
 ----
-This email was automatically sent from  ${site_name} to ${first_name} ${last_name}
+Письмо отпралено автоматически  ${site_name} для ${first_name} ${last_name}
