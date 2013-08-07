@@ -265,14 +265,15 @@ section.foldit {
    }
 }
 
-$godynamo-top-margin: 15px; // button is on same level with title of problem
+$go-button-top-margin: 15px; // button is on same level with title of problem
 
-    div.godynamo {
+    div.go-button {
       width: 100px;
       float:right;
     }
-    .godynamo p{
-        margin-top: $godynamo-top-margin;
+    .go-button p{
+        z-index: 100500;
+        margin-top: $go-button-top-margin;
         a{
           text-align:center;
           color: white;
@@ -283,16 +284,16 @@ $godynamo-top-margin: 15px; // button is on same level with title of problem
         }
     }
 
-    .godynamo a{
+    .go-button a{
         @include button(simple, rgb(29, 157, 217)); // nice blue color
     }
-    .godynamo-static p{
+    .go-button-static p{
 
         position: absolute;
         top: 50px;
     }
-    .godynamo-float p{
+    .go-button-float p{
 
-        top: 0 - $godynamo-top-margin;  // should be lower to make for margin
+        top: 0 - $go-button-top-margin;  // should be lower to make for margin
         position: fixed;
     }

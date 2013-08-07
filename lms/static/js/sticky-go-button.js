@@ -6,18 +6,22 @@
 
 $(document).ready(function () {
 
-var marginTopInPx = parseInt($('div.godynamo #go-button').css("margin-top"));
-var offsetTop = $('.godynamo').offset().top;
+var marginTopInPx = parseInt($('.godynamo').css("margin-top"));
+var offsetTop = $('.go-button').offset().top;
 
+console.log(marginTopInPx);
+console.log(offsetTop);
+
+//var origOffsetY = offsetTop + marginTopInPx;
 var origOffsetY = offsetTop + marginTopInPx;
 
     function onScroll(e) {
   if (window.scrollY >= origOffsetY)
     {
-        $('.godynamo').addClass('godynamo-float').removeClass("godynamo-static");
+        $('.go-button').addClass('go-button-float').removeClass("go-button-static");
     }
     else {
-        $('.godynamo').removeClass('godynamo-float').addClass("godynamo-static");
+        $('.go-button').removeClass('go-button-float').addClass("go-button-static");
     }
 }
 
