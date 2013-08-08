@@ -50,7 +50,7 @@ def cleanup(filepath, remove_meta):
     to_remove = ('format', 'display_name',
                  'graceperiod', 'showanswer', 'rerandomize',
                  'start', 'due', 'graded', 'hide_from_toc',
-                 'ispublic', 'xqa_key', 'showbuttonanswer')
+                 'ispublic', 'xqa_key', 'showbuttonanswer', 'checkanswer')
 
     try:
         print "Cleaning {0}".format(filepath)
