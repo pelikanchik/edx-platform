@@ -41,11 +41,8 @@
             var t = '${delay_answers}';
             var id = setTimeout(function() {
               $('#show_answers_button').show();
-            }, t*1000);
-
+            }, t*1000) + '{problem["id"]}';
         }
-
-
         );
     </script>
     % if attempts_allowed :

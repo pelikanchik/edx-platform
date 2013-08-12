@@ -31,8 +31,10 @@ class VerticalModule(VerticalFields, XModule):
             self.contents = [{
                 'id': child.id,
                 'content': child.get_html(),
+                'father': self.id,
                 'direct_term': self.direct_term,
-                'progress_detail': Progress.to_js_detail_str(self.get_progress())
+                'progress_detail': Progress.to_js_detail_str(self.get_progress()),
+                'type': child.get_icon_class()
             } for child in self.get_display_items()]
 
         return self.system.render_template('vert_module.html', {

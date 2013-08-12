@@ -146,6 +146,11 @@ class @VideoPlayer extends Subview
     @$(".vidtime").html(progress)
     @caption.updatePlayTime(time)
     @progressSlider.updatePlayTime(time, @duration())
+    if Time.format(time) == "0:10"
+      window.player.pauseVideo()
+      new_url = "http://127.0.0.1:8000/courses/Yandex/1/Mathematics/modx/i4x://Yandex/1/problem/b1e132e2005b4b10b50a849e9ae0d7b3"
+      $.postWithPrefix "#{@problem_id}/problem_get", (response) =>
+         @el.html(response.html)
 
   toggleFullScreen: (event) =>
     event.preventDefault()
