@@ -25,6 +25,7 @@ class @Problem
     @$('section.action input.reset').click @reset
     @$('section.action button.show').click @show
     @$('section.action input.save').click @save
+
     @$(".advice-for-problem").each ->
       showDelay = 1000 * parseInt($(this).attr("rel"))
       if $.cookie("advice" + $(this).children(".title").attr("rel"))
