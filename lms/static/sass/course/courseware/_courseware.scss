@@ -269,33 +269,44 @@ $go-button-top-margin: 15px; // button is on same level with title of problem
 
 div.go-button{
 
+  margin-top: $go-button-top-margin;
   width: 100px;
   float:right;
   margin-right:25px;
+  z-index: 1;
   p{
-     @include button(simple, rgb(29, 157, 217)); // nice blue color
-     z-index: 1;
-     margin-top: $go-button-top-margin;
-     a{
        text-align:center;
+     a{
        color: white;
        font: normal 15px/1.6rem $sans-serif;
        &:hover{
-          color:white;
+       color: white;
        }
      }
   }
 }
+
+p.godynamo{
+     @include button(simple, rgb(29, 157, 217)); // nice blue color
+      margin-top: 70px;
+}
+
+p.check-all{
+     @include button(simple, rgb(99, 99, 99)); // gray color
+}
+
 .go-button-static{
    p{
+  width: 100px;
       position: absolute;
       top: 50px;
    }
 }
 .go-button-float{
    p{
+  width: 100px;
       position: fixed;
-      top: 0 - $go-button-top-margin;  // should be lower to make for margin
+      top: 0;
 
    }
 }

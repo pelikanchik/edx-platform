@@ -7,25 +7,38 @@
 $(document).ready(function () {
 
 
-var width = parseInt($(".godynamo").css('width'));
-var marginTopInPx = parseInt($('.godynamo').css("margin-top"));
+//var marginTopInPx = parseInt($('.go-button').css("margin-top")) * 0;
+//var offsetTop = $('.go-button').offset().top;
+//var origOffsetY = offsetTop + marginTopInPx;
+
+//var paddingTopInPx = parseInt($('.check-all').css("padding-top")) + parseInt($('.check-all').css("border-top-width"));
+var paddingTopInPx = parseInt($('.check-all').css("padding-top"));
+
 var offsetTop = $('.go-button').offset().top;
-var origOffsetY = offsetTop + marginTopInPx;
+var origOffsetY = offsetTop - paddingTopInPx;
+
+
+    console.log(parseInt($('.check-all').css("padding-top")));
+//    console.log(parseInt($('.go-button').css("padding-top")));
 
 var isFixed = false;
 
 var initialOffset = 0;
 
-$('.godynamo').css({
+$('.go-button').css({
     'right': initialOffset
 });
 
-var magicValue = recalcOffset();
+var magicValue = recalcHorizontalOffset();
 
-    function recalcOffset(){
+    function recalcHorizontalOffset(){
 
-        var buttonSize = parseInt($('.godynamo').css('padding-left')) + parseInt($('.godynamo').css('padding-right')) +
-            $('.godynamo').width() + parseInt($('.godynamo').css('border-bottom-left-radius'));
+//        var buttonSize = parseInt($('.go-button').css('padding-left')) + parseInt($('.go-button').css('padding-right')) +
+//            $('.go-button').width() + parseInt($('.go-button').css('border-bottom-left-radius'));
+
+
+        var buttonSize = parseInt($('.go-button').css('padding-left')) + parseInt($('.go-button').css('padding-right')) +
+            parseInt($('.go-button').css('border-bottom-left-radius'));
         //not sure about border-bottom-left-radius, maybe right is correct.
 
 
@@ -39,7 +52,7 @@ var magicValue = recalcOffset();
     }
 
 $(window).resize(function(){
-    magicValue = recalcOffset();
+    magicValue = recalcHorizontalOffset();
 
 });
 
@@ -52,7 +65,7 @@ $(window).scroll(function(){
     else {
         $('.go-button').addClass("go-button-static").removeClass('go-button-float');
         if(isFixed){
-            $('.godynamo').css({
+            $('.go-button').css({
                   'right': initialOffset
             });
         }
@@ -60,8 +73,8 @@ $(window).scroll(function(){
     }
 
     if(isFixed){
-        $('.godynamo').css({
-                'right': $(this).scrollLeft() - width + magicValue
+        $('.go-button').css({
+                'right': $(this).scrollLeft() + magicValue
         });
     };
 
