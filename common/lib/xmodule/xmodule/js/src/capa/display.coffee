@@ -1,5 +1,7 @@
 class @Problem
 
+  responsesBeingProcessedCount = 0
+
   constructor: (element) ->
     @el = $(element).find('.problems-wrapper')
     @id = @el.data('problem-id')
@@ -192,8 +194,9 @@ class @Problem
 
 
   check_all: (event) =>
-    event.preventDefault();
-    $('.check').click()
+    event.preventDefault()
+    if (responsesBeingProcessedCount == 0)
+      $('.check').click()
 
 
   ###
@@ -204,8 +207,6 @@ class @Problem
 # maybe preferable to consolidate all dispatches to use FormData
 ###
   check_fd: =>
-
-    console.log "In check_fd!"
 
     # If there are no file inputs in the problem, we can fall back on @check
     if $('input:file').length == 0
@@ -282,6 +283,13 @@ class @Problem
     @check_waitfor()
     Logger.log 'problem_check', @answers
 
+    if( responsesBeingProcessedCount == 0)
+      $('.check-all').html('Подождите...').addClass('check-all-disabled')
+
+    $("#" + @element_id + " .check").val('Подождите...').prop('disabled', true);
+    responsesBeingProcessedCount++;
+
+
     # Segment.io
     analytics.track "Problem Checked",
       problem_id: @id
@@ -296,6 +304,11 @@ class @Problem
             @el.removeClass 'showed'
         else
           @gentle_alert response.success
+      $("#" + @element_id + " .check").val('Проверить').prop('disabled', false)
+      responsesBeingProcessedCount--
+      if( responsesBeingProcessedCount == 0)
+        $('.check-all').html('Проверить').removeClass('check-all-disabled');
+
       Logger.log 'problem_graded', [@answers, response.contents], @url
 
   reset: =>

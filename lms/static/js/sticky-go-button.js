@@ -18,14 +18,17 @@ var offsetTop = $('.go-button').offset().top;
 var origOffsetY = offsetTop - paddingTopInPx;
 
 
-    console.log(parseInt($('.check-all').css("padding-top")));
+//    console.log(parseInt($('.check-all').css("padding-top")));
 //    console.log(parseInt($('.go-button').css("padding-top")));
 
 var isFixed = false;
 
-var initialOffset = 0;
+var initialOffset = 50;
 
-$('.go-button').css({
+$('.godynamo').css({
+    'right': initialOffset
+});
+$('.check-all').css({
     'right': initialOffset
 });
 
@@ -37,8 +40,8 @@ var magicValue = recalcHorizontalOffset();
 //            $('.go-button').width() + parseInt($('.go-button').css('border-bottom-left-radius'));
 
 
-        var buttonSize = parseInt($('.go-button').css('padding-left')) + parseInt($('.go-button').css('padding-right')) +
-            parseInt($('.go-button').css('border-bottom-left-radius'));
+        var buttonSize = parseInt($('.godynamo').css('padding-left')) + parseInt($('.godynamo').css('padding-right')) +
+            parseInt($('.godynamo').css('border-bottom-left-radius'));
         //not sure about border-bottom-left-radius, maybe right is correct.
 
 
@@ -47,6 +50,11 @@ var magicValue = recalcHorizontalOffset();
             buttonSize + initialOffset -   // to account for button size and right offset
             ($('.container').width()) -
             ($('.content-wrapper').width() - $('.container').width())/2;        // to account for gray background area
+
+        console.log(tmp);
+
+        console.log($('.content-wrapper').width());
+        console.log($(window).width());
 
         return tmp;
     }
@@ -65,17 +73,27 @@ $(window).scroll(function(){
     else {
         $('.go-button').addClass("go-button-static").removeClass('go-button-float');
         if(isFixed){
-            $('.go-button').css({
+            $('.check-all').css({
                   'right': initialOffset
             });
+            $('.godynamo').css({
+                  'right': initialOffset
+            });
+
+            recalcOffset();
+
         }
         isFixed = false;
     }
 
     if(isFixed){
-        $('.go-button').css({
+        $('.godynamo').css({
                 'right': $(this).scrollLeft() + magicValue
         });
+        $('.check-all').css({
+            'right': $(this).scrollLeft() + magicValue
+        });
+
     };
 
 });
