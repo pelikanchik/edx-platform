@@ -51,11 +51,6 @@ var magicValue = recalcHorizontalOffset();
             ($('.container').width()) -
             ($('.content-wrapper').width() - $('.container').width())/2;        // to account for gray background area
 
-        console.log(tmp);
-
-        console.log($('.content-wrapper').width());
-        console.log($(window).width());
-
         return tmp;
     }
 
