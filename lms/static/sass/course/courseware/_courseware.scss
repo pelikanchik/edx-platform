@@ -275,10 +275,10 @@ div.go-button{
   margin-right:25px;
   z-index: 1;
   p{
+       font: normal 15px/1.6rem $sans-serif;
        text-align:center;
      a{
        color: white;
-       font: normal 15px/1.6rem $sans-serif;
        &:hover{
        color: white;
        }
@@ -288,11 +288,16 @@ div.go-button{
 
 p.godynamo{
      @include button(simple, rgb(29, 157, 217)); // nice blue color
-      margin-top: 70px;
+      margin-top: 50px; //(or 45)
 }
 
 p.check-all{
      @include button(simple, rgb(99, 99, 99)); // gray color
+}
+p.check-all-disabled{
+     @include button(simple, rgb(59, 59, 59)); // dark gray color
+//         &:hover{
+
 }
 
 .go-button-static{
