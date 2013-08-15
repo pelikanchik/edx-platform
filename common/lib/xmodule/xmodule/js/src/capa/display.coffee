@@ -22,6 +22,8 @@ class @Problem
 
     @$('section.action input:button').click @refreshAnswers
     @$('section.action input.check').click @check_fd
+    # XXX
+    $('.check-all').unbind('click').click @check_all
     @$('section.action input.reset').click @reset
     @$('section.action button.show').click @show
     @$('section.action input.save').click @save
@@ -188,6 +190,12 @@ class @Problem
           throw e
 
 
+
+  check_all: (event) =>
+    event.preventDefault();
+    $('.check').click()
+
+
   ###
 # 'check_fd' uses FormData to allow file submissions in the 'problem_check' dispatch,
 # in addition to simple querystring-based answers
@@ -196,6 +204,9 @@ class @Problem
 # maybe preferable to consolidate all dispatches to use FormData
 ###
   check_fd: =>
+
+    console.log "In check_fd!"
+
     # If there are no file inputs in the problem, we can fall back on @check
     if $('input:file').length == 0
       @check()
