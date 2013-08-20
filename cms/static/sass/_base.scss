@@ -540,6 +540,12 @@ p, ul, ol, dl {
   }
 }
 
+a.show-graph-item{
+  text-align:left;
+  width:100%;
+  border-bottom: 1px dotted;
+}
+
 .item-actions {
   position: absolute;
   top: 5px;

@@ -31,6 +31,7 @@ from xblock.plugin import PluginMissingError
 
 __all__ = ['OPEN_ENDED_COMPONENT_TYPES',
            'ADVANCED_COMPONENT_POLICY_KEY',
+           'show_graph',
            'edit_subsection',
            'edit_unit',
            'assignment_type_update',
@@ -64,6 +65,57 @@ def is_section_exist(section_id, sections):
                 return True
 
     return False
+
+
+def show_graph(request, location):
+
+    try:
+        item = modulestore().get_item(location, depth=1)
+    except ItemNotFoundError:
+        return HttpResponseBadRequest()
+
+    # make sure that location references a 'sequential', otherwise return BadRequest
+    if item.location.category != 'sequential':
+        return HttpResponseBadRequest()
+
+    parent_locs = modulestore().get_parent_locations(location, None)
+
+    # we're for now assuming a single parent
+    if len(parent_locs) != 1:
+        logging.error('Multiple (or none) parents have been found for {0}'.format(location))
+
+
+
+    #for section in sections:
+    #   print section.display_name_with_default
+    #    subsections = section.get_children()
+    #    for subsection in subsections:
+    #        print subsection.display_name_with_default
+
+
+    # remove all metadata from the generic dictionary that is presented in a more normalized UI
+
+    policy_metadata = dict(
+        (field.name, field.read_from(item))
+        for field
+        in item.fields
+        if field.name not in ['display_name', 'start', 'due', 'format', 'unlock_term'] and field.scope == Scope.settings
+    )
+
+    #item.unlock_term = '{"disjunctions":[]}'
+    term = json.loads(item.unlock_term)
+
+
+    item.unlock_term = json.dumps(term)
+
+
+    return render_to_response('graph.html',
+                              {'subsection': item})
+
+#    return render_to_response('graph.html',
+#                              {'names_string': names_str,
+#                               'graph_string': graph_str,
+#                               })
 
 
 @login_required
