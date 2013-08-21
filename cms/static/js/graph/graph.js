@@ -8,6 +8,13 @@ window.onload = function() {
 
     g = new Graph();
 
+/*
+        var set = r.set().push(
+                r.rect(n.point[0]-30, n.point[1]-13, 60, 44).attr({"fill": "#feb", r : "12px", "stroke-width" : n.distance == 0 ? "3px" : "1px" })).push(
+                r.text(n.point[0], n.point[1] + 10, (n.label || n.id) + "\n(" + (n.distance == undefined ? "Infinity" : n.distance) + ")"));
+            return set;
+*/
+
     var names_str = $(".names_string").text();
     var graph_str = $(".graph_string").text();
     /*
@@ -26,6 +33,33 @@ window.onload = function() {
 
     var ids_arr = [];
 
+
+        /* custom render function */
+    var render = function(r, node) {
+                var color = Raphael.getColor();
+                var ellipse = r.ellipse(0, 0, 30, 20).attr({fill: color, stroke: color, "stroke-width": 2});
+                /* set DOM node ID */
+//                ellipse.node.id = "ID";
+                ellipse.node.id = "node_" + node.id;
+                ellipse.node.ondblclick = function(){
+                     ellipse.attr("fill", "red");
+                     ellipse.attr("stroke", "red");
+
+                    alert(names_obj[node.id] + "\n");
+//                    alert(names_obj."6abde8cef4894e7789e7a5a16d848f2d");
+
+//                    alert("nhio")
+                }
+
+
+                var shape = r.set().
+//                    r.rect(node.point[0]-30, node.point[1]-13, 60, 44).attr({"fill": "#feb", r : "12px", "stroke-width" : node.distance == 0 ? "3px" : "1px" })).push(
+//                    r.text(node.point[0], node.point[1] + 10, (node.label || n.id)  ));
+                    push(ellipse).
+                    push(r.text(0, 30, node.label));
+                return shape;
+    };
+
 //    alert(names_str);
 //    alert(graph_str);
 
@@ -34,7 +68,7 @@ window.onload = function() {
     jQuery.each(names_obj, function(id, name) {
         var label = name;
         if (label.length > N) label = label.slice(0, N - 3) + "...";
-        g.addNode(id, { label : label });
+        g.addNode(id, { label : label, render : render} );
         ids_arr.push(id);
     });
 
@@ -66,7 +100,7 @@ jQuery.each(edges_arr, function(node_number) {
 
 
 //    var height = $(document).height() - 60;
-    var height = 400 + 40*ids_arr.length;
+    var height = 100 + 40*ids_arr.length;
 
     /* draw the graph using the RaphaelJS draw implementation */
     renderer = new Graph.Renderer.Raphael('canvas', g, width, height);

@@ -265,15 +265,12 @@ section.foldit {
    }
 }
 
-$go-button-top-margin: 15px; // button is on same level with title of problem
-
+$go-button-top-margin : 10px;
 div.go-button{
-
-  margin-top: $go-button-top-margin;
+  margin-top: 0px;
   width: 100px;
   float:right;
   margin-right:25px;
-  z-index: 1;
   p{
        font: normal 15px/1.6rem $sans-serif;
        text-align:center;
@@ -287,11 +284,17 @@ div.go-button{
 }
 
 p.godynamo{
+//    right: 300px;
+  margin-top: $go-button-top-margin;
+     z-index: 100;
      @include button(simple, rgb(29, 157, 217)); // nice blue color
-      margin-top: 50px; //(or 45)
 }
 
 p.check-all{
+   margin-top: $go-button-top-margin;
+     z-index: 100;
+     right: 50px;
+     margin-right: 200px;
      @include button(simple, rgb(99, 99, 99)); // gray color
 }
 p.check-all-disabled{
@@ -302,14 +305,14 @@ p.check-all-disabled{
 
 .go-button-static{
    p{
-  width: 100px;
+      width: 100px;
       position: absolute;
       top: 50px;
    }
 }
 .go-button-float{
    p{
-  width: 100px;
+      width: 100px;
       position: fixed;
       top: 0;
 

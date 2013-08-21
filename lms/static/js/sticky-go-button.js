@@ -13,9 +13,10 @@ $(document).ready(function () {
 
 //var paddingTopInPx = parseInt($('.check-all').css("padding-top")) + parseInt($('.check-all').css("border-top-width"));
 var paddingTopInPx = parseInt($('.check-all').css("padding-top"));
+var marginTopInPx = parseInt($('.check-all').css("margin-top"));
 
-var offsetTop = $('.go-button').offset().top;
-var origOffsetY = offsetTop - paddingTopInPx;
+var offsetTop = $('.check-all').offset().top;
+var origOffsetY = offsetTop - paddingTopInPx + marginTopInPx;
 
 
 //    console.log(parseInt($('.check-all').css("padding-top")));
@@ -23,10 +24,12 @@ var origOffsetY = offsetTop - paddingTopInPx;
 
 var isFixed = false;
 
-var initialOffset = 50;
+var initialOffset = parseInt($('.godynamo').css('right'));
+//var initialOffset = 50;
 
 $('.godynamo').css({
-    'right': initialOffset
+    'right': initialOffset}).css({
+//    'top' : 30                          // XXX
 });
 $('.check-all').css({
     'right': initialOffset
@@ -63,19 +66,28 @@ $(window).scroll(function(){
   if (window.scrollY >= origOffsetY)
     {
         $('.go-button').addClass('go-button-float').removeClass("go-button-static");
+        if(!isFixed){
+            $('.check-all').css({
+                'margin-top' : 0
+            });
+            $('.godynamo').css({
+                'margin-top' : 0
+            });
+        }
         isFixed = true;
+
     }
     else {
         $('.go-button').addClass("go-button-static").removeClass('go-button-float');
         if(isFixed){
             $('.check-all').css({
-                  'right': initialOffset
+                  'right': initialOffset}).css({
+                  'margin-top' : marginTopInPx
             });
             $('.godynamo').css({
-                  'right': initialOffset
+                  'right': initialOffset}).css({
+                  'margin-top' : marginTopInPx
             });
-
-            recalcOffset();
 
         }
         isFixed = false;
