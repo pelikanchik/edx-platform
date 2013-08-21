@@ -701,6 +701,10 @@ body.course.outline {
       .new-unit-item {
         display: none;
       }
+      // ditto for graph
+      .show-graph-item {
+        display: none;
+      }
   }
 
   ol.ui-droppable .branch:first-child .section-item {
