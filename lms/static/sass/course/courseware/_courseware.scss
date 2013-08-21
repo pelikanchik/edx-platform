@@ -286,15 +286,15 @@ div.go-button{
 p.godynamo{
 //    right: 300px;
   margin-top: $go-button-top-margin;
-     z-index: 100;
+     z-index: 1;
      @include button(simple, rgb(29, 157, 217)); // nice blue color
 }
 
 p.check-all{
    margin-top: $go-button-top-margin;
-     z-index: 100;
+     z-index: 1;
      right: 50px;
-     margin-right: 200px;
+     margin-right: 150px;
      @include button(simple, rgb(99, 99, 99)); // gray color
 }
 p.check-all-disabled{
