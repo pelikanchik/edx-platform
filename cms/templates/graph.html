@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html style="overflow: scroll;">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<head>
+<!--
+    <input disabled data-bind='value: term_string' style="font-size: 10px; " class="subsection-display-name-input" data-metadata-name="unlock_term">
+-->
+    <p>        {
+        % for every_unit in subsection.get_children():
+        "${every_unit.get_children}" <br/>
+        % endfor
+        }
+ </p>
+    <p class="names_string" style="display:none">        {
+        % for every_unit in subsection.get_children():
+        "${every_unit.url_name}" : "${every_unit.display_name_with_default}",
+        % endfor
+        }
+ </p>
+    <p class="graph_string" style="display:none">        [
+        % for every_unit in subsection.get_children():
+            ${every_unit.direct_term_with_default} ,<br/>
+        % endfor
+        ]
+ </p>
+
+
+    <script type="text/javascript" src="/static/js/graph/strathausen-dracula-a6a5fa7/js/raphael-min.js"></script>
+    <script type="text/javascript" src="/static/js/graph/strathausen-dracula-a6a5fa7/js/dracula_graffle.js"></script>
+    <script type="text/javascript" src="/static/js/graph/strathausen-dracula-a6a5fa7/js/jquery-1.4.2.min.js"></script>
+    <script type="text/javascript" src="/static/js/graph/strathausen-dracula-a6a5fa7/js/dracula_graph.js"></script>
+    <script type="text/javascript" src="/static/js/graph/graph.js"></script>
+
+    <script>
+        $("#cherryID").live('click',function(){
+            alert("!");
+        })
+    </script>
+
+
+
+</head>
+<body>
+<div id="canvas"></div>
+<button id="redraw" onclick="redraw();">redraw</button>
+</body>
+</html>

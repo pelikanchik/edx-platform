@@ -1,5 +1,7 @@
 class @Problem
 
+  responsesBeingProcessedCount = 0
+
   constructor: (element) ->
     @el = $(element).find('.problems-wrapper')
     @id = @el.data('problem-id')
@@ -22,6 +24,8 @@ class @Problem
 
     @$('section.action input:button').click @refreshAnswers
     @$('section.action input.check').click @check_fd
+    # XXX
+    $('.check-all').unbind('click').click @check_all
     @$('section.action input.reset').click @reset
     @$('section.action button.show').click @show
     @$('section.action input.save').click @save
@@ -188,6 +192,13 @@ class @Problem
           throw e
 
 
+
+  check_all: (event) =>
+    event.preventDefault()
+    if (responsesBeingProcessedCount == 0)
+      $('.check').click()
+
+
   ###
 # 'check_fd' uses FormData to allow file submissions in the 'problem_check' dispatch,
 # in addition to simple querystring-based answers
@@ -196,6 +207,7 @@ class @Problem
 # maybe preferable to consolidate all dispatches to use FormData
 ###
   check_fd: =>
+
     # If there are no file inputs in the problem, we can fall back on @check
     if $('input:file').length == 0
       @check()
@@ -271,6 +283,13 @@ class @Problem
     @check_waitfor()
     Logger.log 'problem_check', @answers
 
+    if( responsesBeingProcessedCount == 0)
+      $('.check-all').html('Подождите...').addClass('check-all-disabled')
+
+    $("#" + @element_id + " .check").val('Подождите...').prop('disabled', true);
+    responsesBeingProcessedCount++;
+
+
     # Segment.io
     analytics.track "Problem Checked",
       problem_id: @id
@@ -285,6 +304,11 @@ class @Problem
             @el.removeClass 'showed'
         else
           @gentle_alert response.success
+      $("#" + @element_id + " .check").val('Проверить').prop('disabled', false)
+      responsesBeingProcessedCount--
+      if( responsesBeingProcessedCount == 0)
+        $('.check-all').html('Проверить').removeClass('check-all-disabled');
+
       Logger.log 'problem_graded', [@answers, response.contents], @url
 
   reset: =>

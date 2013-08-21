@@ -40,6 +40,7 @@ $(document).ready(function() {
 
     $('.unit .item-actions .delete-button').bind('click', deleteUnit);
     $('.new-unit-item').bind('click', createNewUnit);
+    $('.show-graph-item').bind('click', graphPopUpWindow);
 
     // lean/simple modal
     $('a[rel*=modal]').leanModal({
@@ -343,6 +344,16 @@ function saveSubsection() {
     });
 }
 
+function graphPopUpWindow(e) {
+    e.preventDefault();
+
+    var url = "/graph" + window.location.pathname;
+//    alert(url);
+
+    window.open(url,'popupWindow',
+        'toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=no,resizable=yes,copyhistory=no');
+
+}
 
 function createNewUnit(e) {
     e.preventDefault();
