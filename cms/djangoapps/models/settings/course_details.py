@@ -21,6 +21,7 @@ class CourseDetails(object):
         self.enrollment_end = None
         self.syllabus = None  # a pdf file asset
         self.overview = ""  # html to render as the overview
+        self.tags = ""  # html to render as the tags
         self.intro_video = None  # a video pointer
         self.effort = None  # int hours/week
 
@@ -51,6 +52,15 @@ class CourseDetails(object):
         try:
             course.overview = get_modulestore(temploc).get_item(temploc).data
         except ItemNotFoundError:
+            pass
+
+
+        temploc = temploc.replace(name='tags')
+        try:
+
+            course.tags = get_modulestore(temploc).get_item(temploc).data
+        except ItemNotFoundError:
+
             pass
 
         temploc = temploc.replace(name='effort')
@@ -135,6 +145,9 @@ class CourseDetails(object):
 
         temploc = temploc.replace(name='overview')
         update_item(temploc, jsondict['overview'])
+
+        temploc = temploc.replace(name='tags')
+        update_item(temploc, jsondict['tags'])
 
         temploc = temploc.replace(name='effort')
         update_item(temploc, jsondict['effort'])

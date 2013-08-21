@@ -10,6 +10,7 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
         "change textarea" : "updateModel",
         'click .remove-course-introduction-video' : "removeVideo",
         'focus #course-overview' : "codeMirrorize",
+    //    'focus #course-tags' : "codeMirrorize",
         'mouseover #timezone' : "updateTime",
         // would love to move to a general superclass, but event hashes don't inherit in backbone :-(
         'focus :input' : "inputFocus",
@@ -34,6 +35,7 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
     },
 
     render: function() {
+        _this = this;
         this.setupDatePicker('start_date');
         this.setupDatePicker('end_date');
         this.setupDatePicker('enrollment_start');
@@ -41,6 +43,106 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
 
         this.$el.find('#' + this.fieldToSelectorMap['overview']).val(this.model.get('overview'));
         this.codeMirrorize(null, $('#course-overview')[0]);
+        this.$el.find('#' + this.fieldToSelectorMap['tags']).val(this.model.get('tags'));
+
+        //this.codeMirrorize(null, $('#course-tags')[0]);
+        appended_tags = this.model.get('tags');
+        tags_dict = JSON.parse(appended_tags);
+
+
+      $(function(){
+        // Initialize the tree inside the <div>element.
+        // The tree structure is read from the contained <ul> tag.
+        $("#tree").dynatree({
+          children: tags_dict,
+          title: "Programming Sample",
+          onActivate: function(node) {
+            $("#tag-title").val(node.data.title);
+            $("#current").css("visibility","visible");
+    //        alert(node.getKeyPath());
+            if( node.data.url )
+              window.open(node.data.url, node.data.target);
+          },
+          onDeactivate: function(node) {
+            $("#current").css("visibility","hidden");
+          },
+
+          dnd: {
+              preventVoidMoves: true, // Prevent dropping nodes 'before self', etc.
+              onDragStart: function(node) {
+                return true;
+              },
+              onDragEnter: function(node, sourceNode) {
+                return ["after", "over"];
+              },
+              onDrop: function(node, sourceNode, hitMode, ui, draggable) {
+                /** This function MUST be defined to enable dropping of items on
+                 *  the tree.
+                 */
+                sourceNode.move(node, hitMode);
+              }
+          }
+
+        });
+
+        $("#btnAddCode").click(function(){
+
+          var rootNode = $("#tree").dynatree("getRoot");
+          var d = new Date();
+          var randval = "id" + d.getTime() + "_"  + Math.floor(Math.random() * 9999999 + 1);
+          var childNode = rootNode.addChild({
+            title: $('#new-tag-title').attr("value"),
+            isFolder: false,
+            key:randval
+          });
+          saveTree();
+        });
+
+
+        $("#btnSetTitle").click(function(){
+          var node = $("#tree").dynatree("getActiveNode");
+          if( !node ) return;
+          node.setTitle($('#tag-title').attr("value"));
+          saveTree();
+          // this is a shortcut for
+          // node.fromDict({title: node.data.title + new Date()});
+        });
+
+        $("#btnDelete").click(function(){
+          var node = $("#tree").dynatree("getActiveNode");
+          if( !node ) return;
+          node.remove();
+          saveTree();
+          // this is a shortcut for
+          // node.fromDict({title: node.data.title + new Date()});
+        });
+        function saveTree(){
+          var top_level_tags = $("#tree").dynatree("getRoot").getChildren();
+
+          var output_json;
+          $.each(top_level_tags, function(index, value) {
+              if (index == 0){
+                  output_json = JSON.stringify(value.toDict(true));
+              } else {
+                  output_json = output_json + "," + JSON.stringify(value.toDict(true));
+              }
+            });
+
+          output_json = "[" + output_json + "]";
+          //toDict(true);
+         // var nodeList = rootNode.getChildren();
+          //alert(JSON.stringify(dict));
+          $('#course-tags').val(output_json);
+          _this.setAndValidate("tags", output_json);
+
+        }
+
+      });
+
+
+
+
+        //this.codeMirrorize(null, $('#course-tags')[0]);
 
         this.$el.find('.current-course-introduction-video iframe').attr('src', this.model.videosourceSample());
         this.$el.find('#' + this.fieldToSelectorMap['intro_video']).val(this.model.get('intro_video') || '');
@@ -59,6 +161,7 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
         'enrollment_start' : 'enrollment-start',
         'enrollment_end' : 'enrollment-end',
         'overview' : 'course-overview',
+        'tags' : 'course-tags',
         'intro_video' : 'course-introduction-video',
         'effort' : "course-effort"
     },
@@ -122,11 +225,13 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
     updateModel: function(event) {
         switch (event.currentTarget.id) {
         case 'course-effort':
+            //alert("1");
             this.setField(event);
             break;
         // Don't make the user reload the page to check the Youtube ID.
         // Wait for a second to load the video, avoiding egregious AJAX calls.
         case 'course-introduction-video':
+            //alert("2");
             this.clearValidationErrors();
             var previewsource = this.model.set_videosource($(event.currentTarget).val());
             clearTimeout(this.videoTimer);
@@ -141,6 +246,8 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
             }, this), 1000);
             break;
         default: // Everything else is handled by datepickers and CodeMirror.
+
+            //alert("3");
             break;
         }
     },
@@ -168,7 +275,7 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
             var cachethis = this;
             var field = this.selectorToField[thisTarget.id];
             this.codeMirrors[thisTarget.id] = CodeMirror.fromTextArea(thisTarget, {
-                mode: "text/html", lineNumbers: true, lineWrapping: true,
+                mode: "text", lineNumbers: true, lineWrapping: true,
                 onChange: function (mirror) {
                     mirror.save();
                     cachethis.clearValidationErrors();

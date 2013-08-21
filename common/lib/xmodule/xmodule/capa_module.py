@@ -10,7 +10,6 @@ import struct
 import sys
 
 from pkg_resources import resource_string
-
 from capa.capa_problem import LoncapaProblem
 from capa.responsetypes import StudentInputError, \
     ResponseError, LoncapaProblemError
@@ -26,6 +25,11 @@ from xblock.core import Scope, String, Boolean, Dict, Integer, Float
 from .fields import Timedelta, Date
 from django.utils.timezone import UTC
 
+#from xmodule.modulestore.django import modulestore
+#from .access import has_access, get_location_and_verify_access
+#from courseware.courses import course_image_url, get_course_about_section, get_course_with_access, get_course_by_id
+
+
 log = logging.getLogger("mitx.courseware")
 
 
@@ -33,8 +37,7 @@ log = logging.getLogger("mitx.courseware")
 NUM_RANDOMIZATION_BINS = 20
 # Never produce more than this many different seeds, no matter what.
 MAX_RANDOMIZATION_BINS = 1000
-
-
+##print tags_json
 def randomization_bin(seed, problem_id):
     """
     Pick a randomization bin for the problem given the user's seed and a problem id.
@@ -81,6 +84,7 @@ class CapaFields(object):
     """
     Define the possible fields for a Capa problem
     """
+
     display_name = String(
         display_name=u"Отображаемое название",
         help=u"Будет видно при наведении в горизонтальном меню.",
@@ -132,6 +136,11 @@ class CapaFields(object):
             {"display_name": u"Нет", "value": 0}],
         scope = Scope.settings,
         default=1
+    )
+    tags_appended = String(
+        display_name=u" Тэги",
+        help=(u"tags"),
+        scope = Scope.settings
     )
     force_save_button = Boolean(
         help=u"Вынудить ли кнопку сохранения появиться на странице",
@@ -461,7 +470,7 @@ class CapaModule(CapaFields, XModule):
                 u'Failed to generate HTML for problem {url}</font>'.format(
                     url=cgi.escape(self.location.url()))
             )
-            msg += u'<p>Error:</p><p><pre>{msg}</pre></p>'.format(msg=cgi.escape(err.message))
+            msg += u'<p>Ошибка:</p><p><pre>{msg}</pre></p>'.format(msg=cgi.escape(err.message))
             msg += u'<p><pre>{tb}</pre></p>'.format(tb=cgi.escape(traceback.format_exc()))
             html = msg
 
@@ -524,10 +533,10 @@ class CapaModule(CapaFields, XModule):
         except Exception as err:
             html = self.handle_problem_html_error(err)
 
-
         if self.checkanswer == 0:
             html = html.replace("incorrect", "not_known")
             html = html.replace("correct", "not_known")
+
         # The convention is to pass the name of the check button
         # if we want to show a check button, and False otherwise
         # This works because non-empty strings evaluate to True
@@ -940,7 +949,7 @@ class CapaModule(CapaFields, XModule):
             # Otherwise, display just an error message,
             # without a stack trace
             else:
-                msg = u"Error: {msg}".format(msg=inst.message)
+                msg = u"Ошибка: {msg}".format(msg=inst.message)
 
             return {'success': msg}
 
@@ -1021,7 +1030,7 @@ class CapaModule(CapaFields, XModule):
             log.warning("Input error in capa_module:problem_rescore", exc_info=True)
             event_info['failure'] = 'input_error'
             self.system.track_function('problem_rescore_fail', event_info)
-            return {'success': u"Ошибка: {0}".format(inst.message)}
+            return {'success': u"Error: {0}".format(inst.message)}
 
         except Exception as err:
             event_info['failure'] = 'unexpected'

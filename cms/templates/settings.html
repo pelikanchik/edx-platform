@@ -205,8 +205,52 @@ from contentstore import utils
                     a_link = a_link_start + utils.get_lms_link_for_about_page(course_location) + a_link_end
                     text = _("Introductions, prerequisites, FAQs that are used on %s (formatted in HTML)") % a_link
                     %>${text}</%def>
-                ##  <span class="tip tip-stacked">${overview_text()}</span>
+                ##  <span class="tip tip-stacked">Тэги, которые можно сопоставить заданиям</span>
                 </li>
+
+
+
+
+                <li class="field text" id="field-course-tags">
+                  <label for="field-course-tags">Тэги</label>
+
+  <div id="tree">
+
+  </div>
+<style>
+
+    .usual-button{
+        font-size:12px;
+        font-weight: normal;
+        width: 80px !important;
+        height: 20px !important;
+        margin: 0px;
+        padding: 3px 5px 7px 5px;
+        text-align: center;
+
+    }
+    .usual-button:active{
+        box-shadow: inset 0px 0px 5px #cccccc;
+    }
+
+    .tag-input{
+        display: inline!important;
+        width: 120px!important;
+        padding: 4px!important;
+        height: 32px!important;
+        margin: 0px!important;
+    }
+</style>
+  <p>
+      <div id = 'current' style = "visibility:hidden; width:50%;text-align: left; float:left;">Текущий элемент:<br><input type="text" class="tag-input" value = "" id = "tag-title" /> <span id="btnSetTitle" class = "save-term usual-button" >Сохранить</span> <span id="btnDelete" class = "save-term usual-button">Удалить</span> </div>
+      <div id = 'add-tag' style = "width:50%;text-align:right; float:right;">Добавить элемент: <br><input type="text" value = "- новый тэг -" class="tag-input" id = "new-tag-title" /> <span id="btnAddCode" class = "save-term usual-button" >Добавить</span></div>
+
+  </p>
+<p>
+    <textarea id="course-tags"  style = "visibility:hidden;"></textarea>
+</p>
+                </li>
+
 
                 <li class="field video" id="field-course-introduction-video">
                   <label for="course-overview">Вводное видео</label>

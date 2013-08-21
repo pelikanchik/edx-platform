@@ -161,6 +161,7 @@ CMS.Views.Metadata.String = CMS.Views.Metadata.AbstractEditor.extend({
 
     events : {
         "change input" : "updateModel",
+        "click .tree-of-tags" : "updateModel",
         "keypress .setting-input" : "showClearButton"  ,
         "click .setting-clear" : "clear"
     },

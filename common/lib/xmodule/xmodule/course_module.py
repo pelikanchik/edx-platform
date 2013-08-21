@@ -159,6 +159,7 @@ class CourseFields(object):
         scope=Scope.settings)
     end = Date(help="Date that this class ends", scope=Scope.settings)
     advertised_start = String(help="Date that this course is advertised to start", scope=Scope.settings)
+    tags = String(help="", default = "", scope=Scope.settings)
     grading_policy = Dict(help="Grading policy definition for this class",
         default={"GRADER": [
                 {
