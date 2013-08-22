@@ -31,6 +31,8 @@ class @Problem
     @$('section.action button.show').click @show
     @$('section.action input.save').click @save
 
+    @$('section.action input.return').click @return_video
+
     @$(".advice-for-problem").each ->
       showDelay = 1000 * parseInt($(this).attr("rel"))
       if $.cookie("advice" + $(this).children(".title").attr("rel"))
@@ -381,6 +383,10 @@ class @Problem
       saveMessage = response.msg
       @gentle_alert saveMessage
       @updateProgress response
+
+  return_video: =>
+    $('#vert-0').show()
+    $('#vert-1').hide()
 
   refreshMath: (event, element) =>
     element = event.target unless element

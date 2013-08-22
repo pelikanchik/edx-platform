@@ -36,8 +36,9 @@ class VerticalModule(VerticalFields, XModule):
                 'content': rendered_child.content,
                 'father': self.id,                
                 'direct_term': self.direct_term,
-                'progress_detail': Progress.to_js_detail_str(self.get_progress()),
-                'type': child.get_icon_class()                
+                'progress_detail': Progress.to_js_detail_str(self.get_progress()),               
+                'type': child.get_icon_class(),
+                'show_now': 'true' if child.get_icon_class() == 'video' or child.problem_now else 'false'
             })
 
         fragment.add_content(self.system.render_template('vert_module.html', {

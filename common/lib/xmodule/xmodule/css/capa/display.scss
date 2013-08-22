@@ -187,6 +187,13 @@ section.problem {
         margin-left:15px;
       }
     }
+    label.choicegroup_not_known{
+      &:after{
+        content: "ok";
+        color: green;
+        margin-left:15px;
+      }
+    }
 
     .indicator_container {
       float: left;
@@ -411,6 +418,13 @@ section.problem {
         width: 20px;
         height: 20px;
         background: url('../images/incorrect-icon.png') center center no-repeat;
+      }
+      &.not_known{
+
+        input {
+          border-color:green;
+        }
+
       }
       &.not_known{
 

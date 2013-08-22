@@ -34,6 +34,14 @@
 
             });
     </script>
+
+    % if return_to_video_button:
+    <!--
+    <section class="video-controls"></section>
+    <input class="return" type="button" value="Вернуться к видео" />
+    -->
+    % endif
+
     % if attempts_allowed :
     <section class="submission_feedback">
       ${_("You have used {num_used} of {num_total} submissions").format(num_used=attempts_used, num_total=attempts_allowed)}
@@ -41,3 +49,4 @@
     % endif
   </section>
 </section>
+

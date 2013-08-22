@@ -163,11 +163,6 @@ class CapaFields(object):
             {"display_name": "Per Student", "value": "per_student"}
         ]
     )
-    show_problem_after_video = Boolean(
-        help=u"Показать это задание по завершению просмотра видео",
-        scope=Scope.settings,
-        default=False
-    )
     data = String(help="XML data for the problem", scope=Scope.content, default="<problem></problem>")
     correct_map = Dict(help="Dictionary with the correctness of current student answers",
                        scope=Scope.user_state, default={})
@@ -186,6 +181,12 @@ class CapaFields(object):
     source_code = String(
         help="Source code for LaTeX and Word problems. This feature is not well-supported.",
         scope=Scope.settings
+    )
+    problem_now = Boolean(
+        display_name=u"Задание сразу/после видео",
+        help=u"True - показать задание сразу. False - задание будет показано после видео.",
+        scope=Scope.settings,
+        default=True
     )
     text_customization = Dict(
         help="String customization substitutions for particular locations",
@@ -576,6 +577,11 @@ class CapaModule(CapaFields, XModule):
         else:
             check_button = False
 
+        show_return_to_video_button = True
+
+        if self.problem_now:
+            show_return_to_video_button = False
+
         content = {'name': self.display_name_with_default,
                    'html': html,
                    'weight': self.weight,
@@ -589,7 +595,8 @@ class CapaModule(CapaFields, XModule):
                    'attempts_used': self.attempts,
                    'attempts_allowed': self.max_attempts,
                    'delay_answers': self.showbuttonanswer,
-                   'after_video': self.show_problem_after_video,
+                   'problem_now': self.problem_now,
+                   'return_to_video_button': show_return_to_video_button,
                    'check_answer': self.checkanswer,
                    'progress': self.get_progress(),
                    'progress_detail': Progress.to_js_detail_str(self.get_progress())
