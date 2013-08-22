@@ -70,7 +70,7 @@ class CMS.Views.ModuleEdit extends Backbone.View
   render: ->
     if @model.id
       @$el.load("/preview_component/#{@model.id}", =>
-        alert "#{@model.id}"
+        # alert "#{@model.id}"
         @loadDisplay()
         @delegateEvents()
       )
