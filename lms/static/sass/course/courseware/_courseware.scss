@@ -294,7 +294,7 @@ p.check-all{
    margin-top: $go-button-top-margin;
      z-index: 1;
      right: 50px;
-     margin-right: 150px;
+     margin-right: 200px;
      @include button(simple, rgb(99, 99, 99)); // gray color
 }
 p.check-all-disabled{

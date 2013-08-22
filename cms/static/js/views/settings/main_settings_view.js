@@ -47,8 +47,12 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
 
         //this.codeMirrorize(null, $('#course-tags')[0]);
         appended_tags = this.model.get('tags');
-        tags_dict = JSON.parse(appended_tags);
-
+        if (!appended_tags){
+            tags_dict = []
+        }
+        else{
+            tags_dict = JSON.parse(appended_tags);
+        }
 
       $(function(){
         // Initialize the tree inside the <div>element.
