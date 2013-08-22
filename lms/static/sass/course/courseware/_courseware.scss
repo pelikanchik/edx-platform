@@ -286,13 +286,13 @@ div.go-button{
 p.godynamo{
 //    right: 300px;
   margin-top: $go-button-top-margin;
-     z-index: 1;
+     z-index: 2;  // no hiding under video
      @include button(simple, rgb(29, 157, 217)); // nice blue color
 }
 
 p.check-all{
    margin-top: $go-button-top-margin;
-     z-index: 1;
+     z-index: 2; // no hiding under video
      right: 50px;
      margin-right: 140px;
      @include button(simple, rgb(99, 99, 99)); // gray color
