@@ -151,11 +151,6 @@ class CapaFields(object):
             {"display_name": u"Для каждого студента своя комбинация", "value": "per_student"}
         ]
     )
-    show_problem_after_video = Boolean(
-        help=u"Показать это задание по завершению просмотра видео",
-        scope=Scope.settings,
-        default=False
-    )
     data = String(help=u"XML-вид задания", scope=Scope.content, default="<problem></problem>")
     correct_map = Dict(help=u"Словарь с правильностью ответов нынешнего студента",
                        scope=Scope.user_state, default={})
@@ -174,6 +169,12 @@ class CapaFields(object):
     source_code = String(
         help=u"Исходный код для заданий в LaTeX или Word. Эта функция поддерживается неважно.",
         scope=Scope.settings
+    )
+    problem_now = Boolean(
+        display_name=u"Задание сразу/после видео",
+        help=u"True - показать задание сразу. False - задание будет показано после видео.",
+        scope=Scope.settings,
+        default=True
     )
 
 
@@ -373,7 +374,7 @@ class CapaModule(CapaFields, XModule):
         else:
             final_check = False
 
-        return u'Окончательный ответ' if final_check else u'Проверить'
+        return u'Ответить'
 
     def should_show_check_button(self):
         """
@@ -529,6 +530,10 @@ class CapaModule(CapaFields, XModule):
         except Exception as err:
             html = self.handle_problem_html_error(err)
 
+
+        if self.checkanswer == 0:
+            html = html.replace("incorrect", "not_known")
+            html = html.replace("correct", "not_known")
         # The convention is to pass the name of the check button
         # if we want to show a check button, and False otherwise
         # This works because non-empty strings evaluate to True
@@ -536,6 +541,11 @@ class CapaModule(CapaFields, XModule):
             check_button = self.check_button_name()
         else:
             check_button = False
+
+        show_return_to_video_button = True
+
+        if self.problem_now:
+            show_return_to_video_button = False
 
         content = {'name': self.display_name_with_default,
                    'html': html,
@@ -550,7 +560,8 @@ class CapaModule(CapaFields, XModule):
                    'attempts_used': self.attempts,
                    'attempts_allowed': self.max_attempts,
                    'delay_answers': self.showbuttonanswer,
-                   'after_video': self.show_problem_after_video,
+                   'problem_now': self.problem_now,
+                   'return_to_video_button': show_return_to_video_button,
                    'check_answer': self.checkanswer,
                    'progress': self.get_progress(),
                    'progress_detail': Progress.to_js_detail_str(self.get_progress())
@@ -1023,7 +1034,7 @@ class CapaModule(CapaFields, XModule):
             log.warning("Input error in capa_module:problem_rescore", exc_info=True)
             event_info['failure'] = 'input_error'
             self.system.track_function('problem_rescore_fail', event_info)
-            return {'success': u"Error: {0}".format(inst.message)}
+            return {'success': u"Ошибка: {0}".format(inst.message)}
 
         except Exception as err:
             event_info['failure'] = 'unexpected'
@@ -1081,7 +1092,7 @@ class CapaModule(CapaFields, XModule):
             event_info['failure'] = 'closed'
             self.system.track_function('save_problem_fail', event_info)
             return {'success': False,
-                    'msg': "Problem is closed"}
+                    'msg': u"Задание закрыто"}
 
         # Problem submitted. Student should reset before saving
         # again.
@@ -1089,16 +1100,16 @@ class CapaModule(CapaFields, XModule):
             event_info['failure'] = 'done'
             self.system.track_function('save_problem_fail', event_info)
             return {'success': False,
-                    'msg': "Problem needs to be reset prior to save"}
+                    'msg': u"Ответы не сохранены, попробуйте ещё раз"}
 
         self.lcp.student_answers = answers
 
         self.set_state_from_lcp()
 
         self.system.track_function('save_problem_success', event_info)
-        msg = "Your answers have been saved"
+        msg = u"Ваши ответы сохранены"
         if not self.max_attempts == 0:
-            msg += " but not graded. Hit 'Check' to grade them."
+            msg += u', но не оценены. Нажмите "Ответить" для оценки ответов'
         return {'success': True,
                 'msg': msg}
 

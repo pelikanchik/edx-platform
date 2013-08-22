@@ -37,7 +37,6 @@ class VideoFields(object):
     )
     position = Integer(help=u"Текущая позиция в видео", scope=Scope.user_state, default=0)
     show_captions = Boolean(help=u"Управляет, показываются ли по умолчанию заголовки.", display_name=u"Показывать заголовки", scope=Scope.settings, default=True)
-    problem_after_video = Boolean(help=u"Показать задание по завершении видео.", display_name=u"Задачка после видео", scope=Scope.settings, default=True)
     youtube_id_1_0 = String(help=u"YouTube ID для видео нормальной скорости.", display_name=u"Обычная скорость", scope=Scope.settings, default="OEoXaMPEzfM")
     youtube_id_0_75 = String(help=u"Youtube ID для видео скорости 0.75x.", display_name=u"Скорость: .75x", scope=Scope.settings, default="")
     youtube_id_1_25 = String(help=u"Youtube ID для видео скорости 1.25x", display_name=u"Скорость: 1.25x", scope=Scope.settings, default="")
@@ -64,6 +63,7 @@ class VideoModule(VideoFields, XModule):
          if filename.endswith('.coffee')]
     }
     css = {'scss': [resource_string(__name__, 'css/video/display.scss')]}
+    #js_module_name = "Video"
     js_module_name = "Video"
 
     def __init__(self, *args, **kwargs):
@@ -81,24 +81,11 @@ class VideoModule(VideoFields, XModule):
         return json.dumps({'position': self.position})
 
     def get_html(self):
-        problem_id = None
-        print "1!@#$%^&*(!@#$%^&*(!@#$%^&*****(!@#$%^&*"
-        if self.problem_after_video:
-            print "!@#$$##@!"
-            print self.location.url()
-            print self.location.course_id
-            print self.location.dict()
-            print self.get_child_descriptors()
-
-            print self.get_icon_class()
-        print "2!@#$%^&*(!@#$%^&*(!@#$%^&*****(!@#$%^&*"
-
         return self.system.render_template('video.html', {
             'youtube_id_0_75': self.youtube_id_0_75,
             'youtube_id_1_0': self.youtube_id_1_0,
             'youtube_id_1_25': self.youtube_id_1_25,
             'youtube_id_1_5': self.youtube_id_1_5,
-            'problem_id': problem_id,
             'id': self.location.html_id(),
             'position': self.position,
             'source': self.source,

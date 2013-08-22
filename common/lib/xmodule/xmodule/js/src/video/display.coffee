@@ -2,10 +2,7 @@ class @Video
   constructor: (element) ->
     @el = $(element).find('.video')
     @id = @el.attr('id').replace(/video_/, '')
-    @problem_id = @el.data('problem-id')
-    @full_id  = @el.attr('id')
     @start = @el.data('start')
-    @father_el = $(element).find('.video')
     @end = @el.data('end')
     @caption_asset_path = @el.data('caption-asset-path')
     @show_captions = @el.data('show-captions')
@@ -67,4 +64,3 @@ class @Video
       code: @youtubeId()
       currentTime: @player.currentTime
       speed: @speed
-

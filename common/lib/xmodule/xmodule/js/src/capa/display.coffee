@@ -27,6 +27,8 @@ class @Problem
     @$('section.action input.reset').click @reset
     @$('section.action button.show').click @show
     @$('section.action input.save').click @save
+    @$('section.action input.return').click @return_video
+
     @$(".advice-for-problem").each ->
       showDelay = 1000 * parseInt($(this).attr("rel"))
       if $.cookie("advice" + $(this).children(".title").attr("rel"))
@@ -293,8 +295,6 @@ class @Problem
   # need something where responsetypes can define their own behavior when show
   # is called.
   show: =>
-    index_new = @index_showed + 1
-    @index_showed = index_new
     if !@el.hasClass 'showed'
       Logger.log 'problem_show', problem: @id
       $.postWithPrefix "#{@url}/problem_show", (response) =>
@@ -351,6 +351,10 @@ class @Problem
       saveMessage = response.msg
       @gentle_alert saveMessage
       @updateProgress response
+
+  return_video: =>
+    $('#vert-0').show()
+    $('#vert-1').hide()
 
   refreshMath: (event, element) =>
     element = event.target unless element

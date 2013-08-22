@@ -177,6 +177,13 @@ section.problem {
         margin-left:15px;
       }
     }
+    label.choicegroup_not_known{
+      &:after{
+        content: "ok";
+        color: green;
+        margin-left:15px;
+      }
+    }
 
     min-width:100px;
     width: auto !important;
@@ -291,9 +298,23 @@ section.problem {
         text-indent: -9999px;
       }
 
+
       input {
         border-color: red;
       }
+    }
+    &.not_known{
+
+      input {
+        border-color:green;
+      }
+      p.status {
+        @include inline-block();
+        height: 20px;
+        width: 20px;
+        text-indent: -9999px;
+      }
+
     }
 
     > span {
@@ -381,6 +402,13 @@ section.problem {
         width: 20px;
         position: relative;
         top: 3px;
+      }
+      &.not_known{
+
+        input {
+          border-color:green;
+        }
+
       }
     }
 

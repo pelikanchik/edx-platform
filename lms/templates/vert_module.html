@@ -1,11 +1,14 @@
 <ol class="vert-mod">
 % for idx, item in enumerate(items):
-  <li id="vert-${idx}" data-id="${item['id']}"  data-progress_detail="${item['progress_detail']}">
+  <li id="vert-${idx}" data-id="${item['id']}"  data-progress_detail="${item['progress_detail']}"
+      %if item['show_now'] == 'false':
+        style="display: none"
+      %endif
+      %if item['show_now'] == 'true':
+        style="display: block"
+      %endif
+          >
     ${item['content']}
-    ${item['father']}
-    %if item['type'] == 'video':
-      ${item['type']}
-    %endif
   </li>
 % endfor
 </ol>
