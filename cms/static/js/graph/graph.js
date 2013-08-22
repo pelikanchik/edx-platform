@@ -45,7 +45,7 @@ window.onload = function() {
                      ellipse.attr("fill", "red");
                      ellipse.attr("stroke", "red");
 
-                    alert(names_obj[node.id] + "\n");
+//                    alert(names_obj[node.id] + "\n");
 //                    alert(names_obj."6abde8cef4894e7789e7a5a16d848f2d");
 
 //                    alert("nhio")
