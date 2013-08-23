@@ -1,8 +1,31 @@
 
 var redraw, g, renderer;
 
-var N =15;      // maximum label length, in characters
-                // if label is longer tha...
+
+function hide_rest_of_string(S){
+    var N =15;      // maximum label length, in characters
+                    // if label is longer tha...
+
+    if (S.length > N) S = S.slice(0, N - 3) + "...";
+    return S;
+}
+
+function parse_sign(S){
+    switch(S){
+        case "more":
+          return ">"
+        case "more-equals":
+      return "≥"
+        case "equals":
+      return "="
+        case "less-equals":
+      return "≤"
+        case "less":
+      return "<"
+    default:
+      return S;
+    }
+}
 
 /* only do all this when document has finished loading (needed for RaphaelJS) */
 window.onload = function() {
@@ -37,7 +60,7 @@ window.onload = function() {
     var names_obj = jQuery.parseJSON(names_str);
     var data_obj = jQuery.parseJSON(data_str);
 
-    var ids_arr = [];
+    var ids_arr = [];                       // why is it necessary?
 
 
         /* custom render function */
@@ -84,8 +107,7 @@ window.onload = function() {
 //    alert(names_obj."9c522b8de7f349eca566c7da934aa334");
 
     jQuery.each(names_obj, function(id, obj) {
-        var label = obj["name"];
-        if (label.length > N) label = label.slice(0, N - 3) + "...";
+        var label = hide_rest_of_string(obj["name"]);
         g.addNode(id, { label : label, render : render} );
         ids_arr.push(id);
     });
@@ -96,14 +118,52 @@ window.onload = function() {
 
 
 
-var source;
+var source, edge_label;
 jQuery.each(edges_arr, function(node_number) {
-    jQuery.each(edges_arr[node_number], function() {
+    jQuery.each(edges_arr[node_number], function(edge_number) {
             source = ids_arr[node_number];
 //            alert("source is " + source);
 //            alert("dest is " + this.direct_element_id);
 
-            g.addEdge(source, this.direct_element_id, { directed : true });
+//            edge_label = names_obj[this.direct_element_id]["name"];
+//            edge_label = "complicated";
+//            var len = edges_arr[node_number].length;
+            var is_complicated = false;
+            var condition_is_short = false;
+            // how many conditions? more than one?
+            if (this.disjunctions.length > 1){
+                is_complicated = true;
+            } else {
+                if (this.disjunctions[0]["conjunctions"].length > 1){
+                    is_complicated = true;
+                }
+            };
+            if (is_complicated) edge_label = "complicated";
+            else {
+                // so, there is only one condition, "if [something], then goto [somewhere]"
+                // which unit this condition is related to?
+                // the source unit? or something more complicated?
+
+                // condition is shorthand for edges_arr[node_number][i]["disjunctions"][0]["conjunctions"][0]["source_element_id"]
+                var condition = this.disjunctions[0]["conjunctions"][0];
+
+                var related_vertex_name;
+                if (condition["source_element_id"] === source) {
+                    related_vertex_name = "";
+                } else {
+                    var name = names_obj[condition["source_element_id"]]["name"];
+                    related_vertex_name = hide_rest_of_string(name) + " ";
+                }
+                var percent_sign = (condition["field"] === "score_rel")? "%" : "";
+                var sign = parse_sign(condition["sign"]);
+
+                var target_value = condition["value"];
+
+                edge_label = related_vertex_name + sign + " " + target_value + percent_sign;
+
+                }
+
+            g.addEdge(source, this.direct_element_id, { directed : true, label: edge_label });
 
     });
 });
