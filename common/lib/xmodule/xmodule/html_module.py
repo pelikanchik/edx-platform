@@ -59,6 +59,11 @@ class HtmlDescriptor(HtmlFields, XmlDescriptor, EditingDescriptor):
     js_module_name = "HTMLEditingDescriptor"
     css = {'scss': [resource_string(__name__, 'css/editor/edit.scss'), resource_string(__name__, 'css/html/edit.scss')]}
 
+    @property
+    def get_class(self):
+        return "HtmlDescriptor"
+
+
     # VS[compat] TODO (cpennington): Delete this method once all fall 2012 course
     # are being edited in the cms
     @classmethod

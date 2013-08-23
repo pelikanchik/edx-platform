@@ -1171,7 +1171,9 @@ class CapaDescriptor(CapaFields, RawDescriptor):
     metadata_translations = dict(RawDescriptor.metadata_translations)
     metadata_translations['attempts'] = 'max_attempts'
 
-
+    @property
+    def get_class(self):
+        return "CapaDescriptor"
 
     def get_context(self):
         _context = RawDescriptor.get_context(self)

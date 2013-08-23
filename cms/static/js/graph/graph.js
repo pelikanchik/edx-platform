@@ -7,6 +7,7 @@ var N =15;      // maximum label length, in characters
 /* only do all this when document has finished loading (needed for RaphaelJS) */
 window.onload = function() {
 
+
     g = new Graph();
 
 /*
@@ -36,18 +37,6 @@ window.onload = function() {
     var names_obj = jQuery.parseJSON(names_str);
     var data_obj = jQuery.parseJSON(data_str);
 
-    jQuery.each(data_obj, function(id) {
-        jQuery.each(data_obj[id], function(number) {
-                var S = data_obj[id][number].rawdata;
-                if (S != undefined){
-                    var i = S.indexOf("(");
-                    S = S.slice(0, i);
-                    data_obj[id][number].rawdata = S;
-            };
-        });
-    });
-
-
     var ids_arr = [];
 
 
@@ -55,24 +44,37 @@ window.onload = function() {
     var render = function(r, node) {
                 var color = Raphael.getColor();
                 var ellipse = r.ellipse(0, 0, 30, 20).attr({fill: color, stroke: color, "stroke-width": 2});
+
+                var show_details = function(){
+                    var message = names_obj[node.id]["name"] + "\n";
+                    jQuery.each(data_obj[node.id], function(number) {
+                        if (data_obj[node.id][number].type != undefined){
+                            message += "\n" + data_obj[node.id][number].type;
+                        }
+                    });
+                    $(".dialog-message").text(message);
+                    $(".node-edit-link").attr("href", "/edit/" + names_obj[node.id]["location"]);
+                    $( "#node-details" ).dialog({
+                          modal: true,
+                          buttons: {
+                            Ok: function() {
+                                $( this ).dialog( "close" );
+                            }
+                          }
+                    });
+                }
                 /* set DOM node ID */
                 ellipse.node.id = "node_" + node.id;
-                ellipse.node.ondblclick = function(){
-//                     ellipse.attr("fill", "red");
-//                     ellipse.attr("stroke", "red");
-                    var S = names_obj[node.id] + "\n";
-                    jQuery.each(data_obj[node.id], function(number) {
-                        S = S + "\n" + data_obj[node.id][number].rawdata;
-                    });
-                    alert(S);
-//                    alert(names_obj[node.id] + "\n" + data_obj[node.id]);
-                }
+                ellipse.node.ondblclick = show_details;
+
+                var vertex_text = r.text(0, 30, node.label);
+                vertex_text.node.onclick = show_details;
 
                 var shape = r.set().
 //                    r.rect(node.point[0]-30, node.point[1]-13, 60, 44).attr({"fill": "#feb", r : "12px", "stroke-width" : node.distance == 0 ? "3px" : "1px" })).push(
 //                    r.text(node.point[0], node.point[1] + 10, (node.label || n.id)  ));
                     push(ellipse).
-                    push(r.text(0, 30, node.label));
+                    push(vertex_text);
                 return shape;
     };
 
@@ -81,8 +83,8 @@ window.onload = function() {
 
 //    alert(names_obj."9c522b8de7f349eca566c7da934aa334");
 
-    jQuery.each(names_obj, function(id, name) {
-        var label = name;
+    jQuery.each(names_obj, function(id, obj) {
+        var label = obj["name"];
         if (label.length > N) label = label.slice(0, N - 3) + "...";
         g.addNode(id, { label : label, render : render} );
         ids_arr.push(id);
