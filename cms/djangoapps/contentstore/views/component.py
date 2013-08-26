@@ -69,16 +69,6 @@ def is_section_exist(section_id, sections):
 
 def show_graph(request, location):
 
-
-    print("!!!!!")
-    print("!!!!!")
-    print("!!!!!")
-    print(location)
-    print("!!!!!")
-    print("!!!!!")
-    print("!!!!!")
-
-
     try:
         item = modulestore().get_item(location, depth=1)
     except ItemNotFoundError:

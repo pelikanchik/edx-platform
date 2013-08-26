@@ -29,7 +29,6 @@ var initialOffset = parseInt($('.godynamo').css('right'));
 
 $('.godynamo').css({
     'right': initialOffset}).css({
-//    'top' : 30                          // XXX
 });
 $('.check-all').css({
     'right': initialOffset

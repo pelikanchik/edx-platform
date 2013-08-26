@@ -351,7 +351,7 @@ function graphPopUpWindow(e) {
 //    alert(url);
 
     window.open(url,'popupWindow',
-        'toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=no,resizable=yes,copyhistory=no');
+        'toolbar=no,location=no,fullscreen=yes,directories=no,status=no,menubar=no,scrollbars=yes,resizable=yes,copyhistory=no');
 
 }
 
