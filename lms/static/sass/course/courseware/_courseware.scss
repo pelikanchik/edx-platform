@@ -265,36 +265,58 @@ section.foldit {
    }
 }
 
-$go-button-top-margin: 15px; // button is on same level with title of problem
-
+$go-button-top-margin : 10px;
 div.go-button{
-
+  margin-top: 0px;
   width: 100px;
   float:right;
   margin-right:25px;
   p{
-     @include button(simple, rgb(29, 157, 217)); // nice blue color
-     z-index: 1;
-     margin-top: $go-button-top-margin;
-     a{
-       text-align:center;
-       color: white;
        font: normal 15px/1.6rem $sans-serif;
+       text-align:center;
+     a{
+       color: white;
        &:hover{
-          color:white;
+       color: white;
        }
      }
   }
 }
+
+p.godynamo{
+//    right: 300px;
+  margin-top: $go-button-top-margin;
+     z-index: 2;  // no hiding under video
+     @include button(simple, rgb(29, 157, 217)); // nice blue color
+}
+
+p.check-all{
+   margin-top: $go-button-top-margin;
+     z-index: 2; // no hiding under video
+     right: 50px;
+     margin-right: 140px;
+     @include button(simple, rgb(99, 99, 99)); // gray color
+}
+p.check-all-disabled{
+     @include button(simple, rgb(59, 59, 59)); // dark gray color
+//         &:hover{
+
+}
+
 .go-button-static{
    p{
+      width: 100px;
       position: absolute;
       top: 50px;
+      right:0px;      // for Chrome
    }
 }
 .go-button-float{
    p{
+      width: 100px;
       position: fixed;
-      top: 0 - $go-button-top-margin;  // should be lower to make for margin
+      top: 0;
+      right:0px;      // for Chrome
+
    }
 }

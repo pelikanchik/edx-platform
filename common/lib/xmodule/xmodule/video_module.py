@@ -109,6 +109,10 @@ class VideoDescriptor(VideoFields,
             _parse_video_xml(self, self.data)
 
     @property
+    def get_class(self):
+        return "VideoDescriptor"
+
+    @property
     def non_editable_metadata_fields(self):
         non_editable_fields = super(MetadataOnlyEditingDescriptor, self).non_editable_metadata_fields
         non_editable_fields.extend([VideoModule.start_time,

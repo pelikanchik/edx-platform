@@ -31,6 +31,7 @@ from xblock.plugin import PluginMissingError
 
 __all__ = ['OPEN_ENDED_COMPONENT_TYPES',
            'ADVANCED_COMPONENT_POLICY_KEY',
+           'show_graph',
            'edit_subsection',
            'edit_unit',
            'assignment_type_update',
@@ -64,6 +65,21 @@ def is_section_exist(section_id, sections):
                 return True
 
     return False
+
+
+def show_graph(request, location):
+
+    try:
+        item = modulestore().get_item(location, depth=1)
+    except ItemNotFoundError:
+        return HttpResponseBadRequest()
+
+    # make sure that location references a 'sequential', otherwise return BadRequest
+    if item.location.category != 'sequential':
+        return HttpResponseBadRequest()
+
+    return render_to_response('graph.html',
+                              {'subsection': item})
 
 
 @login_required
