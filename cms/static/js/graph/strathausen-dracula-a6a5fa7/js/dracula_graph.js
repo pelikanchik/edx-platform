@@ -285,6 +285,9 @@ Graph.Renderer.Raphael.prototype = {
         edge.connection.fg.show();
         edge.connection.bg && edge.connection.bg.show();
         edge.connection.draw();
+    },
+    getCanvas: function() {
+        return this.r;
     }
 };
 Graph.Layout = {};

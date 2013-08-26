@@ -59,6 +59,9 @@ var magicValue = recalcHorizontalOffset();
 $(window).resize(function(){
     magicValue = recalcHorizontalOffset();
 
+    // /!\
+    // bugfix here
+
 });
 
 $(window).scroll(function(){

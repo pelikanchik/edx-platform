@@ -1,20 +1,6 @@
 
 var redraw, g, renderer;
 
-var add_edge_mode = false;
-var mouse_x, mouse_y, origin_x, origin_y = null
-
-document.onmousemove = function (e) {
-        e = e || window.event;
-        if (!add_edge_mode) return;
-        if (mouse_x == null) {
-            mouse_x = e.clientX;
-            mouse_y = e.clientY;
-
-
-            return;
-        }
-}
 
 function hideRestOfString(S){
     var N =15;      // maximum label length, in characters
@@ -56,6 +42,95 @@ function parseType(S){
 /* only do all this when document has finished loading (needed for RaphaelJS) */
 window.onload = function() {
 
+var add_edge_mode = false;
+var mouse_x, mouse_y, origin_x, origin_y;
+var origin_node;
+
+var new_edge_line;
+
+$("#canvas").click(function (e) {
+        setTimeout(exitMode, 500);
+});
+
+function exitMode(){
+    add_edge_mode = false;
+    new_edge_line.remove();
+};
+
+function bindNewEdgeTo(ellipse, node){
+    if(add_edge_mode){
+        add_edge_mode = false;
+        g.addEdge(origin_node, node.id, {directed: true});
+        new_edge_line.remove();
+
+        renderer.draw();
+
+//        alert(g.edges);
+//        for (var i = 0; i < g.edges.length; i++) {
+/*            alert(g.edges[i].source + " -> " + g.edges[i].target);
+            showNodeDetails(ellipse, g.edges[i].target);
+            showNodeDetails(ellipse, g.edges[i].source );
+*/
+//            g.drawEdge(g.edges[i]);
+//        }
+
+    }
+
+}
+
+function showNodeDetails(ellipse, node){
+    var S;
+    var message = names_obj[node.id]["name"];
+    $(".node-data").remove();
+    jQuery.each(data_obj[node.id], function(number) {
+        if (data_obj[node.id][number].type != undefined){
+            S = "";
+            if (data_obj[node.id][number].name!="") S += data_obj[node.id][number].name + " : ";
+            S += parseType(data_obj[node.id][number].type);
+            $( "#node-details").append("<p class=\"node-data\">" + S + "</p>");
+    //                            $( "#node-details").append("<p>" + parse_type(data_obj[node.id][number].type) + " - " + data_obj[node.id][number].url +  "</p>");
+        }
+    });
+    $(".dialog-message").text(message);
+    $(".node-edit-link").attr("href", "/edit/" + names_obj[node.id]["location"]);
+    $( "#node-details" ).dialog({
+          modal: true,
+          buttons: {
+            Ok: function() {
+                $( this ).dialog( "close" );
+            },
+            "Новое ребро": function() {
+                add_edge_mode = true;
+                origin_x = ellipse.attr('cx');
+                origin_y = ellipse.attr('cy');
+                origin_node = node.id;
+                $( this ).dialog( "close" );
+            }
+          }
+    });
+
+
+}
+
+document.onmousemove = function (e) {
+        e = e || window.event;
+        if (!add_edge_mode) return;
+
+            var r = renderer.getCanvas();
+//            alert(r);
+            mouse_x = e.pageX;
+            mouse_y = e.pageY;
+            var path = ["M", origin_x, origin_y, "L", mouse_x, mouse_y].join(",");
+
+            if (new_edge_line !=undefined) new_edge_line.remove();
+
+            new_edge_line = r.path(path);
+//            r.path(path).attr({stroke: "#000"});
+//            alert(path);
+            return;
+//        }
+}
+
 
     g = new Graph();
 
@@ -95,37 +170,16 @@ window.onload = function() {
                 var ellipse = r.ellipse(0, 0, 30, 20).attr({fill: color, stroke: color, "stroke-width": 2});
 
                 var show_details = function(){
-                    var S;
-                    var message = names_obj[node.id]["name"];
-                    $(".node-data").remove();
-                    jQuery.each(data_obj[node.id], function(number) {
-                        if (data_obj[node.id][number].type != undefined){
-                            S = "";
-                            if (data_obj[node.id][number].name!="") S += data_obj[node.id][number].name + " : ";
-                            S += parseType(data_obj[node.id][number].type);
-                            $( "#node-details").append("<p class=\"node-data\">" + S + "</p>");
-//                            $( "#node-details").append("<p>" + parse_type(data_obj[node.id][number].type) + " - " + data_obj[node.id][number].url +  "</p>");
-                        }
-                    });
-                    $(".dialog-message").text(message);
-                    $(".node-edit-link").attr("href", "/edit/" + names_obj[node.id]["location"]);
-                    $( "#node-details" ).dialog({
-                          modal: true,
-                          buttons: {
-                            Ok: function() {
-                                $( this ).dialog( "close" );
-/*                            },
-                            "Новое ребро": function() {
-                                add_edge_mode = true;
-                                origin_x =
-                                $( this ).dialog( "close" );
-*/                            }
-                          }
-                    });
+                    if (!add_edge_mode) showNodeDetails(ellipse, node);
                 }
+
+
                 /* set DOM node ID */
                 ellipse.node.id = "node_" + node.id;
                 ellipse.node.ondblclick = show_details;
+                ellipse.node.onclick = function(){
+                    if (add_edge_mode) bindNewEdgeTo(ellipse, node);
+                };
 
                 var vertex_text = r.text(0, 30, node.label);
                 vertex_text.node.onclick = show_details;
