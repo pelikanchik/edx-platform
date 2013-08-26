@@ -1,8 +1,22 @@
 
 var redraw, g, renderer;
 
+var add_edge_mode = false;
+var mouse_x, mouse_y, origin_x, origin_y = null
 
-function hide_rest_of_string(S){
+document.onmousemove = function (e) {
+        e = e || window.event;
+        if (!add_edge_mode) return;
+        if (mouse_x == null) {
+            mouse_x = e.clientX;
+            mouse_y = e.clientY;
+
+
+            return;
+        }
+}
+
+function hideRestOfString(S){
     var N =15;      // maximum label length, in characters
                     // if label is longer tha...
 
@@ -10,7 +24,7 @@ function hide_rest_of_string(S){
     return S;
 }
 
-function parse_sign(S){
+function parseSign(S){
     switch(S){
         case "more":
           return ">"
@@ -22,6 +36,18 @@ function parse_sign(S){
       return "≤"
         case "less":
       return "<"
+    default:
+      return S;
+    }
+}
+function parseType(S){
+    switch(S){
+        case "VideoDescriptor":
+          return "Видео"
+        case "CapaDescriptor":
+      return "Задача"
+        case "HtmlDescriptor":
+      return "Текст"
     default:
       return S;
     }
@@ -69,10 +95,16 @@ window.onload = function() {
                 var ellipse = r.ellipse(0, 0, 30, 20).attr({fill: color, stroke: color, "stroke-width": 2});
 
                 var show_details = function(){
-                    var message = names_obj[node.id]["name"] + "\n";
+                    var S;
+                    var message = names_obj[node.id]["name"];
+                    $(".node-data").remove();
                     jQuery.each(data_obj[node.id], function(number) {
                         if (data_obj[node.id][number].type != undefined){
-                            message += "\n" + data_obj[node.id][number].type;
+                            S = "";
+                            if (data_obj[node.id][number].name!="") S += data_obj[node.id][number].name + " : ";
+                            S += parseType(data_obj[node.id][number].type);
+                            $( "#node-details").append("<p class=\"node-data\">" + S + "</p>");
+//                            $( "#node-details").append("<p>" + parse_type(data_obj[node.id][number].type) + " - " + data_obj[node.id][number].url +  "</p>");
                         }
                     });
                     $(".dialog-message").text(message);
@@ -82,7 +114,12 @@ window.onload = function() {
                           buttons: {
                             Ok: function() {
                                 $( this ).dialog( "close" );
-                            }
+/*                            },
+                            "Новое ребро": function() {
+                                add_edge_mode = true;
+                                origin_x =
+                                $( this ).dialog( "close" );
+*/                            }
                           }
                     });
                 }
@@ -107,7 +144,7 @@ window.onload = function() {
 //    alert(names_obj."9c522b8de7f349eca566c7da934aa334");
 
     jQuery.each(names_obj, function(id, obj) {
-        var label = hide_rest_of_string(obj["name"]);
+        var label = hideRestOfString(obj["name"]);
         g.addNode(id, { label : label, render : render} );
         ids_arr.push(id);
     });
@@ -122,14 +159,8 @@ var source, edge_label;
 jQuery.each(edges_arr, function(node_number) {
     jQuery.each(edges_arr[node_number], function(edge_number) {
             source = ids_arr[node_number];
-//            alert("source is " + source);
-//            alert("dest is " + this.direct_element_id);
 
-//            edge_label = names_obj[this.direct_element_id]["name"];
-//            edge_label = "complicated";
-//            var len = edges_arr[node_number].length;
             var is_complicated = false;
-            var condition_is_short = false;
             // how many conditions? more than one?
             if (this.disjunctions.length > 1){
                 is_complicated = true;
@@ -138,7 +169,7 @@ jQuery.each(edges_arr, function(node_number) {
                     is_complicated = true;
                 }
             };
-            if (is_complicated) edge_label = "complicated";
+            if (is_complicated) edge_label = "сложно";
             else {
                 // so, there is only one condition, "if [something], then goto [somewhere]"
                 // which unit this condition is related to?
@@ -152,10 +183,10 @@ jQuery.each(edges_arr, function(node_number) {
                     related_vertex_name = "";
                 } else {
                     var name = names_obj[condition["source_element_id"]]["name"];
-                    related_vertex_name = hide_rest_of_string(name) + " ";
+                    related_vertex_name = hideRestOfString(name) + " ";
                 }
                 var percent_sign = (condition["field"] === "score_rel")? "%" : "";
-                var sign = parse_sign(condition["sign"]);
+                var sign = parseSign(condition["sign"]);
 
                 var target_value = condition["value"];
 
@@ -178,7 +209,7 @@ jQuery.each(edges_arr, function(node_number) {
 
 
 //    var height = $(document).height() - 60;
-    var height = 100 + 40*ids_arr.length;
+    var height = 100 + 50*ids_arr.length;
 
     /* draw the graph using the RaphaelJS draw implementation */
     renderer = new Graph.Renderer.Raphael('canvas', g, width, height);
@@ -188,12 +219,5 @@ jQuery.each(edges_arr, function(node_number) {
         renderer.draw();
     };
 
-    //    console.log(g.nodes["kiwi"]);
 };
 
-/*
-    function popupWindow(url) {
-  window.open(url,'popupWindow','toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=no,resizable=yes,copyhistory=no,width=100,height=100,screenX=150,screenY=150,top=150,left=150')
-}
-fullscreen=yes
-    */
