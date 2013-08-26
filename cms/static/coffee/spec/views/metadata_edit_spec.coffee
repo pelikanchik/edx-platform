@@ -2,6 +2,7 @@ describe "Test Metadata Editor", ->
     editorTemplate = readFixtures('metadata-editor.underscore')
     numberEntryTemplate = readFixtures('metadata-number-entry.underscore')
     stringEntryTemplate = readFixtures('metadata-string-entry.underscore')
+    treeEntryTemplate = readFixtures('metadata-tree-entry.underscore')
     optionEntryTemplate = readFixtures('metadata-option-entry.underscore')
 
     beforeEach ->
@@ -9,6 +10,7 @@ describe "Test Metadata Editor", ->
         appendSetFixtures($("<script>", {id: "metadata-number-entry", type: "text/template"}).text(numberEntryTemplate))
         appendSetFixtures($("<script>", {id: "metadata-string-entry", type: "text/template"}).text(stringEntryTemplate))
         appendSetFixtures($("<script>", {id: "metadata-option-entry", type: "text/template"}).text(optionEntryTemplate))
+        appendSetFixtures($("<script>", {id: "metadata-tree-entry", type: "text/template"}).text(optionEntryTemplate))
 
     genericEntry = {
         default_value: 'default value',

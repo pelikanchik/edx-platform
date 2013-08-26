@@ -1,0 +1,97 @@
+<%
+    var d = new Date();
+    randval = Math.floor(Math.random() * 99999 + 1);
+    randval = "tag" + d.getTime() + "_" +randval;
+
+%>
+<style>
+.dynatree-container{
+    border:0!important;
+}
+</style>
+
+<div class="wrapper-comp-setting" style = "width: 100px;">
+	<label class="label setting-label" for="<%= uniqueId %>"><%= model.get('display_name') %></label>
+	<input class="input setting-input tags <%=randval %>" style = "visibility: hidden; width: 1px; height: 1px" type="text" id="<%= uniqueId %>" value='<%= model.get("value") %>'/>
+</div>
+<div class="tree-of-tags  <%=randval %>"></div>
+ <%
+var appended_tags;
+ $(document).ready(function(){
+            if (!CMS.Views['Settings']) CMS.Views.Settings = {};
+
+                CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
+                    initialize : function() {
+                        //alert("!!"+randval);
+                        //this.$el.find('#course-tags').text(this.model.get('tags'));
+                        appended_tags = this.model.get('tags');
+
+                        selected_tags = ($(".tags." + randval).val()).split(",");
+
+                        tags_dict = JSON.parse(appended_tags);
+                        $(".tree-of-tags." + randval).dynatree({
+                          checkbox: true,
+                          selectMode: 2,
+                          onActivate: function(node) {
+                          },
+                          children: tags_dict,
+
+
+                          onSelect: function(select, node) {
+                            var selNodes = node.tree.getSelectedNodes();
+                            var selKeys = $.map(selNodes, function(node){
+                                 return "" + node.data.key + "";
+                            });
+
+
+                            $(".tags." + randval).val(selKeys.join(","));
+                          },
+                          onClick: function(node, event) {
+                            // We should not toggle, if target was "checkbox", because this
+                            // would result in double-toggle (i.e. no toggle)
+                            if( node.getEventTargetType(event) == "title" )
+                              node.toggleSelect();
+                          },
+                          onKeydown: function(node, event) {
+                            if( event.which == 32 ) {
+                              node.toggleSelect();
+                              return false;
+                            }
+                          },
+
+                          cookieId: "dynatree-Cb1" + randval,
+                          idPrefix: "dynatree-Cb1-" + randval
+
+                        });
+
+
+                        $.each(selected_tags, function(i, id){
+                           $(".tree-of-tags." + randval).dynatree("getTree").getNodeByKey(id).select();
+                         });
+
+
+                    }
+                });
+
+
+              //alert(appended_tags);
+              var model = new CMS.Models.Settings.CourseDetails();
+              model.urlRoot = urlRoot;
+              model.fetch({
+                success: function(model) {
+                  var editor = new CMS.Views.Settings.Details({
+                      el: $('.settings-details'),
+                      model: model
+                  });
+                  editor.render();
+                },
+                reset: true
+              });
+
+
+    // Attach the dynatree widget to an existing <div id="tree"> element
+    // and pass the tree options as an argument to the dynatree() function:
+
+ });
+
+%>

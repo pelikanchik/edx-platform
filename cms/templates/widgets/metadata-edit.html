@@ -11,22 +11,22 @@
 ## js templates
 <%block name="jsextra">
 
-  <script type="text/javascript" src="/static/js/models/course_relative.js"></script>
-  <script type="text/javascript" src="/static/js/views/validating_view.js"></script>
-  <script type="text/javascript" src="/static/js/models/settings/course_details.js"></script>
-<script type="text/javascript">
+    <script type="text/javascript" src="/static/js/models/course_relative.js"></script>
+    <script type="text/javascript" src="/static/js/views/validating_view.js"></script>
+    <script type="text/javascript" src="/static/js/models/settings/course_details.js"></script>
+    <script type="text/javascript">
 
-$('.nav-course-settings-schedule a').attr("href");
-      //alert(window.location.pathname);
-      //var url_name = window.location.pathname.split("/");
-      //alert (url_name[4]);
-      //alert (url_name[5]);
+    $('.nav-course-settings-schedule a').attr("href");
+          //alert(window.location.pathname);
+          //var url_name = window.location.pathname.split("/");
+          //alert (url_name[4]);
+          //alert (url_name[5]);
 
-    var i = 0;
-    var urlRoot = $('.nav-course-settings-schedule a').attr("href") + '/section/details';
+        var randvar = "none";
+        var urlRoot = $('.nav-course-settings-schedule a').attr("href") + '/section/details';
 
 
-</script>
+    </script>
 
 
 
@@ -44,6 +44,9 @@ $('.nav-course-settings-schedule a').attr("href");
 
 <script id="metadata-string-entry" type="text/template">
     <%static:include path="js/metadata-string-entry.underscore" />
+</script>
+<script id="metadata-tree-entry" type="text/template">
+    <%static:include path="js/metadata-tree-entry.underscore" />
 </script>
 
 <script id="metadata-option-entry" type="text/template">
