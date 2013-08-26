@@ -84,6 +84,7 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
                  *  the tree.
                  */
                 sourceNode.move(node, hitMode);
+                saveTree();
               }
           }
 
@@ -139,7 +140,7 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
           $('#course-tags').val(output_json);
           _this.setAndValidate("tags", output_json);
 
-        }
+        };
 
       });
 
