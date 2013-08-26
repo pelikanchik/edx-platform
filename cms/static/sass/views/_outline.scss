@@ -498,6 +498,10 @@ body.course.outline {
 
       .subsection-list {
           margin: 0 12px;
+      // ditto for graph
+        .show-graph-item {
+          display: none;
+        }
 
           > ol {
               @include tree-view;
@@ -701,10 +705,12 @@ body.course.outline {
       .new-unit-item {
         display: none;
       }
+
       // ditto for graph
-      .show-graph-item {
-        display: none;
+/*      .show-graph-item {
+        visibility: hidden;
       }
+*/
   }
 
   ol.ui-droppable .branch:first-child .section-item {

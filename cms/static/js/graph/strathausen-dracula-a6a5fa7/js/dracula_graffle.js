@@ -82,10 +82,11 @@ Raphael.fn.connection = function (obj1, obj2, style) {
             y4 = p[res[1]].y,
             dx = Math.max(Math.abs(x1 - x4) / 2, 10),
             dy = Math.max(Math.abs(y1 - y4) / 2, 10),
-            x2 = [x1, x1, x1 - dx, x1 + dx][res[0]].toFixed(3),
-            y2 = [y1 - dy, y1 + dy, y1, y1][res[0]].toFixed(3),
-            x3 = [0, 0, 0, 0, x4, x4, x4 - dx, x4 + dx][res[1]].toFixed(3),
-            y3 = [0, 0, 0, 0, y1 + dy, y1 - dy, y4, y4][res[1]].toFixed(3);
+            x2 = parseFloat([x1, x1, x1 - dx, x1 + dx][res[0]].toFixed(3)),
+            y2 = parseFloat([y1 - dy, y1 + dy, y1, y1][res[0]].toFixed(3)),
+            x3 = parseFloat([0, 0, 0, 0, x4, x4, x4 - dx, x4 + dx][res[1]].toFixed(3)),
+            y3 = parseFloat([0, 0, 0, 0, y1 + dy, y1 - dy, y4, y4][res[1]].toFixed(3));
+
         /* assemble path and arrow */
         var path = ["M", x1.toFixed(3), y1.toFixed(3), "C", x2, y2, x3, y3, x4.toFixed(3), y4.toFixed(3)].join(",");
 //            var path = ["M", x1.toFixed(3), y1.toFixed(3), "L", x2, y2, x3, y3, x4.toFixed(3), y4.toFixed(3)].join(",");
@@ -111,8 +112,19 @@ Raphael.fn.connection = function (obj1, obj2, style) {
         || style && style.fill && (edge.bg = style.fill.split && selfRef.path(path).attr({stroke: style.fill.split("|")[0], fill: "none", "stroke-width": style.fill.split("|")[1] || 3}).toBack());
         /* setting label */
         style && style.label
-        && (edge.label && edge.label.attr({x:(x1+x4)/2, y:(y1+y4)/2})
-            || (edge.label = selfRef.text((x1+x4)/2, (y1+y4)/2, style.label).attr({fill: "#000", "font-size": style["font-size"] || "12px"})));
+        && (edge.label && edge.label.attr({x:(x2+x3)/2, y:(y2+y3)/2})
+            || (edge.label = selfRef.text((x2+x3)/2, (y2+y3)/2, style.label).attr({fill: "#000", "font-size": style["font-size"] || "12px"})));
+
+//        && (edge.label && edge.label.attr({x:(x2+x3)/2, y:(y2+y3)/2})
+//            || (edge.label = selfRef.text((x1+x4)/2, (y1+y4)/2, style.label).attr({fill: "#000", "font-size": style["font-size"] || "12px"})));
+
+
+
+//        && (edge.label && edge.label.attr({x:(x1+x4)/2, y:(y1+y4)/2})
+//           || (edge.label = selfRef.text((x1+x4)/2, (y1+y4)/2, style.label).attr({fill: "#000", "font-size": style["font-size"] || "12px"})));
+
+//        && (edge.label && edge.label.attr({x:x2, y:y2})
+//            || (edge.label = selfRef.text(x2, y2, style.label).attr({fill: "#000", "font-size": style["font-size"] || "12px"})));
         style && style.label && style["label-style"] && edge.label && edge.label.attr(style["label-style"]);
         style && style.callback && style.callback(edge);
         }
