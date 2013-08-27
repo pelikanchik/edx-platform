@@ -1,1 +1,1 @@
-You have been enrolled in ${course_id}
+Вы были приглашены на курс ${course_id}

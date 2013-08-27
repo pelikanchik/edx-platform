@@ -12,7 +12,7 @@
         <% ctx_loc = context_course.location %>
         ${context_course.display_name_with_default} |
         % endif
-        edX Studio
+        Пеликан
     </title>
 
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -20,8 +20,10 @@
 
     <script type="text/javascript" src="/jsi18n/"></script>
     <%static:css group='base-style'/>
+
     <link rel="stylesheet" type="text/css" href="${static.url('js/vendor/markitup/skins/simple/style.css')}" />
     <link rel="stylesheet" type="text/css" href="${static.url('js/vendor/markitup/sets/wiki/style.css')}" />
+    <link rel="stylesheet" type="text/css" href="${static.url('css/dynatree.css')}" />
 
     <%include file="widgets/segment-io.html" />
 
@@ -37,6 +39,7 @@
     </script>
 
     ## javascript
+
     <script type="text/javascript" src="${static.url('js/vendor/json2.js')}"></script>
     <script type="text/javascript" src="${static.url('js/vendor/underscore-min.js')}"></script>
     <script type="text/javascript" src="${static.url('js/vendor/underscore.string.min.js')}"></script>
@@ -44,9 +47,11 @@
     <script type="text/javascript" src="${static.url('js/vendor/backbone-associations-min.js')}"></script>
     <script type="text/javascript" src="${static.url('js/vendor/markitup/jquery.markitup.js')}"></script>
     <script type="text/javascript" src="${static.url('js/vendor/markitup/sets/wiki/set.js')}"></script>
+    <script type="text/javascript" src="${static.url('js/dynatree.js')}"></script>
 
     <%static:js group='main'/>
     <%static:js group='module-js'/>
+
     <script src="${static.url('js/vendor/jquery.inlineedit.js')}"></script>
     <script src="${static.url('js/vendor/jquery.cookie.js')}"></script>
     <script src="${static.url('js/vendor/jquery.leanModal.min.js')}"></script>

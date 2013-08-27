@@ -31,6 +31,7 @@ from xblock.plugin import PluginMissingError
 
 __all__ = ['OPEN_ENDED_COMPONENT_TYPES',
            'ADVANCED_COMPONENT_POLICY_KEY',
+           'show_graph',
            'edit_subsection',
            'edit_unit',
            'assignment_type_update',
@@ -64,6 +65,21 @@ def is_section_exist(section_id, sections):
                 return True
 
     return False
+
+
+def show_graph(request, location):
+
+    try:
+        item = modulestore().get_item(location, depth=1)
+    except ItemNotFoundError:
+        return HttpResponseBadRequest()
+
+    # make sure that location references a 'sequential', otherwise return BadRequest
+    if item.location.category != 'sequential':
+        return HttpResponseBadRequest()
+
+    return render_to_response('graph.html',
+                              {'subsection': item})
 
 
 @login_required
@@ -115,8 +131,9 @@ def edit_subsection(request, location):
         if field.name not in ['display_name', 'start', 'due', 'format', 'unlock_term'] and field.scope == Scope.settings
     )
 
-
+    #item.unlock_term = '{"disjunctions":[]}'
     term = json.loads(item.unlock_term)
+
 
     # updating if term has links to already not existed sections
     for disjunction in term["disjunctions"]:
@@ -260,8 +277,6 @@ def edit_unit(request, location):
         index=index)
 
     unit_state = compute_unit_state(item)
-
-    print (item)
 
     return render_to_response('unit.html', {
         'context_course': course,

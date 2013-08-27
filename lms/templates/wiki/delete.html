@@ -2,34 +2,34 @@
 {% load wiki_tags i18n sekizai_tags %}
 {% load url from future %}
 
-{% block pagetitle %}{% trans "Delete article" %}{% endblock %}
+{% block pagetitle %}Удалить статью{% endblock %}
 
 {% block wiki_contents %}
   <section class="delete">
-  <h1 class="page-header">{% trans "Delete" %} "{{ article.current_revision.title }}"</h1>
+  <h1 class="page-header">Удалить "{{ article.current_revision.title }}"</h1>
   
   {% if cannot_delete_root %}
-    <p class="lead">{% trans "You cannot delete a root article." %}</p>
-    <p><a href="{% url 'wiki:get' path=urlpath.path article_id=article.id %}">{% trans "Go back" %}</a></p>
+    <p class="lead">Нельзя удалить корневую статью</p>
+    <p><a href="{% url 'wiki:get' path=urlpath.path article_id=article.id %}">Назад</a></p>
   {% else %}
   
     {% if cannot_delete_children %}
       
-      <p class="alert alert-error"><strong>{% trans "You cannot delete this article because you do not have permission to delete articles with children. Try to remove the children manually one-by-one." %}</strong></p>
+      <p class="alert alert-error"><strong>Недостаточно прав для удаления</strong></p>
       
     {% endif %}
       
     {% if delete_children %}
 
-      <p class="lead">{% trans "You are deleting an article. This means that its children will be deleted as well. If you choose to purge, children will also be purged!" %}</p>
+      <p class="lead">Вы удаляете статью, вместе с этим вы удалите и все статьи-потомки!</p>
       
-      <h2>{% trans "Articles that will be deleted" %}</h2>
+      <h2>Статьи, которые будут удалены</h2>
       
       <ul>
         {% for child in delete_children %}
         <li><a href="{% url 'wiki:get' article_id=child.article.id %}" target="_blank">{{ child.article }}</a></li>
         {% if delete_children_more %}
-        <li><em>{% trans "...and more!" %}</em></li>
+        <li><em>и это не всё!</em></li>
         {% endif %}
         {% endfor %}
       </ul>
@@ -37,7 +37,7 @@
     {% endif %}
     
     {% if not cannot_delete_children %}
-    <p class="lead">{% trans "You are deleting an article. Please confirm." %}</p>
+    <p class="lead">Вы удаляете статью, подтвердите</p>
 
     <form method="POST" class="form-horizontal">
       {% wiki_form delete_form %}
@@ -47,11 +47,11 @@
       <div class="form-actions">
           <button type="submit" name="save_changes" class="btn btn-danger btn-large">
             <span class="icon-plus"></span>
-            {% trans "Delete article" %}
+            Удалить статью
           </button>
           <a href="{% url 'wiki:get' path=urlpath.path article_id=article.id %}" class="btn btn-large back">
             <span class="icon-circle-arrow-left"></span>
-            {% trans "Go back" %}
+            Назад
           </a>
       </div>  
     </form>

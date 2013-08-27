@@ -43,6 +43,7 @@ def preview_dispatch(request, preview_id, location, dispatch=None):
     """
 
     descriptor = modulestore().get_item(location)
+
     instance = load_preview_module(request, preview_id, descriptor)
     # Let the module handle the AJAX
     try:
@@ -73,6 +74,15 @@ def preview_component(request, location):
         return HttpResponseForbidden()
 
     component = modulestore().get_item(location)
+
+    print("!!!!!")
+    print("!!!!!")
+    print("preview")
+    print(location)
+    print(component)
+    print("!!!!!")
+    print("!!!!!")
+    print("!!!!!")
 
     return render_to_response('component.html', {
         'preview': get_module_previews(request, component)[0],

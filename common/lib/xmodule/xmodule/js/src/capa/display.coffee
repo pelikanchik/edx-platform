@@ -1,5 +1,7 @@
 class @Problem
 
+  responsesBeingProcessedCount = 0
+
   constructor: (element) ->
     @el = $(element).find('.problems-wrapper')
     @id = @el.data('problem-id')
@@ -22,9 +24,27 @@ class @Problem
 
     @$('section.action input:button').click @refreshAnswers
     @$('section.action input.check').click @check_fd
+    # XXX
+    $('.check-all').unbind('click').click @check_all
     @$('section.action input.reset').click @reset
     @$('section.action button.show').click @show
     @$('section.action input.save').click @save
+
+    @$(".advice-for-problem").each ->
+      showDelay = 1000 * parseInt($(this).attr("rel"))
+      if $.cookie("advice" + $(this).children(".title").attr("rel"))
+        $(this).css("display","block")
+      else
+        $(this).delay(showDelay).fadeIn()
+        if $(this).children(".title").attr("rel")
+          $.cookie("advice" + $(this).children(".title").attr("rel"),"1");
+
+    @$(".advice-for-problem .title").click ->
+      $(this).next(".inner").stop().slideToggle()
+      if $(this).parent().hasClass("active")
+         $(this).parent().removeClass "active"
+      else
+         $(this).parent().addClass "active"
 
     # Collapsibles
     Collapsible.setCollapsibles(@el)
@@ -39,16 +59,16 @@ class @Problem
     detail = @el.data('progress_detail')
     status = @el.data('progress_status')
     # i18n
-    progress = "(#{detail} points)"
+    progress = "(баллов: #{detail})"
     if status == 'none' and detail? and detail.indexOf('/') > 0
         a = detail.split('/')
         possible = parseInt(a[1])
         if possible == 1
             # i18n
-            progress = "(#{possible} point possible)"
+            progress = "(возможное количество баллов: #{possible})"
         else
             # i18n
-            progress = "(#{possible} points possible)"
+            progress = "(возможное количество баллов: #{possible})"
     @$('.problem-progress').html(progress)
 
   updateProgress: (response) =>
@@ -104,14 +124,14 @@ class @Problem
   # Use this if you want to make an ajax call on the input type object
   # static method so you don't have to instantiate a Problem in order to use it
   # Input:
-  #   url: the AJAX url of the problem
-  #   input_id: the input_id of the input you would like to make the call on
-  #     NOTE: the id is the ${id} part of "input_${id}" during rendering
-  #           If this function is passed the entire prefixed id, the backend may have trouble
-  #           finding the correct input
-  #   dispatch: string that indicates how this data should be handled by the inputtype
-  #   callback: the function that will be called once the AJAX call has been completed.
-  #             It will be passed a response object
+  # url: the AJAX url of the problem
+  # input_id: the input_id of the input you would like to make the call on
+  # NOTE: the id is the ${id} part of "input_${id}" during rendering
+  # If this function is passed the entire prefixed id, the backend may have trouble
+  # finding the correct input
+  # dispatch: string that indicates how this data should be handled by the inputtype
+  # callback: the function that will be called once the AJAX call has been completed.
+  # It will be passed a response object
   @inputAjax: (url, input_id, dispatch, data, callback) ->
     data['dispatch'] = dispatch
     data['input_id'] = input_id
@@ -168,25 +188,33 @@ class @Problem
           if e.name == "Waitfor Exception"
             alert e.message
           else
-            alert "Could not grade your answer. The submission was aborted."
+            alert "Невозможно сохранить ваш ответ. Отправка прервана."
           throw e
 
 
+
+  check_all: (event) =>
+    event.preventDefault()
+    if (responsesBeingProcessedCount == 0)
+      $('.check').click()
+
+
   ###
-  # 'check_fd' uses FormData to allow file submissions in the 'problem_check' dispatch,
-  #      in addition to simple querystring-based answers
-  #
-  # NOTE: The dispatch 'problem_check' is being singled out for the use of FormData;
-  #       maybe preferable to consolidate all dispatches to use FormData
-  ###
+# 'check_fd' uses FormData to allow file submissions in the 'problem_check' dispatch,
+# in addition to simple querystring-based answers
+#
+# NOTE: The dispatch 'problem_check' is being singled out for the use of FormData;
+# maybe preferable to consolidate all dispatches to use FormData
+###
   check_fd: =>
+
     # If there are no file inputs in the problem, we can fall back on @check
     if $('input:file').length == 0
       @check()
       return
 
     if not window.FormData
-      alert "Submission aborted! Sorry, your browser does not support file uploads. If you can, please use Chrome or Safari which have been verified to support file uploads."
+      alert "Отправка прервана! Ваш браузер, к сожалению, не поддерживает загрузку файлов. Используйте, пожалуйста, Chrome, Яндекс.Браузер или FireFox."
       return
 
     fd = new FormData()
@@ -203,7 +231,7 @@ class @Problem
     @inputs.each (index, element) ->
       if element.type is 'file'
         required_files = $(element).data("required_files")
-        allowed_files  = $(element).data("allowed_files")
+        allowed_files = $(element).data("allowed_files")
         for file in element.files
           if allowed_files.length != 0 and file.name not in allowed_files
             unallowed_file_submitted = true
@@ -255,6 +283,13 @@ class @Problem
     @check_waitfor()
     Logger.log 'problem_check', @answers
 
+    if( responsesBeingProcessedCount == 0)
+      $('.check-all').html('Подождите...').addClass('check-all-disabled')
+
+    $("#" + @element_id + " .check").val('Подождите...').prop('disabled', true);
+    responsesBeingProcessedCount++;
+
+
     # Segment.io
     analytics.track "Problem Checked",
       problem_id: @id
@@ -269,6 +304,11 @@ class @Problem
             @el.removeClass 'showed'
         else
           @gentle_alert response.success
+      $("#" + @element_id + " .check").val('Проверить').prop('disabled', false)
+      responsesBeingProcessedCount--
+      if( responsesBeingProcessedCount == 0)
+        $('.check-all').html('Проверить').removeClass('check-all-disabled');
+
       Logger.log 'problem_graded', [@answers, response.contents], @url
 
   reset: =>
@@ -374,9 +414,9 @@ class @Problem
 
     'text-input-dynamath': (element) =>
       ###
-      Return: function (eqn) -> eqn that preprocesses the user formula input before
-                it is fed into MathJax. Return 'false' if no preprocessor specified
-      ###
+Return: function (eqn) -> eqn that preprocesses the user formula input before
+it is fed into MathJax. Return 'false' if no preprocessor specified
+###
       data = $(element).find('.text-input-dynamath_data')
 
       preprocessorClassName = data.data('preprocessor')
@@ -391,11 +431,11 @@ class @Problem
 
       data = $(element).find(".javascriptinput_data")
 
-      params        = data.data("params")
-      submission    = data.data("submission")
-      evaluation    = data.data("evaluation")
-      problemState  = data.data("problem_state")
-      displayClass  = window[data.data('display_class')]
+      params = data.data("params")
+      submission = data.data("submission")
+      evaluation = data.data("evaluation")
+      problemState = data.data("problem_state")
+      displayClass = window[data.data('display_class')]
 
       if evaluation == ''
           evaluation = null

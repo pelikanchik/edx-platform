@@ -1,7 +1,7 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%inherit file="base.html" />
 <%! from django.core.urlresolvers import reverse %>
-<%block name="title">Course Checklists</%block>
+<%block name="title">Контрольные списки</%block>
 <%block name="bodyclass">is-signedin course uxdesign checklists</%block>
 
 <%namespace name='static' file='static_content.html'/>
@@ -33,7 +33,7 @@
     <h1 class="page-header">
 
       <small class="subtitle">Инструменты</small>
-      <span class="sr">&gt; </span>Чеклисты
+      <span class="sr">&gt; </span>Контрольные списки
 
     </h1>
   </header>
@@ -44,7 +44,7 @@
     <article class="content-primary" role="main">
       <form id="course-checklists" class="course-checklists" method="post" action="">
 
-        <h2 class="title title-3 sr">Текущие чеклисты</h2>
+        <h2 class="title title-3 sr">Текущие контрольные списки</h2>
 
       </form>
     </article>
@@ -52,18 +52,18 @@
     <aside class="content-supplementary" role="complimentary">
       <div class="bit">
 
-        <h3 class="title title-3">Что такое чеклисты?</h3>
+        <h3 class="title title-3">Что такое контрольные списки?</h3>
         <p>
           Запуск курса - это сложный проект, состоящий из нескольких задач.
         </p>
         <p>
-        Чеклист позволяет не пропустить важные вещи, а также быть в курсе, на каком этапе находится создание курса (особенно в случае команды более одного человека).
+        Контрольный список позволяет не пропустить важные вещи, а также быть в курсе, на каком этапе находится создание курса (особенно в случае команды более одного человека).
 
         </p>
       </div>
 
       <div class="bit">
-        <h3 class="title title-3">Чеклисты</h3>
+        <h3 class="title title-3">Контрольные списки</h3>
         <nav class="nav-page checklists-current">
           <ol>
             % for checklist in checklists:

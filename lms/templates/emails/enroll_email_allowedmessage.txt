@@ -1,13 +1,13 @@
-Dear student,
+Уважаемый ученик,
 
-You have been invited to join ${course_id} at ${site_name} by a member of the course staff.
+Вы приглашены для регистрации на курс ${course_id} от ${site_name} одним из членов персонала курса.
 
-To finish your registration, please visit ${registration_url} and fill out the registration form.
+Для регистрации пройдите, пожалуйста, по ссылке ${registration_url} и заполните поля приведенной формы.
 % if auto_enroll:
-Once you have registered and activated your account, you will see ${course_id} listed on your dashboard.
+После регистрации и активации аккаунта вы увидите курс ${course_id} в вашем расписании.
 % else:
-Once you have registered and activated your account, visit ${course_url} to join the course.
+После регистрации и активации аккаунта посетите ${course_url} для того, чтобы присоединииться к курсу.
 % endif
 
 ----
-This email was automatically sent from ${site_name} to ${email_address}
+Письмо отпралено автоматически ${site_name} для ${email_address}

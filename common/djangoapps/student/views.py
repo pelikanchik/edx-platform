@@ -361,7 +361,7 @@ def change_enrollment(request):
     action = request.POST.get("enrollment_action")
     course_id = request.POST.get("course_id")
     if course_id is None:
-        return HttpResponseBadRequest(_("Course id not specified"))
+        return HttpResponseBadRequest(_(u"id курса не указано"))
 
     if action == "enroll":
         # Make sure the course exists
@@ -371,10 +371,10 @@ def change_enrollment(request):
         except ItemNotFoundError:
             log.warning("User {0} tried to enroll in non-existent course {1}"
                         .format(user.username, course_id))
-            return HttpResponseBadRequest(_("Course id is invalid"))
+            return HttpResponseBadRequest(_(u"id курса недопустимо"))
 
         if not has_access(user, course, 'enroll'):
-            return HttpResponseBadRequest(_("Enrollment is closed"))
+            return HttpResponseBadRequest(_(u"Регистрация закрыта"))
 
         org, course_num, run = course_id.split("/")
         statsd.increment("common.student.enrollment",
@@ -403,9 +403,9 @@ def change_enrollment(request):
 
             return HttpResponse()
         except CourseEnrollment.DoesNotExist:
-            return HttpResponseBadRequest(_("You are not enrolled in this course"))
+            return HttpResponseBadRequest(_(u"Вы не зарегистрированы в этом курсе"))
     else:
-        return HttpResponseBadRequest(_("Enrollment action is invalid"))
+        return HttpResponseBadRequest(_(u"Регистрация недоступна"))
 
 
 @ensure_csrf_cookie
@@ -420,7 +420,7 @@ def login_user(request, error=""):
     ''' AJAX request to log in the user. '''
     if 'email' not in request.POST or 'password' not in request.POST:
         return HttpResponse(json.dumps({'success': False,
-                                        'value': _('There was an error receiving your login information. Please email us.')}))  # TODO: User error message
+                                        'value': _(u'Произошла ошибка получения регистрационной информации. Пожалуйста, напишите нам.')}))  # TODO: User error message
 
     email = request.POST['email']
     password = request.POST['password']
@@ -479,7 +479,7 @@ def login_user(request, error=""):
     log.warning(u"Login failed - Account not active for user {0}, resending activation".format(username))
 
     reactivation_email_for_user(user)
-    not_activated_msg = _("This account has not been activated. We have sent another activation message. Please check your e-mail for the activation instructions.")
+    not_activated_msg = _(u"Этот аккаунт не был активирован. Мы  отправили вам другое активационное письмо. Пожалуйста, проверьте свою электронную почту")
     return HttpResponse(json.dumps({'success': False,
                                     'value': not_activated_msg}))
 
@@ -537,12 +537,12 @@ def _do_create_account(post_vars):
         js = {'success': False}
         # Figure out the cause of the integrity error
         if len(User.objects.filter(username=post_vars['username'])) > 0:
-            js['value'] = _("An account with the Public Username '{username}' already exists.").format(username=post_vars['username'])
+            js['value'] = _(u"Аккаунт с публичным именем '{username}' уже существует.").format(username=post_vars['username'])
             js['field'] = 'username'
             return HttpResponse(json.dumps(js))
 
         if len(User.objects.filter(email=post_vars['email'])) > 0:
-            js['value'] = _("An account with the Email '{email}' already exists.").format(email=post_vars['email'])
+            js['value'] = _(u"Аккаунт с электронным адресом '{email}' уже существует.").format(email=post_vars['email'])
             js['field'] = 'email'
             return HttpResponse(json.dumps(js))
 
@@ -603,12 +603,12 @@ def create_account(request, post_override=None):
     # Confirm we have a properly formed request
     for a in ['username', 'email', 'password', 'name']:
         if a not in post_vars:
-            js['value'] = _("Error (401 {field}). E-mail us.").format(field=a)
+            js['value'] = _(u"Ошибка (401 {field}). Напишите нам.").format(field=a)
             js['field'] = a
             return HttpResponse(json.dumps(js))
 
     if post_vars.get('honor_code', 'false') != u'true':
-        js['value'] = _("Для регистрации вы должны согласиться с honor code.").format(field=a)
+        js['value'] = _(u"Для регистрации вы должны согласиться с honor code.").format(field=a)
         js['field'] = 'honor_code'
         return HttpResponse(json.dumps(js))
 
@@ -619,7 +619,7 @@ def create_account(request, post_override=None):
 
     if not tos_not_required:
         if post_vars.get('terms_of_service', 'false') != u'true':
-            js['value'] = _("Вы должны согласиться с правилами пользования.").format(field=a)
+            js['value'] = _(u"Вы должны согласиться с правилами пользования.").format(field=a)
             js['field'] = 'terms_of_service'
             return HttpResponse(json.dumps(js))
 
@@ -648,14 +648,14 @@ def create_account(request, post_override=None):
     try:
         validate_email(post_vars['email'])
     except ValidationError:
-        js['value'] = _("Необходимо ввести корректный e-mail").format(field=a)
+        js['value'] = _(u"Необходимо ввести корректный e-mail").format(field=a)
         js['field'] = 'email'
         return HttpResponse(json.dumps(js))
 
     try:
         validate_slug(post_vars['username'])
     except ValidationError:
-        js['value'] = _("Имя пользователя может содержать только латинские буквы и цифры без пробелов.").format(field=a)
+        js['value'] = _(u"Имя пользователя может содержать только латинские буквы и цифры без пробелов.").format(field=a)
         js['field'] = 'username'
         return HttpResponse(json.dumps(js))
 
@@ -680,14 +680,14 @@ def create_account(request, post_override=None):
         try:
             if settings.MITX_FEATURES.get('REROUTE_ACTIVATION_EMAIL'):
                 dest_addr = settings.MITX_FEATURES['REROUTE_ACTIVATION_EMAIL']
-                message = ("Activation for %s (%s): %s\n" % (user, user.email, profile.name) +
+                message = (u"Активация %s (%s): %s\n" % (user, user.email, profile.name) +
                            '-' * 80 + '\n\n' + message)
                 send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [dest_addr], fail_silently=False)
             else:
                 res = user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
         except:
-            log.warning('Unable to send activation email to user', exc_info=True)
-            js['value'] = _('Could not send activation e-mail.')
+            log.warning(u'Не удалось отправить письмо активации', exc_info=True)
+            js['value'] = _(u'Не удалось отправить письмо активации.')
             return HttpResponse(json.dumps(js))
 
     # Immediately after a user creates an account, we log them in. They are only
@@ -997,7 +997,7 @@ def password_reset(request):
                                         'value': render_to_string('registration/password_reset_done.html', {})}))
     else:
         return HttpResponse(json.dumps({'success': False,
-                                        'error': _('Invalid e-mail or user')}))
+                                        'error': _(u'Неверный e-mail или пользователь')}))
 
 
 def password_reset_confirm_wrapper(request, uidb36=None, token=None):
@@ -1032,7 +1032,7 @@ def reactivation_email_for_user(user):
     try:
         res = user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
     except:
-        log.warning('Unable to send reactivation email', exc_info=True)
+        log.warning(u'Не удалось отправить письмо реактивации', exc_info=True)
         return HttpResponse(json.dumps({'success': False, 'error': _(u'Невозможно отправить письмо')}))
 
 
@@ -1203,7 +1203,7 @@ def reject_name_change(request):
     try:
         pnc = PendingNameChange.objects.get(id=int(request.POST['id']))
     except PendingNameChange.DoesNotExist:
-        return HttpResponse(json.dumps({'success': False, 'error': _('Invalid ID')}))
+        return HttpResponse(json.dumps({'success': False, 'error': _(u'Неверный ID')}))
 
     pnc.delete()
     return HttpResponse(json.dumps({'success': True}))
@@ -1213,7 +1213,7 @@ def accept_name_change_by_id(id):
     try:
         pnc = PendingNameChange.objects.get(id=id)
     except PendingNameChange.DoesNotExist:
-        return HttpResponse(json.dumps({'success': False, 'error': _('Invalid ID')}))
+        return HttpResponse(json.dumps({'success': False, 'error': _(u'Неверный ID')}))
 
     u = pnc.user
     up = UserProfile.objects.get(user=u)

@@ -9,6 +9,7 @@ CMS.Models.Settings.CourseDetails = Backbone.Model.extend({
         enrollment_end: null,
         syllabus: null,
         overview: "",
+        tags: "",
         intro_video: null,
         effort: null	// an int or null
     },
