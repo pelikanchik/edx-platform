@@ -5,14 +5,11 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
     events : {
         "input input" : "updateModel",
         "input textarea" : "updateModel",
-        // Leaving change in as fallback for older browsers
         "change input" : "updateModel",
         "change textarea" : "updateModel",
         'click .remove-course-introduction-video' : "removeVideo",
         'focus #course-overview' : "codeMirrorize",
-    //    'focus #course-tags' : "codeMirrorize",
         'mouseover #timezone' : "updateTime",
-        // would love to move to a general superclass, but event hashes don't inherit in backbone :-(
         'focus :input' : "inputFocus",
         'blur :input' : "inputUnfocus"
 
@@ -43,27 +40,30 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
 
         this.$el.find('#' + this.fieldToSelectorMap['overview']).val(this.model.get('overview'));
         this.codeMirrorize(null, $('#course-overview')[0]);
+
+
+        // подставляет в поле с тэгом значение из базы
         this.$el.find('#' + this.fieldToSelectorMap['tags']).val(this.model.get('tags'));
 
-        //this.codeMirrorize(null, $('#course-tags')[0]);
         appended_tags = this.model.get('tags');
-        if (!appended_tags){
-            tags_dict = []
+
+        // Если значение непусто - парсим, иначе подставляем пустое значение по умолчанию.
+        // Этот объект съест дерево
+        if (appended_tags){
+            tags_dict = JSON.parse(appended_tags);
         }
         else{
-            tags_dict = JSON.parse(appended_tags);
+            tags_dict = []
         }
 
       $(function(){
-        // Initialize the tree inside the <div>element.
-        // The tree structure is read from the contained <ul> tag.
+        // Инициализация дерева
         $("#tree").dynatree({
           children: tags_dict,
-          title: "Programming Sample",
+          title: "Дерево тэгов",
           onActivate: function(node) {
             $("#tag-title").val(node.data.title);
             $("#current").css("visibility","visible");
-    //        alert(node.getKeyPath());
             if( node.data.url )
               window.open(node.data.url, node.data.target);
           },
@@ -72,17 +72,20 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
           },
 
           dnd: {
+
+              // описывает, что происходит при перетаскивании элементов внутри дерева
+
               preventVoidMoves: true, // Prevent dropping nodes 'before self', etc.
               onDragStart: function(node) {
                 return true;
               },
               onDragEnter: function(node, sourceNode) {
+
+                // есть два состояния: перетащить после элемента и засунуть внутрь элемента
                 return ["after", "over"];
               },
               onDrop: function(node, sourceNode, hitMode, ui, draggable) {
-                /** This function MUST be defined to enable dropping of items on
-                 *  the tree.
-                 */
+                // при отпускании совершаем перемещение и сохраняем
                 sourceNode.move(node, hitMode);
                 saveTree();
               }
@@ -90,54 +93,66 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
 
         });
 
+        // добавление тэга
         $("#btnAddCode").click(function(){
+          var title;
+          if (title = prompt("Введите название для тэга")){
 
-          var rootNode = $("#tree").dynatree("getRoot");
-          var d = new Date();
-          var randval = "id" + d.getTime() + "_"  + Math.floor(Math.random() * 9999999 + 1);
-          var childNode = rootNode.addChild({
-            title: $('#new-tag-title').attr("value"),
-            isFolder: false,
-            key:randval
-          });
-          saveTree();
+              var rootNode = $("#tree").dynatree("getRoot");
+              var d = new Date();
+              var randval = "id" + d.getTime() + "_"  + Math.floor(Math.random() * 9999999 + 1);
+              var childNode = rootNode.addChild({
+                title: title,
+                isFolder: false,
+                key:randval
+              });
+              saveTree();
+          }
         });
 
 
+        // изменение тэга
         $("#btnSetTitle").click(function(){
           var node = $("#tree").dynatree("getActiveNode");
           if( !node ) return;
           node.setTitle($('#tag-title').attr("value"));
           saveTree();
-          // this is a shortcut for
-          // node.fromDict({title: node.data.title + new Date()});
         });
 
+        // удаление тэга
         $("#btnDelete").click(function(){
-          var node = $("#tree").dynatree("getActiveNode");
-          if( !node ) return;
-          node.remove();
-          saveTree();
-          // this is a shortcut for
-          // node.fromDict({title: node.data.title + new Date()});
+          if (confirm("Вы уверены, что хотите удалить этот тэг? Связь с соответствущими тэгу заданиями будет удалена")){
+              var node = $("#tree").dynatree("getActiveNode");
+              if( !node ) return;
+              node.remove();
+              saveTree();
+          }
+
         });
+
+        // Сохранение дерева: приведение к правильному json-у того, что получилось в дереве.
+        // Извращение связано с тем, что при инициализации создаётся корень дерева, к которому
+        // присоединяются потомки. Соотвественно, при сохранении пустой корень дерева удаляется,
+        // т.к. иначе идёт нарастание вложенности.
         function saveTree(){
           var top_level_tags = $("#tree").dynatree("getRoot").getChildren();
 
-          var output_json;
-          $.each(top_level_tags, function(index, value) {
+          var output_json = "";
+          if (top_level_tags){
+            $.each(top_level_tags, function(index, value) {
               if (index == 0){
                   output_json = JSON.stringify(value.toDict(true));
               } else {
                   output_json = output_json + "," + JSON.stringify(value.toDict(true));
               }
             });
+          }
 
           output_json = "[" + output_json + "]";
-          //toDict(true);
-         // var nodeList = rootNode.getChildren();
-          //alert(JSON.stringify(dict));
+
+          // сначала - в невидимое поле
           $('#course-tags').val(output_json);
+          // затем - запрос к базе
           _this.setAndValidate("tags", output_json);
 
         };

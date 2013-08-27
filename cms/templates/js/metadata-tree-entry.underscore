@@ -1,5 +1,13 @@
 <%
+    // достаём урл, необходим для модели
+    // нужно переделать и доставать более уместным образом, нежели выдёргивание из ссылки, имеющейся на странице
+
+    var urlRoot = $('.nav-course-settings-schedule a').attr("href") + '/section/details';
     var d = new Date();
+
+    // эта переменная спасает в ситуации нескольких заданий на странице
+
+    var randval;
     randval = Math.floor(Math.random() * 99999 + 1);
     randval = "tag" + d.getTime() + "_" +randval;
 
@@ -22,13 +30,16 @@ var appended_tags;
 
                 CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
                     initialize : function() {
-                        //alert("!!"+randval);
-                        //this.$el.find('#course-tags').text(this.model.get('tags'));
+
+                        // достаём тэги для этого курса
                         appended_tags = this.model.get('tags');
 
+                        // а это уже сопоставленные тэги для этой задачи
                         selected_tags = ($(".tags." + randval).val()).split(",");
 
                         tags_dict = JSON.parse(appended_tags);
+
+                        // построение дерева с чекбоксами
                         $(".tree-of-tags." + randval).dynatree({
                           checkbox: true,
                           selectMode: 2,
@@ -38,12 +49,11 @@ var appended_tags;
 
 
                           onSelect: function(select, node) {
+                          // при отметке чекбокса идёт отправка списка проставленных элементов в поле
                             var selNodes = node.tree.getSelectedNodes();
                             var selKeys = $.map(selNodes, function(node){
                                  return "" + node.data.key + "";
                             });
-
-
                             $(".tags." + randval).val(selKeys.join(","));
                           },
                           onClick: function(node, event) {
@@ -73,8 +83,6 @@ var appended_tags;
                     }
                 });
 
-
-              //alert(appended_tags);
               var model = new CMS.Models.Settings.CourseDetails();
               model.urlRoot = urlRoot;
               model.fetch({
@@ -87,10 +95,6 @@ var appended_tags;
                 },
                 reset: true
               });
-
-
-    // Attach the dynatree widget to an existing <div id="tree"> element
-    // and pass the tree options as an argument to the dynatree() function:
 
  });
 
