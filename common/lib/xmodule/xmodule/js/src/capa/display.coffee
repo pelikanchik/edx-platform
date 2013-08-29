@@ -204,7 +204,7 @@ class @Problem
       $('.check').click()
 
 
-  ###
+###
 # 'check_fd' uses FormData to allow file submissions in the 'problem_check' dispatch,
 # in addition to simple querystring-based answers
 #
@@ -383,10 +383,6 @@ class @Problem
       saveMessage = response.msg
       @gentle_alert saveMessage
       @updateProgress response
-
-  return_video: =>
-    $('#vert-0').show()
-    $('#vert-1').hide()
 
   refreshMath: (event, element) =>
     element = event.target unless element

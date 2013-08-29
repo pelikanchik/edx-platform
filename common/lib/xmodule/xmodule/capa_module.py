@@ -188,6 +188,12 @@ class CapaFields(object):
         scope=Scope.settings,
         default=True
     )
+    problem_time = String(
+        display_name=u"Время показа видео",
+        help=u"Укажите момент показа задачи в виде HH:MM:SS",
+        scope=Scope.settings,
+        default=None
+    )
     text_customization = Dict(
         help="String customization substitutions for particular locations",
         scope=Scope.settings
@@ -578,9 +584,18 @@ class CapaModule(CapaFields, XModule):
             check_button = False
 
         show_return_to_video_button = True
+        problem_time_to_show = -1
 
         if self.problem_now:
             show_return_to_video_button = False
+        else:
+            hours = self.problem_time[0:2]
+            minutes = self.problem_time[3:5]
+            seconds = self.problem_time[6:8]
+            hours_int = int(hours)
+            minutes_int = int(minutes)
+            seconds_int = int(seconds)
+            problem_time_to_show = hours_int*3600+minutes_int*60+seconds_int
 
         content = {'name': self.display_name_with_default,
                    'html': html,
@@ -596,6 +611,7 @@ class CapaModule(CapaFields, XModule):
                    'attempts_allowed': self.max_attempts,
                    'delay_answers': self.showbuttonanswer,
                    'problem_now': self.problem_now,
+                   'problem_time': problem_time_to_show,
                    'return_to_video_button': show_return_to_video_button,
                    'check_answer': self.checkanswer,
                    'progress': self.get_progress(),
