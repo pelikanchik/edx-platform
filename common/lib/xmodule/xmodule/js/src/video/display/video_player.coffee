@@ -146,13 +146,14 @@ class @VideoPlayer extends Subview
     @$(".vidtime").html(progress)
     @caption.updatePlayTime(time)
     @progressSlider.updatePlayTime(time, @duration())
-    if Time.format(@duration() - time) == "0:00"
-      @player.pauseVideo()
-      problem = $("#vert-1").html()
-      $(@video.id).hide()
-      $('#video_player_yt').html(problem)
-      #$.postWithPrefix "#{@el.data('show-problem-id')}/problem_get", (response) =>
-      #   @el.html(response.html)
+    int_time = parseInt(time)
+    _problems_time = @problems_time()
+    for t, i in _problems_time
+      if (t is int_time)
+        @pause()
+        r = i+1
+        problem = $("#vert-"+r).html()
+        $("#video_player_yt").html(problem)
 
   toggleFullScreen: (event) =>
     event.preventDefault()
@@ -173,6 +174,12 @@ class @VideoPlayer extends Subview
 
   pause: =>
     @player.pauseVideo() if @player.pauseVideo
+
+  problems_time: ->
+    @video.getProblems_time()
+
+  problems_id: ->
+    @video.getProblems_id()
 
   duration: ->
     @video.getDuration()

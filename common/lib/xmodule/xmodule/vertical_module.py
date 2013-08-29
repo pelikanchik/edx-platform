@@ -36,6 +36,10 @@ class VerticalModule(VerticalFields, XModule):
                 'progress_detail': Progress.to_js_detail_str(self.get_progress()),
                 'type': child.get_icon_class(),
                 'show_now': 'true' if child.get_icon_class() == 'video' or child.problem_now else 'false',
+                'problem_time': child.problem_time if child.get_icon_class() == 'problem' else
+                [{"id": child2.id  if child2.get_icon_class() == 'problem' else "video",
+                  "time": child2.problem_time if child2.get_icon_class() == 'problem' else "video",
+                  } for child2 in self.get_display_items()],
             } for child in self.get_display_items()]
 
         return self.system.render_template('vert_module.html', {

@@ -17,11 +17,12 @@ div.video {
 
     section.video-player {
       height: 0;
-      //overflow: hidden;
+      overflow: auto;
       padding-bottom: 56.25%;
       position: relative;
 
-      object, iframe {
+      object, iframe, div.problem {
+        display: block;
         border: none;
         height: 100%;
         left: 0;
@@ -486,7 +487,7 @@ div.video {
     height: 100%;
     left: 0;
     margin: 0;
-    overflow: hidden;
+    overflow: auto;
     padding: 0;
     position: fixed;
     top: 0;

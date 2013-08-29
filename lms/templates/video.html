@@ -34,9 +34,12 @@
     <div class="tc-wrapper">
       <article class="video-wrapper">
         <section class="video-player" id="video_player_yt"  style="display: block">
-          <div id="${id}" style="display: block"></div>
+          <div class="problem" id="frame_problem"></div>
+          <div id="${id}"></div>
         </section>
-        <section class="video-controls"></section>
+        <section class="video-controls">
+          <button class="return-to-video" id="return_to_video_${id}" style="display: none">Вернуться к видео</button>
+        </section>
       </article>
     </div>
   </div>

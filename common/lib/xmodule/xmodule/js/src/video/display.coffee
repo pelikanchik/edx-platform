@@ -36,6 +36,43 @@ class @Video
     if @el.data('youtube-id-1-5')
       @videos['1.50'] = @el.data('youtube-id-1-5')
 
+  getProblems_time: ->
+    @problems_time = []
+    try
+      jsonchik = $("#vert-0").data('problem_time');
+      jsoncheg = jsonchik.replace(/'/g,'"').replace(/: u"/g,': "');
+      obj_id_time = JSON.parse(jsoncheg);
+      problems_count = 0
+      for elem in obj_id_time
+        if elem.time != 'video'
+          hours = elem.time.substr(0,2)
+          minutes = elem.time.substr(3,2)
+          seconds = elem.time.substr(6,2)
+          int_hours = parseInt(hours)
+          int_minutes = parseInt(minutes)
+          int_seconds = parseInt(seconds)
+          time_to_show = int_hours*3600 + int_minutes*60 + int_seconds
+          @problems_time[problems_count] = time_to_show
+          problems_count++
+    catch error
+      console.log("You're in CMS")
+    @problems_time
+
+  getProblems_id: ->
+    @problems_id = []
+    try
+      jsonchik = $("#vert-0").data('problem_time');
+      jsoncheg = jsonchik.replace(/'/g,'"').replace(/: u"/g,': "');
+      obj_id_time = JSON.parse(jsoncheg);
+      problems_count = 0
+      for elem in obj_id_time
+        if elem.time != 'video'
+          @problems_id[problems_count] = elem.id
+          problems_count++
+    catch error
+      console.log("You're in CMS")
+    @problems_id
+
   parseSpeed: ->
     @setSpeed($.cookie('video_speed'))
     @speeds = ($.map @videos, (url, speed) -> speed).sort()
