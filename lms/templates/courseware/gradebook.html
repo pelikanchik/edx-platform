@@ -37,7 +37,7 @@
 <section class="container">
 <div class="gradebook-wrapper">
   <section class="gradebook-content">
-    <h1>${_("Gradebook")}</h1>
+    <h1>Дневник</h1>
 
     <table class="student-table">
       <thead>
@@ -71,7 +71,7 @@
         <thead>
           <tr> <!-- Header Row -->
             %for section in templateSummary['section_breakdown']:
-              <th><div class="assignment-label">${section['label']}</div></th>
+              <th><div class="assignment-label">${section['label'].decode("utf-8")}</div></th>
             %endfor
             <th><div class="assignment-label">Total</div></th>
           </tr>

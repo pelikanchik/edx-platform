@@ -155,25 +155,25 @@ describe 'Problem', ->
     describe 'when the response is correct', ->
       it 'call render with returned content', ->
         spyOn($, 'postWithPrefix').andCallFake (url, answers, callback) ->
-          callback(success: 'correct', contents: 'Correct!')
+          callback(success: 'correct', contents: 'Верно!')
         @problem.check()
-        expect(@problem.el.html()).toEqual 'Correct!'
+        expect(@problem.el.html()).toEqual 'Верно!'
 
     describe 'when the response is incorrect', ->
       it 'call render with returned content', ->
         spyOn($, 'postWithPrefix').andCallFake (url, answers, callback) ->
-          callback(success: 'incorrect', contents: 'Incorrect!')
+          callback(success: 'incorrect', contents: 'Неверно!')
         @problem.check()
-        expect(@problem.el.html()).toEqual 'Incorrect!'
+        expect(@problem.el.html()).toEqual 'Неверно!'
 
     # TODO: figure out why failing
     xdescribe 'when the response is undetermined', ->
       it 'alert the response', ->
         spyOn window, 'alert'
         spyOn($, 'postWithPrefix').andCallFake (url, answers, callback) ->
-          callback(success: 'Number Only!')
+          callback(success: 'Только числа!')
         @problem.check()
-        expect(window.alert).toHaveBeenCalledWith 'Number Only!'
+        expect(window.alert).toHaveBeenCalledWith 'Только число!'
 
   describe 'reset', ->
     beforeEach ->
@@ -226,7 +226,7 @@ describe 'Problem', ->
       it 'toggle the show answer button', ->
         spyOn($, 'postWithPrefix').andCallFake (url, callback) -> callback(answers: {})
         @problem.show()
-        expect($('.show .show-label')).toHaveText 'Hide Answer(s)'
+        expect($('.show .show-label')).toHaveText 'Скрыть ответ(ы)'
 
       it 'add the showed class to element', ->
         spyOn($, 'postWithPrefix').andCallFake (url, callback) -> callback(answers: {})
@@ -323,7 +323,7 @@ describe 'Problem', ->
 
       it 'toggle the show answer button', ->
         @problem.show()
-        expect($('.show .show-label')).toHaveText 'Show Answer(s)'
+        expect($('.show .show-label')).toHaveText 'Показать ответ(ы)'
 
       it 'remove the showed class from element', ->
         @problem.show()

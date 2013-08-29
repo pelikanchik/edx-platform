@@ -8,9 +8,7 @@
 %>
 <%inherit file="main.html" />
 
-<%namespace name='static' file='static_content.html'/>
-
-<%block name="title"><title>${_("Dashboard")}</title></%block>
+<%block name="title"><title>Кабинет</title></%block>
 
 <%block name="js_extra">
   <script type="text/javascript">
@@ -29,7 +27,7 @@
           $("#unenroll_course_id").val() + "&enrollment_action=unenroll";
       } else {
         $('#unenroll_error').html(
-          xhr.responseText ? xhr.responseText : "An error occurred. Please try again later."
+          xhr.responseText ? xhr.responseText : "Ошибка! Попробуйте ещё раз немного позже."
         ).stop().css("display", "block");
       }
     });
@@ -50,11 +48,13 @@
                {"new_email" : new_email, "password" : new_password},
                function(data) {
                  if (data.success) {
-                   $("#change_email_title").html("Please verify your new email");
-                   $("#change_email_form").html("<p>You'll receive a confirmation in your " +
-                                                "in-box. Please click the link in the " +
-                                                "email to confirm the email change.</p>");
-                   $("#change_email_form").html("<p>${_('You\'ll receive a confirmation in your in-box. Please click the link in the email to confirm the email change.')}</p>");
+
+                   $("#change_email_title").html("Пожалуйста, подтвердите ваш e-mail");
+                   $("#change_email_form").html("<p>Вы получите подтверждение на ваш " +
+                                                "e-mail. Пожалуйста, перейдите по " +
+                                                "указанной в письме ссылке.</p>");
+                   $("#change_email_form").html("<p>Вы получите письмо на ваш e-mail. Перейдите по указанной в письме ссылке</p>");
+
                  } else {
                    $("#change_email_error").html(data.error).stop().css("display", "block");
                  }
@@ -98,19 +98,24 @@
     <section class="user-info">
       <ul>
         <li>
-          <span class="title"><div class="icon name-icon"></div>${_("Full Name")} (<a href="#apply_name_change" rel="leanModal" class="edit-name">${_("edit")}</a>)</span> <span class="data">${ user.profile.name | h }</span>
+          <span class="title"><div class="icon name-icon"></div>Полное имя (<a href="#apply_name_change" rel="leanModal" class="edit-name">изменить</a>)</span> <span class="data">${ user.profile.name | h }</span>
+
         </li>
         <li>
           <span class="title"><div class="icon email-icon"></div>${_("Email")}
             % if external_auth_map is None or 'shib' not in external_auth_map.external_domain:
-            (<a href="#change_email" rel="leanModal" class="edit-email">${_("edit")}</a>)
+
+            (<a href="#change_email" rel="leanModal" class="edit-email">изменить</a>)
+
             % endif
           </span> <span class="data">${ user.email | h }</span>
         </li>
 
         % if external_auth_map is None or 'shib' not in external_auth_map.external_domain:
         <li>
-          <span class="title"><a href="#password_reset_complete" rel="leanModal" id="pwd_reset_button">${_("Reset Password")}</a></span>
+
+          <span class="title"><a href="#password_reset_complete" rel="leanModal" id="pwd_reset_button">Изменить пароль</a></span>
+
           <form id="password_reset_form" method="post" data-remote="true" action="${reverse('password_reset')}">
             <input id="id_email" type="hidden" name="email" maxlength="75" value="${user.email}" />
             <!-- <input type="submit" id="pwd_reset_button" value="${_('Reset Password')}" /> -->
@@ -125,7 +130,7 @@
 
   <section class="my-courses">
     <header>
-      <h2>${_("Current Courses")}</h2>
+      <h2>Текущие курсы</h2>
     </header>
 
     % if len(courses) > 0:
@@ -152,11 +157,13 @@
             <hgroup>
               <p class="date-block">
               % if course.has_ended():
-              ${_("Course Completed - {end_date}").format(end_date=course.end_date_text)}
+
+              Занятия окончились ${course.end_date_text}
               % elif course.has_started():
-              ${_("Course Started - {start_date}").format(start_date=course.start_date_text)}
+              Занятия начались ${course.start_date_text}
               % else:   # hasn't started yet
-              ${_("Course Starts - {start_date}").format(start_date=course.start_date_text)}
+              Начало занятий: ${course.start_date_text}
+
               % endif
               </p>
               <h2 class="university">${get_course_about_section(course, 'university')}</h2>
@@ -244,7 +251,7 @@
                            ${"{0:.0f}%".format(float(course.lowest_passing_grade)*100)}</span>.
                       % elif cert_status['status'] == 'restricted':
                           <p class="message-copy">
-                          ${_("Your certificate is being held pending confirmation that the issuance of your certificate is in compliance with strict U.S. embargoes on Iran, Cuba, Syria and Sudan. If you think our system has mistakenly identified you as being connected with one of those countries, please let us know by contacting {email}.").format(email='<a class="contact-link" href="mailto:{email}">{email}</a>.'.format(email=settings.CONTACT_EMAIL))}
+                          Ошибка
                           </p>
                       % endif
                       </p>
@@ -254,12 +261,14 @@
                   <ul class="actions">
                     % if cert_status['show_disabled_download_button']:
                       <li class="action"><span class="disabled">
-                          ${_("Your Certificate is Generating")}</span></li>
+
+                          Ваш сертификат генерируется</span></li>
                     % elif cert_status['show_download_url']:
                       <li class="action">
                       <a class="btn" href="${cert_status['download_url']}"
-                         title="${_('This link will open/download a PDF document')}">
-                         Download Your PDF Certificate</a></li>
+                         title="This link will open/download a PDF document">
+                         Скачать сертификат в PDF</a></li>
+
                     % endif
 
                     % if cert_status['show_survey_button']:
@@ -274,12 +283,14 @@
 
             % if course.id in show_courseware_links_for:
               % if course.has_ended():
-                <a href="${course_target}" class="enter-course archived">${_('View Archived Course')}</a>
+
+                <a href="${course_target}" class="enter-course archived">Посмотреть архивный курса</a>
               % else:
-                <a href="${course_target}" class="enter-course">${_('View Course')}</a>
+                <a href="${course_target}" class="enter-course">Посмотреть курс</a>
               % endif
             % endif
-            <a href="#unenroll-modal" class="unenroll" rel="leanModal" data-course-id="${course.id}" data-course-number="${course.number}">${_('Unregister')}</a>
+            <a href="#unenroll-modal" class="unenroll" rel="leanModal" data-course-id="${course.id}" data-course-number="${course.number}">Не участвовать в курсе</a>
+
           </section>
         </article>
 
@@ -288,16 +299,18 @@
       % endfor
     % else:
       <section class="empty-dashboard-message">
-        <p>${_("Looks like you haven't registered for any courses yet.")}</p>
+
+        <p>По всей видимости, вы ещё не зарегистрированы ни на один курс.</p>
         <a href="${marketing_link('COURSES')}">
-            ${_("Find courses now!")}
+            Найти курс!
         </a>
       </section>
     % endif
 
     % if staff_access and len(errored_courses) > 0:
       <div id="course-errors">
-        <h2>${_("Course-loading errors")}</h2>
+
+        <h2>Ошибка при загрузке курса</h2>
 
       % for course_dir, errors in errored_courses.items():
          <h3>${course_dir | h}</h3>
@@ -316,7 +329,7 @@
 <section id="unenroll-modal" class="modal unenroll-modal">
   <div class="inner-wrapper">
     <header>
-      <h2>${_('Are you sure you want to unregister from {course_number}?').format(course_number='<span id="unenroll_course_number"></span>')}</h2>
+      <h2>Вы твердо решили больше не участвовать в курсе?</h2>
       <hr/>
     </header>
 
@@ -326,7 +339,7 @@
       <input name="course_id" id="unenroll_course_id" type="hidden" />
       <input name="enrollment_action" type="hidden" value="unenroll" />
       <div class="submit">
-        <input name="submit" type="submit" value="Unregister" />
+        <input name="submit" type="submit" value="Да" />
       </div>
     </form>
 
@@ -341,13 +354,14 @@
 <section id="password_reset_complete" class="modal">
   <div class="inner-wrapper">
     <header>
-      <h2>${_('Password Reset Email Sent')}</h2>
+      <h2>Письмо о смене пароля отправлено</h2>
       <hr/>
     </header>
     <div>
       <form> <!-- Here for styling reasons -->
         <section>
-          <p>${_('An email has been sent to {email}. Follow the link in the email to change your password.').format(email=user.email)}</p>
+          <p>Письмо было отправлено на адрес: ${user.email}. Перейдите по указанной в письме ссылке для смены пароля.</p>
+
         </section>
       </form>
     </div>
@@ -362,7 +376,9 @@
 <section id="change_email" class="modal">
   <div class="inner-wrapper">
     <header>
-      <h2><span id="change_email_title">${_("Change Email")}</span></h2>
+
+      <h2><span id="change_email_title">Изменить e-mail</span></h2>
+
       <hr/>
     </header>
     <div id="change_email_body">
@@ -370,16 +386,18 @@
         <div id="change_email_error" class="modal-form-error"> </div>
         <fieldset>
           <div class="input-group">
-            <label>${_('Please enter your new email address:')}</label>
+
+            <label>Пожалуйста, введите новый e-mail:</label>
             <input id="new_email_field" type="email" value="" />
-            <label>${_('Please confirm your password:')}</label>
+            <label>Подтвердите пароль:</label>
             <input id="new_email_password" value="" type="password" />
           </div>
           <section>
-            <p>${_('We will send a confirmation to both {email} and your new email as part of the process.').format(email=user.email)}</p>
+            <p>Мы отправим подтверждение на оба адреса: на ${user.email} и новый e-mail.</p>
           </section>
           <div class="submit">
-            <input type="submit" id="submit_email_change" value="${_('Change Email')}"/>
+            <input type="submit" id="submit_email_change" value="Изменить"/>
+
           </div>
         </fieldset>
       </form>
@@ -395,23 +413,25 @@
 <section id="apply_name_change" class="modal">
   <div class="inner-wrapper">
     <header>
-      <h2>${_("Change your name")}</h2>
+
+      <h2>Изменить имя</h2>
       <hr/>
     </header>
     <div id="change_name_body">
       <form id="change_name_form">
         <div id="change_name_error" class="modal-form-error"> </div>
-        <p>${_("To uphold the credibility of {platform} certificates, all name changes will be logged and recorded.").format(platform=settings.PLATFORM_NAME)}</p>
+
+
         <br/>
         <fieldset>
           <div class="input-group">
-            <label>${_("Enter your desired full name, as it will appear on the {platform} certificates:").format(platform=settings.PLATFORM_NAME)}</label>
+            <label>Введите ваше полное имя: </label>
             <input id="new_name_field" value="" type="text" />
-            <label>${_("Reason for name change:")}</label>
+            <label>Причина смены имени:</label>
             <textarea id="name_rationale_field" value=""></textarea>
           </div>
           <div class="submit">
-            <input type="submit" id="submit" value="${_('Change My Name')}">
+            <input type="submit" id="submit" value="Изменить">
           </div>
         </fieldset>
       </form>

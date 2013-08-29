@@ -42,6 +42,7 @@ def get_course_by_id(course_id, depth=0):
     If course_id is not valid, raises a 404.
     depth: The number of levels of children for the modulestore to cache. None means infinite depth
     """
+
     try:
         course_loc = CourseDescriptor.id_to_location(course_id)
         return modulestore().get_instance(course_id, course_loc, depth=depth)
@@ -138,17 +139,24 @@ def get_course_about_section(course, section_key):
     if section_key in ['short_description', 'description', 'key_dates', 'video',
                        'course_staff_short', 'course_staff_extended',
                        'requirements', 'syllabus', 'textbook', 'faq', 'more_info',
-                       'number', 'instructors', 'overview',
+                       'number', 'instructors', 'overview', 'tags',
                        'effort', 'end_date', 'prerequisites', 'ocw_links']:
 
         try:
+
 
             request = get_request_for_thread()
 
             loc = course.location._replace(category='about', name=section_key)
 
+
+
+            #print (request.user)
+            print (course.id)
             # Use an empty cache
             model_data_cache = ModelDataCache([], course.id, request.user)
+
+
             about_module = get_module(
                 request.user,
                 request,

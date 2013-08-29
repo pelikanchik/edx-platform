@@ -2,7 +2,7 @@
 
 <%inherit file="main.html" />
 <%namespace name='static' file='static_content.html'/>
-<%block name="title"><title>${_("{course_number} Textbook").format(course_number=course.display_number_with_default) | h}</title></%block>
+<%block name="title"><title>Учебники</title></%block>
 
 <%block name="headextra">
 <%static:css group='course'/>
@@ -68,9 +68,9 @@ $("#open_close_accordion a").click(function(){
 <section class="container">
   <div class="book-wrapper">
 
-    <section aria-label="${_('Textbook Navigation')}" class="book-sidebar">
+    <section aria-label="Навигация" class="book-sidebar">
       <header id="open_close_accordion">
-        <a href="#">close</a>
+        <a href="#">закрыть</a>
       </header>
 
       <ul id="booknav" class="treeview-booknav">
@@ -111,10 +111,10 @@ $("#open_close_accordion a").click(function(){
         <nav>
           <ul>
             <li class="last">
-              <a href="javascript:prev_page()">${_('Previous page')}</a>
+              <a href="javascript:prev_page()">Предыдущая страница</a>
             </li>
             <li class="next">
-              <a href="javascript:next_page()">${_('Next page')}</a>
+              <a href="javascript:next_page()">Следующая страница</a>
             </li>
           </ul>
         </nav>

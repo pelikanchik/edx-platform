@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import logging
 from cStringIO import StringIO
 from math import exp
@@ -158,6 +159,7 @@ class CourseFields(object):
                  scope=Scope.settings)
     end = Date(help="Date that this class ends", scope=Scope.settings)
     advertised_start = String(help="Date that this course is advertised to start", scope=Scope.settings)
+    tags = String(help="", default = "", scope=Scope.settings)
     grading_policy = Dict(help="Grading policy definition for this class",
                           default={"GRADER": [
                               {
@@ -214,6 +216,7 @@ class CourseFields(object):
     advanced_modules = List(help="Beta modules used in your course", scope=Scope.settings)
     has_children = True
     checklists = List(scope=Scope.settings,
+#<<<<<<< HEAD
                       default=[
                           {"short_description": "Getting Started With Studio",
                            "items": [{"short_description": "Add Course Team Members",
@@ -327,8 +330,127 @@ class CourseFields(object):
                                       "action_url": "SettingsDetails",
                                       "action_text": "Edit Course Schedule &amp; Details",
                                       "action_external": False}]}
+#=======
+#        default=[
+#            {"short_description" : u"Начало работы со студией",
+#             "items" : [{"short_description": u"Добавить членов курса",
+#                         "long_description": u"Предоставьте вашим сотрудникам возможность отредактировать курс",
+#                         "is_checked": False,
+#                         "action_url": "ManageUsers",
+#                        "action_text":  u"Редактировать команду курса",
+#                         "action_external": False},
+#                        {"short_description": u"Назначьте важные даты для своего курса",
+#                         "long_description": u"Установите студенческую регистрацию своего курса и даты запуска на странице Деталей и расписания.",
+#                         "is_checked": False,
+#                         "action_url": "SettingsDetails",
+#                         "action_text": u"Редактировать детали и расписание",
+#                         "action_external": False},
+#                         {"short_description": u"Спроектируйте классификацию курса",
+#                         "long_description": u"Установите свои типы присвоения и политику классификации, даже если не создали все свои присвоения.",
+#                         "is_checked": False,
+#                         "action_url": "SettingsGrading",
+#                         "action_text": u"Редактировать систему оценивания",
+#                         "action_external": False},
+#                         {"short_description": u"Исследуйте другие контрольные списки студии",
+#                         "long_description": u"Обнаружьте другие доступные инструменты разработки курса и найдите справку, когда будете требовать ее",
+#                         "is_checked": False,
+#                         "action_url": "",
+#                         "action_text": "",
+#                         "action_external": False}]
+#            },
+ #           {"short_description" : u"Грубое заполнение курса",
+  #           "items" : [{"short_description": u"Создайте свой первый раздел и подраздел",
+   #                       "long_description": u"Используйте свою схему курса, чтобы создать ваш первый раздел и подраздел.",
+    #                      "is_checked": False,
+     #                     "action_url": "CourseOutline",
+      #                    "action_text":  u"Редактировать схему курса",
+       #                   "action_external": False},
+        #                 {"short_description": u"Назначьте даты выпуска раздела",
+         #                 "long_description": u"Определите даты выпуска каждого раздела в курсе. Разделы становятся видимыми студентам в их даты выпуска. ",
+          #                "is_checked": False,
+           #               "action_url": "CourseOutline",
+            #              "action_text": u"Редактировать схему курса",
+             #             "action_external": False},
+              #            {"short_description": u"Определите оцениваемые подразделы",
+               #           "long_description": u"Set a Subsection to be graded as a specific assignment type. Assignments within graded Subsections count toward a student's final grade.",
+                #          "is_checked": False,
+                 #         "action_url": "CourseOutline",
+                  #        "action_text": u"Редактировать схему курса",
+                   #       "action_external": False},
+                    #      {"short_description": u"Reordering Course Content",
+                     #     "long_description": u"Use drag and drop to reorder the content in your course.",
+                      #    "is_checked": False,
+                       #   "action_url": "CourseOutline",
+                        #  "action_text":  u"Редактировать схему курса",
+                         # "action_external": False},
+                          #{"short_description": u"Renaming Sections",
+#                          "long_description": u"Rename Sections by clicking the Section name from the Course Outline.",
+ #                         "is_checked": False,
+  #                        "action_url": "CourseOutline",
+   #                       "action_text":  u"Редактировать схему курса",
+    #                      "action_external": False},
+     #                     {"short_description": u"Deleting Course Content",
+      #                    "long_description": u"Delete Sections, Subsections, or Units you don't need anymore. Be careful, as there is no Undo function.",
+       #                   "is_checked": False,
+        #                  "action_url": "CourseOutline",
+         #                 "action_text":  u"Редактировать схему курса",
+          #                "action_external": False},
+           #               {"short_description": u"Add an Instructor-Only Section to Your Outline",
+            #              "long_description": u"Some course authors find using a section for unsorted, in-progress work useful. To do this, create a section and set the release date to the distant future.",
+             #             "is_checked": False,
+              #            "action_url": "CourseOutline",
+               #           "action_text":  u"Редактировать схему курса",
+                #          "action_external": False}]
+#            },
+ #           {"short_description" : u"Изучение способов поддержки студии",
+  #           "items" : [{"short_description": u"Explore the Studio Help Forum",
+   #                       "long_description": u"Access the Studio Help forum from the menu that appears when you click your user name in the top right corner of Studio.",
+    #                      "is_checked": False,
+     #                     "action_url": "http://help.edge.edx.org/",
+      #                    "action_text": "Visit Studio Help",
+       #                   "action_external": True},
+        #                 {"short_description": u"Enroll in edX 101",
+         #                 "long_description": u"Register for edX 101, edX's primer for course creation.",
+          #                "is_checked": False,
+           #               "action_url": "https://edge.edx.org/courses/edX/edX101/How_to_Create_an_edX_Course/about",
+            #              "action_text": "Register for edX 101",
+             #             "action_external": True},
+              #            {"short_description": u"Download the Studio Documentation",
+               #           "long_description": u"Download the searchable Studio reference documentation in PDF form.",
+                #          "is_checked": False,
+                 #         "action_url": "http://files.edx.org/Getting_Started_with_Studio.pdf",
+                  #        "action_text": "Download Documentation",
+                   #       "action_external": True}]
+#            },
+ #           {"short_description" : u"Заполнение общей информации о курсе",
+  #           "items" : [{"short_description": u"Draft a Course Description",
+   #                       "long_description": u"Courses on edX have an About page that includes a course video, description, and more. Draft the text students will read before deciding to enroll in your course.",
+    #                      "is_checked": False,
+     #                     "action_url": "SettingsDetails",
+      #                    "action_text": "Edit Course Schedule &amp; Details",
+       #                   "action_external": False},
+        #                 {"short_description": u"Add Staff Bios",
+         #                 "long_description": u"Showing prospective students who their instructor will be is helpful. Include staff bios on the course About page.",
+          #                "is_checked": False,
+           #               "action_url": "SettingsDetails",
+            #              "action_text": "Edit Course Schedule &amp; Details",
+             #             "action_external": False},
+              #            {"short_description": u"Add Course FAQs",
+               #           "long_description": u"Include a short list of frequently asked questions about your course.",
+                #          "is_checked": False,
+                 #         "action_url": "SettingsDetails",
+                  #        "action_text": "Edit Course Schedule &amp; Details",
+                   #       "action_external": False},
+                    #      {"short_description": u"Add Course Prerequisites",
+                     #     "long_description": u"Let students know what knowledge and/or skills they should have before they enroll in your course.",
+                      #    "is_checked": False,
+                       #   "action_url": "SettingsDetails",
+                        #  "action_text": "Edit Course Schedule &amp; Details",
+                         # "action_external": False}]
+#            }
+#>>>>>>> 4f9bf342df105f2a5f00372194e6f7a65dac6f8b
         ])
-    info_sidebar_name = String(scope=Scope.settings, default='Course Handouts')
+    info_sidebar_name = String(scope=Scope.settings, default=u'Раздаточные материалы')
     show_timezone = Boolean(help="True if timezones should be shown on dates in the courseware", scope=Scope.settings, default=True)
     enrollment_domain = String(help="External login method associated with user accounts allowed to register in course",
                                scope=Scope.settings)
@@ -807,7 +929,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
                 if result is None:
                     result = text.title()
                 else:
-                    result = result.strftime("%b %d, %Y")
+                    result = result.strftime("%d.%m.%Y")
             except ValueError:
                 result = text.title()
 
@@ -819,7 +941,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
             # TODO this is an impossible state since the init function forces start to have a value
             return 'TBD'
         else:
-            return (self.advertised_start or self.start).strftime("%b %d, %Y")
+            return (self.advertised_start or self.start).strftime("%d.%m.%Y")
 
     @property
     def end_date_text(self):
@@ -828,7 +950,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
 
         If the course does not have an end date set (course.end is None), an empty string will be returned.
         """
-        return '' if self.end is None else self.end.strftime("%b %d, %Y")
+        return '' if self.end is None else self.end.strftime("%d.%m.%Y")
 
     @property
     def forum_posts_allowed(self):
@@ -908,11 +1030,11 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
 
         @property
         def first_eligible_appointment_date_text(self):
-            return self.first_eligible_appointment_date.strftime("%b %d, %Y")
+            return self.first_eligible_appointment_date.strftime("%d.%m.%Y")
 
         @property
         def last_eligible_appointment_date_text(self):
-            return self.last_eligible_appointment_date.strftime("%b %d, %Y")
+            return self.last_eligible_appointment_date.strftime("%d.%m.%Y")
 
         @property
         def registration_end_date_text(self):

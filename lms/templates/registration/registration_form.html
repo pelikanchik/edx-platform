@@ -1,0 +1,52 @@
+{% extends "registration/base.html" %}
+
+{% block title %}Зарегистрироваться{% endblock %}
+
+{% block content %}
+
+  {% if form.errors %}
+  <p class="errors">Пожалуйста, исправьте ошибки ниже: {{ form.non_field_errors }}</p>
+  {% endif %}
+
+  <h1>Создать аккаунт</h1>
+  
+  <form method="post" action="" class="wide">
+{% csrf_token %}
+    <p>
+      <label for="id_username">Имя пользователя:</label>
+      {% if form.username.errors %}
+        <p class="errors">{{ form.username.errors.as_text }}</p>
+      {% endif %}
+      {{ form.username }}
+    </p>
+    <p>
+      <label for="id_email">Email:</label>
+      {% if form.email.errors %}
+        <p class="errors">{{ form.email.errors.as_text }}</p>
+      {% endif %}
+      {{ form.email }}
+    </p>
+    <p>
+      <label for="id_password1">Пароль:</label>
+      {% if form.password1.errors %}
+        <p class="errors">{{ form.password1.errors.as_text }}</p>
+      {% endif %}
+      {{ form.password1 }}
+    </p>
+    <p>
+      <label for="id_password2">Пароль (ещё раз):</label>
+      {% if form.password2.errors %}
+        <p class="errors">{{ form.password2.errors.as_text }}</p>
+      {% endif %}
+      {{ form.password2 }}
+    </p>
+    <p class="submit"><input type="submit" value="Зарегистрироваться &rarr;"></p>
+  </form>
+  
+{% endblock %}
+
+{% block content-related %}
+<p>Заполните поле слева (все поля необходимы), и ваш аккаунт будет создан; на указанный e-mail будет отправлено письмо с инструкцией и ссылкой для активации.</p>
+
+<p>Мы используем ваш e-mail только для того, чтобы отправить вам иструкцию для активации. Мы ненавидим спам так же, как и вы.</p>
+{% endblock %}

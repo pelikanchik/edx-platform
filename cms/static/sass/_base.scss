@@ -540,6 +540,13 @@ p, ul, ol, dl {
   }
 }
 
+a.show-graph-item{
+  text-align:right;
+  width:100%;
+  border-bottom: 1px dotted;
+//  visibility: hidden;
+}
+
 .item-actions {
   position: absolute;
   top: 5px;
@@ -904,4 +911,42 @@ body.hide-wip {
   .wip-box {
     display: none;
   }
+}
+
+
+.termConstructor {
+
+    padding: 1em; max-width: 655px;
+
+    input.value {width: 5em!important; border: 1px solid #ccc;}
+    p { margin-top: 0.9em; margin-bottom: 0.9em; }
+    select{font-size:0.8em; border:1px solid #ccc;padding: 2px; padding-right: 0px; }
+    img {cursor:pointer; padding:0; margin:0;}
+    TABLE, .liveExample TD, .liveExample TH { padding: 3px!important; border-width: 0; margin: 0; }
+    TD {padding: 3px!important;}
+    table.termEditor > tbody > TR { border-bottom: 1px solid silver; }
+    td input { font-size:0.8em!important;padding: 1px 4px;}
+
+}
+
+
+.save-subsection-button, .save-term {
+
+        background-color: #009FE6;
+        background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0));
+        border: 1px solid #007FB8;
+        border-radius: 3px 3px 3px 3px;
+        box-shadow: 0 1px 0 rgba(255, 255, 255, 0.3) inset, 0 0 0 transparent;
+        color: white;
+        display: inline-block;
+        font-size: 1.4rem!important;
+        font-weight: 700;
+        padding: 4px 20px 5px;
+        transition: background-color 0.15s ease 0s, box-shadow 0.15s ease 0s;
+        width: 200px!important;
+}
+
+.save-subsection-button-active, .save-term-active {
+        background-color: #007Fc6;
+        background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.3));
 }

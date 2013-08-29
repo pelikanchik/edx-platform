@@ -2,20 +2,20 @@
 <%inherit file="base.html" />
 <%! from django.core.urlresolvers import reverse %>
 <%namespace name="units" file="widgets/units.html" />
-<%block name="title">${_("Individual Unit")}</%block>
+<%block name="title">Редактирование элемента</%block>
 <%block name="bodyclass">is-signedin course unit</%block>
 
 <%block name="jsextra">
+
   <script type='text/javascript'>
   $(document).ready(function() {
-    new CMS.Views.UnitEdit({
+    __this = new CMS.Views.UnitEdit({
       el: $('.main-wrapper'),
       model: new CMS.Models.Module({
         id: '${unit_location}',
         state: '${unit_state}'
       })
     });
-
     $(document).ready(function() {
 
       // tabs
@@ -31,40 +31,307 @@
     var unit_location_analytics = '${unit_location}';
   </script>
 
+
+
+
+
+
 </%block>
 <%block name="content">
+
   <div class="main-wrapper edit-state-${unit_state}" data-id="${unit_location}">
+
     <div class="inner-wrapper">
       <div class="alert editing-draft-alert">
-        <p class="alert-message"><strong>${_("You are editing a draft.")}</strong>
+        <p class="alert-message"><strong>Вы редактируете черновик.</strong>
         % if published_date:
-        ${_("This unit was originally published on {date}.").format(date=published_date)}
+        Элемент будет опубликован ${published_date}.
         % endif
         </p>
-        <a href="${published_preview_link}" target="_blank" class="alert-action secondary">${_("View the Live Version")}</a>
+        <a href="${published_preview_link}" target="_blank" class="alert-action secondary">Текущая версия на сайте</a>
       </div>
       <div class="main-column">
         <article class="unit-body window">
-        <p class="unit-name-input"><label>${_("Display Name:")}</label><input type="text" value="${unit.display_name_with_default | h}" class="unit-display-name-input" /></p>
-          <ol class="components">
+          <p class="unit-name-input"><label>Название элемента:</label><input type="text" value="${unit.display_name_with_default | h}" class="unit-display-name-input" /></p>
+          <label>Условие для перенаправления:</label>
+
+
+            <script type='text/javascript' src='/static/js/knockout.js'></script>
+            <script type='text/javascript' src='/static/js/knockout-mapping.js'></script>
+            <script type='text/javascript' src='/static/js/numeric.js'></script>
+
+            <div id='termConstructor' class = 'termConstructor' style = "width: 100%;">
+                    <table class='termEditor' style = "width: 100%;">
+
+                        <tbody data-bind="foreach: disjunctions">
+                            <tr>
+
+                                <td rowspan = "2">
+                                    <div><img class = "close" src = "/static/img/Delete-icon.png" data-bind='click: $root.removeDisjunction'/></div>
+                                </td>
+                                <td>
+                                     перейти в
+                                     <select  data-bind='value: direct_element_id, valueUpdate: "afterkeydown"'>
+
+                                         % for every_unit in subsection.get_children():
+                                                <option value="${every_unit.url_name}">${every_unit.display_name_with_default}</option>
+                                          % endfor
+
+                                     </select>, если одновременно выполнены следующие условия:
+
+                                </td>
+
+                            </tr>
+                            <tr>
+
+                                <td align = "center">
+                                    <table>
+
+                                        <tbody data-bind="foreach: conjunctions">
+                                            <tr>
+
+                                                <td>
+
+                                                <select data-bind='value: source_element_id, valueUpdate: "afterkeydown"'>
+
+                                                      % for every_unit in subsection.get_children():
+                                                            <option value="${every_unit.url_name}">${every_unit.display_name_with_default}</option>
+                                                       % endfor
+
+                                                </select>
+
+                                                </td>
+
+
+                                                <td>
+                                                    <select  data-bind='value: field, valueUpdate: "afterkeydown"'>
+                                                        <option value="score_abs">Результат (абсолютный)</option>
+                                                        <option value="score_rel">Результат (относительный, %)</option>
+                                                    </select>
+                                                </td>
+                                                <td>
+
+                                                    <select  data-bind='value: sign, valueUpdate: "afterkeydown"'>
+                                                        <option value="more">&#62;</option>
+                                                        <option value="more-equals">&#8805;</option>
+                                                        <option value="equals">=</option>
+                                                        <option value="less-equals">&#8804;</option>
+                                                        <option value="less">&#60;</option>
+                                                    </select>
+
+                                                </td>
+                                                <td><input data-bind='value: value, valueUpdate: "afterkeydown"' class = "value" /></td>
+                                                <td style="vertical-align: middle"><img width="20" src = "/static/img/edit_remove.png"  data-bind='click: $root.removeConjunction' class = "del" /></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                     <div style = "width:100%">
+                                         <img class = "add" src  = "/static/img/plus_16.png" data-bind='click: $root.addConjunction' />
+                                     </div>
+
+
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                 <div style="width: 100%; padding:10px 0px ">
+                    <img class = "add" style="width:20px; margin: 3px;" src = "/static/img/plus_32.png" data-bind='click: addDisjunction' />
+                </div>
+                </div>
+
+                <input disabled data-bind='value: term_string'  style="font-size: 10px; display:none;"  type="text" class="unit-direct-term-input" />
+
+                  <p class="unit-term-input" style="text-align: center;"> <input type="button" class = "save-term" value = "Сохранить" style="width:200px;margin:auto 0;" /></p>
+
+          <script>
+
+            var input_json = '${unit.direct_term_with_default|h}'.replace(/\&#34;/g, '"');
+            //var dataFromDB = ko.utils.parseJson(unlock_term).disjunctions;
+            //var input_json = '[{"direct_element_id":"95bbd1de07d744e8a114f3a61c405c91","disjunctions":[{"conjunctions":[{"source_element_id":"95bbd1de07d744e8a114f3a61c405c91","field":"score_rel","sign":"less","value":"111"}]},{"conjunctions":[{"source_element_id":"95bbd1de07d744e8a114f3a61c405c91","field":"score_abs","sign":"more","value":"999"}]}]}]';
+            /*var initialData = [
+                    {
+                        direct_element_id: ko.observable(),
+                        conjunctions: [
+                        { source_element_id: ko.observable(), field: "score_rel" , sign: "less" , value: "5" }]
+                   }
+               ];*/
+
+
+            // входная строка преобразуется из json в объект и приводим к виду, с которым работает конструктор
+            var input_structure = [];
+            var input_dict = jQuery.parseJSON(input_json);
+            $.each(input_dict, function(){
+               itself = this;
+               var disjunctions = [];
+               $.each(itself.disjunctions, function(){
+                    input_structure.push({
+                        direct_element_id:itself.direct_element_id,
+                        conjunctions:this.conjunctions
+                    });
+               });
+            });
+
+            //var output_json = ko.toJSON(input_structure);
+            //console.log(output_json);
+
+            var DisjunctionsModel = function(disjunctions) {
+                var self = this;
+
+                self.disjunctions = ko.mapping.fromJS(input_structure);
+
+                self.addDisjunction = function() {
+                    self.disjunctions.push({
+                        direct_element_id: ko.observable(),
+                        conjunctions: ko.observableArray([{
+                            source_element_id: ko.observable(),
+                            field: ko.observable("score_abs"),
+                            sign: ko.observable("more"),
+                            value: ko.observable("0")
+                        }])
+                    });
+
+                    check_numeric();
+                    hovers();
+                };
+
+                self.removeDisjunction = function(disjunction) {
+                    self.disjunctions.remove(disjunction);
+
+                };
+
+                self.addConjunction = function(disjunction) {
+                    disjunction.conjunctions.push({
+                        source_element_id: ko.observable(),
+                        field: ko.observable("score_abs"),
+                        sign: ko.observable("more"),
+                        value: ko.observable("0")
+                    });
+                    check_numeric();
+                    hovers();
+                };
+
+                self.removeConjunction = function(conjunction) {
+                    $.each(self.disjunctions(), function() { this.conjunctions.remove(conjunction) })
+                };
+
+                // объект, полученный на выходе после работы конструктора, преобразуется обратно в канонический вид.
+
+                self.term_string = ko.computed(function () {
+
+                    var output_json = ko.toJSON({disjunctions: self.disjunctions});
+                    var output_dict = jQuery.parseJSON(output_json).disjunctions;
+
+                    var elements = [];
+                    var elements_id = [];
+
+                    $.each(output_dict, function(){
+
+                        var disjunctions = [];
+
+                               itself = this;
+                               //element_id = itself.direct_element_id;
+
+                               if ($.inArray(itself.direct_element_id,elements_id)==-1){
+
+                                   $.each(output_dict, function(){
+                                       if (itself.direct_element_id == this.direct_element_id){
+                                           disjunctions.push({conjunctions:this.conjunctions});
+                                       }
+                                   });
+
+
+                                   elements.push({
+                                       direct_element_id: itself.direct_element_id,
+                                       disjunctions:disjunctions
+                                   });
+
+
+                                   elements_id.push(itself.direct_element_id);
+
+                               };
+                        }
+                    );
+                    var output_json = ko.toJSON(elements);
+
+                    return output_json;
+
+                });
+
+                function update(){
+                    self.lastSavedJson(JSON.stringify(ko.toJS({disjunctions: self.disjunctions}), null, 0));
+                }
+            };
+
+            ko.applyBindings(new DisjunctionsModel());
+
+
+            function hovers(){
+                $("img.close").hover(
+                    function () {
+                        $(this).parent().parent().parent().css("background-color","#fcc");
+                        $(this).parent().parent().parent().next().css("background-color","#fcc");
+                    },
+                    function () {
+                        $(this).parent().parent().parent().css("background-color","");
+                        $(this).parent().parent().parent().next().css("background-color","");
+                    }
+                );
+
+
+                $("img.del").hover(
+                    function () {
+                        $(this).parent().parent().css("background-color","#fcc");
+                    },
+                    function () {
+                        $(this).parent().parent().css("background-color","");
+                    }
+                );
+
+                $("img.add").hover(
+                    function () {
+                        $(this).parent().css("background-color","#cfc");
+                    },
+                    function () {
+                        $(this).parent().css("background-color","");
+                    }
+                );
+            };
+
+            hovers();
+
+            function check_numeric(){
+                $("input.value").numeric();
+            }
+
+            check_numeric();
+
+
+        </script>
+
+
+
+
+            <ol class="components">
             % for id in components:
             <li class="component" data-id="${id}"/>
             % endfor
             <li class="new-component-item adding">
               <div class="new-component">
-                <h5>${_("Add New Component")}</h5>
+
+                <h5>Добавить компонент</h5>
                 <ul class="new-component-type">
                   % for type, templates in sorted(component_templates.items()):
                   <li>
                   % if type == 'advanced' or len(templates) > 1:
-                    <a href="#" class="multiple-templates" data-type="${type}">
+                    <a href="#" class="multiple-templates" data-type="${type}"  style = "height:60px;">
                   % else:
                     % for __, category, __, __ in templates:
-                    <a href="#" class="single-template" data-type="${type}" data-category="${category}">
+                    <a href="#" class="single-template" data-type="${type}" data-category="${category}" style = "height:60px;">
                     % endfor
                   % endif
                       <span class="large-template-icon large-${type}-icon"></span>
-                      <span class="name">${type}</span>
+                      ##<span class="name">${type}</span>
                     </a>
                   </li>
                   % endfor
@@ -74,14 +341,16 @@
                   % if len(templates) > 1 or type == 'advanced':
                 <div class="new-component-templates new-component-${type}">
                     % if type == "problem":
+
                     <div class="tab-group tabs">
                             <ul class="problem-type-tabs nav-tabs">
                               <li class="current">
-                                <a class="link-tab" href="#tab1">${_("Common Problem Types")}</a>
+                                <a class="link-tab" href="#tab1">Общие задания</a>
                               </li>
                               <li>
-                                <a class="link-tab" href="#tab2">${_("Advanced")}</a>
+                                <a class="link-tab" href="#tab2">Продвинутые задания</a>
                               </li>
+
                             </ul>
                     % endif
                     <div class="tab current" id="tab1">
@@ -136,44 +405,41 @@
 
       <div class="sidebar">
         <div class="unit-settings window">
-          <h4 class="header">${_("Unit Settings")}</h4>
+
+          <h4 class="header">Настройки элемента</h4>
           <div class="window-contents">
             <div class="row visibility">
-              <label class="inline-label">${_("Visibility:")}</label>
+              <label class="inline-label">Общий доступ:</label>
               <select class='visibility-select'>
-                <option value="public">${_("Public")}</option>
-                <option value="private">${_("Private")}</option>
+                <option value="public">Публичный</option>
+                <option value="private">Непубличный</option>
               </select>
             </div>
             <div class="row published-alert">
-              <p class="edit-draft-message">${_('This unit has been published. To make changes, you must {link_start}edit a draft{link_end}.').format(link_start='<a href="#" class="create-draft">', link_end='</a>')}</p>
-              <p class="publish-draft-message">${_('This is a draft of the published unit. To update the live version, you must {link_start}replace it with this draft{link_end}.').format(link_start='<a href="#" class="publish-draft">', link_end='</a>')}</p>
+              <p class="edit-draft-message">Элемент опубликован. Чтобы произвести изменения, нужно <a href="#" class="create-draft">отредактировать черновик</a>.</p>
+              <p class="publish-draft-message">Это черновик опубликованного элемента. Чтобы обновить публичную версию, <a href="#" class="publish-draft">замените её черновиком</a>.</p>
             </div>
             <div class="row status">
-              <p>${_("This unit is scheduled to be released to <strong>students</strong>")}
+              <p>Этот элемент будет доступен <strong>студентам</strong>
               % if release_date is not None:
-                ${_(u"on {date}").format(date=u"<strong>{}</strong>".format(release_date))}
+                  <strong>${release_date}</strong>
               % endif
-              ${_("with the subsection {link_start}{name}{link_end}").format(
-                  name=subsection.display_name_with_default,
-                  link_start='<a href="{url}">'.format(url=reverse('edit_subsection', kwargs={'location': subsection.location})),
-                  link_end='</a>',
-                )}
-              </p>
+              в подразделе <a href="${reverse('edit_subsection', kwargs={'location': subsection.location})}">"${subsection.display_name_with_default}"</a></p>
             </div>
             <div class="row unit-actions">
-              <a href="#" class="delete-draft delete-button">${_("Delete Draft")}</a>
-              <a href="${draft_preview_link}" target="_blank" class="preview-button">${_("Preview")}</a>
-              <a href="${published_preview_link}" target="_blank" class="view-button">${_("View Live")}</a>
+              <a href="#" class="delete-draft delete-button">Удалить черновик</a>
+              ##<a href="${draft_preview_link}" target="_blank" class="preview-button">Preview</a>
+              ##<a href="${published_preview_link}" target="_blank" class="view-button">View Live</a>
+
             </div>
           </div>
         </div>
         <div class="window unit-location">
-          <h4 class="header">${_("Unit Location")}</h4>
+          <h4 class="header">Расположение элемента</h4>
           <div class="window-contents">
             <div class="row wrapper-unit-id">
               <p class="unit-id">
-                <span class="label">${_("Unit Identifier:")}</span>
+                <span class="label">${_(u"Идентификатор элемента:")}</span>
                 <input type="text" class="url value" value="${unit.location.name}" disabled />
               </p>
             </div>

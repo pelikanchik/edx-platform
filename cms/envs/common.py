@@ -177,11 +177,21 @@ ROOT_URLCONF = 'cms.urls'
 IGNORABLE_404_ENDS = ('favicon.ico')
 
 # Email
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-DEFAULT_FROM_EMAIL = 'registration@edx.org'
-DEFAULT_FEEDBACK_EMAIL = 'feedback@edx.org'
-SERVER_EMAIL = 'devops@edx.org'
-ADMINS = ()
+#<<<<<<< HEAD
+#EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+#DEFAULT_FROM_EMAIL = 'registration@edx.org'
+#DEFAULT_FEEDBACK_EMAIL = 'feedback@edx.org'
+#SERVER_EMAIL = 'devops@edx.org'
+#ADMINS = ()
+#=======
+EMAIL_BACKEND = 'django_ses.SESBackend'
+DEFAULT_FROM_EMAIL = 'registration@pelic.ru'
+DEFAULT_FEEDBACK_EMAIL = 'feedback@pelic.ru'
+SERVER_EMAIL = 'devops@pelic.ru'
+ADMINS = (
+    ('lutiX Admins', 'admin@pelic.ru'),
+)
+#>>>>>>> 4f9bf342df105f2a5f00372194e6f7a65dac6f8b
 MANAGERS = ADMINS
 
 # Static content
@@ -198,8 +208,8 @@ STATICFILES_DIRS = [
 ]
 
 # Locale/Internationalization
-TIME_ZONE = 'America/New_York'  # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
-LANGUAGE_CODE = 'en'  # http://www.i18nguy.com/unicode/language-identifiers.html
+TIME_ZONE = 'Europe/Moscow'   # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
+LANGUAGE_CODE = 'ru'  # http://www.i18nguy.com/unicode/language-identifiers.html
 
 USE_I18N = False
 USE_L10N = True

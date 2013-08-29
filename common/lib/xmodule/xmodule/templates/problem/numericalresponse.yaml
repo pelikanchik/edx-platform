@@ -1,6 +1,6 @@
 ---
 metadata:
-    display_name: Numerical Input
+    display_name: Задание с ответом в виде числа
     markdown: |
        A numerical input problem accepts a line of text input from the
        student, and evaluates the input for correctness based on its

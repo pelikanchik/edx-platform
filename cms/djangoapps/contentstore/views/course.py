@@ -274,6 +274,7 @@ def get_course_settings(request, org, course, name):
                                        "course": course,
                                        "name": name,
                                        "section": "details"}),
+
         'about_page_editable': not settings.MITX_FEATURES.get(
             'ENABLE_MKTG_SITE', False
         ),

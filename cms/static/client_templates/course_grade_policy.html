@@ -1,37 +1,35 @@
 <li class="field-group course-grading-assignment-list-item">
   <div class="field text" id="field-course-grading-assignment-name">
-  	<label for="course-grading-assignment-name">Assignment Type	Name</label>
+  	<label for="course-grading-assignment-name">Название типа</label>
   	<input type="text" class="long" id="course-grading-assignment-name" value="<%= model.get('type') %>" /> 
-  	<span class="tip tip-stacked">e.g. Homework, Midterm Exams</span> 
+  	<span class="tip tip-stacked">Например, домашняя работа, контрольная работа, экзамен и т.п.</span>
   </div>
 
   <div class="field text" id="field-course-grading-assignment-shortname">
-    <label for="course-grading-assignment-shortname">Abbreviation:</label>
+    <label for="course-grading-assignment-shortname">Сокращение:</label>
     <input type="text" class="short" id="course-grading-assignment-shortname" value="<%= model.get('short_label') %>" /> 
-    <span class="tip tip-inline">e.g. HW, Midterm</span>
+    <span class="tip tip-inline">Например, ДЗ, Экз. и т.п.</span>
   </div>
   
   <div class="field text" id="field-course-grading-assignment-gradeweight">
-    <label for="course-grading-assignment-gradeweight">Weight of Total Grade</label>
+    <label for="course-grading-assignment-gradeweight">Вес</label>
     <input type="text" class="short" id="course-grading-assignment-gradeweight" value = "<%= model.get('weight') %>" /> 
-    <span class="tip tip-inline">e.g. 25%</span>
+    <span class="tip tip-inline">например, 25%</span>
   </div>
   
   <div class="field text" id="field-course-grading-assignment-totalassignments">
-    <label for="course-grading-assignment-totalassignments">Total
-			Number</label>
+    <label for="course-grading-assignment-totalassignments">Общее количество</label>
     <input type="text" class="short" id="course-grading-assignment-totalassignments" value = "<%= model.get('min_count') %>" /> 
-    <span class="tip tip-inline">total exercises assigned</span>
+    <span class="tip tip-inline">Общее количество занятий этого типа</span>
   </div>
   
   <div class="field text" id="field-course-grading-assignment-droppable">
-    <label for="course-grading-assignment-droppable">Number of
-			Droppable</label>
+    <label for="course-grading-assignment-droppable">Число неоцениваемых занятий</label>
     <input type="text" class="short" id="course-grading-assignment-droppable" value = "<%= model.get('drop_count') %>" />
-    <span class="tip tip-inline">total exercises that won't be graded</span>
+    <span class="tip tip-inline">Число неоцениваемых занятий этого типа</span>
   </div>
   
   <div class="actions">
-  	<a href="#" class="button delete-button standard remove-item remove-grading-data"><span class="delete-icon"></span>Delete</a>
+  	<a href="#" class="button delete-button standard remove-item remove-grading-data"><span class="delete-icon"></span>Удалить</a>
   </div>
 </li>

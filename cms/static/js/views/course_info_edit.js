@@ -55,7 +55,7 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
             }
           });
           this.$el.find(".new-update-form").hide();
-          this.$el.find('.date').datepicker({ 'dateFormat': 'MM d, yy' });
+          this.$el.find('.date').datepicker({ 'dateFormat': 'd.m.yy' });
           return this;
     },
 
@@ -89,7 +89,7 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
         });
 
         $('.date').datepicker('destroy');
-        $('.date').datepicker({ 'dateFormat': 'MM d, yy' });
+        $('.date').datepicker({ 'dateFormat': 'd.m.yy' });
     },
 
     onSave: function(event) {
@@ -152,11 +152,13 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
     onDelete: function(event) {
         event.preventDefault();
 
+
         var self = this;
+
         var targetModel = this.eventModel(event);
         var confirm = new CMS.Views.Prompt.Warning({
-            title: gettext('Are you sure you want to delete this update?'),
-            message: gettext('This action cannot be undone.'),
+            title: gettext('Действительно удалить?'),
+            message: gettext('Это действие нельзя отменить.'),
             actions: {
                 primary: {
                     text: gettext('OK'),
@@ -167,7 +169,7 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
                         });
                         self.modelDom(event).remove();
                         var deleting = new CMS.Views.Notification.Mini({
-                            title: gettext('Deleting') + '&hellip;'
+                            title: gettext('Удаляется') + '&hellip;'
                         });
                         deleting.show();
                         targetModel.destroy({

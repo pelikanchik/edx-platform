@@ -1,5 +1,7 @@
+# -*- coding: utf-8 -*-
 import logging
 import urllib
+import json
 
 from functools import partial
 
@@ -90,6 +92,36 @@ def render_accordion(request, course, chapter, section, model_data_cache):
     Returns the html string
     """
 
+    staff_access = has_access(request.user, course, 'staff')
+
+    # NOTE: To make sure impersonation by instructor works, use
+    # student instead of request.user in the rest of the function.
+
+    # The pre-fetching of groups is done to make auth checks not require an
+    # additional DB lookup (this kills the Progress page in particular).
+    course_id = course.id
+    student_id = None
+    if student_id is None or student_id == request.user.id:
+        # always allowed to see your own profile
+        student = request.user
+    else:
+        # Requesting access to a different student's profile
+        if not staff_access:
+            raise Http404
+        student = User.objects.get(id=int(student_id))
+ 
+    student = User.objects.prefetch_related("groups").get(id=student.id)
+
+    model_data_cache = ModelDataCache.cache_for_descriptor_descendents(
+        course_id, student, course, depth=None)
+
+    courseware_summary = grades.progress_summary(student, request, course,
+                                                 model_data_cache)
+
+    print("<-------------")
+    print(courseware_summary)
+    print("------------->")
+
     # grab the table of contents
     user = User.objects.prefetch_related("groups").get(id=request.user.id)
     request.user = user	# keep just one instance of User
@@ -98,7 +130,8 @@ def render_accordion(request, course, chapter, section, model_data_cache):
     context = dict([('toc', toc),
                     ('course_id', course.id),
                     ('csrf', csrf(request)['csrf_token']),
-                    ('show_timezone', course.show_timezone)] + template_imports.items())
+                    ('show_timezone', course.show_timezone),
+                    ('courseware_summary',courseware_summary),] + template_imports.items())
     return render_to_string('courseware/accordion.html', context)
 
 
@@ -296,6 +329,7 @@ def index(request, course_id, chapter=None, section=None,
      - HTTPresponse
     """
     user = User.objects.prefetch_related("groups").get(id=request.user.id)
+
     request.user = user	# keep just one instance of User
     course = get_course_with_access(user, course_id, 'load', depth=2)
     staff_access = has_access(user, course, 'staff')
@@ -360,6 +394,7 @@ def index(request, course_id, chapter=None, section=None,
 
         if section is not None:
             section_descriptor = chapter_descriptor.get_child_by(lambda m: m.url_name == section)
+
             if section_descriptor is None:
                 # Specifically asked-for section doesn't exist
                 if masq=='student':  # if staff is masquerading as student be kinder, don't 404
@@ -384,6 +419,14 @@ def index(request, course_id, chapter=None, section=None,
                 # they don't have access to.
                 raise Http404
 
+            model_data_cache_for_check = ModelDataCache.cache_for_descriptor_descendents(course_id, user, course, depth=None)
+
+            courseware_summary = grades.progress_summary(user, request, course,
+                                                 model_data_cache_for_check)
+
+
+            is_section_unlocked = grades.return_section_by_id(section_module.url_name, courseware_summary)['unlocked']
+
             # Save where we are in the chapter
             save_child_position(chapter_module, section)
 
@@ -401,10 +444,19 @@ def index(request, course_id, chapter=None, section=None,
                 # add in the appropriate timer information to the rendering context:
                 context.update(check_for_active_timelimit_module(request, course_id, course))
 
-            context['content'] = section_module.runtime.render(section_module, None, 'student_view').content
+
+           # context['content'] = section_module.runtime.render(section_module, None, 'student_view').content
+
+            if not is_section_unlocked:
+                context['content'] = u'Раздел вам пока не доступен'
+            else:
+                context['content'] = section_module.runtime.render(section_module, None, 'student_view').content
+                #context['content'] = section_module.get_html()
+
         else:
             # section is none, so display a message
             prev_section = get_current_child(chapter_module)
+
             if prev_section is None:
                 # Something went wrong -- perhaps this chapter has no sections visible to the user
                 raise Http404

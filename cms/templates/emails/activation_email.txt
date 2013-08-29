@@ -1,6 +1,6 @@
 <%! from django.utils.translation import ugettext as _ %>
 
-${_("Thank you for signing up for edX Studio! To activate your account, please copy and paste this address into your web browser's address bar:")}
+${_(u"Спасибо за регистрацию! Для активации аккаунта перейдите по ссылке: ")}
 
 % if is_secure:
   https://${ site }/activate/${ key }
@@ -8,4 +8,4 @@ ${_("Thank you for signing up for edX Studio! To activate your account, please c
   http://${ site }/activate/${ key }
 % endif
 
-${_("If you didn't request this, you don't need to do anything; you won't receive any more email from us. Please do not reply to this e-mail; if you require assistance, check the help section of the edX web site.")}
+${_(u"Если вы не ожидаете этого письма, просто ничего не делайте - больше вы не получите от нас писем.")}

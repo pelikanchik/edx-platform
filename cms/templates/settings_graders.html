@@ -1,6 +1,6 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%inherit file="base.html" />
-<%block name="title">${_("Grading Settings")}</%block>
+<%block name="title">${_(u"Настройки оценивания")}</%block>
 <%block name="bodyclass">is-signedin course grading settings</%block>
 
 <%namespace name='static' file='static_content.html'/>
@@ -42,8 +42,8 @@ from contentstore import utils
 <div class="wrapper-mast wrapper">
   <header class="mast has-subtitle">
     <h1 class="page-header">
-      <small class="subtitle">${_("Settings")}</small>
-      <span class="sr">&gt; </span>${_("Grading")}
+      <small class="subtitle">${_(u"Настройки")}</small>
+      <span class="sr">&gt; </span>${_(u"Оценивание")}
     </h1>
   </header>
 </div>
@@ -54,8 +54,8 @@ from contentstore import utils
       <form id="settings_details" class="settings-grading" method="post" action="">
         <section class="group-settings grade-range">
           <header>
-            <h2 class="title-2">${_("Overall Grade Range")}</h2>
-            <span class="tip">${_("Your overall grading scale for student final grades")}</span>
+            <h2 class="title-2">${_(u"Возможные оценки")}</h2>
+            <span class="tip">${_(u"Ваша общая оценочная шкала для итоговой оценки студентов")}</span>
           </header>
 
           <ol class="list-input">
@@ -90,15 +90,17 @@ from contentstore import utils
 
         <section class="group-settings grade-rules">
           <header>
-            <h2 class="title-2">${_("Grading Rules &amp; Policies")}</h2>
-            <span class="tip">${_("Deadlines, requirements, and logistics around grading student work")}</span>
+            <h2 class="title-2">${_(u"Правила оценивания")}</h2>
+            <span class="tip">${_(u"Сроки, требования и логика оценивания студенческих работ")}</span>
           </header>
 
           <ol class="list-input">
             <li class="field text" id="field-course-grading-graceperiod">
-              <label for="course-grading-graceperiod">${_("Grace Period on Deadline:")}</label>
-              <input type="text" class="short time" id="course-grading-graceperiod" value="00:00" placeholder="HH:MM" autocomplete="off" />
-              <span class="tip tip-inline">${_("Leeway on due dates")}</span>
+
+              <label for="course-grading-graceperiod">${_(u"Льготный период на срок:")}</label>
+              <input type="text" class="short time" id="course-grading-graceperiod" value="0:00" placeholder="HH:MM" autocomplete="off" />
+              <span class="tip tip-inline">${_(u"Отставание от установленных сроков")}</span>
+
             </li>
           </ol>
         </section>
@@ -107,8 +109,8 @@ from contentstore import utils
 
         <section class="group-settings assignment-types">
           <header>
-            <h2 class="title-2">${_("Assignment Types")}</h2>
-            <span class="tip">${_("Categories and labels for any exercises that are gradable")}</span>
+            <h2 class="title-2">${_(u"Типы заданий")}</h2>
+            <span class="tip">${_(u"Категории и метки для любых оцениваемых упражнений")}</span>
           </header>
 
           <ol class="list-input course-grading-assignment-list enum">
@@ -117,7 +119,7 @@ from contentstore import utils
 
           <div class="actions">
             <a href="#" class="new-button new-course-grading-item add-grading-data">
-              <i class="icon-plus"></i>${_("New Assignment Type")}
+              <i class="icon-plus"></i>${_(u"Назначение нового типа")}
             </a>
           </div>
         </section>
@@ -126,22 +128,22 @@ from contentstore import utils
 
     <aside class="content-supplementary" role="complimentary">
       <div class="bit">
-        <h3 class="title-3">${_("How will these settings be used?")}</h3>
-        <p>${_("Your grading settings will be used to calculate students grades and performance.")}</p>
+        <h3 class="title-3">${_(u"Как эти параметры будут использоваться?")}</h3>
+        <p>${_(u"Ваши настройки оценивания будут использоваться для расчета оценок студентов и их производительности.")}</p>
 
-        <p>${_("Overall grade range will be used in students' final grades, which are calculated by the weighting you determine for each custom assignment type.")}</p>
+        <p>${_(u"Общая оценка рейтинга будет использоваться для итоговых оценок студентов, которые рассчитываются для каждого назначенного типа")}</p>
       </div>
 
       <div class="bit">
       % if context_course:
       <% ctx_loc = context_course.location %>
       <%! from django.core.urlresolvers import reverse %>
-        <h3 class="title-3">${_("Other Course Settings")}</h3>
+        <h3 class="title-3">${_(u"Другие настройки курса")}</h3>
         <nav class="nav-related">
           <ul>
-            <li class="nav-item"><a href="${reverse('contentstore.views.get_course_settings', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">${_("Details &amp; Schedule")}</a></li>
-            <li class="nav-item"><a href="${reverse('manage_users', kwargs={'org' : ctx_loc.org, 'course' : ctx_loc.course, 'name': ctx_loc.name})}">${_("Course Team")}</a></li>
-            <li class="nav-item"><a href="${reverse('course_advanced_settings', kwargs={'org' : ctx_loc.org, 'course' : ctx_loc.course, 'name': ctx_loc.name})}">${_("Advanced Settings")}</a></li>
+            <li class="nav-item"><a href="${reverse('contentstore.views.get_course_settings', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">${_(u"Расписание и детали")}</a></li>
+            <li class="nav-item"><a href="${reverse('manage_users', kwargs={'org' : ctx_loc.org, 'course' : ctx_loc.course, 'name': ctx_loc.name})}">${_(u"Команда курса")}</a></li>
+            <li class="nav-item"><a href="${reverse('course_advanced_settings', kwargs={'org' : ctx_loc.org, 'course' : ctx_loc.course, 'name': ctx_loc.name})}">${_(u"Специализированные настройки")}</a></li>
           </ul>
         </nav>
       % endif

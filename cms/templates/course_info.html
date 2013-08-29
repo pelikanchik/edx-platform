@@ -3,7 +3,7 @@
 <%namespace name='static' file='static_content.html'/>
 
 <!-- TODO decode course # from context_course into title -->
-<%block name="title">${_("Course Updates")}</%block>
+<%block name="title">${_(u"Новости")}</%block>
 <%block name="bodyclass">is-signedin course course-info updates</%block>
 
 <%block name="header_extras">
@@ -51,15 +51,15 @@
   <div class="wrapper-mast wrapper">
     <header class="mast has-actions has-subtitle">
       <h1 class="page-header">
-        <small class="subtitle">${_("Content")}</small>
-        <span class="sr">&gt; </span>${_("Course Updates")}
+        <small class="subtitle">${_(u"Содержание")}</small>
+        <span class="sr">&gt; </span>${_(u"Новости")}
       </h1>
 
       <nav class="nav-actions">
-        <h3 class="sr">${_('Page Actions')}</h3>
+        <h3 class="sr">${_(u'Действия')}</h3>
         <ul>
           <li class="nav-item">
-            <a href="#" class=" button new-button new-update-button"><i class="icon-plus"></i> ${_('New Update')}</a>
+            <a href="#" class=" button new-button new-update-button"><i class="icon-plus"></i> ${_(u'Добавить новость')}</a>
           </li>
         </ul>
       </nav>
@@ -69,7 +69,7 @@
   <div class="wrapper-content wrapper">
     <section class="content">
       <div class="introduction">
-        <p clas="copy">${_('Course updates are announcements or notifications you want to share with your class. Other course authors have used them for important exam/date reminders, change in schedules, and to call out any important steps students need to be aware of.')}</p>
+        <p clas="copy">${_(u'Новости или объявления об обновлении курса, которые вы хотите опубликовать для студентов. Многие авторы используют это для объявлении дат экзамена, изменении в расписании, а также для оповещения о любых важных шагах, которые студент обязан пройти в курсе')}</p>
       </div>
     </section>
   </div>

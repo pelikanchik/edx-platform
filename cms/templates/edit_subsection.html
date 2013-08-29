@@ -5,7 +5,7 @@
   from django.utils.translation import ugettext as _
   from django.core.urlresolvers import reverse
 %>
-<%block name="title">${_("CMS Subsection")}</%block>
+<%block name="title">Редактирование подраздела</%block>
 <%block name="bodyclass">is-signedin course subsection</%block>
 
 
@@ -13,16 +13,208 @@
 <%namespace name='static' file='static_content.html'/>
 
 <%block name="content">
+
+<script type='text/javascript' src='/static/js/knockout.js'></script>
+<script type='text/javascript' src='/static/js/knockout-mapping.js'></script>
+<script type='text/javascript' src='/static/js/numeric.js'></script>
+
+
 <div class="main-wrapper">
   <div class="inner-wrapper">
     <div class="main-column">
       <article class="subsection-body window" data-id="${subsection.location}">
         <div class="subsection-name-input">
-        <label>${_("Display Name:")}</label>
+
+          <label>Название раздела:</label>
+
           <input type="text" value="${subsection.display_name_with_default | h}" class="subsection-display-name-input" data-metadata-name="display_name"/>
         </div>
+        <div class="subsection-name-input">
+
+          <label>Условие для разблокировки раздела (если пусто, раздел разблокирован)</label>
+                <div id='termConstructor' class = 'termConstructor'>
+                    <table class='termEditor'>
+                        <tbody data-bind="foreach: disjunctions">
+                            <tr>
+                                <td>
+                                    <div><img class = "close" src = "/static/img/Delete-icon.png" data-bind='click: $root.removeDisjunction'/></div>
+                                </td>
+
+                                <td align = "center">
+                                    <table>
+
+                                        <tbody data-bind="foreach: conjunctions">
+                                            <tr>
+
+                                                <td>
+
+                                                <select  data-bind='value: source_section_id, valueUpdate: "afterkeydown"'>
+                                                    % for every_section in sections:
+                                                      % for every_subsection in every_section.get_children():
+                                                         % if subsection.url_name != every_subsection.url_name:
+                                                            <option value="${every_subsection.url_name}">${every_section.display_name_with_default}: ${every_subsection.display_name_with_default}</option>
+                                                         % endif
+                                                       % endfor
+                                                    % endfor
+                                                </select>
+
+                                                </td>
+
+
+                                                <td>
+                                                    <select data-bind='value: field, valueUpdate: "afterkeydown"'>
+                                                        <option value="score_abs">Результат (абсолютный)</option>
+                                                        <option value="score_rel">Результат (относительный, %)</option>
+                                                    </select>
+                                                </td>
+                                                <td>
+
+                                                    <select  data-bind='value: sign, valueUpdate: "afterkeydown"'>
+                                                        <option value="more">&#62;</option>
+                                                        <option value="more-equals">&#8805;</option>
+                                                        <option value="equals">=</option>
+                                                        <option value="less-equals">&#8804;</option>
+                                                        <option value="less">&#60;</option>
+                                                    </select>
+
+                                                </td>
+                                                <td><input  data-bind='value: value, valueUpdate: "afterkeydown"' class = "value" /></td>
+                                                <td style="vertical-align: middle"><img width="20" src = "/static/img/edit_remove.png"  data-bind='click: $root.removeConjunction' class = "del" /></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                     <div style = "width:100%">
+                                         <img class = "add" src  = "/static/img/plus_16.png" data-bind='click: $root.addConjunction' />
+                                     </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                 <div style="width: 100%; padding:10px 0px ">
+                    <img class = "add" style="width:20px; margin: 3px;" src = "/static/img/plus_32.png" data-bind='click: addDisjunction' />
+                </div>
+                </div>
+                <p style = "text-align: center;"><input type = "button" class = "save-subsection-button" value="Сохранить"/></p>
+
+                <input disabled data-bind='value: term_string' style="font-size: 10px; display:none;" class="subsection-display-name-input" data-metadata-name="unlock_term">
+
+        <script>
+
+            var unlock_term = '${subsection.unlock_term_with_default|h}'.replace(/\&#34;/g, '"');
+            var dataFromDB = ko.utils.parseJson(unlock_term).disjunctions;
+
+            var initialData = [
+                    { conjunctions: [
+                        { source_section_id: ko.observable(), field: "score_rel" , sign: "less" , value: "123" }]
+                   }
+               ];
+
+            var DisjunctionsModel = function(disjunctions) {
+                var self = this;
+
+                self.disjunctions = ko.mapping.fromJS(dataFromDB);
+
+                self.addDisjunction = function() {
+                    self.disjunctions.push({
+                        conjunctions: ko.observableArray([{
+                            source_section_id: ko.observable(),
+                            field: ko.observable("score_abs"),
+                            sign: ko.observable("more"),
+                            value: ko.observable("0")
+                        }])
+                    });
+
+                    check_numeric();
+                    hovers();
+                };
+
+                self.removeDisjunction = function(disjunction) {
+                    self.disjunctions.remove(disjunction);
+
+
+                };
+
+                self.addConjunction = function(disjunction) {
+                    disjunction.conjunctions.push({
+                        source_section_id: ko.observable(),
+                        field: ko.observable("score_abs"),
+                        sign: ko.observable("more"),
+                        value: ko.observable("0")
+                    });
+
+                    check_numeric();
+                    hovers();
+                };
+
+                self.removeConjunction = function(conjunction) {
+                    $.each(self.disjunctions(), function() { this.conjunctions.remove(conjunction) })
+
+
+                };
+
+
+                self.term_string = ko.computed(function () {
+                    return ko.toJSON({disjunctions: self.disjunctions});
+
+                });
+
+
+                function update(){
+                    self.lastSavedJson(JSON.stringify(ko.toJS({disjunctions: self.disjunctions}), null, 0));
+                }
+                //self.lastSavedJson = ko.observable(unlock_term)
+            };
+
+            ko.applyBindings(new DisjunctionsModel());
+
+            function hovers(){
+                $("img.close").hover(
+                    function () {
+                        $(this).parent().parent().parent().css("background-color","#fcc");
+                    },
+                    function () {
+                        $(this).parent().parent().parent().css("background-color","");
+                    }
+                );
+
+
+                $("img.del").hover(
+                    function () {
+                        $(this).parent().parent().css("background-color","#fcc");
+                    },
+                    function () {
+                        $(this).parent().parent().css("background-color","");
+                    }
+                );
+
+                $("img.add").hover(
+                    function () {
+                        $(this).parent().css("background-color","#cfc");
+                    },
+                    function () {
+                        $(this).parent().css("background-color","");
+                    }
+                );
+            };
+
+            hovers();
+
+            function check_numeric(){
+                $("input.value").numeric();
+            }
+
+            check_numeric();
+
+        </script>
+
+        </div>
+
         <div class="sortable-unit-list">
-        <label>${_("Units:")}</label>
+
+          <label>Элементы:</label>
+
+
           ${units.enum_units(subsection, subsection_units=subsection_units)}
         </div>
       </article>
@@ -30,63 +222,71 @@
 
     <div class="sidebar">
       <div class="unit-settings window id-holder" data-id="${subsection.location}">
-    <h4 class="header">${_("Subsection Settings")}</h4>
+
+    <h4 class="header">Настройки подраздела</h4>
     <div class="window-contents">
       <div class="scheduled-date-input row">
         <div class="datepair" data-language="javascript">
           <div class="field field-start-date">
-            <label for="start_date">${_("Release Day")}</label>
+
+            <label for="start_date">${_(u"Дата начала")}</label>
             <input type="text" id="start_date" name="start_date"
-                value="${subsection.lms.start.strftime('%m/%d/%Y') if subsection.lms.start else ''}"
-                placeholder="MM/DD/YYYY" class="date" size='15' autocomplete="off"/>
+                value="${subsection.lms.start.strftime('%d.%m.%Y') if subsection.lms.start else ''}"
+                placeholder="DD.MM.YYYY" class="date" size='15' autocomplete="off"/>
           </div>
           <div class="field field-start-time">
-            <label for="start_time">${_("Release Time")} (<abbr title="${_("Coordinated Universal Time")}">${_("UTC")}</abbr>)</label>
+            <label for="start_time">${_(u"Время начала")} (<abbr title="${_(u"Coordinated Universal Time")}">${_(u"UTC")}</abbr>)</label>
             <input type="text" id="start_time" name="start_time"
                 value="${subsection.lms.start.strftime('%H:%M') if subsection.lms.start else ''}"
+
                 placeholder="HH:MM" class="time" size='10' autocomplete="off"/>
           </div>
         </div>
         % if subsection.lms.start and not almost_same_datetime(subsection.lms.start, parent_item.lms.start):
             % if parent_item.lms.start is None:
-            <p class="notice">${_("The date above differs from the release date of {name}, which is unset.").format(name=parent_item.display_name_with_default)}
+
+            <p class="notice">${_(u"Вышеуказанная дата отличается от даты конца  {name}, которая не задана.").format(name=parent_item.display_name_with_default)}
             % else:
-      <p class="notice">${_("The date above differs from the release date of {name} - {start_time}").format(name=parent_item.display_name_with_default, start_time=get_default_time_display(parent_item.lms.start))}.
+      <p class="notice">${_(u"Вышеуказанная дата отличается от даты начала {name} - {start_time}").format(name=parent_item.display_name_with_default, start_time=get_default_time_display(parent_item.lms.start))}.
             % endif
-      <a href="#" class="sync-date no-spinner">${_("Sync to {name}.").format(name=parent_item.display_name_with_default)}</a></p>
+      ##<a href="#" class="sync-date no-spinner">${_(u"Синхронизация с {name}.").format(name=parent_item.display_name_with_default)}</a></p>
+
         % endif
       </div>
 
     <div class="row gradable">
-      <label>${_("Graded as:")}</label>
+
+      <label>Оценивается как:</label>
 
     <div class="gradable-status" data-initial-status="${subsection.lms.format if subsection.lms.format is not None else _('Not Graded')}">
     </div>
 
     <div class="due-date-input row">
-      <a href="#" class="set-date">${_("Set a due date")}</a>
+
+      <a href="#" class="set-date">${_(u"Установите дату окончания")}</a>
       <div class="datepair date-setter">
         <div class="field field-start-date">
-        <label for="due_date">${_("Due Day")}</label>
+        <label for="due_date">${_(u"День окончания")}</label>
           <input type="text" id="due_date" name="due_date"
-          value="${subsection.lms.due.strftime('%m/%d/%Y') if subsection.lms.due else ''}"
-          placeholder="MM/DD/YYYY" class="date" size='15' autocomplete="off"/>
+          value="${subsection.lms.due.strftime('%d.%m.%Y') if subsection.lms.due else ''}"
+          placeholder="DD.MM.YYYY" class="date" size='15' autocomplete="off"/>
         </div>
         <div class="field field-start-time">
-        <label for="due_time">${_("Due Time")} (<abbr title="${_('Coordinated Universal Time')}">UTC</abbr>)</label>
+        <label for="due_time">${_(u"Время окончания")}</label>
           <input type="text" id="due_time" name="due_time"
             value="${subsection.lms.due.strftime('%H:%M') if subsection.lms.due else ''}"
             placeholder="HH:MM" class="time" size='10' autocomplete="off"/>
         </div>
-        <a href="#" class="remove-date">${_("Remove due date")}</a>
+        <a href="#" class="remove-date">${_(u"Удалить дату окончания")}</a>
       </div>
     </div>
     <div class="row unit-actions">
-      <a href="${preview_link}" target="_blank" class="preview-button">${_("Preview Drafts")}</a>
+      <a href="${preview_link}" target="_blank" class="preview-button">${_(u"Посмотреть черновик")}</a>
       %if can_view_live:
-      <a href="${lms_link}" target="_blank" class="preview-button">${_("View Live")}</a>
+      <a href="${lms_link}" target="_blank" class="preview-button">${_(u"Live")}</a>
       %endif
     </div>
+
       </div>
     </div>
   </div>

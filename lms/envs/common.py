@@ -32,7 +32,7 @@ from .discussionsettings import *
 
 ################################### FEATURES ###################################
 # The display name of the platform to be used in templates/emails/etc.
-PLATFORM_NAME = "edX"
+PLATFORM_NAME = "lutiX"
 
 COURSEWARE_ENABLED = True
 ENABLE_JASMINE = False
@@ -75,9 +75,9 @@ MITX_FEATURES = {
     # this should remain off in production until digest notifications are online.
     'ENABLE_DISCUSSION_HOME_PANEL': False,
 
-    'ENABLE_PSYCHOMETRICS': False,  # real-time psychometrics (eg item response theory analysis in instructor dashboard)
+    'ENABLE_PSYCHOMETRICS': True,  # real-time psychometrics (eg item response theory analysis in instructor dashboard)
 
-    'ENABLE_DJANGO_ADMIN_SITE': False,  # set true to enable django's admin site, even on prod (e.g. for course ops)
+    'ENABLE_DJANGO_ADMIN_SITE': True,  # set true to enable django's admin site, even on prod (e.g. for course ops)
     'ENABLE_SQL_TRACKING_LOGS': False,
     'ENABLE_LMS_MIGRATION': False,
     'ENABLE_MANUAL_GIT_RELOAD': False,
@@ -359,14 +359,27 @@ ROOT_URLCONF = 'lms.urls'
 IGNORABLE_404_ENDS = ('favicon.ico')
 
 # Email
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-DEFAULT_FROM_EMAIL = 'registration@edx.org'
-DEFAULT_FEEDBACK_EMAIL = 'feedback@edx.org'
-SERVER_EMAIL = 'devops@edx.org'
-TECH_SUPPORT_EMAIL = 'technical@edx.org'
-CONTACT_EMAIL = 'info@edx.org'
-BUGS_EMAIL = 'bugs@edx.org'
-ADMINS = ()
+#<<<<<<< HEAD
+#EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+#DEFAULT_FROM_EMAIL = 'registration@edx.org'
+#DEFAULT_FEEDBACK_EMAIL = 'feedback@edx.org'
+#SERVER_EMAIL = 'devops@edx.org'
+#TECH_SUPPORT_EMAIL = 'technical@edx.org'
+#CONTACT_EMAIL = 'info@edx.org'
+#BUGS_EMAIL = 'bugs@edx.org'
+#ADMINS = ()
+#=======
+EMAIL_BACKEND = 'django_ses.SESBackend'
+DEFAULT_FROM_EMAIL = 'registration@pelic.ru'
+DEFAULT_FEEDBACK_EMAIL = 'feedback@pelic.ru'
+SERVER_EMAIL = 'devops@pelic.ru'
+TECH_SUPPORT_EMAIL = 'technical@pelic.ru'
+CONTACT_EMAIL = 'info@pelic.ru'
+BUGS_EMAIL = 'bugs@pelic.ru'
+ADMINS = (
+    ('edX Admins', 'admin@pelic.ru'),
+)
+#>>>>>>> 4f9bf342df105f2a5f00372194e6f7a65dac6f8b
 MANAGERS = ADMINS
 
 # Static content
@@ -382,8 +395,8 @@ STATICFILES_DIRS = [
 FAVICON_PATH = 'images/favicon.ico'
 
 # Locale/Internationalization
-TIME_ZONE = 'America/New_York'  # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
-LANGUAGE_CODE = 'en'  # http://www.i18nguy.com/unicode/language-identifiers.html
+TIME_ZONE = 'Europe/Moscow'  # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
+LANGUAGE_CODE = 'ru'  # http://www.i18nguy.com/unicode/language-identifiers.html
 USE_I18N = False
 USE_L10N = True
 
@@ -759,7 +772,7 @@ INSTALLED_APPS = (
 
     # External auth (OpenID, shib)
     'external_auth',
-    'django_openid_auth',
+    # 'django_openid_auth',
 
     #For the wiki
     'wiki',  # The new django-wiki from benjaoming

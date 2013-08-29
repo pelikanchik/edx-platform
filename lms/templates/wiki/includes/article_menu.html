@@ -8,7 +8,7 @@
 <li class="${"active" if selected_tab == "view" else ""}">
   <a href="${reverse('wiki:get', kwargs={'article_id' : article.id, 'path' : urlpath.path})}">
     <span class="icon-home icon"></span>
-    View
+    Просмотр
   </a>
 </li>
 
@@ -16,7 +16,7 @@
   <li class="${"active" if selected_tab == "edit" else ""}">
     <a href="${reverse('wiki:edit', kwargs={'article_id' : article.id, 'path' : urlpath.path})}">
       <span class="icon-edit icon"></span>
-      Edit
+      Редактировать
     </a>
   </li>
 %endif
@@ -24,7 +24,7 @@
 <li class="${"active" if selected_tab == "history" else ""}">
   <a href="${reverse('wiki:history', kwargs={'article_id' : article.id, 'path' : urlpath.path})}">
     <span class="icon-changes icon"></span>
-    Changes
+    Изменения
   </a>
 </li>
 
@@ -48,7 +48,8 @@ ${_("This should be enabled for all non-anonymous users once the notifications a
 <li class="${"active" if selected_tab == "settings" else ""}">
   <a href="${reverse('wiki:settings', kwargs={'article_id' : article.id, 'path' : urlpath.path})}">
     <span class="icon-settings icon"></span>
-    ${_("Settings")}
+
+    Настройки
   </a>
 </li>
 %endif

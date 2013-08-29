@@ -1074,7 +1074,11 @@ class CustomResponse(LoncapaResponse):
         log.debug('%s: student_answers=%s' % (unicode(self), student_answers))
 
         # ordered list of answer id's
-        idset = sorted(self.answer_ids)
+        if len(self.answer_ids) > 9:
+            idset = self.answer_ids
+        else:
+            idset = sorted(self.answer_ids)
+
         try:
             # ordered list of answers
             submission = [student_answers[k] for k in idset]

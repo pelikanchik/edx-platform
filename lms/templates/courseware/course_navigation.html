@@ -33,7 +33,7 @@ def url_class(is_active):
     <%block name="extratabs" />
         % if masquerade is not UNDEFINED:
           % if staff_access and masquerade is not None:
-          <li style="float:right"><a href="#" id="staffstatus">${_("Staff view")}</a></li>
+          <li style="float:right"><a href="#" id="staffstatus">Учительский интерфейс</a></li>
           % endif
         % endif
     </ol>
@@ -47,9 +47,9 @@ masq = (function(){
     var el = $('#staffstatus');
     var setstat = function(status){
         if (status=='student'){
-            el.html('<font color="green">Student view</font>');
+            el.html('<font color="green">Студенческий интерфейс</font>');
         }else{
-            el.html('<font color="red">Staff view</font>');
+            el.html('<font color="red">Учительский интерфейс</font>');
         }
     }
     setstat('${masquerade}');

@@ -33,6 +33,7 @@ from xblock.plugin import PluginMissingError
 
 __all__ = ['OPEN_ENDED_COMPONENT_TYPES',
            'ADVANCED_COMPONENT_POLICY_KEY',
+           'show_graph',
            'edit_subsection',
            'edit_unit',
            'assignment_type_update',
@@ -55,6 +56,31 @@ ADVANCED_COMPONENT_TYPES = [
 ] + OPEN_ENDED_COMPONENT_TYPES + NOTE_COMPONENT_TYPES
 ADVANCED_COMPONENT_CATEGORY = 'advanced'
 ADVANCED_COMPONENT_POLICY_KEY = 'advanced_modules'
+
+
+# checking if section with id = section_id doesn't exist in sections
+def is_section_exist(section_id, sections):
+    for section in sections:
+       for subsection in section.get_children():
+           if subsection.url_name == section_id:
+                return True
+
+    return False
+
+
+def show_graph(request, location):
+
+    try:
+        item = modulestore().get_item(location, depth=1)
+    except ItemNotFoundError:
+        return HttpResponseBadRequest()
+
+    # make sure that location references a 'sequential', otherwise return BadRequest
+    if item.location.category != 'sequential':
+        return HttpResponseBadRequest()
+
+    return render_to_response('graph.html',
+                              {'subsection': item})
 
 
 @login_required
@@ -97,6 +123,14 @@ def edit_subsection(request, location):
 
     # this should blow up if we don't find any parents, which would be erroneous
     parent = modulestore().get_item(parent_locs[0])
+    sections = modulestore().get_item(course.location, depth=3).get_children()
+
+    #for section in sections:
+    #   print section.display_name_with_default
+    #    subsections = section.get_children()
+    #    for subsection in subsections:
+    #        print subsection.display_name_with_default
+
 
     # remove all metadata from the generic dictionary that is presented in a
     # more normalized UI
@@ -105,9 +139,23 @@ def edit_subsection(request, location):
         (field.name, field.read_from(item))
         for field
         in item.fields
-        if field.name not in ['display_name', 'start', 'due', 'format']
+
+        if field.name not in ['display_name', 'start', 'due', 'format', 'unlock_term']
             and field.scope == Scope.settings
+
     )
+
+    #item.unlock_term = '{"disjunctions":[]}'
+    term = json.loads(item.unlock_term)
+
+
+    # updating if term has links to already not existed sections
+    for disjunction in term["disjunctions"]:
+        for conjunction in disjunction["conjunctions"]:
+            if not is_section_exist(conjunction["source_section_id"], sections):
+                disjunction["conjunctions"].remove(conjunction)
+
+    item.unlock_term = json.dumps(term)
 
     can_view_live = False
     subsection_units = item.get_children()
@@ -117,22 +165,21 @@ def edit_subsection(request, location):
             can_view_live = True
             break
 
-    return render_to_response(
-        'edit_subsection.html',
-        {
-           'subsection': item,
-           'context_course': course,
-           'new_unit_category': 'vertical',
-           'lms_link': lms_link,
-           'preview_link': preview_link,
-           'course_graders': json.dumps(CourseGradingModel.fetch(course.location).graders),
-           'parent_location': course.location,
-           'parent_item': parent,
-           'policy_metadata': policy_metadata,
-           'subsection_units': subsection_units,
-           'can_view_live': can_view_live
-        }
-    )
+
+    return render_to_response('edit_subsection.html',
+                              {'subsection': item,
+                               'context_course': course,
+                               'new_unit_category': 'vertical',
+                               'lms_link': lms_link,
+                               'preview_link': preview_link,
+                               'course_graders': json.dumps(CourseGradingModel.fetch(course.location).graders),
+                               'parent_location': course.location,
+                               'parent_item': parent,
+                               'policy_metadata': policy_metadata,
+                               'subsection_units': subsection_units,
+                               'sections': sections,
+                               'can_view_live': can_view_live
+                               })
 
 
 @login_required

@@ -40,7 +40,7 @@ class CMS.Views.ModuleEdit extends Backbone.View
       else
         @hideDataEditor()
 
-      title = interpolate(gettext('<em>Editing:</em> %s'),
+      title = interpolate(gettext('<em>Редактируется:</em> %s'),
         [@metadataEditor.getDisplayName()])
       @$el.find('.component-name').html(title)
 
@@ -70,6 +70,7 @@ class CMS.Views.ModuleEdit extends Backbone.View
   render: ->
     if @model.id
       @$el.load("/preview_component/#{@model.id}", =>
+        # alert "#{@model.id}"
         @loadDisplay()
         @delegateEvents()
       )
@@ -85,7 +86,7 @@ class CMS.Views.ModuleEdit extends Backbone.View
     data.metadata = _.extend(data.metadata || {}, @changedMetadata())
     @hideModal()
     saving = new CMS.Views.Notification.Mini
-      title: gettext('Saving') + '&hellip;'
+      title: gettext('Сохраняется') + '&hellip;'
     saving.show()
     @model.save(data).done( =>
     #   # showToastMessage("Your changes have been saved.", null, 3)
@@ -94,7 +95,7 @@ class CMS.Views.ModuleEdit extends Backbone.View
       @$el.removeClass('editing')
       saving.hide()
     ).fail( ->
-      showToastMessage(gettext("There was an error saving your changes. Please try again."), null, 3)
+      showToastMessage(gettext("Возникли проблемы при сохранении. Попробуйте ещё раз"), null, 3)
     )
 
   clickCancelButton: (event) ->

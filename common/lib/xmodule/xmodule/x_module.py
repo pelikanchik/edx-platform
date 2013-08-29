@@ -497,6 +497,8 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
             name = self.url_name.replace('_', ' ')
         return name
 
+
+
     def get_required_module_descriptors(self):
         """Returns a list of XModuleDescritpor instances upon which this module depends, but are
         not children of this module"""

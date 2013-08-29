@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # pylint: disable=W0223
 """Video is ungraded Xmodule for support video content.
 It's new improved video module, which support additional feature:
@@ -35,6 +36,7 @@ log = logging.getLogger(__name__)
 class VideoFields(object):
     """Fields for `VideoModule` and `VideoDescriptor`."""
     display_name = String(
+#<<<<<<< HEAD
         display_name="Display Name", help="Display name for this module.",
         default="Video",
         scope=Scope.settings
@@ -112,6 +114,30 @@ class VideoFields(object):
         scope=Scope.settings,
         default=""
     )
+#=======
+#        display_name=u"Отображаемое имя",
+#        help=u"Это имя появляется в горизонтальной навигации наверху страницы.",
+#        scope=Scope.settings,
+#        # it'd be nice to have a useful default but it screws up other things; so,
+#        # use display_name_with_default for those
+#        default=u"Видео"
+#    )
+#    data = String(
+#        help=u"XML-данные",
+#        default='',
+#        scope=Scope.content
+#    )
+#    position = Integer(help=u"Текущая позиция в видео", scope=Scope.user_state, default=0)
+#    show_captions = Boolean(help=u"Управляет, показываются ли по умолчанию заголовки.", display_name=u"Показывать заголовки", scope=Scope.settings, default=True)
+#    youtube_id_1_0 = String(help=u"YouTube ID для видео нормальной скорости.", display_name=u"Обычная скорость", scope=Scope.settings, default="OEoXaMPEzfM")
+#    youtube_id_0_75 = String(help=u"Youtube ID для видео скорости 0.75x.", display_name=u"Скорость: .75x", scope=Scope.settings, default="")
+#    youtube_id_1_25 = String(help=u"Youtube ID для видео скорости 1.25x", display_name=u"Скорость: 1.25x", scope=Scope.settings, default="")
+#    youtube_id_1_5 = String(help=u"Youtube ID для видео скорости 1.5x", display_name=u"Скорость: 1.5x", scope=Scope.settings, default="")
+#    start_time = Float(help=u"Время запуска видео", display_name=u"Время начала", scope=Scope.settings, default=0.0)
+#    end_time = Float(help=u"Время, когда показ видео закончится", display_name=u"Время окончания", scope=Scope.settings, default=0.0)
+#    source = String(help=u"Внешняя ссылка на видеофайл.", display_name=u"Скачать видео", scope=Scope.settings, default="")
+#    track = String(help=u"Внешняя ссылка на субтитры.", display_name=u"Скачать субтитры", scope=Scope.settings, default="")
+#>>>>>>> 4f9bf342df105f2a5f00372194e6f7a65dac6f8b
 
 
 class VideoModule(VideoFields, XModule):
@@ -200,12 +226,30 @@ class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor
 
     def __init__(self, *args, **kwargs):
         super(VideoDescriptor, self).__init__(*args, **kwargs)
+#<<<<<<< HEAD
         # For backwards compatibility -- if we've got XML data, parse
         # it out and set the metadata fields
         if self.data:
             model_data = VideoDescriptor._parse_video_xml(self.data)
             self._model_data.update(model_data)
             del self.data
+#=======
+        # If we don't have a `youtube_id_1_0`, this is an XML course
+        # and we parse out the fields.
+#        if self.data and 'youtube_id_1_0' not in self._model_data:
+#            _parse_video_xml(self, self.data)
+#
+#    @property
+#    def get_class(self):
+#        return "VideoDescriptor"
+#
+#    @property
+#    def non_editable_metadata_fields(self):
+#        non_editable_fields = super(MetadataOnlyEditingDescriptor, self).non_editable_metadata_fields
+#        non_editable_fields.extend([VideoModule.start_time,
+#                                    VideoModule.end_time])
+#        return non_editable_fields
+#>>>>>>> 4f9bf342df105f2a5f00372194e6f7a65dac6f8b
 
     @classmethod
     def from_xml(cls, xml_data, system, org=None, course=None):
@@ -380,6 +424,7 @@ def _create_youtube_string(module):
     module.  Necessary for backwards compatibility with XML-based
     courses.
     """
+#<<<<<<< HEAD
     youtube_ids = [
         module.youtube_id_0_75,
         module.youtube_id_1_0,
@@ -391,3 +436,34 @@ def _create_youtube_string(module):
                      for pair
                      in zip(youtube_speeds, youtube_ids)
                      if pair[1]])
+#=======
+#    ret = {'0.75': 'slow', '1.00': 'norm', '1.25': 'fast', '1.50': 'xfast'}
+#    if data == '':
+#        return ret
+#    videos = data.split(',')
+#    for video in videos:
+#        pieces = video.split(':')
+        # HACK
+        # To elaborate somewhat: in many LMS tests, the keys for
+        # Youtube IDs are inconsistent. Sometimes a particular
+        # speed isn't present, and formatting is also inconsistent
+        # ('1.0' versus '1.00'). So it's necessary to either do
+        # something like this or update all the tests to work
+        # properly.
+#        ret['%.2f' % float(pieces[0])] = pieces[1]
+#    return ret
+
+
+#def _parse_time(str_time):
+#    """Converts s in '12:34:45' format to seconds. If s is
+#    None, returns empty string"""
+#    if str_time is None or str_time == '':
+#        return ''
+#    else:
+#        obj_time = time.strptime(str_time, '%H:%M:%S')
+#        return datetime.timedelta(
+#            hours=obj_time.tm_hour,
+#            minutes=obj_time.tm_min,
+#            seconds=obj_time.tm_sec
+#        ).total_seconds()
+#>>>>>>> 4f9bf342df105f2a5f00372194e6f7a65dac6f8b

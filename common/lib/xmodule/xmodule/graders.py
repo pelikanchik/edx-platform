@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import abc
 import inspect
 import logging
@@ -181,9 +182,9 @@ class WeightedSubsectionsGrader(CourseGrader):
 
         for subgrader, category, weight in self.sections:
             subgrade_result = subgrader.grade(grade_sheet, generate_random_scores)
-
+           #subgrade_result = 20
             weighted_percent = subgrade_result['percent'] * weight
-            section_detail = "{0} = {1:.1%} of a possible {2:.0%}".format(category, weighted_percent, weight)
+            section_detail = "{0} = {1:.1%} of a possible {2:.0%}".format(category.encode("utf-8"), weighted_percent, weight)
 
             total_percent += weighted_percent
             section_breakdown += subgrade_result['section_breakdown']
@@ -287,7 +288,8 @@ class AssignmentFormatGrader(CourseGrader):
         self.show_only_average = show_only_average
         self.starting_index = starting_index
         self.hide_average = hide_average
-
+        self.section_type = self.section_type.encode("utf-8")
+        self.short_label = self.short_label.encode("utf-8")
     def grade(self, grade_sheet, generate_random_scores=False):
         def total_with_drops(breakdown, drop_count):
             '''calculates total score for a section while dropping lowest scores'''
@@ -320,7 +322,7 @@ class AssignmentFormatGrader(CourseGrader):
                 else:
                     earned = scores[i].earned
                     possible = scores[i].possible
-                    section_name = scores[i].section
+                    section_name = scores[i].section.encode("utf-8")
 
                 percentage = earned / float(possible)
                 summary_format = "{section_type} {index} - {name} - {percent:.0%} ({earned:.3n}/{possible:.3n})"
@@ -332,7 +334,7 @@ class AssignmentFormatGrader(CourseGrader):
                                                 possible=float(possible))
             else:
                 percentage = 0
-                summary = "{section_type} {index} Unreleased - 0% (?/?)".format(index=i + self.starting_index,
+                summary = "{section_type} {index} (не выполнено) - 0% (?/?)".format(index=i + self.starting_index,
                                                                                 section_type=self.section_type)
 
             short_label = "{short_label} {index:02d}".format(index=i + self.starting_index,
@@ -357,9 +359,9 @@ class AssignmentFormatGrader(CourseGrader):
             breakdown = [{'percent': total_percent, 'label': total_label,
                           'detail': total_detail, 'category': self.category, 'prominent': True}, ]
         else:
-            total_detail = "{section_type} Average = {percent:.0%}".format(percent=total_percent,
+            total_detail = "{section_type} (в среднем) = {percent:.0%}".format(percent=total_percent,
                                                                            section_type=self.section_type)
-            total_label = "{short_label} Avg".format(short_label=self.short_label)
+            total_label = "{short_label} (в среднем)".format(short_label=self.short_label)
 
             if self.show_only_average:
                 breakdown = []
