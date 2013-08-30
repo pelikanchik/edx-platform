@@ -505,6 +505,16 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
         return string;
       });
 
+      // textbox
+      xml = xml.replace(/^\===/gm, function(match, p) {
+         var string;
+         string = '<customresponse>\n';
+         string += '  <textbox/>\n';
+         string += '</customresponse>\n';
+
+        return string;
+      });
+
       // replace string and numerical
       xml = xml.replace(/^\=\s*(.*?$)/gm, function(match, p) {
         var string;
