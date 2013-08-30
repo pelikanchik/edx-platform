@@ -243,12 +243,12 @@ class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor
     def get_class(self):
         return "VideoDescriptor"
 #
-    @property
-    def non_editable_metadata_fields(self):
-        non_editable_fields = super(MetadataOnlyEditingDescriptor, self).non_editable_metadata_fields
-        non_editable_fields.extend([VideoModule.start_time,
-                                    VideoModule.end_time])
-        return non_editable_fields
+#    @property
+#    def non_editable_metadata_fields(self):
+#        non_editable_fields = super(MetadataOnlyEditingDescriptor, self).non_editable_metadata_fields
+#        non_editable_fields.extend([VideoModule.start_time,
+#                                    VideoModule.end_time])
+#        return non_editable_fields
 #>>>>>>> 4f9bf342df105f2a5f00372194e6f7a65dac6f8b
 
     @classmethod
