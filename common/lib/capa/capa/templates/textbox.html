@@ -1,0 +1,14 @@
+<section id="textbox_${id}" class="textbox">
+  <textarea rows="20" cols="60" name="input_${id}" aria-describedby="answer_${id}" id="input_${id}"
+       % if hidden:
+      	    style="display:none;"
+       % endif
+  >${value|h}</textarea>
+
+  <span id="answer_${id}"></span>
+
+  <div class="external-grader-message">
+    ${msg|n}
+  </div>
+
+</section>

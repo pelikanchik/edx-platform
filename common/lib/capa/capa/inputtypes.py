@@ -644,7 +644,8 @@ class CodeInput(InputTypeBase):
     etc.
     """
 
-    template = "codeinput.html"
+    #template = "codeinput.html"
+    template = "textbox.html"
     tags = ['codeinput',
             'textbox',
             # Another (older) name--at some point we may want to make it use a

@@ -142,7 +142,7 @@ class LoncapaResponse(object):
         self.system = system
 
         self.id = xml.get('id')
-
+        print (self.allowed_inputfields);
         for abox in inputfields:
             if abox.tag not in self.allowed_inputfields:
                 msg = "%s: cannot have input field %s" % (
