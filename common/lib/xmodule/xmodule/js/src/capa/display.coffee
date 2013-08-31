@@ -304,10 +304,10 @@ class @Problem
             @el.removeClass 'showed'
         else
           @gentle_alert response.success
-      $("#" + @element_id + " .check").val('Проверить').prop('disabled', false)
+      $("#" + @element_id + " .check").val('Ответить').prop('disabled', false)
       responsesBeingProcessedCount--
       if( responsesBeingProcessedCount == 0)
-        $('.check-all').html('Проверить').removeClass('check-all-disabled');
+        $('.check-all').html('Ответить').removeClass('check-all-disabled');
 
       Logger.log 'problem_graded', [@answers, response.contents], @url
 
