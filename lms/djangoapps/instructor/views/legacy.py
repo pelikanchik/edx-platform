@@ -533,7 +533,7 @@ def instructor_dashboard(request, course_id):
     #----------------------------------------
     # DataDump
 
-    elif 'Download CSV of all student profile data' in action:
+    elif u'Скачать CSV с данными пользователей' in action:
         enrolled_students = User.objects.filter(
             courseenrollment__course_id=course_id,
             courseenrollment__is_active=1,
@@ -550,7 +550,7 @@ def instructor_dashboard(request, course_id):
         datatable['title'] = 'Student profile data for course %s' % course_id
         return return_csv('profiledata_%s.csv' % course_id, datatable)
 
-    elif 'Download CSV of all responses to problem' in action:
+    elif u'Скачать CSV всех попыток по заданию' in action:
         problem_to_dump = request.POST.get('problem_to_dump', '')
 
         if problem_to_dump[-4:] == ".xml":
