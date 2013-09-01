@@ -223,40 +223,40 @@ def instructor_dashboard(request, course_id):
             except Exception as err:
                 msg += '<br/><p>Error: {0}</p>'.format(escape(err))
 
-    if action == 'Dump list of enrolled students' or action == 'List enrolled students':
+    if action == u'Список приглашенных учеников' or action == 'List enrolled students':
         log.debug(action)
         datatable = get_student_grade_summary_data(request, course, course_id, get_grades=False, use_offline=use_offline)
         datatable['title'] = 'List of students enrolled in {0}'.format(course_id)
         track.views.server_track(request, "list-students", {}, page="idashboard")
 
-    elif 'Dump Grades' in action:
+    elif u'Данные успеваемости' in action:
         log.debug(action)
         datatable = get_student_grade_summary_data(request, course, course_id, get_grades=True, use_offline=use_offline)
         datatable['title'] = 'Summary Grades of students enrolled in {0}'.format(course_id)
         track.views.server_track(request, "dump-grades", {}, page="idashboard")
 
-    elif 'Dump all RAW grades' in action:
+    elif u'Сырые данные об успеваемости учеников курса' in action:
         log.debug(action)
         datatable = get_student_grade_summary_data(request, course, course_id, get_grades=True,
                                                    get_raw_scores=True, use_offline=use_offline)
         datatable['title'] = 'Raw Grades of students enrolled in {0}'.format(course_id)
         track.views.server_track(request, "dump-grades-raw", {}, page="idashboard")
 
-    elif 'Download CSV of all student grades' in action:
+    elif u'Скачать CSV успеваемости' in action:
         track.views.server_track(request, "dump-grades-csv", {}, page="idashboard")
         return return_csv('grades_{0}.csv'.format(course_id),
                           get_student_grade_summary_data(request, course, course_id, use_offline=use_offline))
 
-    elif 'Download CSV of all RAW grades' in action:
+    elif u'Скачать CSV с сырыми данными об успеваемости' in action:
         track.views.server_track(request, "dump-grades-csv-raw", {}, page="idashboard")
         return return_csv('grades_{0}_raw.csv'.format(course_id),
                           get_student_grade_summary_data(request, course, course_id, get_raw_scores=True, use_offline=use_offline))
 
-    elif 'Download CSV of answer distributions' in action:
+    elif u'Скачать CSV распределения ответов' in action:
         track.views.server_track(request, "dump-answer-dist-csv", {}, page="idashboard")
         return return_csv('answer_dist_{0}.csv'.format(course_id), get_answers_distribution(request, course_id))
 
-    elif 'Dump description of graded assignments configuration' in action:
+    elif u'Описание выставления оценок' in action:
         # what is "graded assignments configuration"?
         track.views.server_track(request, "dump-graded-assignments-config", {}, page="idashboard")
         msg += dump_grading_context(course)
@@ -569,7 +569,7 @@ def instructor_dashboard(request, course_id):
 
         if smdat:
             datatable = {'header': ['username', 'state']}
-            datatable['data'] = [[x.student.username, x.state] for x in smdat]
+            datatable['data'] = [[x.student.username, x.state.decode('unicode_escape')] for x in smdat]
             datatable['title'] = 'Student state for problem %s' % problem_to_dump
             return return_csv('student_state_from_%s.csv' % problem_to_dump, datatable)
 
