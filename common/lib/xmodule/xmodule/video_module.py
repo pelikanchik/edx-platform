@@ -55,7 +55,8 @@ class VideoModule(VideoFields, XModule):
     js = {
         'coffee': [
             resource_string(__name__, 'js/src/time.coffee'),
-            resource_string(__name__, 'js/src/video/display.coffee')
+            resource_string(__name__, 'js/src/video/display.coffee'),
+            resource_string(__name__, 'js/src/capa/display.coffee'),
         ] +
         [resource_string(__name__, 'js/src/video/display/' + filename)
          for filename

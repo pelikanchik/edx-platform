@@ -3,7 +3,7 @@
 <h2 class="problem-header">
   ${ problem['name'] }
 </h2>
-s
+
 <section class="problem-progress"></section>
 
 <section class="problem">
@@ -13,7 +13,7 @@ s
     <input type="hidden" name="problem_id" value="${ problem['name'] }" />
 
     % if check_button:
-    <input class="check ${ check_button }" type="button" value="${ check_button }" />
+    <input class="check" type="button" value="${ check_button }" />
     % endif
     % if reset_button:
     <input class="reset" type="button" value="Сбросить ответы" />
@@ -27,8 +27,11 @@ s
     <script type='text/javascript'>
         $(document).ready(function () {
             var t = '${delay_answers}';
+            var all_id = "show_answers_button"
+            //console.log(all_id);
             var id = setTimeout(function() {
-              $('#show_answers_button').show();
+              var button = document.getElementById(all_id);
+              button.style.display = "block";
             }, t*1000);
         });
 

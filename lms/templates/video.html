@@ -3,7 +3,6 @@
 % endif
 
 %if settings.MITX_FEATURES.get('USE_YOUTUBE_OBJECT_API') and normal_speed_video_id:
-  12234
   <object width="640" height="390">
     <param name="movie"
     % if not settings.MITX_FEATURES['STUB_VIDEO_FOR_TESTING']:
@@ -33,12 +32,14 @@
        data-autoplay="${settings.MITX_FEATURES['AUTOPLAY_VIDEOS']}">
     <div class="tc-wrapper">
       <article class="video-wrapper">
-        <section class="video-player" id="video_player_yt"  style="display: block">
-          <div class="problem" id="frame_problem"></div>
+        <section class="video-player">
+          <section class="xmodule_display xmodule_CapaModule" data-type="Problem" id="frame_problem" style="display: none"></section>
+          <div id="temp_index_problem" style="display: none"></div>
           <div id="${id}"></div>
         </section>
         <section class="video-controls">
           <button class="return-to-video" id="return_to_video_${id}" style="display: none">Вернуться к видео</button>
+          <button class="answer-problem" id="answer_problem" style="display: none">Проверить</button>
         </section>
       </article>
     </div>

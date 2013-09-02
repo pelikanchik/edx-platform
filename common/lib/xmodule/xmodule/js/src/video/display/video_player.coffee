@@ -151,9 +151,26 @@ class @VideoPlayer extends Subview
     for t, i in _problems_time
       if (t is int_time)
         @pause()
-        r = i+1
-        problem = $("#vert-"+r).html()
-        $("#video_player_yt").html(problem)
+        @updatePlayTime(t+1)
+        r = i + 1
+        index = $("#temp_index_problem").html()
+        if index.length == 0
+          return_to_video = document.getElementsByClassName("return-to-video")
+          return_to_video[0].style.display = 'block'
+          iframe = document.getElementById(this.video.id)
+          iframe.style.height = '0%'
+          frame_problem = document.getElementById("frame_problem")
+          frame_problem.style.display = 'block'
+          slider = document.getElementsByClassName("slider")
+          slider[0].style.display = 'none'
+          underslider = document.getElementsByClassName("underslider")
+          underslider[0].style.display = 'none'
+          $("#temp_index_problem").html(r)
+          problem_id = $("#vert-" + r).data('id').replace(/:\/\//,'-').replace(/\//g,'-')
+          $("#frame_problem").attr 'data-old-id': problem_id
+          $("#problem_" + problem_id).appendTo("#frame_problem")
+
+
 
   toggleFullScreen: (event) =>
     event.preventDefault()
