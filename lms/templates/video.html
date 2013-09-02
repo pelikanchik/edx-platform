@@ -86,11 +86,13 @@
           </section>
           <a class="nav-skip sr" id="before-transcript_${id}" href="#after-transcript_${id}">${_('Skip to end of transcript.')}</a>
         <section class="video-player" id="video_player_yt"  style="display: block">
-          <div class="problem" id="frame_problem"></div>
+          <section class="xmodule_display xmodule_CapaModule" data-type="Problem" id="frame_problem" style="display: none"></section>
+          <div id="temp_index_problem" style="display: none"></div>
           <div id="${id}"></div>
         </section>
         <section class="video-controls">
           <button class="return-to-video" id="return_to_video_${id}" style="display: none">Вернуться к видео</button>
+          <button class="answer-problem" id="answer_problem" style="display: none">Проверить</button>
         </section>
       </article>
 

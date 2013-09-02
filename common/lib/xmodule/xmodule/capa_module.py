@@ -600,6 +600,7 @@ class CapaModule(CapaFields, XModule):
         content = {'name': self.display_name_with_default,
                    'html': html,
                    'weight': self.weight,
+                   'id': self.id
                    }
         context = {'problem': content,
                    'id': self.id,

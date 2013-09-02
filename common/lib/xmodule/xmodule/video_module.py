@@ -96,8 +96,8 @@ class VideoFields(object):
     )
     #front-end code of video player checks logical validity of (start_time, end_time) pair.
     problem_after_video = Boolean(
-        help=u"Показать задание по завершении видео.", 
-        display_name=u"Задачка после видео", 
+        help=u"Показать задание по завершении видео.",
+        display_name=u"Задачка после видео",
         scope=Scope.settings,
         default=True
     )
@@ -186,7 +186,7 @@ class VideoModule(VideoFields, XModule):
             'youtube_id_1_0': self.youtube_id_1_0,
             'youtube_id_1_25': self.youtube_id_1_25,
             'youtube_id_1_5': self.youtube_id_1_5,
-            'problem_id': problem_id,            
+            'problem_id': problem_id,
             'id': self.location.html_id(),
             'sub': self.sub,
             'sources': sources,
