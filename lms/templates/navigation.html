@@ -3,6 +3,7 @@
 <%namespace file='main.html' import="login_query, stanford_theme_enabled"/>
 <%!
 from django.core.urlresolvers import reverse
+from django.utils.translation import ugettext as _
 
 # App that handles subdomain specific branding
 import branding
@@ -34,9 +35,9 @@ site_status_msg = get_site_status_msg(course_id)
 
 
 % if course:
-  <header class="global slim" aria-label="Global Navigation">
+  <header class="global slim" aria-label="${_('Global Navigation')}">
 % else:
-  <header class="global" aria-label="Global Navigation">
+  <header class="global" aria-label="${_('Global Navigation')}">
 % endif
   <nav>
 
@@ -49,7 +50,7 @@ site_status_msg = get_site_status_msg(course_id)
   </h1>
 
     % if course:
-      <h2><span class="provider">${course.org}:</span> ${course.number} ${course.display_name_with_default}</h2>
+      <h2><span class="provider">${course.display_org_with_default | h}:</span> ${course.display_number_with_default | h} ${course.display_name_with_default}</h2>
     % endif
 
     % if user.is_authenticated():
@@ -57,6 +58,7 @@ site_status_msg = get_site_status_msg(course_id)
     <ol class="left nav-global authenticated">
       <%block name="navigation_global_links_authenticated">
         <li class="nav-global-01">
+
           <a href="${marketing_link('COURSES')}">Выбрать курс</a>
         </li>
       </%block>
@@ -65,14 +67,15 @@ site_status_msg = get_site_status_msg(course_id)
       <li class="primary">
         <a href="${reverse('dashboard')}" class="user-link">
           <span class="avatar"></span>
-          <span class="sr">: кабинет </span>
+          <span class="sr">Кабинет: </span>
             ${user.profile.name}
         </a>
       </li>
       <li class="primary">
-        <a href="#" class="dropdown"><span class="sr">More options dropdown</span> &#9662</a>
+        <a href="#" class="dropdown"><span class="sr">${_("More options dropdown")}</span> &#9662;</a>
         <ul class="dropdown-menu">
           <%block name="navigation_dropdown_menu_links" >
+
             <li><a href="${marketing_link('FAQ')}">FAQ</a></li>
           </%block>
           <li><a href="${reverse('logout')}">Выйти</a></li>
@@ -98,6 +101,7 @@ site_status_msg = get_site_status_msg(course_id)
       % if not settings.MITX_FEATURES['DISABLE_LOGIN_BUTTON']:
           % if course and settings.MITX_FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
           <li class="nav-global-04">
+
             <a class="cta cta-register" href="${reverse('course-specific-register', args=[course.id])}">Зарегистрироваться</a>
           </li>
           % else:
@@ -112,6 +116,7 @@ site_status_msg = get_site_status_msg(course_id)
     <li class="nav-courseware-01">
       % if not settings.MITX_FEATURES['DISABLE_LOGIN_BUTTON']:
           % if course and settings.MITX_FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
+
           <a class="cta cta-login" href="${reverse('course-specific-login', args=[course.id])}${login_query()}">Войти</a>
           % else:
           <a class="cta cta-login" href="/login${login_query()}">Войти</a>

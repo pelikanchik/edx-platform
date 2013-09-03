@@ -1,5 +1,6 @@
 ## mako
 <%! from django.core.urlresolvers import reverse %>
+<%! from django.utils.translation import ugettext as _ %>
 <%namespace name='static' file='static_content.html'/>
 
 <div class="wrapper wrapper-footer">
@@ -9,17 +10,19 @@
       <ol>
           <li class="nav-colophon-01">
           <a id="about" href="${marketing_link('ABOUT')}">
+
               О нас
           </a>
           </li>
 
           <li class="nav-colophon-04">
           <a id="faq" href="${marketing_link('FAQ')}">
-              FAQ
+              ${_("FAQ")}
           </a>
           </li>
           <li class="nav-colophon-05">
           <a id="contact" href="${marketing_link('CONTACT')}">
+
               Контакты
           </a>
           </li>
@@ -44,11 +47,13 @@
         </ul>
       </nav>
 
-      <p class="copyright">&copy; 2013 Pelican, Некоторые права защищены.</p>
+
+     ## <p class="copyright">&copy; 2013 Pelican, Некоторые права защищены.</p>
 
       <nav class="nav-legal">
         <ul>
           <li class="nav-legal-01">
+
             <a href="${marketing_link('TOS')}">Правила пользования</a>
           </li>
           <li class="nav-legal-02">

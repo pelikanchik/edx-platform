@@ -9,6 +9,18 @@
 %>
 
 ## js templates
+<%block name="jsextra">
+
+    <script type="text/javascript" src="/static/js/models/course_relative.js"></script>
+    <script type="text/javascript" src="/static/js/views/validating_view.js"></script>
+    <script type="text/javascript" src="/static/js/models/settings/course_details.js"></script>
+
+
+
+</%block>
+
+
+
 <script id="metadata-editor-tpl" type="text/template">
     <%static:include path="js/metadata-editor.underscore" />
 </script>
@@ -20,9 +32,16 @@
 <script id="metadata-string-entry" type="text/template">
     <%static:include path="js/metadata-string-entry.underscore" />
 </script>
+<script id="metadata-tree-entry" type="text/template">
+    <%static:include path="js/metadata-tree-entry.underscore" />
+</script>
 
 <script id="metadata-option-entry" type="text/template">
     <%static:include path="js/metadata-option-entry.underscore" />
+</script>
+
+<script id="metadata-list-entry" type="text/template">
+    <%static:include path="js/metadata-list-entry.underscore" />
 </script>
 
 <% showHighLevelSource='source_code' in editable_metadata_fields and editable_metadata_fields['source_code']['explicitly_set'] %>

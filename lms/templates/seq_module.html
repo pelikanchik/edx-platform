@@ -1,3 +1,5 @@
+<%! from django.utils.translation import ugettext as _ %>
+
 <script type="text/javascript" src="/static/js/sticky-go-button.js" charset="utf-8"></script>
 
 <div id="sequence_${element_id}" class="sequence"
@@ -6,7 +8,7 @@
      data-course_modx_root="/course/modx" >
   <nav aria-label="Section Navigation" class="sequence-nav">
     <ul class="sequence-nav-buttons">
-      <li class="prev"><a href="#">Previous</a></li>
+      <li class="prev"><a href="#">${_('Previous')}</a></li>
     </ul>
 
     <div class="sequence-list-wrapper">
@@ -29,11 +31,11 @@
     </div>
 
     <ul class="sequence-nav-buttons">
-      <li class="next"><a href="#">Next</a></li>
+      <li class="next"><a href="#">${_("Next")}</a></li>
     </ul>
 
     <div class="sequence-nav-buttons go-button go-button-static" id="gbid">
-        <p class = "check-all"><a href= "#">Проверить</a></p>
+        <p class = "check-all"><a href= "#">Ответить</a></p>
         <p class = "godynamo"><a href= "#">Продолжить</a></p>
     </div>
 
@@ -51,9 +53,9 @@
   <div id="seq_content"></div>
 
   <nav class="sequence-bottom">
-    <ul aria-label="Section Navigation" class="sequence-nav-buttons">
-      <li class="prev"><a href="#">Previous</a></li>
-      <li class="next"><a href="#">Next</a></li>
+    <ul aria-label="${_('Section Navigation')}" class="sequence-nav-buttons">
+      <li class="prev"><a href="#">${_("Previous")}</a></li>
+      <li class="next"><a href="#">${_("Next")}</a></li>
     </ul>
   </nav>
 </div>

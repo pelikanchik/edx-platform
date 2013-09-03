@@ -1,3 +1,5 @@
+<%! from django.utils.translation import ugettext as _ %>
+
 <%! from django.core.urlresolvers import reverse %>
 <%! from time import strftime %>
 <%inherit file="main.html" />
@@ -18,12 +20,14 @@
         % if not self.theme_enabled():
           <section class="actions">
             <div class="main-cta">
+
               <a href="#signup-modal" id="signup_action" class="find-courses" rel="leanModal">Регистрация</a>
+
             </div>
 
             <div class="secondary-actions">
               <div class="social-sharing">
-                <div class="sharing-message">Stay up to date with all edX has to offer!</div>
+                <div class="sharing-message">${_("Stay up to date with all {platform_name} has to offer!").format(platform_name=settings.PLATFORM_NAME)}</div>
                 <a href="https://twitter.com/edXOnline" class="share">
                   <img src="${static.url('images/social/twitter-sharing.png')}">
                 </a>
@@ -44,13 +48,7 @@
 
   <section class="container">
     <section class="highlighted-courses">
-      ## Disable university partner logos and sites for non-edX sites
-      % if not self.theme_enabled():
-        <h2>Наши курсы:</h2>
-
-
-      % endif
-
+      <h2>Наши курсы:</h2>
       <section class="courses">
           <ul class="courses-listing">
           %for course in courses:
@@ -62,14 +60,11 @@
       </section>
     </section>
   </section>
-
-
 </section>
 
 
-
 <%block name="js_extra">
-   <script type="text/javascript"">
+   <script type="text/javascript">
       $(window).load(function() {
          if(getParameterByName('next')) {
               $('#login').trigger("click");

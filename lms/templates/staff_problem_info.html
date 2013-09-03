@@ -1,3 +1,5 @@
+<%! from django.utils.translation import ugettext as _ %>
+
 ## The JS for this is defined in xqa_interface.html
 ${module_content}
 %if location.category in ['problem','video','html','combinedopenended','graphical_slider_tool']:
@@ -19,6 +21,7 @@ ${module_content}
 %  if settings.MITX_FEATURES.get('ENABLE_STUDENT_HISTORY_VIEW') and \
       location.category == 'problem':
 <div><a href="#${element_id}_history" id="${element_id}_history_trig">История отправок</a></div>
+
 %  endif
 
 <section id="${element_id}_xqa-modal" class="modal xqa-modal" style="width:80%; left:20%; height:80%; overflow:auto" >
@@ -35,6 +38,7 @@ ${module_content}
       <input id="${element_id}_xqa_tag" type="text" placeholder="tag" style="width:80px;display:inline">
       <div class="submit">
         <button name="submit" type="submit">Добавить комментарий</button>
+
       </div>
       <hr>
       <div id="${element_id}_xqa_log_data"></div>
@@ -46,7 +50,7 @@ ${module_content}
 <section class="modal staff-modal" id="${element_id}_debug" style="width:80%; left:20%; height:80%; overflow:auto;" >
   <div class="inner-wrapper" style="color:black">
     <header>
-      <h2>Отладка</h2>
+      <h2>Подробно (для учителя)</h2>
     </header>
     <div class="staff_info" style="display:block">
 is_released = ${is_released}

@@ -25,13 +25,18 @@
         <p>${_(u"Загружаемые файлы должны быть сжаты (.tar.gz), и должны содержать, как минимум файл {filename}.").format(filename='<code>course.xml</code>')}</p>
         <p>${_(u"Пожалуйста, обратите внимание, если ваш курс имеет некоторые проблемы с автоматической генерацией {nodename} узлов, импорт вашего курса вновь может привести к потере информации об учащихся, связанных с этими проблемами").format(nodename='<code>url_name</code>')}</p>
       </div>
-      <form action="${reverse('import_course', kwargs=dict(org=context_course.location.org, course=context_course.location.course, name=context_course.location.name))}" method="post" enctype="multipart/form-data" class="import-form">
-        <h2>${_(u"Курс для импорта:")}</h2>
+
+      <form id="fileupload" method="post" enctype="multipart/form-data"
+          class="import-form" url="${reverse('import_course', kwargs=dict(org=context_course.location.org, course=context_course.location.course, name=context_course.location.name))}">
+        <h2>Курс для импорта</h2>
         <p class="error-block"></p>
-        <a href="#" class="choose-file-button">${_(u"Выберите файл")}</a>
-        <p class="file-name-block"><span class="file-name"></span><a href="#" class="choose-file-button-inline">${_(u"изменить")}</a></p>
-        <input type="file" name="course-data" class="file-input">
-        <input type="submit" value="${_(u'Replace my course with the one above')}" class="submit-button">
+        <a href="#" class="choose-file-button">Выберите файл</a>
+        <p class="file-name-block"><span class="file-name"></span><a href="#" class="choose-file-button-inline">изменить</a></p>
+        <input type="file" name="course-data" class="file-input" >
+        <input type="submit" value="${_('Replace my course with the one above')}" class="submit-button" >
+        <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}">
+        <p class="status-block">Распаковка...</p>
+
         <div class="progress-bar">
           <div class="progress-fill"></div>
           <div class="percent">0%</div>
@@ -43,6 +48,9 @@
 </%block>
 
 <%block name="jsextra">
+<script src="${static.url('js/vendor/jQuery-File-Upload/js/jquery.iframe-transport.js')}"> </script>
+<script src="${static.url('js/vendor/jQuery-File-Upload/js/jquery.fileupload.js')}"> </script>
+
 <script>
 (function() {
 
@@ -50,33 +58,63 @@ var bar = $('.progress-bar');
 var fill = $('.progress-fill');
 var percent = $('.percent');
 var status = $('#status');
+var statusBlock = $('.status-block');
 var submitBtn = $('.submit-button');
 
-$('form').ajaxForm({
-    beforeSend: function() {
-        status.empty();
-        var percentVal = '0%';
+
+$('#fileupload').fileupload({
+
+    dataType: 'json',
+    type: 'POST',
+
+    maxChunkSize: 20 * 1000000, // 20 MB
+
+    autoUpload: false,
+
+    add: function(e, data) {
+        submitBtn.unbind('click');
+        var file = data.files[0];
+        if (file.type == "application/x-gzip") {
+            submitBtn.click(function(e){
+                e.preventDefault();
+                submitBtn.hide();
+                data.submit().complete(function(result, textStatus, xhr) {
+                    if (result.status != 200) {
+                        alert('${_("Your import has failed.")}\n\n' + JSON.parse(result.responseText)["ErrMsg"]);
+                        submitBtn.show();
+                        bar.hide();
+                    } else {
+                        if (result.responseText["ImportStatus"] == 1) {
+                            bar.hide();
+                            statusBlock.show();
+                        }
+                    }
+                });
+            });
+        } else {
+            data.files = [];
+        }
+    },
+
+    progressall: function(e, data){
+        var percentVal = parseInt(data.loaded / data.total * 100, 10) + "%";
         bar.show();
         fill.width(percentVal);
         percent.html(percentVal);
-        submitBtn.hide();
     },
-    uploadProgress: function(event, position, total, percentComplete) {
-        var percentVal = percentComplete + '%';
-        fill.width(percentVal);
-        percent.html(percentVal);
-    },
-    complete: function(xhr) {
-      if (xhr.status == 200) {
+
+    done: function(e, data){
+        bar.hide();
         alert('${_(u"Импорт прошёл успешно.")}');
         window.location = '${successful_import_redirect_url}';
-      }
-      else
-        alert('${_(u"Ошибка при импорте.")}\n\n' + xhr.responseText);
-        submitBtn.show();
-        bar.hide();
-    }
-  });
+    },
+    sequentialUploads: true
+
+
+
+});
+
+
 })();
 </script>
 </%block>

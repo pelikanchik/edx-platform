@@ -21,7 +21,6 @@ class @Problem
 
     problem_prefix = @element_id.replace(/problem_/,'')
     @inputs = @$("[id^=input_#{problem_prefix}_]")
-
     @$('section.action input:button').click @refreshAnswers
     @$('section.action input.check').click @check_fd
     # XXX
@@ -29,6 +28,7 @@ class @Problem
     @$('section.action input.reset').click @reset
     @$('section.action button.show').click @show
     @$('section.action input.save').click @save
+
     @$(".advice-for-problem").each ->
       showDelay = 1000 * parseInt($(this).attr("rel"))
       if $.cookie("advice" + $(this).children(".title").attr("rel"))
@@ -61,7 +61,7 @@ class @Problem
     progress = "(баллов: #{detail})"
     if status == 'none' and detail? and detail.indexOf('/') > 0
         a = detail.split('/')
-        possible = parseInt(a[1])
+        possible = parseFloat(a[1])
         if possible == 1
             # i18n
             progress = "(возможное количество баллов: #{possible})"
@@ -274,6 +274,7 @@ class @Problem
             @updateProgress response
           else
             @gentle_alert response.success
+        Logger.log 'problem_graded', [@answers, response.contents], @url
 
     if not abort_submission
       $.ajaxWithPrefix("#{@url}/problem_check", settings)
@@ -303,10 +304,10 @@ class @Problem
             @el.removeClass 'showed'
         else
           @gentle_alert response.success
-      $("#" + @element_id + " .check").val('Проверить').prop('disabled', false)
+      $("#" + @element_id + " .check").val('Ответить').prop('disabled', false)
       responsesBeingProcessedCount--
       if( responsesBeingProcessedCount == 0)
-        $('.check-all').html('Проверить').removeClass('check-all-disabled');
+        $('.check-all').html('Ответить').removeClass('check-all-disabled');
 
       Logger.log 'problem_graded', [@answers, response.contents], @url
 

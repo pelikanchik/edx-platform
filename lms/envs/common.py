@@ -72,8 +72,8 @@ MITX_FEATURES = {
     'ENABLE_TEXTBOOK': True,
     'ENABLE_DISCUSSION_SERVICE': True,
     # discussion home panel, which includes a subscription on/off setting for discussion digest emails.
-    # this should remain off in production until digest notifications are online. 
-    'ENABLE_DISCUSSION_HOME_PANEL': True,
+    # this should remain off in production until digest notifications are online.
+    'ENABLE_DISCUSSION_HOME_PANEL': False,
 
     'ENABLE_PSYCHOMETRICS': True,  # real-time psychometrics (eg item response theory analysis in instructor dashboard)
 
@@ -85,8 +85,6 @@ MITX_FEATURES = {
     'ENABLE_MASQUERADE': True,  # allow course staff to change to student view of courseware
 
     'DISABLE_LOGIN_BUTTON': False,  # used in systems where login is automatic, eg MIT SSL
-
-    'STUB_VIDEO_FOR_TESTING': False,  # do not display video when running automated acceptance tests
 
     # extrernal access methods
     'ACCESS_REQUIRE_STAFF_FOR_COURSE': False,
@@ -144,15 +142,24 @@ MITX_FEATURES = {
     # Enable instructor dash to submit background tasks
     'ENABLE_INSTRUCTOR_BACKGROUND_TASKS': True,
 
+    # Enable instructor dash beta version link
+    'ENABLE_INSTRUCTOR_BETA_DASHBOARD': True,
+
     # Allow use of the hint managment instructor view.
     'ENABLE_HINTER_INSTRUCTOR_VIEW': False,
 
     # for load testing
-    'AUTOMATIC_AUTH_FOR_LOAD_TESTING': False,
+    'AUTOMATIC_AUTH_FOR_TESTING': False,
 
     # Toggle to enable chat availability (configured on a per-course
     # basis in Studio)
-    'ENABLE_CHAT': False
+    'ENABLE_CHAT': False,
+
+    # Toggle the availability of the shopping cart page
+    'ENABLE_SHOPPING_CART': False,
+
+    # Toggle storing detailed billing information
+    'STORE_BILLING_INFO': False
 }
 
 # Used for A/B testing
@@ -166,7 +173,7 @@ XQUEUE_WAITTIME_BETWEEN_REQUESTS = 5  # seconds
 
 
 ############################# SET PATH INFORMATION #############################
-PROJECT_ROOT = path(__file__).abspath().dirname().dirname()  # /mitx/lms
+PROJECT_ROOT = path(__file__).abspath().dirname().dirname()  # /edx-platform/lms
 REPO_ROOT = PROJECT_ROOT.dirname()
 COMMON_ROOT = REPO_ROOT / "common"
 ENV_ROOT = REPO_ROOT.dirname()  # virtualenv dir /mitx is in
@@ -223,6 +230,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.contrib.messages.context_processors.messages',
     #'django.core.context_processors.i18n',
     'django.contrib.auth.context_processors.auth',  # this is required for admin
+    'django.core.context_processors.csrf',
 
     # Added for django-wiki
     'django.core.context_processors.media',
@@ -235,10 +243,10 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'mitxmako.shortcuts.marketing_link_context_processor',
 )
 
-# add csrf support unless disabled for load testing
-if not MITX_FEATURES.get('AUTOMATIC_AUTH_FOR_LOAD_TESTING'):
-    TEMPLATE_CONTEXT_PROCESSORS += ('django.core.context_processors.csrf',)  # necessary for csrf protection
-
+# use the ratelimit backend to prevent brute force attacks
+AUTHENTICATION_BACKENDS = (
+    'ratelimitbackend.backends.RateLimitModelBackend',
+)
 STUDENT_FILEUPLOAD_MAX_SIZE = 4 * 1000 * 1000  # 4 MB
 MAX_FILEUPLOADS_PER_INPUT = 20
 
@@ -320,8 +328,6 @@ CODE_JAIL = {
     'limits': {
         # How many CPU seconds can jailed code use?
         'CPU': 1,
-        # How large a file can jailed code write?
-        'FSIZE': 50000,
     },
 }
 
@@ -353,16 +359,27 @@ ROOT_URLCONF = 'lms.urls'
 IGNORABLE_404_ENDS = ('favicon.ico')
 
 # Email
+#<<<<<<< HEAD
+#EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+#DEFAULT_FROM_EMAIL = 'registration@edx.org'
+#DEFAULT_FEEDBACK_EMAIL = 'feedback@edx.org'
+#SERVER_EMAIL = 'devops@edx.org'
+#TECH_SUPPORT_EMAIL = 'technical@edx.org'
+#CONTACT_EMAIL = 'info@edx.org'
+#BUGS_EMAIL = 'bugs@edx.org'
+#ADMINS = ()
+#=======
 EMAIL_BACKEND = 'django_ses.SESBackend'
-DEFAULT_FROM_EMAIL = 'registration@lutix.crabdance.com'
-DEFAULT_FEEDBACK_EMAIL = 'feedback@lutix.crabdance.com'
-SERVER_EMAIL = 'devops@lutix.crabdance.com'
-TECH_SUPPORT_EMAIL = 'technical@lutix.crabdance.com'
-CONTACT_EMAIL = 'info@lutix.crabdance.com'
-BUGS_EMAIL = 'bugs@lutix.crabdance.com'
+DEFAULT_FROM_EMAIL = 'registration@pelic.ru'
+DEFAULT_FEEDBACK_EMAIL = 'feedback@pelic.ru'
+SERVER_EMAIL = 'devops@pelic.ru'
+TECH_SUPPORT_EMAIL = 'technical@pelic.ru'
+CONTACT_EMAIL = 'info@pelic.ru'
+BUGS_EMAIL = 'bugs@pelic.ru'
 ADMINS = (
-    ('edX Admins', 'admin@lutix.crabdance.com'),
+    ('edX Admins', 'admin@pelic.ru'),
 )
+#>>>>>>> 4f9bf342df105f2a5f00372194e6f7a65dac6f8b
 MANAGERS = ADMINS
 
 # Static content
@@ -380,9 +397,11 @@ FAVICON_PATH = 'images/favicon.ico'
 # Locale/Internationalization
 TIME_ZONE = 'Europe/Moscow'  # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 LANGUAGE_CODE = 'ru'  # http://www.i18nguy.com/unicode/language-identifiers.html
-USE_I18N = True
+USE_I18N = False
 USE_L10N = True
 
+# Localization strings (e.g. django.po) are under this directory
+LOCALE_PATHS = (REPO_ROOT + '/conf/locale',)  # edx-platform/conf/locale/
 # Messages
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 
@@ -431,6 +450,19 @@ ZENDESK_URL = None
 ZENDESK_USER = None
 ZENDESK_API_KEY = None
 
+##### shoppingcart Payment #####
+PAYMENT_SUPPORT_EMAIL = 'payment@edx.org'
+##### Using cybersource by default #####
+CC_PROCESSOR = {
+    'CyberSource': {
+        'SHARED_SECRET': '',
+        'MERCHANT_ID': '',
+        'SERIAL_NUMBER': '',
+        'ORDERPAGE_VERSION': '7',
+        'PURCHASE_ENDPOINT': '',
+    }
+}
+
 ################################# open ended grading config  #####################
 
 #By setting up the default settings with an incorrect user name and password,
@@ -439,10 +471,10 @@ OPEN_ENDED_GRADING_INTERFACE = {
     'url': 'http://sandbox-grader-001.m.edx.org/peer_grading',
     'username': 'incorrect_user',
     'password': 'incorrect_pass',
-    'staff_grading' : 'staff_grading',
-    'peer_grading' : 'peer_grading',
-    'grading_controller' : 'grading_controller'
-    }
+    'staff_grading': 'staff_grading',
+    'peer_grading': 'peer_grading',
+    'grading_controller': 'grading_controller'
+}
 
 # Used for testing, debugging peer grading
 MOCK_PEER_GRADING = False
@@ -485,19 +517,22 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'track.middleware.TrackMiddleware',
     'mitxmako.middleware.MakoMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
 
     'course_wiki.course_nav.Middleware',
+
+    # Detects user-requested locale from 'accept-language' header in http request
+    'django.middleware.locale.LocaleMiddleware',
 
     'django.middleware.transaction.TransactionMiddleware',
     # 'debug_toolbar.middleware.DebugToolbarMiddleware',
 
     'django_comment_client.utils.ViewNameMiddleware',
     'codejail.django_integration.ConfigureCodeJailMiddleware',
-)
 
-# add in csrf middleware unless disabled for load testing
-if not MITX_FEATURES.get('AUTOMATIC_AUTH_FOR_LOAD_TESTING'):
-    MIDDLEWARE_CLASSES = MIDDLEWARE_CLASSES + ('django.middleware.csrf.CsrfViewMiddleware',)
+    # catches any uncaught RateLimitExceptions and returns a 403 instead of a 500
+    'ratelimitbackend.middleware.RateLimitMiddleware',
+)
 
 ############################### Pipeline #######################################
 
@@ -755,6 +790,7 @@ INSTALLED_APPS = (
 
     # For testing
     'django.contrib.admin',  # only used in DEBUG mode
+    'django_nose',
     'debug',
 
     # Discussion forums
@@ -766,8 +802,14 @@ INSTALLED_APPS = (
     'rest_framework',
     'user_api',
 
+    # shopping cart
+    'shoppingcart',
+
     # Notification preferences setting
     'notification_prefs',
+
+    # Different Course Modes
+    'course_modes'
 )
 
 ######################### MARKETING SITE ###############################
@@ -810,4 +852,3 @@ def enable_theme(theme_name):
     # avoid collisions with default edX static files
     STATICFILES_DIRS.append((u'themes/%s' % theme_name,
                              theme_root / 'static'))
-

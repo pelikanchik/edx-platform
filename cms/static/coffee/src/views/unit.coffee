@@ -45,7 +45,12 @@ class CMS.Views.UnitEdit extends Backbone.View
           id: unit_location_analytics
 
         payload = children : @components()
-        options = success : => @model.unset('children')
+        saving = new CMS.Views.Notification.Mini
+          title: gettext('Saving') + '&hellip;'
+        saving.show()
+        options = success : =>
+          @model.unset('children')
+          saving.hide()
         @model.save(payload, options)
       helper: 'clone'
       opacity: '0.5'
@@ -119,6 +124,7 @@ class CMS.Views.UnitEdit extends Backbone.View
     @model.save()
 
   deleteComponent: (event) =>
+    event.preventDefault()
     msg = new CMS.Views.Prompt.Warning(
       title: gettext('Удалить компонент?'),
       message: gettext('Удаление компонента нельзя будет отменить. Никогда. Вообще.'),

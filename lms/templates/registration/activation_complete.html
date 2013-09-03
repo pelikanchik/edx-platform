@@ -1,3 +1,4 @@
+<%! from django.utils.translation import ugettext as _ %>
 <%! from django.core.urlresolvers import reverse %>
 <%inherit file="../main.html" />
 
@@ -7,20 +8,23 @@
 
   <section class="message">
     %if not already_active:
+
       <h1 class="valid">Активация завершена!</h1>
     %else:
       <h1>Аккаунт уже активирован!</h1>
     %endif
     <hr class="horizontal-divider">
-    
+
     <p>
       %if not already_active:
+
         Спасибо за активацию аккаунта.
       %else:
         Аккаунт уже был активирован ранее.
       %endif
-      
+
       %if user_logged_in:
+
         Посетите ваш <a href="${reverse('dashboard')}">кабинет</a>, чтобы увидеть ваши курсы.
       %else:
         Теперь вы можете <a href="${reverse('signin_user')}">войти</a>.

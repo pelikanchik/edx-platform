@@ -1,6 +1,7 @@
 <%! from django.utils.translation import ugettext as _ %>
 
 <%inherit file="base.html" />
+
 <%block name="title">Общая информация</%block>
 <%block name="bodyclass">is-signedin course schedule settings</%block>
 
@@ -21,6 +22,10 @@ from contentstore import utils
   <script type="text/javascript" src="${static.url('js/views/validating_view.js')}"></script>
   <script type="text/javascript" src="${static.url('js/views/settings/main_settings_view.js')}"></script>
   <script type="text/javascript" src="${static.url('js/models/settings/course_details.js')}"></script>
+
+  <script type="text/template" id="upload-dialog-tpl">
+    <%static:include path="js/upload-dialog.underscore" />
+  </script>
 
   <script type="text/javascript">
     $(document).ready(function(){
@@ -43,9 +48,59 @@ from contentstore import utils
         },
         reset: true
       });
+
+      CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
     });
 
   </script>
+  <style>
+
+img#btnSetTitle,
+img#btnAddCode,
+img#btnDelete{
+
+    position:relative;
+    cursor:pointer;
+    top:2px;
+}
+
+img#btnSetTitle:hover,
+img#btnAddCode:hover,
+img#btnDelete:hover{
+    opacity: 0.8;
+}
+img#btnSetTitle{
+    top:4px;
+}
+
+
+img#btnDelete:active,
+img#btnAddCode:active{
+    top:3px;
+}
+
+img#btnSetTitle:active{
+    top:5px;
+}
+
+div#current{
+    visibility:hidden;
+    text-align: left;
+    float:left;
+}
+div#add-tag{
+    text-align:right;
+    float:right;
+}
+.tag-input{
+    display: inline!important;
+    width: 120px!important;
+    padding: 4px!important;
+    height: 26px!important;
+    margin: 0px!important;
+    font-size: 12px!important;
+}
+</style>
 </%block>
 
 <%block name="content">
@@ -205,8 +260,63 @@ from contentstore import utils
                     a_link = a_link_start + utils.get_lms_link_for_about_page(course_location) + a_link_end
                     text = _("Introductions, prerequisites, FAQs that are used on %s (formatted in HTML)") % a_link
                     %>${text}</%def>
-                ##  <span class="tip tip-stacked">${overview_text()}</span>
+                ##  <span class="tip tip-stacked">Тэги, которые можно сопоставить заданиям</span>
                 </li>
+
+
+                <li class="field image" id="field-course-image">
+                  <label>${_("Course Image")}</label>
+                  <div class="current current-course-image">
+                    % if context_course.course_image:
+                    <span class="wrapper-course-image">
+                      <img class="course-image" id="course-image" src="${utils.course_image_url(context_course)}" alt="${_('Course Image')}"/>
+                    </span>
+
+                    <% ctx_loc = context_course.location %>
+                    <span class="msg msg-help">${_("You can manage this image along with all of your other")} <a href="${reverse('asset_index', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">${_("files &amp; uploads")}</a></span>
+
+                    % else:
+                    <span class="wrapper-course-image">
+                      <img class="course-image placeholder" id="course-image" src="${utils.course_image_url(context_course)}" alt="${_('Course Image')}"/>
+                    </span>
+                    <span class="msg msg-empty">${_("Your course currently does not have an image. Please upload one (JPEG or PNG format, and minimum suggested dimensions are 375px wide by 200px tall)")}</span>
+                    % endif
+                  </div>
+
+                  <div class="wrapper-input">
+                    <div class="input">
+                      <input type="text" class="long new-course-image-url" id="course-image-url" value="" placeholder="Your course image URL" autocomplete="off" />
+                      <span class="tip tip-stacked">${_("Please provide a valid path and name to your course image (Note: only JPEG or PNG format supported)")}</span>
+                    </div>
+                    <button type="button" class="action action-upload-image">${_("Upload Course Image")}</button>
+                  </div>
+                </li>
+
+
+
+
+
+                <li class="field text" id="field-course-tags">
+                    <label for="field-course-tags">Тэги</label>
+
+                      <div id="tree"></div>
+
+                      <div>
+                          <div id = 'current'>
+                              <input type="text" class="tag-input" value = "" id = "tag-title" />
+                              <img id="btnSetTitle" width = "20" title = "Сохранить" alt = "Сохранить" src = "/static/img/save.png" />
+                              <img id="btnDelete" title = "Удалить" alt = "Удалить" src = "/static/img/Delete-icon.png" />
+                          </div>
+                          <div id = 'add-tag'>
+                              <img id="btnAddCode" title = "Добавить тэг" alt = "Добавить тэг" src  = "/static/img/plus_16.png" />
+                          </div>
+                     </div>
+                    <p>
+                        <textarea id="course-tags"  style = "visibility:hidden;"></textarea>
+                    </p>
+                </li>
+
+
 
                 <li class="field video" id="field-course-introduction-video">
                   <label for="course-overview">Вводное видео</label>

@@ -5,4 +5,12 @@
         <i class="icon-undo"></i><span class="sr">"<%= gettext("Очистить значение") %>"</span>
     </button>
 </div>
-<span class="tip setting-help"><%= model.get('help') %></span>
+<span class="tip setting-help">
+
+          <div id="settings_details" class="settings-details" >
+
+<%= model.get('help') %>
+          </div>
+
+
+</span>

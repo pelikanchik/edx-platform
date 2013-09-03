@@ -1,11 +1,11 @@
+<%! from django.utils.translation import ugettext as _ %>
+
 <%namespace name='static' file='static_content.html'/>
 
 <h2 class="problem-header">
   ${ problem['name'] }
 </h2>
-
-<section class="problem-progress"></section>
-
+##<section class="problem-progress"></section>
 <section class="problem">
   ${ problem['html'] }
 
@@ -13,19 +13,7 @@
     <input type="hidden" name="problem_id" value="${ problem['name'] }" />
 
     % if check_button:
-    <input class="check ${ check_button }" id = "check_answer_button" type="button" value="${ check_button }" />
-      <script type='text/javascript'>
-
-            var check_answer = '${check_answer}';
-            if (check_answer == 0){
-               $("#check_answer_button").val("Ответить");
-               $(".incorrect").removeClass("incorrect");
-               $(".correct").removeClass("correct");
-               $(".choicegroup_incorrect").addClass("choicegroup_correct").removeClass("choicegroup_incorrect");
-               //$(".choicegroup_correct").removeClass("choicegroup_correct");
-            }
-
-      </script>
+    <input class="check ${ check_button }" type="button" value="${ check_button }" />
     % endif
     % if reset_button:
     <input class="reset" type="button" value="Сбросить ответы" />
@@ -35,22 +23,22 @@
     % endif
     % if answer_available:
     <button class="show" id="show_answers_button" style="display: none"><span class="show-label">Показать ответ(ы)</span> <span class="sr">(для вопросов выше - рядом с каждым полем)</span></button>
+
     % endif
-    <script type='text/javascript'>
-        $(document).ready(function () {
-            var t = '${delay_answers}';
-            var id = setTimeout(function() {
-              $('#show_answers_button').show();
-            }, t*1000);
+        <script type='text/javascript'>
+            $(document).ready(function () {
+                var t = '${delay_answers}';
+                var id = setTimeout(function() {
+                  $('#show_answers_button').show();
+                }, t*1000);
 
-        }
-
-
-        );
+            });
     </script>
     % if attempts_allowed :
     <section class="submission_feedback">
+
       Использовано попыток: ${ attempts_used } из ${ attempts_allowed }.
+
     </section>
     % endif
   </section>

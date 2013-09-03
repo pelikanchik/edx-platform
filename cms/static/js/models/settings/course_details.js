@@ -9,8 +9,11 @@ CMS.Models.Settings.CourseDetails = Backbone.Model.extend({
         enrollment_end: null,
         syllabus: null,
         overview: "",
+        tags: "",
         intro_video: null,
-        effort: null	// an int or null
+        effort: null,	// an int or null,
+        course_image_name: '', // the filename
+        course_image_asset_path: '' // the full URL (/c4x/org/course/num/asset/filename)
     },
 
     // When init'g from html script, ensure you pass {parse: true} as an option (2nd arg to reset)
@@ -75,7 +78,7 @@ CMS.Models.Settings.CourseDetails = Backbone.Model.extend({
         return this.videosourceSample();
     },
     videosourceSample : function() {
-        if (this.has('intro_video')) return "http://www.youtube.com/embed/" + this.get('intro_video');
+        if (this.has('intro_video')) return "//www.youtube.com/embed/" + this.get('intro_video');
         else return "";
     }
 });

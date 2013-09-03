@@ -1,10 +1,7 @@
 from django.conf import settings
 from django.conf.urls import patterns, include, url
-from django.contrib import admin
+from ratelimitbackend import admin
 from django.conf.urls.static import static
-
-# Not used, the work is done in the imported module.
-from . import one_time_startup      # pylint: disable=W0611
 
 import django.contrib.auth.views
 
@@ -63,29 +60,15 @@ urlpatterns = ('',  # nopep8
     url(r'^user_api/', include('user_api.urls')),
 )
 
-# University profiles only make sense in the default edX context
-if not settings.MITX_FEATURES["USE_CUSTOM_THEME"]:
-    urlpatterns += (
-        ##
-        ## Only universities without courses should be included here.  If
-        ## courses exist, the dynamic profile rule below should win.
-        ##
-        url(r'^(?i)university_profile/WellesleyX$', 'courseware.views.static_university_profile',
-            name="static_university_profile", kwargs={'org_id': 'WellesleyX'}),
-        url(r'^(?i)university_profile/McGillX$', 'courseware.views.static_university_profile',
-            name="static_university_profile", kwargs={'org_id': 'McGillX'}),
-        url(r'^(?i)university_profile/TorontoX$', 'courseware.views.static_university_profile',
-            name="static_university_profile", kwargs={'org_id': 'TorontoX'}),
-        url(r'^(?i)university_profile/RiceX$', 'courseware.views.static_university_profile',
-            name="static_university_profile", kwargs={'org_id': 'RiceX'}),
-        url(r'^(?i)university_profile/ANUx$', 'courseware.views.static_university_profile',
-            name="static_university_profile", kwargs={'org_id': 'ANUx'}),
-        url(r'^(?i)university_profile/EPFLx$', 'courseware.views.static_university_profile',
-            name="static_university_profile", kwargs={'org_id': 'EPFLx'}),
+js_info_dict = {
+    'domain': 'djangojs',
+    'packages': ('lms',),
+}
 
-        url(r'^university_profile/(?P<org_id>[^/]+)$', 'courseware.views.university_profile',
-            name="university_profile"),
-    )
+urlpatterns += (
+    # Serve catalog of localized strings to be rendered by Javascript
+    url(r'^jsi18n/$', 'django.views.i18n.javascript_catalog', js_info_dict),
+)
 
 #Semi-static views (these need to be rendered and have the login bar, but don't change)
 urlpatterns += (
@@ -263,12 +246,14 @@ if settings.COURSEWARE_ENABLED:
 
         # For the instructor
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor$',
-            'instructor.views.instructor_dashboard', name="instructor_dashboard"),
+            'instructor.views.legacy.instructor_dashboard', name="instructor_dashboard"),
+
+        # see ENABLE_INSTRUCTOR_BETA_DASHBOARD section for more urls
 
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/gradebook$',
-            'instructor.views.gradebook', name='gradebook'),
+            'instructor.views.legacy.gradebook', name='gradebook'),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/grade_summary$',
-            'instructor.views.grade_summary', name='grade_summary'),
+            'instructor.views.legacy.grade_summary', name='grade_summary'),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/staff_grading$',
             'open_ended_grading.views.staff_grading', name='staff_grading'),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/staff_grading/get_next$',
@@ -352,9 +337,14 @@ if settings.COURSEWARE_ENABLED:
                 name='submission_history'),
         )
 
+if settings.COURSEWARE_ENABLED and settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BETA_DASHBOARD'):
+    urlpatterns += (
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor_dashboard$',
+            'instructor.views.instructor_dashboard.instructor_dashboard_2', name="instructor_dashboard_2"),
 
-if settings.ENABLE_JASMINE:
-    urlpatterns += (url(r'^_jasmine/', include('django_jasmine.urls')),)
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor_dashboard/api/',
+            include('instructor.views.api_urls'))
+    )
 
 if settings.DEBUG or settings.MITX_FEATURES.get('ENABLE_DJANGO_ADMIN_SITE'):
     ## Jasmine and admin
@@ -380,6 +370,11 @@ if settings.MITX_FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD'):
             'external_auth.views.course_specific_register', name='course-specific-register'),
 
     )
+
+# Shopping cart
+urlpatterns += (
+    url(r'^shoppingcart/', include('shoppingcart.urls')),
+)
 
 
 if settings.MITX_FEATURES.get('AUTH_USE_OPENID_PROVIDER'):
@@ -443,7 +438,7 @@ if settings.MITX_FEATURES.get('ENABLE_HINTER_INSTRUCTOR_VIEW'):
     )
 
 # enable automatic login
-if settings.MITX_FEATURES.get('AUTOMATIC_AUTH_FOR_LOAD_TESTING'):
+if settings.MITX_FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING'):
     urlpatterns += (
         url(r'^auto_auth$', 'student.views.auto_auth'),
     )
