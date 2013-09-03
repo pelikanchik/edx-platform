@@ -67,10 +67,6 @@ function parseType(S){
 /* only do all this when document has finished loading (needed for RaphaelJS) */
 window.onload = function() {
 
-/*
-
-*/
-//alert(getCookie('csrftoken'));
 
     /* JSON data */
     var edges_arr;
@@ -497,11 +493,15 @@ var layouter;
                     'display_name': new_node_name
                 },
                 success : function(answer){
+                    console.log(answer);
                     var location = jQuery.parseJSON(answer)["id"];
+                    console.log(location);
 
 //                    var location = "i4x://Org/101/vertical/something" + 100*Math.random();
                     var i = location.lastIndexOf("/");
                     var node_id = location.slice(i+1);
+
+
                     g.addNode(node_id, { label : hideRestOfString(new_node_name), render : render} );
                     ids_arr.push(node_id);
                     edges_arr.push([]);

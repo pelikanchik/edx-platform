@@ -373,10 +373,6 @@ function createNewUnit(e) {
         'parent_location': parent
     });
 
-    alert(parent);
-    alert(category);
-    alert(data['id']);
-
     $.post('/create_item', {
         'parent_location': parent,
         'category': category,

@@ -160,11 +160,7 @@ Graph.Renderer.Raphael = function(element, graph, width, height) {
      */
     this.isDrag = false;
     this.dragger = function (e) {
-        console.log(this);
-//        console.log(selfRef);
-//        console.log(e);
         this.dx = e.clientX;
-//        this.dy = 150;
         this.dy = e.clientY;
         selfRef.isDrag = this;
         this.set && this.set.animate({"fill-opacity": .1}, 200) && this.set.toFront();
