@@ -160,7 +160,11 @@ Graph.Renderer.Raphael = function(element, graph, width, height) {
      */
     this.isDrag = false;
     this.dragger = function (e) {
+        console.log(this);
+//        console.log(selfRef);
+//        console.log(e);
         this.dx = e.clientX;
+//        this.dy = 150;
         this.dy = e.clientY;
         selfRef.isDrag = this;
         this.set && this.set.animate({"fill-opacity": .1}, 200) && this.set.toFront();
@@ -258,7 +262,10 @@ Graph.Renderer.Raphael.prototype = {
 
         shape.attr({"fill-opacity": .6});
         /* re-reference to the node an element belongs to, needed for dragging all elements of a node */
-        shape.items.forEach(function(item){ item.set = shape; item.node.style.cursor = "move"; });
+        shape.items.forEach(function(item){
+            item.set = shape;
+//            item.node.style.cursor = "move";
+        });
         shape.mousedown(this.dragger);
 
         var box = shape.getBBox();
@@ -474,8 +481,53 @@ Graph.Layout.Ordered.prototype = {
     }
 };
 
+
+Graph.Layout.Saved = function(graph, x, y) {
+    this.graph = graph;
+    this.x = x;
+    this.y = y;
+    this.layout();
+};
+Graph.Layout.Saved.prototype = {
+    layout: function() {
+        this.layoutPrepare();
+        this.layoutCalcBounds();
+    },
+
+    layoutPrepare: function() {
+        var counter = 0;
+        for (i in this.graph.nodes) {
+            var node = this.graph.nodes[i];
+            node.layoutPosX = this.x[counter];
+            node.layoutPosY = this.y[counter];
+            counter++;
+        }
+    },
+
+    layoutCalcBounds: function() {
+        var minx = Infinity, maxx = -Infinity, miny = Infinity, maxy = -Infinity;
+
+        for (i in this.graph.nodes) {
+            var x = this.graph.nodes[i].layoutPosX;
+            var y = this.graph.nodes[i].layoutPosY;
+
+            if(x > maxx) maxx = x;
+            if(x < minx) minx = x;
+            if(y > maxy) maxy = y;
+            if(y < miny) miny = y;
+        }
+
+        this.graph.layoutMinX = minx;
+        this.graph.layoutMaxX = maxx;
+
+        this.graph.layoutMinY = miny;
+        this.graph.layoutMaxY = maxy;
+    }
+};
+
+
 /*
- * usefull JavaScript extensions, 
+ * useful JavaScript extensions,
  */
 
 function log(a) {console.log&&console.log(a);}

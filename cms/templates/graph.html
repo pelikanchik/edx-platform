@@ -1,27 +1,44 @@
-<!doctype html>
-<html style="overflow-y: scroll;">
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<head>
+
+    <%! from django.utils.translation import ugettext as _ %>
+<%inherit file="base.html" />
+<%!
+   import logging
+   from xmodule.util.date_utils import get_default_time_display, almost_same_datetime
+%>
+
+<%! from django.core.urlresolvers import reverse %>з
+<%block name="title">Визуализация подраздела</%block>
+
+<%block name="bodyclass">is-signedin course subsection</%block>
+
+
+<%namespace name="units" file="widgets/units.html" />
+<%namespace name='static' file='static_content.html'/>
+
+<%block name="content">
+
 
     <script type="text/javascript" src="/static/js/graph/strathausen-dracula-a6a5fa7/js/raphael-min.js"></script>
     <script type="text/javascript" src="/static/js/graph/strathausen-dracula-a6a5fa7/js/dracula_graffle.js"></script>
     <script type="text/javascript" src="/static/js/graph/strathausen-dracula-a6a5fa7/js/jquery-1.4.2.min.js"></script>
     <script type="text/javascript" src="/static/js/graph/strathausen-dracula-a6a5fa7/js/dracula_graph.js"></script>
+
+
     <script type="text/javascript" src="/static/js/graph/graph.js"></script>
     <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
+
     <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
     <script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
         <!---
             jQuery UI 1.10.3 has a bug when dragging makes dialog window jump to the bottom of screen.
             So it is advisable to use version 1.10.2 before it is fixed.
          --->
-</head>
-<body>
 
 <!--- Костыль: я не умею получать тип модуля, поэтому я выдираю его, используя особенности форматирования вывода -->
 <!--- Возможно, стоит добавить всем модулям нужный метод -->
 <!--- (стандартная функция child.module_class не работает) -->
-    <p class="data_string" style="display:none">        {
+    <p class="data_string" style="display:none">{
         % for every_unit in subsection.get_children():
         "${every_unit.url_name}" : [
             % for child in every_unit.get_children():
@@ -31,28 +48,82 @@
         % endfor
         }
     </p>
-    <p class="names_string" style="display:none">        {
+<!-- style="display:none" -->
+    <p class="names_string"  style="display:none">{
         % for every_unit in subsection.get_children():
-        "${every_unit.url_name}" : { "name" : "${every_unit.display_name_with_default}", "location" : "${every_unit.location}"}, <br/>
+        "${every_unit.url_name}" : { "name" : "${every_unit.display_name_with_default}",
+            "location" : "${every_unit.location}",
+            "coords_x" : "${every_unit.coords_x}", "coords_y" : "${every_unit.coords_y}"}, <br/>
         % endfor
         }
     </p>
-    <p class="graph_string" style="display:none">        [
+    <p class="graph_string" style="display:none">[
         % for every_unit in subsection.get_children():
             ${every_unit.direct_term_with_default} ,<br/>
         % endfor
         ]
-     </p>
+    </p>
+
+    <p class="parent-location" style="display:none">${subsection.location}</p>
 
 <div style="display:none">
     <div id="node-details" title="Подробности">
         <p class = "dialog-message">Here be dragons</p>
         <a class="node-edit-link" href="#">Редактировать</a>
     </div>
+    <div id="add-new-node" title="Добавление вершины">
+        <input id="node-name-input" data-bind='value: value, valueUpdate: "afterkeydown"'/>
+    </div>
+    <div id="node-add-condition" title="Добавление перехода">
+
+        <table>
+
+            <tbody data-bind="foreach: conjunctions">
+                <tr>
+<!--
+                    <td>
+                    <select data-bind='value: source_element_id, valueUpdate: "afterkeydown"'>
+
+                                <option value="7178ded6aba24ee7834f39e2d1443efe">Шаг1</option>
+                                <option value="4cef09af7eb04295aadf94d3493b32cf">Шаг2</option>
+                                <option value="be4c52d00818459fad333aa020dbdb60">Новый элемент</option>
+                                <option value="cdeab081f25d4f6991d975103a7385be">absorbing node</option>
+
+                    </select>
+
+                    </td>
+-->
+
+                    <td>
+                        <select id="input-field" data-bind='value: field, valueUpdate: "afterkeydown"'>
+                            <option value="score_abs">Результат (абсолютный)</option>
+                            <option value="score_rel">Результат (относительный, %)</option>
+                        </select>
+                    </td>
+                    <td>
+
+                        <select id="input-sign" data-bind='value: sign, valueUpdate: "afterkeydown"'>
+                            <option value="more">&#62;</option>
+                            <option value="more-equals">&#8805;</option>
+                            <option value="equals">=</option>
+                            <option value="less-equals">&#8804;</option>
+                            <option value="less">&#60;</option>
+                        </select>
+
+                    </td>
+                    <td><input id="input-value" data-bind='value: value, valueUpdate: "afterkeydown"' class = "value" /></td>
+                </tr>
+            </tbody>
+        </table>
+
+
+    </div>
 </div>
 
 <div id="canvas"></div>
-<button id="redraw" onclick="redraw();">redraw</button>
+<button id="new_node" onclick="add_node();">New Node</button>
+<button id="random_redraw" onclick="redraw();">redraw</button>
+<button id="save" onclick="save_layout();">save</button>
+<button id="load" onclick="load_layout();">load</button>
 
-</body>
-</html>
+        </%block>

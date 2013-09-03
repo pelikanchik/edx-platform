@@ -66,8 +66,18 @@ def is_section_exist(section_id, sections):
 
     return False
 
-
+#@require_http_methods(("GET", "POST", "PUT"))
+#@ensure_csrf_cookie
+@login_required
 def show_graph(request, location):
+    # check that we have permissions to edit this item
+    try:
+        course = get_course_for_item(location)
+    except InvalidLocationError:
+        return HttpResponseBadRequest()
+
+    if not has_access(request.user, course.location):
+        raise PermissionDenied()
 
     try:
         item = modulestore().get_item(location, depth=1)
