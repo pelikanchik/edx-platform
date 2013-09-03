@@ -494,7 +494,8 @@ var layouter;
                 },
                 success : function(answer){
                     console.log(answer);
-                    var location = jQuery.parseJSON(answer)["id"];
+//                    var location = jQuery.parseJSON(answer)["id"];
+                    var location = answer["id"];
                     console.log(location);
 
 //                    var location = "i4x://Org/101/vertical/something" + 100*Math.random();
