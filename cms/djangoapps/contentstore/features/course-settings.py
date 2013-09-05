@@ -163,6 +163,38 @@ def image_url_present(_step):
     expected_value = '/c4x/MITx/999/asset/image.jpg'
     assert world.css_value(field_css) == expected_value
 
+@step('I click the "Upload Course Image" button')
+def click_upload_button(_step):
+    button_css = '.action-upload-image'
+    world.css_click(button_css)
+
+
+@step('I upload a new course image$')
+def upload_new_course_image(_step):
+    upload_file('image.jpg')
+
+
+@step('I should see the new course image$')
+def i_see_new_course_image(_step):
+    img_css = '#course-image'
+    images = world.css_find(img_css)
+    assert len(images) == 1
+    img = images[0]
+    expected_src = '/c4x/MITx/999/asset/image.jpg'
+    # Don't worry about the domain in the URL
+    try:
+        assert img['src'].endswith(expected_src)
+    except AssertionError as e:
+        e.args += ('Was looking for {}'.format(expected_src), 'Found {}'.format(img['src']))
+        raise
+
+
+@step('the image URL should be present in the field')
+def image_url_present(_step):
+    field_css = '#course-image-url'
+    expected_value = '/c4x/MITx/999/asset/image.jpg'
+    assert world.css_value(field_css) == expected_value
+
 
 ############### HELPER METHODS ####################
 def set_date_or_time(css, date_or_time):

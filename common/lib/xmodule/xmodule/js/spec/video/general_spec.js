@@ -171,10 +171,10 @@
                     });
                 });
 
-                // Note that the loading of stand alone HTML5 player API is
-                // handled by Require JS. When state.videoPlayer is created,
-                // the stand alone HTML5 player object is already loaded, so no
-                // further testing in that case is required.
+                // Note that the loading of stand alone HTML5 player API is handled by
+                // Require JS. When state.videoPlayer is created, the stand alone HTML5
+                // player object is already loaded, so no further testing in that case
+                // is required.
                 describe('HTML5 API is available', function () {
                     beforeEach(function () {
                         state = new Video('#example');

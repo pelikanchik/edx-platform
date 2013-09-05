@@ -30,6 +30,7 @@ function (HTML5Video, Resizer) {
     function _makeFunctionsPublic(state) {
         var methodsDict = {
             duration: duration,
+            getProblemsTime: getProblemsTime,
             handlePlaybackQualityChange: handlePlaybackQualityChange,
             isPlaying: isPlaying,
             log: log,
@@ -258,7 +259,6 @@ function (HTML5Video, Resizer) {
                 newSpeed
             );
         }
-
         newSpeed = parseFloat(newSpeed).toFixed(2).replace(/\.00$/, '.0');
 
         this.videoPlayer.log(
@@ -531,6 +531,7 @@ function (HTML5Video, Resizer) {
         */
     }
 
+
     function onStateChange(event) {
         switch (event.data) {
             case this.videoPlayer.PlayerState.UNSTARTED:
@@ -652,6 +653,47 @@ function (HTML5Video, Resizer) {
                 this.videoPlayer.startTime = 0;
                 this.videoPlayer.endTime = null;
             }
+            console.log(time);
+            var duration;
+    
+            duration = this.videoPlayer.duration();
+    
+            this.trigger('videoProgressSlider.updatePlayTime', {'time': time, 'duration': duration});
+            this.trigger('videoControl.updateVcrVidTime', {'time': time, 'duration': duration});
+            this.trigger('videoCaption.updatePlayTime', time);
+    
+            var int_time = parseInt(time);
+            var _problems_time = this.videoPlayer.getProblemsTime();
+            var l_t= _problems_time.length;
+            for (var _i=0; _i < l_t; _i++)
+            {
+              var t = _problems_time[_i];
+              if (t === int_time)
+              {
+                this.videoPlayer.pause();
+                this.videoPlayer.player.seekTo(t+1,true);
+                var r = _i + 1;
+                var index = $("#temp_index_problem").html();
+                if (index.length === 0)
+                {
+                  var return_to_video = document.getElementsByClassName("return-to-video");
+                  return_to_video[0].style.display = 'block';
+                  //console.log(this.id);
+                  var iframe = document.getElementById(this.id);
+                  iframe.style.height = '0%';
+                  var frame_problem = document.getElementById("frame_problem");
+                  frame_problem.style.display = 'block';
+                  var slider = document.getElementsByClassName("slider");
+                  slider[0].style.display = 'none';
+                  var underslider = document.getElementsByClassName("underslider");
+                  underslider[0].style.display = 'none';
+                  $("#temp_index_problem").html(r);
+                  var problem_id = $("#vert-" + r).data('id').replace(/:\/\//,'-').replace(/\//g,'-');
+                  $("#frame_problem").attr({'data-old-id': problem_id});
+                  $("#problem_" + problem_id).appendTo("#frame_problem");
+                }
+              }
+            }            
         }
 
         this.trigger(

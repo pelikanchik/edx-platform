@@ -34,6 +34,7 @@ function () {
             hideControls: hideControls,
             pause: pause,
             play: play,
+            returnVideo: returnVideo,
             showControls: showControls,
             toggleFullScreen: toggleFullScreen,
             togglePlayback: togglePlayback,
@@ -57,6 +58,7 @@ function () {
         state.videoControl.secondaryControlsEl = state.videoControl.el.find('.secondary-controls');
         state.videoControl.fullScreenEl        = state.videoControl.el.find('.add-fullscreen');
         state.videoControl.vidTimeEl           = state.videoControl.el.find('.vidtime');
+        state.videoControl.returnVideoEl       = state.videoControl.el.find('.return-to-video');
 
         state.videoControl.fullScreenState = false;
 
@@ -88,6 +90,7 @@ function () {
     function _bindHandlers(state) {
         state.videoControl.playPauseEl.on('click', state.videoControl.togglePlayback);
         state.videoControl.fullScreenEl.on('click', state.videoControl.toggleFullScreen);
+        state.videoControl.returnVideoEl.on('click', state.videoControl.returnVideo);
         $(document).on('keyup', state.videoControl.exitFullScreen);
 
         if ((state.videoType === 'html5') && (state.config.autohideHtml5)) {
@@ -166,6 +169,29 @@ function () {
         this.videoControl.playPauseEl.removeClass('pause').addClass('play').attr('title', gettext('Play'));
         this.videoControl.isPlaying = false;
     }
+
+    function returnVideo() {
+      var frame_problem = document.getElementById("frame_problem");
+      frame_problem.style.display = 'none';
+      var iframe = document.getElementById(this.id);
+      iframe.style.height = '100%';
+      var slider = document.getElementsByClassName("slider");
+      slider[0].style.display = 'block';
+      var underslider = document.getElementsByClassName("underslider");
+      underslider[0].style.display = 'block';
+      var return_to_video = document.getElementsByClassName("return-to-video");
+      return_to_video[0].style.display = 'none';
+      var r = $("#temp_index_problem").html();
+      $("#temp_index_problem").html("");
+      var problem_id = $("#frame_problem").attr("data-old-id");
+      var cur_vert = $("#vert-" + r);
+      var cur_class = cur_vert.find(".xmodule_display.xmodule_CapaModule");
+      cur_class.html("");
+      $("#problem_" + problem_id).appendTo(cur_class);
+      $("#frame_problem").html("");
+      this.videoPlayer.play();
+    }
+
 
     function togglePlayback(event) {
         event.preventDefault();

@@ -108,7 +108,7 @@ div.video {
         }
       }
 
-      object, iframe, video {
+      object, iframe, video, .iproblem {
         border: none;
         width: 100%;
       }
@@ -120,6 +120,10 @@ div.video {
         &.hidden {
           display: none;
         }
+      }
+
+      .iproblem {
+        background-color: white;
       }
     }
 
@@ -360,6 +364,7 @@ div.video {
 
           // fix for now
           ol.video_speeds {
+            box-shadow: inset 1px 0 0 #555, 0 3px 0 #444;
             @include transition(none);
             box-shadow: inset 1px 0 0 #555, 0 4px 0 #444;
             background-color: #444;
@@ -368,12 +373,7 @@ div.video {
             display: none;
             opacity: 0;
             position: absolute;
-            width: 131px;
-
-            @media (max-width: 1024px) {
-              width: 101px;
-            }
-
+            width: 133px;
             z-index: 10;
 
             li {
@@ -548,7 +548,6 @@ div.video {
 
 
         a.hide-subtitles {
-          @include transition(none);
           background: url('../images/cc.png') center no-repeat;
           float: left;
           font-weight: 800;
@@ -683,6 +682,7 @@ div.video {
     height: 100%;
     left: 0;
     margin: 0;
+    overflow: auto;
     padding: 0;
     position: fixed;
     top: 0;
@@ -725,7 +725,7 @@ div.video {
         vertical-align: middle;
         float: none;
 
-        object, iframe, video{
+        object, iframe, video, .problem {
           position: absolute;
           width: auto;
           height: auto;

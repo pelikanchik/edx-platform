@@ -32,8 +32,12 @@ from xmodule.modulestore import Location
 from xblock.fields import Scope, String, Boolean, List, Integer, ScopeIds
 from xmodule.fields import RelativeTime
 
+
 from xmodule.modulestore.inheritance import InheritanceKeyValueStore
 from xblock.runtime import DbModel
+import datetime
+import time
+
 log = logging.getLogger(__name__)
 
 
@@ -182,11 +186,8 @@ class VideoModule(VideoFields, XModule):
             yt_test_url = 'https://gdata.youtube.com/feeds/api/videos/'
 
         return self.system.render_template('video.html', {
-            'youtube_id_0_75': self.youtube_id_0_75,
-            'youtube_id_1_0': self.youtube_id_1_0,
-            'youtube_id_1_25': self.youtube_id_1_25,
-            'youtube_id_1_5': self.youtube_id_1_5,
             'problem_id': problem_id,
+            'youtube_streams': _create_youtube_string(self),
             'id': self.location.html_id(),
             'sub': self.sub,
             'sources': sources,

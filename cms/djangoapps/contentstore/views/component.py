@@ -96,12 +96,12 @@ def subsection_handler(request, tag=None, course_id=None, branch=None, version_g
 
         preview_link = get_lms_link_for_item(old_location, course_id=course.location.course_id, preview=True)
 
-        # make sure that location references a 'sequential', otherwise return
-        # BadRequest
-        if item.location.category != 'sequential':
-            return HttpResponseBadRequest()
+    lms_link = get_lms_link_for_item(location, course_id=course.location.course_id)
+    preview_link = get_lms_link_for_item(location, course_id=course.location.course_id, preview=True)
 
-        parent_locs = modulestore().get_parent_locations(old_location, None)
+    # make sure that location references a 'sequential', otherwise return BadRequest
+    if item.location.category != 'sequential':
+        return HttpResponseBadRequest()
 
         # we're for now assuming a single parent
         if len(parent_locs) != 1:
@@ -110,8 +110,9 @@ def subsection_handler(request, tag=None, course_id=None, branch=None, version_g
                 unicode(locator)
             )
 
-        # this should blow up if we don't find any parents, which would be erroneous
-        parent = modulestore().get_item(parent_locs[0])
+    # we're for now assuming a single parent
+    if len(parent_locs) != 1:
+        logging.error('Multiple (or none) parents have been found for {0}'.format(location))
 
         # remove all metadata from the generic dictionary that is presented in a
         # more normalized UI. We only want to display the XBlocks fields, not
@@ -127,14 +128,14 @@ def subsection_handler(request, tag=None, course_id=None, branch=None, version_g
 
         sections = modulestore().get_item(course.location, depth=3).get_children()
 
-        #for section in sections:
-        #   print section.display_name_with_default
-        #    subsections = section.get_children()
-        #    for subsection in subsections:
-        #        print subsection.display_name_with_default
+    # remove all metadata from the generic dictionary that is presented in a more normalized UI
 
-        #item.unlock_term = '{"disjunctions":[]}'
-        term = json.loads(item.unlock_term)
+    policy_metadata = dict(
+        (field.name, field.read_from(item))
+        for field
+        in item.fields
+        if field.name not in ['display_name', 'start', 'due', 'format', 'unlock_term'] and field.scope == Scope.settings
+    )
 
 
         # updating if term has links to already not existed sections
@@ -157,25 +158,20 @@ def subsection_handler(request, tag=None, course_id=None, branch=None, version_g
             course.location.course_id, course.location, False, True
         )
 
-        return render_to_response(
-            'edit_subsection.html',
-            {
-                'subsection': item,
-                'context_course': course,
-                'new_unit_category': 'vertical',
-                'lms_link': lms_link,
-                'preview_link': preview_link,
-                'course_graders': json.dumps(CourseGradingModel.fetch(course_locator).graders),
-                'parent_item': parent,
-                'locator': locator,
-                'policy_metadata': policy_metadata,
-                'subsection_units': subsection_units,
-                'sections': sections,
-                'can_view_live': can_view_live
-            }
-        )
-    else:
-        return HttpResponseBadRequest("Only supports html requests")
+        return render_to_response('edit_subsection.html',
+                              {'subsection': item,
+                               'context_course': course,
+                               'new_unit_category': 'vertical',
+                               'lms_link': lms_link,
+                               'preview_link': preview_link,
+                               'course_graders': json.dumps(CourseGradingModel.fetch(course.location).graders),
+                               'parent_location': course.location,
+                               'parent_item': parent,
+                               'policy_metadata': policy_metadata,
+                               'subsection_units': subsection_units,
+                               'sections': sections,
+                               'can_view_live': can_view_live
+                               })
 
 
 def _load_mixed_class(category):
