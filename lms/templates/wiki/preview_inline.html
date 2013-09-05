@@ -28,8 +28,10 @@
 
       {% if revision and revision.deleted %}
         <div class="warning">
+
           <strong>Эта ветка была удалена.</strong>
           <p>Восстановление к этому ответвлению приведет к пометке статьи как удаленной</p>
+
         </div>
       {% else %}
         {% wiki_render article content %}

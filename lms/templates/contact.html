@@ -1,3 +1,5 @@
+<%! from django.utils.translation import ugettext as _ %>
+
 <%namespace name='static' file='static_content.html'/>
 
 <%inherit file="main.html" />
@@ -15,6 +17,8 @@
       <img src="${static.url('images/contact-page.jpg')}">
     </div>
     <div class="contacts">
+
+
       <h2>Обратная связь. Класс</h2>
       <p>Мы ждем ваши отзывы, чтобы сделать наши курсы лучше. Если вас пригласили в класс и у вас есть какие-либо вопросы, отзывы, предложения, пожалуйста, пишите на форумах этого класса.</p>
 
@@ -24,8 +28,12 @@
       <h2>Технические вопросы и обратная связь</h2>
       <p>Отзывы и предложени по технической работе сайта направляйте по адресу <a href="mailto:technical@edx.org">technical@edx.org</a>. Для сообщений об ошибках используйте: <a href="mailto:bugs@edx.org">bugs@edx.org</a>.</p>
 
-      <h2>Медиа</h2>
+      <h2>СМИ</h2>
       <p>Пожалуйста, посетите <a href="${reverse('faq_edx')}">медиа страницу</a>. Там вы сможете найти дополнительную информацию.</p>
+
+    <h2>Университетам</h2>
+      <p>Если вы хотите с нами сотрудничать и вместе создавать курсы - <a href="mailto:university@edx.org">пишите</a></p>
+
     </div>
   </section>
 </section>

@@ -7,6 +7,7 @@ class CMS.Views.ModuleEdit extends Backbone.View
     "click .component-editor .cancel-button": 'clickCancelButton'
     "click .component-editor .save-button": 'clickSaveButton'
     "click .component-actions .edit-button": 'clickEditButton'
+    "click .component-actions .insert-button": 'clickInsertButton'
     "click .component-actions .delete-button": 'onDelete'
     "click .mode a": 'clickModeButton'
 
@@ -70,7 +71,7 @@ class CMS.Views.ModuleEdit extends Backbone.View
   render: ->
     if @model.id
       @$el.load("/preview_component/#{@model.id}", =>
-        #alert "#{@model.id}"
+        # alert "#{@model.id}"
         @loadDisplay()
         @delegateEvents()
       )
@@ -114,6 +115,11 @@ class CMS.Views.ModuleEdit extends Backbone.View
     $modalCover.show().addClass('is-fixed')
     @$component_editor().slideDown(150)
     @loadEdit()
+
+  clickInsertButton: (event) ->
+    event.preventDefault()
+    vidtime = @$el.find('.vidtime')
+    console.log(vidtime.html())
 
   clickModeButton: (event) ->
     event.preventDefault()

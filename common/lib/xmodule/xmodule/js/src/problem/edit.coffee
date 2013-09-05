@@ -469,6 +469,16 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
         return groupString;
       });
 
+      // textbox
+      xml = xml.replace(/^\:===/gm, function(match, p) {
+         var string;
+         string = '<customresponse>\n';
+         string += '  <textbox/>\n';
+         string += '</customresponse>\n';
+
+        return string;
+      });
+
       //(\s*[I]:.*\n\s*[S]:.*\n\s*[+]:.*?$)(?!(\n\s*[+-]:.*?$))
       // replace string and numerical for msup
       xml = xml.replace(/^(\s*[I]:.*?$\n\s*[S]:.*?$\n\s*[+]:.*?$)(?!(\n\s*[+-]:.*?$))/gm, function(match, p) {
@@ -517,7 +527,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
           } else {
             string = '<numericalresponse answer="' + floatValue + '">\n';
           }
-          string += '  <textline />\n';
+          string += '  <formulaequationinput />\n';
           string += '</numericalresponse>\n\n';
         } else {
           string = '<stringresponse answer="' + p + '" type="ci">\n  <textline size="20"/>\n</stringresponse>\n\n';

@@ -1,3 +1,4 @@
+<%! from django.utils.translation import ugettext as _ %>
 <script type="text/template" id="thread-list-template">
     <div class="browse-search">
         <div class="home">
@@ -25,7 +26,7 @@
             <li><a href="#" data-sort="votes">оценкам</a></li>
             <li><a href="#" data-sort="comments">популярности</a></li>
         </ul>
-        
+
 
         %if is_course_cohorted and is_moderator:
         <span class="group-filter-label cohort">Показать:</span>
@@ -34,7 +35,7 @@
                     %for c in cohorts:
                         <option value="${c.id}">Посмотреть как ${c.name}</option>
                     %endfor
-            </select>        
+            </select>
         %endif
     </div>
     <div class="post-list-wrapper">

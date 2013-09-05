@@ -19,7 +19,6 @@ from capa.tests.response_xml_factory import OptionResponseXMLFactory, \
     StringResponseXMLFactory, NumericalResponseXMLFactory, \
     FormulaResponseXMLFactory, CustomResponseXMLFactory, \
     CodeResponseXMLFactory, ChoiceTextResponseXMLFactory
-from nose.tools import assert_true
 
 
 # Factories from capa.tests.response_xml_factory that we will use
@@ -226,7 +225,6 @@ def answer_problem(problem_type, correctness):
 
         input_value = "8" if correctness == 'correct' else "5"
         choice = "choiceinput_0bc" if correctness == 'correct' else "choiceinput_1bc"
-        world.css_check(inputfield(problem_type, choice=choice))
         world.css_fill(
             inputfield(
                 problem_type,
@@ -234,6 +232,7 @@ def answer_problem(problem_type, correctness):
             ),
             input_value
         )
+        world.css_check(inputfield(problem_type, choice=choice))
 
 
 def problem_has_answer(problem_type, answer_class):

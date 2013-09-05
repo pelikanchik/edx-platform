@@ -1,3 +1,4 @@
+<%! from django.utils.translation import ugettext as _ %>
 <%inherit file="../main.html" />
 
 <%namespace name='static' file='../static_content.html'/>
@@ -8,14 +9,13 @@
   <header class="search">
     <div class="inner-wrapper main-search">
       <hgroup>
+
           <h2>Выберите курс, который вам по душе.</h2>
       </hgroup>
     </div>
   </header>
 
   <section class="container">
-    ## I'm removing this for now since we aren't using it for the fall.
-    ## <%include file="course_filter.html" />
     <section class="courses">
       <ul class="courses-listing">
         %for course in courses:

@@ -23,7 +23,6 @@ class @Problem
 
     problem_prefix = @element_id.replace(/problem_/,'')
     @inputs = @$("[id^=input_#{problem_prefix}_]")
-
     @$('section.action input:button').click @refreshAnswers
     @$('section.action input.check').click @check_fd
     # XXX
@@ -66,6 +65,13 @@ class @Problem
         a = detail.split('/')
         possible = parseInt(a[1])
         progress = "(возможное количество баллов: #{possible})"
+        possible = parseFloat(a[1])
+        if possible == 1
+            # i18n
+            progress = "(возможное количество баллов: #{possible})"
+        else
+            # i18n
+            progress = "(возможное количество баллов: #{possible})"
     @$('.problem-progress').html(progress)
 
   updateProgress: (response) =>
@@ -272,6 +278,7 @@ class @Problem
             @updateProgress response
           else
             @gentle_alert response.success
+        Logger.log 'problem_graded', [@answers, response.contents], @url
 
     if not abort_submission
       $.ajaxWithPrefix("#{@url}/problem_check", settings)
@@ -301,10 +308,10 @@ class @Problem
             @el.removeClass 'showed'
         else
           @gentle_alert response.success
-      $("#" + @element_id + " .check").val('Проверить').prop('disabled', false)
+      $("#" + @element_id + " .check").val('Ответить').prop('disabled', false)
       responsesBeingProcessedCount--
       if( responsesBeingProcessedCount == 0)
-        $('.check-all').html('Проверить').removeClass('check-all-disabled');
+        $('.check-all').html('Ответить').removeClass('check-all-disabled');
 
       Logger.log 'problem_graded', [@answers, response.contents], @url
 
