@@ -119,7 +119,36 @@ class CMS.Views.ModuleEdit extends Backbone.View
   clickInsertButton: (event) ->
     event.preventDefault()
     vidtime = @$el.find('.vidtime')
-    console.log(vidtime.html())
+    time_str = vidtime.html()
+    cur_time_str = time_str.substr(0,time_str.indexOf('/')-1)
+    cur_time_str_parts = cur_time_str.split(':')
+    time = 0
+    for elem in cur_time_str_parts
+      time_part = parseInt(elem)
+      time = time*60+time_part
+    console.log(time)
+    seconds = time%60
+    minutes = ((time-seconds)/60)%60
+    hours = (time-minutes-seconds)/3600
+    seconds_str = seconds + ""
+    if seconds_str.length == 1
+      seconds_str = "0" + seconds_str
+    minutes_str = minutes + ""
+    if minutes_str.length == 1
+      minutes_str = "0" + minutes_str
+    hours_str = hours + ""
+    if hours_str.length == 1
+      hours_str = "0" + hours_str
+    time_format = hours_str + ":" + minutes_str + ":" + seconds_str
+    console.log(time_format)
+    new_component = document.getElementsByClassName('multiple-templates')
+    for elem in new_component
+      if elem.getAttribute('data-type') == 'problem'
+      #if elem.data.type == 'problem'
+        elem.click()
+        elem.setAttribute 'time', time_format
+        elem.setAttribute 'show_now', 'False'
+
 
   clickModeButton: (event) ->
     event.preventDefault()
