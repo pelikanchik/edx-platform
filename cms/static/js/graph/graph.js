@@ -404,8 +404,8 @@ var layouter;
 
 
 
-//    var height = 100 + 50*ids_arr.length;
-    var height = 300;
+    var height = 100 + 50*ids_arr.length;
+//    var height = 300;
 
     /* draw the graph using the RaphaelJS draw implementation */
     renderer = new Graph.Renderer.Raphael('canvas', g, width, height);
