@@ -150,7 +150,8 @@
 		float: right;
 
 		.edit-button,
-		.delete-button{
+		.delete-button,
+        .insert-button{
 			float: left;
 			@include white-button;
 	    padding: 3px 10px 4px;
@@ -159,7 +160,8 @@
 	    font-weight: 400;
 
 	    .edit-icon,
-	    .delete-icon {
+	    .delete-icon,
+        .insert-icon {
 	      margin-right: 4px;
 	    }
 		}
@@ -190,7 +192,8 @@
     font-weight: 400;
 
     .edit-icon,
-    .delete-icon {
+    .delete-icon,
+    .insert-icon {
       margin-right: 4px;
     }
 	}
