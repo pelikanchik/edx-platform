@@ -121,12 +121,20 @@ class CMS.Views.ModuleEdit extends Backbone.View
     vidtime = @$el.find('.vidtime')
     time_str = vidtime.html()
     cur_time_str = time_str.substr(0,time_str.indexOf('/')-1)
+    duration_time_str = time_str.substr(time_str.indexOf('/')+2)
+    console.log(cur_time_str)
+    console.log(duration_time_str)
+    console.log(cur_time_str.length)
+    console.log(duration_time_str.length)
     cur_time_str_parts = cur_time_str.split(':')
     time = 0
     for elem in cur_time_str_parts
       time_part = parseInt(elem)
       time = time*60+time_part
     console.log(time)
+    if time > 0
+      if cur_time_str == duration_time_str
+        time = time-1
     seconds = time%60
     minutes = ((time-seconds)/60)%60
     hours = (time-minutes-seconds)/3600

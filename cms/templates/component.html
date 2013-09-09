@@ -19,7 +19,6 @@
 	  			</li>
 	  		</ul>
 		</div> <!-- Editor Header -->
-
 		<div class="component-edit-modes">
 	        <div class="module-editor">
 	            ${editor}
@@ -35,7 +34,9 @@
 <div class="component-actions">
   <a href="#" class="edit-button standard"><span class="edit-icon"></span>${_(u"Редактировать")}</a>
   <a href="#" class="delete-button standard"><span class="delete-icon"></span>${_(u"Удалить")}</a>
-  <a href="#" class="insert-button standard">${_(u"Вставить задачу #прямосейчас")}</a>
+  %if module_class == "video":
+    <a href="#" class="insert-button standard"><span class="insert-icon"></span>${_(u"Вставить задачу #прямосейчас")}</a>
+  %endif
 </div>
 <a data-tooltip='${_("Drag to reorder")}' href="#" class="drag-handle"></a>
 ${preview}

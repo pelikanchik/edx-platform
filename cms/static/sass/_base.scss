@@ -554,7 +554,8 @@ a.show-graph-item{
 
   .edit-button,
   .delete-button,
-  .visibility-toggle {
+  .visibility-toggle,
+  .insert-button {
     float: left;
     margin-right: 13px;
     color: #a4aab7;
@@ -760,7 +761,8 @@ hr.divide {
 }
 
 .edit-button.standard,
-.delete-button.standard {
+.delete-button.standard,
+.insert-button.standard {
   @extend .t-action4;
   @include white-button;
   float: left;
