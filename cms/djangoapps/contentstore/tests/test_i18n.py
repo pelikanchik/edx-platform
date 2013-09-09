@@ -3,10 +3,13 @@ from unittest import skip
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 from django.test.client import Client
+from django.test.utils import override_settings
 
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from contentstore.tests.modulestore_config import TEST_MODULESTORE
 
 
+@override_settings(MODULESTORE=TEST_MODULESTORE)
 class InternationalizationTest(ModuleStoreTestCase):
     """
     Tests to validate Internationalization.
@@ -85,9 +88,11 @@ class InternationalizationTest(ModuleStoreTestCase):
                                HTTP_ACCEPT_LANGUAGE='fr'
                                )
 
-        TEST_STRING = u'<h1 class="title-1">' \
-                      + u'My \xc7\xf6\xfcrs\xe9s L#' \
-                      + u'</h1>'
+        TEST_STRING = (
+            u'<h1 class="title-1">'
+            u'My \xc7\xf6\xfcrs\xe9s L#'
+            u'</h1>'
+        )
 
         self.assertContains(resp,
                             TEST_STRING,

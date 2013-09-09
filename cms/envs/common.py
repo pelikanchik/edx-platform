@@ -25,7 +25,7 @@ Longer TODO:
 
 import sys
 import lms.envs.common
-from lms.envs.common import USE_TZ
+from lms.envs.common import USE_TZ, TECH_SUPPORT_EMAIL, PLATFORM_NAME, BUGS_EMAIL
 from path import path
 
 ############################ FEATURE CONFIGURATION #############################
@@ -38,9 +38,6 @@ MITX_FEATURES = {
     'ENABLE_DISCUSSION_SERVICE': False,
 
     'AUTH_USE_MIT_CERTIFICATES': False,
-
-    # do not display video when running automated acceptance tests
-    'STUB_VIDEO_FOR_TESTING': False,
 
     # email address for studio staff (eg to request course creation)
     'STUDIO_REQUEST_EMAIL': '',
@@ -105,11 +102,13 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.static',
     'django.contrib.messages.context_processors.messages',
     'django.contrib.auth.context_processors.auth',  # this is required for admin
+    'django.core.context_processors.csrf'
 )
 
-# add csrf support unless disabled for load testing
-if not MITX_FEATURES.get('AUTOMATIC_AUTH_FOR_LOAD_TESTING'):
-    TEMPLATE_CONTEXT_PROCESSORS += ('django.core.context_processors.csrf',)  # necessary for csrf protection
+# use the ratelimit backend to prevent brute force attacks
+AUTHENTICATION_BACKENDS = (
+    'ratelimitbackend.backends.RateLimitModelBackend',
+)
 
 LMS_BASE = None
 
@@ -141,6 +140,7 @@ MIDDLEWARE_CLASSES = (
     'request_cache.middleware.RequestCache',
     'django.middleware.cache.UpdateCacheMiddleware',
     'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'method_override.middleware.MethodOverrideMiddleware',
 
@@ -154,12 +154,11 @@ MIDDLEWARE_CLASSES = (
     # Detects user-requested locale from 'accept-language' header in http request
     'django.middleware.locale.LocaleMiddleware',
 
-    'django.middleware.transaction.TransactionMiddleware'
-)
+    'django.middleware.transaction.TransactionMiddleware',
 
-# add in csrf middleware unless disabled for load testing
-if not MITX_FEATURES.get('AUTOMATIC_AUTH_FOR_LOAD_TESTING'):
-    MIDDLEWARE_CLASSES = MIDDLEWARE_CLASSES + ('django.middleware.csrf.CsrfViewMiddleware',)
+    # catches any uncaught RateLimitExceptions and returns a 403 instead of a 500
+    'ratelimitbackend.middleware.RateLimitMiddleware',
+)
 
 ############################ SIGNAL HANDLERS ################################
 # This is imported to register the exception signal handling that logs exceptions
@@ -178,13 +177,21 @@ ROOT_URLCONF = 'cms.urls'
 IGNORABLE_404_ENDS = ('favicon.ico')
 
 # Email
+#<<<<<<< HEAD
+#EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+#DEFAULT_FROM_EMAIL = 'registration@edx.org'
+#DEFAULT_FEEDBACK_EMAIL = 'feedback@edx.org'
+#SERVER_EMAIL = 'devops@edx.org'
+#ADMINS = ()
+#=======
 EMAIL_BACKEND = 'django_ses.SESBackend'
-DEFAULT_FROM_EMAIL = 'registration@lutix.crabdance.com'
-DEFAULT_FEEDBACK_EMAIL = 'feedback@lutix.crabdance.com'
-SERVER_EMAIL = 'devops@lutix.crabdance.com'
+DEFAULT_FROM_EMAIL = 'registration@pelic.ru'
+DEFAULT_FEEDBACK_EMAIL = 'feedback@pelic.ru'
+SERVER_EMAIL = 'devops@pelic.ru'
 ADMINS = (
-    ('lutiX Admins', 'admin@lutix.crabdance.com'),
+    ('lutiX Admins', 'admin@pelic.ru'),
 )
+#>>>>>>> 4f9bf342df105f2a5f00372194e6f7a65dac6f8b
 MANAGERS = ADMINS
 
 # Static content
@@ -196,15 +203,15 @@ STATICFILES_DIRS = [
     COMMON_ROOT / "static",
     PROJECT_ROOT / "static",
 
-# This is how you would use the textbook images locally
-# ("book", ENV_ROOT / "book_images")
+    # This is how you would use the textbook images locally
+    # ("book", ENV_ROOT / "book_images")
 ]
 
 # Locale/Internationalization
 TIME_ZONE = 'Europe/Moscow'   # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 LANGUAGE_CODE = 'ru'  # http://www.i18nguy.com/unicode/language-identifiers.html
 
-USE_I18N = True
+USE_I18N = False
 USE_L10N = True
 
 # Localization strings (e.g. django.po) are under this directory
@@ -244,10 +251,13 @@ PIPELINE_JS = {
             rooted_glob(COMMON_ROOT / 'static/', 'coffee/src/**/*.js') +
             rooted_glob(PROJECT_ROOT / 'static/', 'coffee/src/**/*.js')
         ) + ['js/hesitate.js', 'js/base.js', 'js/views/feedback.js',
+             'js/models/course.js',
              'js/models/section.js', 'js/views/section.js',
              'js/models/metadata_model.js', 'js/views/metadata_editor_view.js',
+             'js/models/uploads.js', 'js/views/uploads.js',
              'js/models/textbook.js', 'js/views/textbook.js',
-             'js/views/assets.js', 'js/utility.js'],
+             'js/views/assets.js', 'js/utility.js',
+             'js/models/settings/course_grading_policy.js'],
         'output_filename': 'js/cms-application.js',
         'test_order': 0
     },
@@ -334,6 +344,9 @@ INSTALLED_APPS = (
     # Monitor the status of services
     'service_status',
 
+    # Testing
+    'django_nose',
+
     # For CMS
     'contentstore',
     'auth',
@@ -341,7 +354,7 @@ INSTALLED_APPS = (
     'student',  # misleading name due to sharing with lms
     'course_groups',  # not used in cms (yet), but tests run
 
-    # tracking
+    # Tracking
     'track',
 
     # For asset pipelining
@@ -354,7 +367,10 @@ INSTALLED_APPS = (
     'django_comment_common',
 
     # for course creator table
-    'django.contrib.admin'
+    'django.contrib.admin',
+
+    # for managing course modes
+    'course_modes'
 )
 
 ################# EDX MARKETING SITE ##################################

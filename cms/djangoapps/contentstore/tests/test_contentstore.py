@@ -3,6 +3,9 @@
 import json
 import shutil
 import mock
+
+from textwrap import dedent
+
 from django.test.client import Client
 from django.test.utils import override_settings
 from django.conf import settings
@@ -22,6 +25,7 @@ from contentstore.tests.utils import parse_json
 from auth.authz import add_user_to_creator_group
 
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from contentstore.tests.modulestore_config import TEST_MODULESTORE
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from xmodule.modulestore import Location, mongo
@@ -49,7 +53,7 @@ import datetime
 from pytz import UTC
 from uuid import uuid4
 from pymongo import MongoClient
-
+from student.models import CourseEnrollment
 
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['OPTIONS']['db'] = 'test_xcontent_%s' % uuid4().hex
@@ -65,7 +69,7 @@ class MongoCollectionFindWrapper(object):
         return self.original(query, *args, **kwargs)
 
 
-@override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
+@override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE, MODULESTORE=TEST_MODULESTORE)
 class ContentStoreToyCourseTest(ModuleStoreTestCase):
     """
     Tests that rely on the toy courses.
@@ -95,8 +99,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         self.client.login(username=uname, password=password)
 
     def tearDown(self):
-        mongo = MongoClient()
-        mongo.drop_database(TEST_DATA_CONTENTSTORE['OPTIONS']['db'])
+        MongoClient().drop_database(TEST_DATA_CONTENTSTORE['OPTIONS']['db'])
         _CONTENTSTORE.clear()
 
     def check_components_on_page(self, component_types, expected_types):
@@ -108,8 +111,8 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         expected_types is the list of elements that should appear on the page.
 
         expected_types and component_types should be similar, but not
-        exactly the same -- for example, 'videoalpha' in
-        component_types should cause 'Video Alpha' to be present.
+        exactly the same -- for example, 'video' in
+        component_types should cause 'Video' to be present.
         """
         store = modulestore('direct')
         import_from_xml(store, 'common/test/data/', ['simple'])
@@ -137,14 +140,13 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
     def test_advanced_components_in_edit_unit(self):
         # This could be made better, but for now let's just assert that we see the advanced modules mentioned in the page
         # response HTML
-        self.check_components_on_page(ADVANCED_COMPONENT_TYPES, ['Video Alpha',
-                                                                 'Word cloud',
+        self.check_components_on_page(ADVANCED_COMPONENT_TYPES, ['Word cloud',
                                                                  'Annotation',
                                                                  'Open Response Assessment',
                                                                  'Peer Grading Interface'])
 
     def test_advanced_components_require_two_clicks(self):
-        self.check_components_on_page(['videoalpha'], ['Video Alpha'])
+        self.check_components_on_page(['word_cloud'], ['Word cloud'])
 
     def test_malformed_edit_unit_request(self):
         store = modulestore('direct')
@@ -304,7 +306,24 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         num_drafts = self._get_draft_counts(course)
         self.assertEqual(num_drafts, 1)
 
-    def test_import_textbook_as_content_element(self):
+    def test_no_static_link_rewrites_on_import(self):
+        module_store = modulestore('direct')
+        import_from_xml(module_store, 'common/test/data/', ['toy'])
+
+        handouts = module_store.get_item(Location(['i4x', 'edX', 'toy', 'course_info', 'handouts', None]))
+        self.assertIn('/static/', handouts.data)
+
+        handouts = module_store.get_item(Location(['i4x', 'edX', 'toy', 'html', 'toyhtml', None]))
+        self.assertIn('/static/', handouts.data)
+
+    @mock.patch('xmodule.course_module.requests.get')
+    def test_import_textbook_as_content_element(self, mock_get):
+        mock_get.return_value.text = dedent("""
+            <?xml version="1.0"?><table_of_contents>
+            <entry page="5" page_label="ii" name="Table of Contents"/>
+            </table_of_contents>
+        """).strip()
+
         module_store = modulestore('direct')
         import_from_xml(module_store, 'common/test/data/', ['toy'])
 
@@ -392,6 +411,20 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
 
+    def test_video_module_caption_asset_path(self):
+        '''
+        This verifies that a video caption url is as we expect it to be
+        '''
+        direct_store = modulestore('direct')
+        import_from_xml(direct_store, 'common/test/data/', ['toy'])
+
+        # also try a custom response which will trigger the 'is this course in whitelist' logic
+        video_module_location = Location(['i4x', 'edX', 'toy', 'video', 'sample_video', None])
+        url = reverse('preview_component', kwargs={'location': video_module_location.url()})
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, 'data-caption-asset-path="/c4x/edX/toy/asset/subs_"')
+
     def test_delete(self):
         direct_store = modulestore('direct')
         CourseFactory.create(org='edX', course='999', display_name='Robot Super Course')
@@ -454,7 +487,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         content_store = contentstore()
 
         module_store = modulestore('direct')
-        import_from_xml(module_store, 'common/test/data/', ['toy'], static_content_store=content_store)
+        import_from_xml(module_store, 'common/test/data/', ['toy'], static_content_store=content_store, verbose=True)
 
         course_location = CourseDescriptor.id_to_location('edX/toy/2012_Fall')
         course = module_store.get_item(course_location)
@@ -604,34 +637,136 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
             'org': 'MITx',
             'number': '999',
             'display_name': 'Robot Super Course',
+            'run': '2013_Spring'
         }
 
         module_store = modulestore('direct')
+        draft_store = modulestore('draft')
         import_from_xml(module_store, 'common/test/data/', ['toy'])
+
+        source_course_id = 'edX/toy/2012_Fall'
+        dest_course_id = 'MITx/999/2013_Spring'
+        source_location = CourseDescriptor.id_to_location(source_course_id)
+        dest_location = CourseDescriptor.id_to_location(dest_course_id)
+
+        # get a vertical (and components in it) to put into 'draft'
+        # this is to assert that draft content is also cloned over
+        vertical = module_store.get_instance(source_course_id, Location([
+            source_location.tag, source_location.org, source_location.course, 'vertical', 'vertical_test', None]), depth=1)
+
+        draft_store.convert_to_draft(vertical.location)
+        for child in vertical.get_children():
+            draft_store.convert_to_draft(child.location)
+
+        items = module_store.get_items(Location([source_location.tag, source_location.org, source_location.course, None, None, 'draft']))
+        self.assertGreater(len(items), 0)
 
         resp = self.client.post(reverse('create_new_course'), course_data)
         self.assertEqual(resp.status_code, 200)
         data = parse_json(resp)
-        self.assertEqual(data['id'], 'i4x://MITx/999/course/Robot_Super_Course')
+        self.assertEqual(data['id'], 'i4x://MITx/999/course/2013_Spring')
 
         content_store = contentstore()
 
-        source_location = CourseDescriptor.id_to_location('edX/toy/2012_Fall')
-        dest_location = CourseDescriptor.id_to_location('MITx/999/Robot_Super_Course')
-
+        # now do the actual cloning
         clone_course(module_store, content_store, source_location, dest_location)
+
+        # first assert that all draft content got cloned as well
+        items = module_store.get_items(Location([source_location.tag, source_location.org, source_location.course, None, None, 'draft']))
+        self.assertGreater(len(items), 0)
+        clone_items = module_store.get_items(Location([dest_location.tag, dest_location.org, dest_location.course, None, None, 'draft']))
+        self.assertGreater(len(clone_items), 0)
+        self.assertEqual(len(items), len(clone_items))
 
         # now loop through all the units in the course and verify that the clone can render them, which
         # means the objects are at least present
-        items = module_store.get_items(Location(['i4x', 'edX', 'toy', 'poll_question', None]))
+        items = module_store.get_items(Location([source_location.tag, source_location.org, source_location.course, None, None]))
         self.assertGreater(len(items), 0)
-        clone_items = module_store.get_items(Location(['i4x', 'MITx', '999', 'poll_question', None]))
+        clone_items = module_store.get_items(Location([dest_location.tag, dest_location.org, dest_location.course, None, None]))
         self.assertGreater(len(clone_items), 0)
+
         for descriptor in items:
-            new_loc = descriptor.location.replace(org='MITx', course='999')
+            source_item = module_store.get_instance(source_course_id, descriptor.location)
+            if descriptor.location.category == 'course':
+                new_loc = descriptor.location.replace(org=dest_location.org, course=dest_location.course, name='2013_Spring')
+            else:
+                new_loc = descriptor.location.replace(org=dest_location.org, course=dest_location.course)
             print "Checking {0} should now also be at {1}".format(descriptor.location.url(), new_loc.url())
-            resp = self.client.get(reverse('edit_unit', kwargs={'location': new_loc.url()}))
-            self.assertEqual(resp.status_code, 200)
+            lookup_item = module_store.get_item(new_loc)
+
+            # we want to assert equality between the objects, but we know the locations
+            # differ, so just make them equal for testing purposes
+            source_item.location = new_loc
+            if hasattr(source_item, 'data') and hasattr(lookup_item, 'data'):
+                self.assertEqual(source_item.data, lookup_item.data)
+
+            # also make sure that metadata was cloned over and filtered with own_metadata, i.e. inherited
+            # values were not explicitly set
+            self.assertEqual(own_metadata(source_item), own_metadata(lookup_item))
+
+            # check that the children are as expected
+            self.assertEqual(source_item.has_children, lookup_item.has_children)
+            if source_item.has_children:
+                expected_children = []
+                for child_loc_url in source_item.children:
+                    child_loc = Location(child_loc_url)
+                    child_loc = child_loc._replace(
+                        tag=dest_location.tag,
+                        org=dest_location.org,
+                        course=dest_location.course
+                    )
+                    expected_children.append(child_loc.url())
+                self.assertEqual(expected_children, lookup_item.children)
+
+    def test_portable_link_rewrites_during_clone_course(self):
+        course_data = {
+            'org': 'MITx',
+            'number': '999',
+            'display_name': 'Robot Super Course',
+            'run': '2013_Spring'
+        }
+
+        module_store = modulestore('direct')
+        draft_store = modulestore('draft')
+        content_store = contentstore()
+
+        import_from_xml(module_store, 'common/test/data/', ['toy'])
+
+        source_course_id = 'edX/toy/2012_Fall'
+        dest_course_id = 'MITx/999/2013_Spring'
+        source_location = CourseDescriptor.id_to_location(source_course_id)
+        dest_location = CourseDescriptor.id_to_location(dest_course_id)
+
+        # let's force a non-portable link in the clone source
+        # as a final check, make sure that any non-portable links are rewritten during cloning
+        html_module_location = Location([
+            source_location.tag, source_location.org, source_location.course, 'html', 'nonportable'])
+        html_module = module_store.get_instance(source_location.course_id, html_module_location)
+
+        self.assertTrue(isinstance(html_module.data, basestring))
+        new_data = html_module.data.replace('/static/', '/c4x/{0}/{1}/asset/'.format(
+            source_location.org, source_location.course))
+        module_store.update_item(html_module_location, new_data)
+
+        html_module = module_store.get_instance(source_location.course_id, html_module_location)
+        self.assertEqual(new_data, html_module.data)
+
+        # create the destination course
+
+        resp = self.client.post(reverse('create_new_course'), course_data)
+        self.assertEqual(resp.status_code, 200)
+        data = parse_json(resp)
+        self.assertEqual(data['id'], 'i4x://MITx/999/course/2013_Spring')
+
+        # do the actual cloning
+        clone_course(module_store, content_store, source_location, dest_location)
+
+        # make sure that any non-portable links are rewritten during cloning
+        html_module_location = Location([
+            dest_location.tag, dest_location.org, dest_location.course, 'html', 'nonportable'])
+        html_module = module_store.get_instance(dest_location.course_id, html_module_location)
+
+        self.assertIn('/static/foo.jpg', html_module.data)
 
     def test_illegal_draft_crud_ops(self):
         draft_store = modulestore('draft')
@@ -659,6 +794,22 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
     def test_bad_contentstore_request(self):
         resp = self.client.get('http://localhost:8001/c4x/CDX/123123/asset/&images_circuits_Lab7Solution2.png')
         self.assertEqual(resp.status_code, 400)
+
+    def test_rewrite_nonportable_links_on_import(self):
+        module_store = modulestore('direct')
+        content_store = contentstore()
+
+        import_from_xml(module_store, 'common/test/data/', ['toy'], static_content_store=content_store)
+
+        # first check a static asset link
+        html_module_location = Location(['i4x', 'edX', 'toy', 'html', 'nonportable'])
+        html_module = module_store.get_instance('edX/toy/2012_Fall', html_module_location)
+        self.assertIn('/static/foo.jpg', html_module.data)
+
+        # then check a intra courseware link
+        html_module_location = Location(['i4x', 'edX', 'toy', 'html', 'nonportable_link'])
+        html_module = module_store.get_instance('edX/toy/2012_Fall', html_module_location)
+        self.assertIn('/jump_to_id/nonportable_link', html_module.data)
 
     def test_delete_course(self):
         """
@@ -705,7 +856,14 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
             filesystem = OSFS(root_dir / ('test_export/' + dirname))
             self.assertTrue(filesystem.exists(item.location.name + filename_suffix))
 
-    def test_export_course(self):
+    @mock.patch('xmodule.course_module.requests.get')
+    def test_export_course(self, mock_get):
+        mock_get.return_value.text = dedent("""
+            <?xml version="1.0"?><table_of_contents>
+            <entry page="5" page_label="ii" name="Table of Contents"/>
+            </table_of_contents>
+        """).strip()
+
         module_store = modulestore('direct')
         draft_store = modulestore('draft')
         content_store = contentstore()
@@ -805,8 +963,17 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
                                                   'vertical', 'vertical_test', None]), depth=1)
 
         self.assertTrue(getattr(vertical, 'is_draft', False))
+        self.assertNotIn('index_in_children_list', child.xml_attributes)
+        self.assertNotIn('parent_sequential_url', vertical.xml_attributes)
+                
         for child in vertical.get_children():
             self.assertTrue(getattr(child, 'is_draft', False))
+            self.assertNotIn('index_in_children_list', child.xml_attributes)
+            if hasattr(child, 'data'):
+                self.assertNotIn('index_in_children_list', child.data)
+            self.assertNotIn('parent_sequential_url', child.xml_attributes)
+            if hasattr(child, 'data'):
+                self.assertNotIn('parent_sequential_url', child.data)
 
         # make sure that we don't have a sequential that is in draft mode
         sequential = draft_store.get_item(Location(['i4x', 'edX', 'toy',
@@ -917,6 +1084,38 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         # It should now contain empty data
         self.assertEquals(imported_word_cloud.data, '')
 
+    def test_html_export_roundtrip(self):
+        """
+        Test that a course which has HTML that has style formatting is preserved in export/import
+        """
+        module_store = modulestore('direct')
+        content_store = contentstore()
+
+        import_from_xml(module_store, 'common/test/data/', ['toy'])
+
+        location = CourseDescriptor.id_to_location('edX/toy/2012_Fall')
+
+        # Export the course
+        root_dir = path(mkdtemp_clean())
+        export_to_xml(module_store, content_store, location, root_dir, 'test_roundtrip')
+
+        # Reimport and get the video back
+        import_from_xml(module_store, root_dir)
+
+        # get the sample HTML with styling information
+        html_module = module_store.get_instance(
+            'edX/toy/2012_Fall',
+            Location(['i4x', 'edX', 'toy', 'html', 'with_styling'])
+        )
+        self.assertIn('<p style="font:italic bold 72px/30px Georgia, serif; color: red; ">', html_module.data)
+
+        # get the sample HTML with just a simple <img> tag information
+        html_module = module_store.get_instance(
+            'edX/toy/2012_Fall',
+            Location(['i4x', 'edX', 'toy', 'html', 'just_img'])
+        )
+        self.assertIn('<img src="/static/foo_bar.jpg" />', html_module.data)
+
     def test_course_handouts_rewrites(self):
         module_store = modulestore('direct')
 
@@ -941,12 +1140,15 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         wrapper = MongoCollectionFindWrapper(module_store.collection.find)
         module_store.collection.find = wrapper.find
+        print module_store.metadata_inheritance_cache_subsystem
+        print module_store.request_cache
         course = module_store.get_item(location, depth=2)
 
         # make sure we haven't done too many round trips to DB
-        # note we say 4 round trips here for 1) the course, 2 & 3) for the chapters and sequentials, and
-        # 4) because of the RT due to calculating the inherited metadata
-        self.assertEqual(wrapper.counter, 4)
+        # note we say 3 round trips here for 1) the course, and 2 & 3) for the chapters and sequentials
+        # Because we're querying from the top of the tree, we cache information needed for inheritance,
+        # so we don't need to make an extra query to compute it.
+        self.assertEqual(wrapper.counter, 3)
 
         # make sure we pre-fetched a known sequential which should be at depth=2
         self.assertTrue(Location(['i4x', 'edX', 'toy', 'sequential',
@@ -982,7 +1184,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         export_to_xml(module_store, content_store, location, root_dir, 'test_export')
 
 
-@override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
+@override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE, MODULESTORE=TEST_MODULESTORE)
 class ContentStoreTest(ModuleStoreTestCase):
     """
     Tests for the CMS ContentStore application.
@@ -1016,6 +1218,7 @@ class ContentStoreTest(ModuleStoreTestCase):
             'org': 'MITx',
             'number': '999',
             'display_name': 'Robot Super Course',
+            'run': '2013_Spring'
         }
 
     def tearDown(self):
@@ -1027,40 +1230,58 @@ class ContentStoreTest(ModuleStoreTestCase):
         """Test new course creation - happy path"""
         self.assert_created_course()
 
-    def assert_created_course(self):
+    def assert_created_course(self, number_suffix=None):
         """
         Checks that the course was created properly.
         """
-        resp = self.client.post(reverse('create_new_course'), self.course_data)
+        test_course_data = {}
+        test_course_data.update(self.course_data)
+        if number_suffix:
+            test_course_data['number'] = '{0}_{1}'.format(test_course_data['number'], number_suffix)
+        resp = self.client.post(reverse('create_new_course'), test_course_data)
         self.assertEqual(resp.status_code, 200)
         data = parse_json(resp)
-        self.assertEqual(data['id'], 'i4x://MITx/999/course/Robot_Super_Course')
+        self.assertNotIn('ErrMsg', data)
+        self.assertEqual(data['id'], 'i4x://MITx/{0}/course/2013_Spring'.format(test_course_data['number']))
+        # Verify that the creator is now registered in the course.
+        self.assertTrue(CourseEnrollment.is_enrolled(self.user, self._get_course_id(test_course_data)))
+        return test_course_data
 
     def test_create_course_check_forum_seeding(self):
         """Test new course creation and verify forum seeding """
-        self.assert_created_course()
-        self.assertTrue(are_permissions_roles_seeded('MITx/999/Robot_Super_Course'))
+        test_course_data = self.assert_created_course(number_suffix=uuid4().hex)
+        self.assertTrue(are_permissions_roles_seeded(self._get_course_id(test_course_data)))
+
+    def _get_course_id(self, test_course_data):
+        """Returns the course ID (org/number/run)."""
+        return "{org}/{number}/{run}".format(**test_course_data)
 
     def test_create_course_duplicate_course(self):
         """Test new course creation - error path"""
         self.client.post(reverse('create_new_course'), self.course_data)
-        self.assert_course_creation_failed('There is already a course defined with this name.')
+        self.assert_course_creation_failed('There is already a course defined with the same organization, course number, and course run. Please change either organization or course number to be unique.')
 
     def assert_course_creation_failed(self, error_message):
         """
         Checks that the course did not get created
         """
+        course_id = self._get_course_id(self.course_data)
+        initially_enrolled = CourseEnrollment.is_enrolled(self.user, course_id)
         resp = self.client.post(reverse('create_new_course'), self.course_data)
         self.assertEqual(resp.status_code, 200)
         data = parse_json(resp)
         self.assertEqual(data['ErrMsg'], error_message)
+        # One test case involves trying to create the same course twice. Hence for that course,
+        # the user will be enrolled. In the other cases, initially_enrolled will be False.
+        self.assertEqual(initially_enrolled, CourseEnrollment.is_enrolled(self.user, course_id))
 
     def test_create_course_duplicate_number(self):
         """Test new course creation - error path"""
         self.client.post(reverse('create_new_course'), self.course_data)
         self.course_data['display_name'] = 'Robot Super Course Two'
+        self.course_data['run'] = '2013_Summer'
 
-        self.assert_course_creation_failed('There is already a course defined with the same organization and course number.')
+        self.assert_course_creation_failed('There is already a course defined with the same organization and course number. Please change at least one field to be unique.')
 
     def test_create_course_with_bad_organization(self):
         """Test new course creation - error path for bad organization name"""
@@ -1133,7 +1354,7 @@ class ContentStoreTest(ModuleStoreTestCase):
         resp = self.client.get(reverse('index'))
         self.assertContains(
             resp,
-            '<span class="class-name">Robot Super Educational Course</span>',
+            '<h3 class="course-title">Robot Super Educational Course</h3>',
             status_code=200,
             html=True
         )
@@ -1208,7 +1429,7 @@ class ContentStoreTest(ModuleStoreTestCase):
                                                'course': loc.course,
                                                'name': loc.name}))
 
-        self.assertEqual(200, resp.status_code)
+        self.assertEqual(resp.status_code, 200)
         self.assertContains(resp, 'Chapter 2')
 
         # go to various pages
@@ -1218,92 +1439,134 @@ class ContentStoreTest(ModuleStoreTestCase):
                                        kwargs={'org': loc.org,
                                                'course': loc.course,
                                                'name': loc.name}))
-        self.assertEqual(200, resp.status_code)
+        self.assertEqual(resp.status_code, 200)
 
         # export page
         resp = self.client.get(reverse('export_course',
                                        kwargs={'org': loc.org,
                                                'course': loc.course,
                                                'name': loc.name}))
-        self.assertEqual(200, resp.status_code)
+        self.assertEqual(resp.status_code, 200)
 
         # manage users
         resp = self.client.get(reverse('manage_users',
                                        kwargs={'org': loc.org,
                                                'course': loc.course,
                                                'name': loc.name}))
-        self.assertEqual(200, resp.status_code)
+        self.assertEqual(resp.status_code, 200)
 
         # course info
         resp = self.client.get(reverse('course_info',
                                        kwargs={'org': loc.org,
                                                'course': loc.course,
                                                'name': loc.name}))
-        self.assertEqual(200, resp.status_code)
+        self.assertEqual(resp.status_code, 200)
 
         # settings_details
         resp = self.client.get(reverse('settings_details',
                                        kwargs={'org': loc.org,
                                                'course': loc.course,
                                                'name': loc.name}))
-        self.assertEqual(200, resp.status_code)
+        self.assertEqual(resp.status_code, 200)
 
         # settings_details
         resp = self.client.get(reverse('settings_grading',
                                        kwargs={'org': loc.org,
                                                'course': loc.course,
                                                'name': loc.name}))
-        self.assertEqual(200, resp.status_code)
+        self.assertEqual(resp.status_code, 200)
 
         # static_pages
         resp = self.client.get(reverse('static_pages',
                                        kwargs={'org': loc.org,
                                                'course': loc.course,
                                                'coursename': loc.name}))
-        self.assertEqual(200, resp.status_code)
+        self.assertEqual(resp.status_code, 200)
 
         # static_pages
         resp = self.client.get(reverse('asset_index',
                                        kwargs={'org': loc.org,
                                                'course': loc.course,
                                                'name': loc.name}))
-        self.assertEqual(200, resp.status_code)
+        self.assertEqual(resp.status_code, 200)
 
         # go look at a subsection page
         subsection_location = loc.replace(category='sequential', name='test_sequence')
         resp = self.client.get(reverse('edit_subsection',
                                        kwargs={'location': subsection_location.url()}))
-        self.assertEqual(200, resp.status_code)
+        self.assertEqual(resp.status_code, 200)
 
         # go look at the Edit page
         unit_location = loc.replace(category='vertical', name='test_vertical')
         resp = self.client.get(reverse('edit_unit',
                                        kwargs={'location': unit_location.url()}))
-        self.assertEqual(200, resp.status_code)
+        self.assertEqual(resp.status_code, 200)
 
         # delete a component
         del_loc = loc.replace(category='html', name='test_html')
         resp = self.client.post(reverse('delete_item'),
                                 json.dumps({'id': del_loc.url()}), "application/json")
-        self.assertEqual(200, resp.status_code)
+        self.assertEqual(resp.status_code, 204)
 
         # delete a unit
         del_loc = loc.replace(category='vertical', name='test_vertical')
         resp = self.client.post(reverse('delete_item'),
                                 json.dumps({'id': del_loc.url()}), "application/json")
-        self.assertEqual(200, resp.status_code)
+        self.assertEqual(resp.status_code, 204)
 
         # delete a unit
         del_loc = loc.replace(category='sequential', name='test_sequence')
         resp = self.client.post(reverse('delete_item'),
                                 json.dumps({'id': del_loc.url()}), "application/json")
-        self.assertEqual(200, resp.status_code)
+        self.assertEqual(resp.status_code, 204)
 
         # delete a chapter
         del_loc = loc.replace(category='chapter', name='chapter_2')
         resp = self.client.post(reverse('delete_item'),
                                 json.dumps({'id': del_loc.url()}), "application/json")
-        self.assertEqual(200, resp.status_code)
+        self.assertEqual(resp.status_code, 204)
+
+    def test_import_into_new_course_id(self):
+        module_store = modulestore('direct')
+        target_location = Location(['i4x', 'MITx', '999', 'course', '2013_Spring'])
+
+        course_data = {
+            'org': target_location.org,
+            'number': target_location.course,
+            'display_name': 'Robot Super Course',
+            'run': target_location.name
+        }
+
+        target_course_id = '{0}/{1}/{2}'.format(target_location.org, target_location.course, target_location.name)
+
+        resp = self.client.post(reverse('create_new_course'), course_data)
+        self.assertEqual(resp.status_code, 200)
+        data = parse_json(resp)
+        self.assertEqual(data['id'], target_location.url())
+
+        import_from_xml(module_store, 'common/test/data/', ['toy'], target_location_namespace=target_location)
+
+        modules = module_store.get_items(Location([
+            target_location.tag, target_location.org, target_location.course, None, None, None]))
+
+        # we should have a number of modules in there
+        # we can't specify an exact number since it'll always be changing
+        self.assertGreater(len(modules), 10)
+
+        #
+        # test various re-namespacing elements
+        #
+
+        # first check PDF textbooks, to make sure the url paths got updated
+        course_module = module_store.get_instance(target_course_id, target_location)
+
+        self.assertEquals(len(course_module.pdf_textbooks), 1)
+        self.assertEquals(len(course_module.pdf_textbooks[0]["chapters"]), 2)
+        self.assertEquals(course_module.pdf_textbooks[0]["chapters"][0]["url"], '/c4x/MITx/999/asset/Chapter1.pdf')
+        self.assertEquals(course_module.pdf_textbooks[0]["chapters"][1]["url"], '/c4x/MITx/999/asset/Chapter2.pdf')
+
+        # check that URL slug got updated to new course slug
+        self.assertEquals(course_module.wiki_slug, '999')
 
     def test_import_metadata_with_attempts_empty_string(self):
         module_store = modulestore('direct')
@@ -1424,14 +1687,41 @@ class ContentStoreTest(ModuleStoreTestCase):
         # is this test too strict? i.e., it requires the dicts to be ==
         self.assertEqual(course.checklists, fetched_course.checklists)
 
+    def test_image_import(self):
+        """Test backwards compatibilty of course image."""
+        module_store = modulestore('direct')
 
+        content_store = contentstore()
+
+        # Use conditional_and_poll, as it's got an image already
+        import_from_xml(
+            module_store,
+            'common/test/data/',
+            ['conditional_and_poll'],
+            static_content_store=content_store
+        )
+
+        course = module_store.get_courses()[0]
+
+        # Make sure the course image is set to the right place
+        self.assertEqual(course.course_image, 'images_course_image.jpg')
+
+        # Ensure that the imported course image is present -- this shouldn't raise an exception
+        location = course.location._replace(tag='c4x', category='asset', name=course.course_image)
+        content_store.find(location)
+
+
+@override_settings(MODULESTORE=TEST_MODULESTORE)
 class MetadataSaveTestCase(ModuleStoreTestCase):
-    """
-    Test that metadata is correctly decached.
-    """
+    """Test that metadata is correctly cached and decached."""
 
     def setUp(self):
-        sample_xml = '''
+        CourseFactory.create(
+            org='edX', course='999', display_name='Robot Super Course')
+        course_location = Location(
+            ['i4x', 'edX', '999', 'course', 'Robot_Super_Course', None])
+
+        video_sample_xml = '''
         <video display_name="Test Video"
                 youtube="1.0:p2Q6BrNhdh8,0.75:izygArpw-Qo,1.25:1EeWXzPdhSA,1.5:rABDYkeK0x8"
                 show_captions="false"
@@ -1441,19 +1731,17 @@ class MetadataSaveTestCase(ModuleStoreTestCase):
             <track src="http://www.example.com/track"/>
         </video>
         '''
-        CourseFactory.create(org='edX', course='999', display_name='Robot Super Course')
-        course_location = Location(['i4x', 'edX', '999', 'course', 'Robot_Super_Course', None])
+        self.video_descriptor = ItemFactory.create(
+            parent_location=course_location, category='video',
+            data={'data': video_sample_xml}
+        )
 
-        model_data = {'data': sample_xml}
-        self.descriptor = ItemFactory.create(parent_location=course_location, category='video', data=model_data)
-
-    def test_metadata_persistence(self):
+    def test_metadata_not_persistence(self):
         """
         Test that descriptors which set metadata fields in their
-        constructor are correctly persisted.
+        constructor are correctly deleted.
         """
-        # We should start with a source field, from the XML's <source/> tag
-        self.assertIn('source', own_metadata(self.descriptor))
+        self.assertIn('html5_sources', own_metadata(self.video_descriptor))
         attrs_to_strip = {
             'show_captions',
             'youtube_id_1_0',
@@ -1463,23 +1751,27 @@ class MetadataSaveTestCase(ModuleStoreTestCase):
             'start_time',
             'end_time',
             'source',
+            'html5_sources',
             'track'
         }
-        # We strip out all metadata fields to reproduce a bug where
-        # constructors which set their fields (e.g. Video) didn't have
-        # those changes persisted. So in the end we have the XML data
-        # in `descriptor.data`, but not in the individual fields
-        fields = self.descriptor.fields
+
+        fields = self.video_descriptor.fields
+        location = self.video_descriptor.location
+
         for field in fields:
             if field.name in attrs_to_strip:
-                field.delete_from(self.descriptor)
+                field.delete_from(self.video_descriptor)
 
-        # Assert that we correctly stripped the field
-        self.assertNotIn('source', own_metadata(self.descriptor))
-        get_modulestore(self.descriptor.location).update_metadata(
-            self.descriptor.location,
-            own_metadata(self.descriptor)
+        self.assertNotIn('html5_sources', own_metadata(self.video_descriptor))
+        get_modulestore(location).update_metadata(
+            location,
+            own_metadata(self.video_descriptor)
         )
-        module = get_modulestore(self.descriptor.location).get_item(self.descriptor.location)
-        # Assert that get_item correctly sets the metadata
-        self.assertIn('source', own_metadata(module))
+        module = get_modulestore(location).get_item(location)
+
+        self.assertNotIn('html5_sources', own_metadata(module))
+
+    def test_metadata_persistence(self):
+        # TODO: create the same test as `test_metadata_not_persistence`,
+        # but check persistence for some other module.
+        pass

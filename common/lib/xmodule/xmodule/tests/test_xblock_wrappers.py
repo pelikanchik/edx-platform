@@ -3,7 +3,7 @@ Tests for the wrapping layer that provides the XBlock API using XModule/Descript
 functionality
 """
 
-from nose.tools import assert_equal
+from nose.tools import assert_equal  # pylint: disable=E0611
 from unittest.case import SkipTest
 from mock import Mock
 
@@ -16,10 +16,9 @@ from xmodule.gst_module import GraphicalSliderToolDescriptor
 from xmodule.html_module import HtmlDescriptor
 from xmodule.peer_grading_module import PeerGradingDescriptor
 from xmodule.poll_module import PollDescriptor
-from xmodule.video_module import VideoDescriptor
 from xmodule.word_cloud_module import WordCloudDescriptor
 from xmodule.crowdsource_hinter import CrowdsourceHinterDescriptor
-from xmodule.videoalpha_module import VideoAlphaDescriptor
+from xmodule.video_module import VideoDescriptor
 from xmodule.seq_module import SequenceDescriptor
 from xmodule.conditional_module import ConditionalDescriptor
 from xmodule.randomize_module import RandomizeDescriptor
@@ -35,9 +34,8 @@ LEAF_XMODULES = (
     HtmlDescriptor,
     PeerGradingDescriptor,
     PollDescriptor,
-    VideoDescriptor,
     # This is being excluded because it has dependencies on django
-    #VideoAlphaDescriptor,
+    #VideoDescriptor,
     WordCloudDescriptor,
 )
 
@@ -66,7 +64,7 @@ class TestXBlockWrapper(object):
     @property
     def leaf_module_runtime(self):
         runtime = Mock()
-        runtime.render_template = lambda *args, **kwargs: unicode((args, kwargs))
+        runtime.render_template = lambda *args, **kwargs: u'{!r}, {!r}'.format(args, kwargs)
         runtime.anonymous_student_id = 'dummy_anonymous_student_id'
         runtime.open_ended_grading_interface = {}
         runtime.seed = 5
@@ -78,7 +76,7 @@ class TestXBlockWrapper(object):
     @property
     def leaf_descriptor_runtime(self):
         runtime = Mock()
-        runtime.render_template = lambda *args, **kwargs: unicode((args, kwargs))
+        runtime.render_template = lambda *args, **kwargs: u'{!r}, {!r}'.format(args, kwargs)
         return runtime
 
     def leaf_descriptor(self, descriptor_cls):
@@ -102,7 +100,7 @@ class TestXBlockWrapper(object):
     @property
     def container_descriptor_runtime(self):
         runtime = Mock()
-        runtime.render_template = lambda *args, **kwargs: unicode((args, kwargs))
+        runtime.render_template = lambda *args, **kwargs: u'{!r}, {!r}'.format(args, kwargs)
         return runtime
 
     def container_descriptor(self, descriptor_cls):

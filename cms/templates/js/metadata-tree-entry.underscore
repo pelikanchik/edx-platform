@@ -1,0 +1,101 @@
+<%
+    // достаём урл, необходим для модели
+    // нужно переделать и доставать более уместным образом, нежели выдёргивание из ссылки, имеющейся на странице
+
+    var urlRoot = $('.nav-course-settings-schedule a').attr("href") + '/section/details';
+    var d = new Date();
+
+    // эта переменная спасает в ситуации нескольких заданий на странице
+
+    var randval;
+    randval = Math.floor(Math.random() * 99999 + 1);
+    randval = "tag" + d.getTime() + "_" +randval;
+
+%>
+<style>
+.dynatree-container{
+    border:0!important;
+}
+</style>
+
+<div class="wrapper-comp-setting" style = "width: 100px;">
+	<label class="label setting-label" for="<%= uniqueId %>"><%= model.get('display_name') %></label>
+	<input class="input setting-input tags <%=randval %>" style = "visibility: hidden; width: 1px; height: 1px" type="text" id="<%= uniqueId %>" value='<%= model.get("value") %>'/>
+</div>
+<div class="tree-of-tags  <%=randval %>"></div>
+ <%
+var appended_tags;
+ $(document).ready(function(){
+            if (!CMS.Views['Settings']) CMS.Views.Settings = {};
+
+                CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
+                    initialize : function() {
+
+                        // достаём тэги для этого курса
+                        appended_tags = this.model.get('tags');
+
+                        // а это уже сопоставленные тэги для этой задачи
+                        selected_tags = ($(".tags." + randval).val()).split(",");
+
+                        tags_dict = JSON.parse(appended_tags);
+
+                        // построение дерева с чекбоксами
+                        $(".tree-of-tags." + randval).dynatree({
+                          checkbox: true,
+                          selectMode: 2,
+                          onActivate: function(node) {
+                          },
+                          children: tags_dict,
+
+
+                          onSelect: function(select, node) {
+                          // при отметке чекбокса идёт отправка списка проставленных элементов в поле
+                            var selNodes = node.tree.getSelectedNodes();
+                            var selKeys = $.map(selNodes, function(node){
+                                 return "" + node.data.key + "";
+                            });
+                            $(".tags." + randval).val(selKeys.join(","));
+                          },
+                          onClick: function(node, event) {
+                            // We should not toggle, if target was "checkbox", because this
+                            // would result in double-toggle (i.e. no toggle)
+                            if( node.getEventTargetType(event) == "title" )
+                              node.toggleSelect();
+                          },
+                          onKeydown: function(node, event) {
+                            if( event.which == 32 ) {
+                              node.toggleSelect();
+                              return false;
+                            }
+                          },
+
+                          cookieId: "dynatree-Cb1" + randval,
+                          idPrefix: "dynatree-Cb1-" + randval
+
+                        });
+
+
+                        $.each(selected_tags, function(i, id){
+                           $(".tree-of-tags." + randval).dynatree("getTree").getNodeByKey(id).select();
+                         });
+
+
+                    }
+                });
+
+              var model = new CMS.Models.Settings.CourseDetails();
+              model.urlRoot = urlRoot;
+              model.fetch({
+                success: function(model) {
+                  var editor = new CMS.Views.Settings.Details({
+                      el: $('.settings-details'),
+                      model: model
+                  });
+                  editor.render();
+                },
+                reset: true
+              });
+
+ });
+
+%>

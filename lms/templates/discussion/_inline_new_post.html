@@ -1,3 +1,4 @@
+<%! from django.utils.translation import ugettext as _ %>
 <article class="new-post-article">
     <div class="inner-wrapper">
       <div class="new-post-form-errors">
@@ -14,7 +15,7 @@
                     %endif
                     %if is_course_cohorted:
                     <div class="form-group-label choose-cohort">
-                        Make visible to:
+                        ${_("Make visible to:")}
                         <select class="group-filter-select new-post-group" name = "group_id">
                             <option value="">Все группы</option>
                             %if is_moderator:

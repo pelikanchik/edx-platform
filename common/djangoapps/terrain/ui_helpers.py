@@ -10,7 +10,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from lettuce.django import django_url
-from nose.tools import assert_true
+from nose.tools import assert_true  # pylint: disable=E0611
 
 
 @world.absorb
@@ -44,8 +44,8 @@ def is_css_not_present(css_selector, wait_time=5):
 
 
 @world.absorb
-def css_has_text(css_selector, text):
-    return world.css_text(css_selector) == text
+def css_has_text(css_selector, text, index=0, max_attempts=5):
+    return world.css_text(css_selector, index=index, max_attempts=max_attempts) == text
 
 
 @world.absorb
@@ -235,6 +235,13 @@ def click_tools():
 def is_mac():
     return platform.mac_ver()[0] is not ''
 
+@world.absorb
+def is_firefox():
+    return world.browser.driver_name is 'Firefox'
+
+@world.absorb
+def trigger_event(css_selector, event='change', index=0):
+    world.browser.execute_script("$('{}:eq({})').trigger('{}')".format(css_selector, index, event))
 
 @world.absorb
 def retry_on_exception(func, max_attempts=5):

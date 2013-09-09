@@ -1,3 +1,4 @@
+<%! from django.utils.translation import ugettext as _ %>
 <%inherit file="/main.html" />
 <%! from django.core.urlresolvers import reverse %>
 <%namespace name='static' file='/static_content.html'/>
@@ -101,7 +102,12 @@ function goto( mode)
 <section class="container">
 <div class="instructor-dashboard-wrapper">
 
+  %if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BETA_DASHBOARD'):
+    <div class="beta-button-wrapper"><a href="${ beta_dashboard_url }"> Try New Beta Dashboard </a></div>
+  %endif
+
   <section class="instructor-dashboard-content">
+
     <h1>Кабинет учителя</h1>
 
     <h2 class="navbar">[ <a href="#" onclick="goto('Grades');" class="${modeflag.get('Grades')}">Оценки</a> |
@@ -118,9 +124,6 @@ function goto( mode)
           %endif
 	  ]
     </h2>
-
-  <div style="text-align:right"><span id="djangopid">${djangopid}</span>
-  | <span id="mitxver">${mitx_version}</span></div>
 
     <form name="idashform" method="POST">
     <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
@@ -143,22 +146,22 @@ function goto( mode)
     </p>
 
     <p>
-    <input type="submit" name="action" value="Очистсить список приглашенных учеников">
+    <input type="submit" name="action" value="Список приглашенных учеников">
     </p>
 
     <p>
-    <input type="submit" name="action" value="Очистить данные успеваемости всех учеников курса">
+    <input type="submit" name="action" value="Данные успеваемости всех учеников курса">
     <input type="submit" name="action" value="Скачать CSV успеваемости">
     </p>
 
     <p>
-    <input type="submit" name="action" value="Очистить сырые данные об успеваемости учеников курса">
+    <input type="submit" name="action" value="Сырые данные об успеваемости учеников курса">
     <input type="submit" name="action" value="Скачать CSV с сырыми данными об успеваемости">
     </p>
 
     <p>
     <input type="submit" name="action" value="Скачать CSV распределения ответов">
-    <input type="submit" name="action" value="Очистить описание выставления оценок">    </p>
+    <input type="submit" name="action" value="Описание выставления оценок">    </p>
     <hr width="40%" style="align:left">
 
   %if settings.MITX_FEATURES.get('REMOTE_GRADEBOOK_URL','') and instructor_access:
@@ -166,6 +169,7 @@ function goto( mode)
     <%
         rg = course.remote_gradebook
     %>
+
 
     <h3>Экспортировать успеваемость в отдельный журнал</h3>
     <p>Для корректной работы задания курса должны соответствовать заданиям в журнале</p>
@@ -195,6 +199,7 @@ function goto( mode)
 
   %endif
   %if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
+
     <H2>Настройка успеваемости для курса</h2>
 
     <p>
@@ -240,6 +245,7 @@ function goto( mode)
 
     %if instructor_access:
     <p>
+
       Вы также можете удалить информацию об успехах студента в выбранной части курса:
       <input type="submit" name="action" value="Удалить продвижения">
     </p>
@@ -331,7 +337,7 @@ function goto( mode)
     <input type="submit" name="action" value="Добавить ассистента">
     <hr width="40%" style="align:left">
   %else:
-  <p>User requires forum administrator privileges to perform administration tasks.  See instructor.</p>
+  <p>${_("User requires forum administrator privileges to perform administration tasks.  See instructor.")}</p>
   %endif
 %endif
 
@@ -363,6 +369,7 @@ function goto( mode)
 
   %endif
 
+
   <p>Пригласить/отменить приглашение одного или нескольких учеников: вводите адреса электронной почты, разделенные пробелами или символами перевода строки;</p>
   <textarea rows="6" cols="70" name="multiple_students"></textarea>
   <p>
@@ -382,6 +389,7 @@ function goto( mode)
     <p>
     <input type="submit" name="action" value="Скачать CSV с данными пользователей">
     </p>
+
     <p> URL задания:
         <input type="text" name="problem_to_dump" size="40">
         <input type="submit" name="action" value="Скачать CSV всех попыток по заданию">
@@ -426,6 +434,7 @@ function goto( mode)
 %if modeflag.get('Analytics'):
 
   %if not any(analytics_results.values()):
+
     <p>На данный момент аналитики нет.</p>
   %endif
 
@@ -526,7 +535,7 @@ function goto( mode)
   %endif
 
    <p>
-     Student distribution per country, all courses, Sep-12 to Oct-17, 1 server (shown here as an example):
+     ${_("Student distribution per country, all courses, Sep-12 to Oct-17, 1 server (shown here as an example):")}
    </p>
 
 <div id="posts-list" class="clearfix">
@@ -622,18 +631,18 @@ function goto( mode)
 
 %if instructor_tasks is not None and len(instructor_tasks) > 0:
     <hr width="100%">
-    <h2>Pending Instructor Tasks</h2>
+    <h2>${_("Pending Instructor Tasks")}</h2>
     <div id="task-progress-wrapper">
       <table class="stat_table">
         <tr>
-          <th>Task Type</th>
-          <th>Task inputs</th>
-          <th>Task Id</th>
-          <th>Requester</th>
-          <th>Submitted</th>
-          <th>Task State</th>
-          <th>Duration (sec)</th>
-          <th>Task Progress</th>
+          <th>${_("Task Type")}</th>
+          <th>${_("Task inputs")}</th>
+          <th>${_("Task Id")}</th>
+          <th>${_("Requester")}</th>
+          <th>${_("Submitted")}</th>
+          <th>${_("Task State")}</th>
+          <th>${_("Duration (sec)")}</th>
+          <th>${_("Task Progress")}</th>
         </tr>
       %for tasknum, instructor_task in enumerate(instructor_tasks):
         <tr id="task-progress-entry-${tasknum}" class="task-progress-entry"
@@ -645,8 +654,8 @@ function goto( mode)
           <td>${instructor_task.requester}</td>
           <td>${instructor_task.created}</td>
           <td class="task-state">${instructor_task.task_state}</td>
-          <td class="task-duration">unknown</td>
-          <td class="task-progress">unknown</td>
+          <td class="task-duration">${_("unknown")}</td>
+          <td class="task-progress">${_("unknown")}</td>
         </tr>
       %endfor
       </table>
@@ -710,7 +719,7 @@ function goto( mode)
 ##-----------------------------------------------------------------------------
 %if modeflag.get('Admin'):
  % if course_errors is not UNDEFINED:
-    <h2>Course errors</h2>
+    <h2>${_("Course errors")}</h2>
     <div id="course-errors">
     %if not course_errors:
           None

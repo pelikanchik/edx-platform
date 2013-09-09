@@ -39,6 +39,7 @@ class MakoModuleDescriptor(XModuleDescriptor):
         }
 
     def get_html(self):
+        #print self.get_context()
         return self.system.render_template(
             self.mako_template, self.get_context())
 

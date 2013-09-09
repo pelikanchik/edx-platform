@@ -1,3 +1,4 @@
+<%! from django.utils.translation import ugettext as _ %>
 <%def name="render_form_filter_dropdown(map)">
     % for child in map["children"]:
         % if child in map["entries"]:
@@ -39,6 +40,7 @@
                     </div>
                 </div>
                 <div class="options">
+
                     <input type="checkbox" name="follow" class="discussion-follow" class="discussion-follow" id="new-post-follow" checked><label for="new-post-follow">отслеживать сообшения</label>
                     <br>
                     % if course.allow_anonymous:

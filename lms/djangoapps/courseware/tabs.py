@@ -92,6 +92,13 @@ def _discussion(tab, user, course, active_page):
     return []
 
 
+def _external_discussion(tab, user, course, active_page):
+    """
+    This returns a tab that links to an external discussion service
+    """
+    return [CourseTab(u'Форум', tab['link'], active_page == 'discussion')]
+
+
 def _external_link(tab, user, course, active_page):
     # external links are never active
     return [CourseTab(tab['name'], tab['link'], False)]
@@ -109,7 +116,7 @@ def _textbooks(tab, user, course, active_page):
     """
     if user.is_authenticated() and settings.MITX_FEATURES.get('ENABLE_TEXTBOOK'):
         # since there can be more than one textbook, active_page is e.g. "book/0".
-        return [CourseTab(textbook.title, reverse('book', args=[course.id, index]),
+        return [CourseTab(u"Учебники", reverse('book', args=[course.id, index]),
                           active_page == "textbook/{0}".format(index))
                 for index, textbook in enumerate(course.textbooks)]
     return []
@@ -120,7 +127,7 @@ def _pdf_textbooks(tab, user, course, active_page):
     """
     if user.is_authenticated():
         # since there can be more than one textbook, active_page is e.g. "book/0".
-        return [CourseTab(textbook['tab_title'], reverse('pdf_book', args=[course.id, index]),
+        return [CourseTab(u"Учебники", reverse('pdf_book', args=[course.id, index]),
                           active_page == "pdftextbook/{0}".format(index))
                 for index, textbook in enumerate(course.pdf_textbooks)]
     return []
@@ -131,7 +138,7 @@ def _html_textbooks(tab, user, course, active_page):
     """
     if user.is_authenticated():
         # since there can be more than one textbook, active_page is e.g. "book/0".
-        return [CourseTab(textbook['tab_title'], reverse('html_book', args=[course.id, index]),
+        return [CourseTab(u"Учебники", reverse('html_book', args=[course.id, index]),
                           active_page == "htmltextbook/{0}".format(index))
                 for index, textbook in enumerate(course.html_textbooks)]
     return []
@@ -149,6 +156,12 @@ def _staff_grading(tab, user, course, active_page):
         tab = [CourseTab(tab_name, link, active_page == "staff_grading", pending_grading, img_path)]
         return tab
     return []
+
+
+def _syllabus(tab, user, course, active_page):
+    """Display the syllabus tab"""
+    link = reverse('syllabus', args=[course.id])
+    return [CourseTab('Syllabus', link, active_page == 'syllabus')]
 
 
 def _peer_grading(tab, user, course, active_page):
@@ -217,6 +230,7 @@ VALID_TAB_TYPES = {
     'course_info': TabImpl(need_name, _course_info),
     'wiki': TabImpl(need_name, _wiki),
     'discussion': TabImpl(need_name, _discussion),
+    'external_discussion': TabImpl(key_checker(['link']), _external_discussion),
     'external_link': TabImpl(key_checker(['name', 'link']), _external_link),
     'textbooks': TabImpl(null_validator, _textbooks),
     'pdf_textbooks': TabImpl(null_validator, _pdf_textbooks),
@@ -226,7 +240,8 @@ VALID_TAB_TYPES = {
     'peer_grading': TabImpl(null_validator, _peer_grading),
     'staff_grading': TabImpl(null_validator, _staff_grading),
     'open_ended': TabImpl(null_validator, _combined_open_ended_grading),
-    'notes': TabImpl(null_validator, _notes_tab)
+    'notes': TabImpl(null_validator, _notes_tab),
+    'syllabus': TabImpl(null_validator, _syllabus)
     }
 
 
@@ -291,6 +306,7 @@ def get_course_tabs(user, course, active_page):
         tabs.append(CourseTab(u'Администрирование',
                               reverse('instructor_dashboard', args=[course.id]),
                               active_page == 'instructor'))
+
     return tabs
 
 
@@ -365,7 +381,8 @@ def get_static_tab_contents(request, course, tab):
     loc = Location(course.location.tag, course.location.org, course.location.course, 'static_tab', tab['url_slug'])
     model_data_cache = ModelDataCache.cache_for_descriptor_descendents(course.id,
         request.user, modulestore().get_instance(course.id, loc), depth=0)
-    tab_module = get_module(request.user, request, loc, model_data_cache, course.id)
+    tab_module = get_module(request.user, request, loc, model_data_cache, course.id,
+                            static_asset_path=course.lms.static_asset_path)
 
     logging.debug('course_module = {0}'.format(tab_module))
 

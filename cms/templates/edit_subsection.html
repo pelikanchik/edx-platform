@@ -1,13 +1,11 @@
-<%! from django.utils.translation import ugettext as _ %>
 <%inherit file="base.html" />
 <%!
-   import logging
-   from xmodule.util.date_utils import get_default_time_display, almost_same_datetime
+  import logging
+  from xmodule.util.date_utils import get_default_time_display, almost_same_datetime
+  from django.utils.translation import ugettext as _
+  from django.core.urlresolvers import reverse
 %>
-
-<%! from django.core.urlresolvers import reverse %>
 <%block name="title">Редактирование подраздела</%block>
-
 <%block name="bodyclass">is-signedin course subsection</%block>
 
 
@@ -34,11 +32,8 @@
         <div class="subsection-name-input">
 
           <label>Условие для разблокировки раздела (если пусто, раздел разблокирован)</label>
-
-
                 <div id='termConstructor' class = 'termConstructor'>
                     <table class='termEditor'>
-
                         <tbody data-bind="foreach: disjunctions">
                             <tr>
                                 <td>
@@ -218,6 +213,8 @@
         <div class="sortable-unit-list">
 
           <label>Элементы:</label>
+
+
           ${units.enum_units(subsection, subsection_units=subsection_units)}
         </div>
       </article>

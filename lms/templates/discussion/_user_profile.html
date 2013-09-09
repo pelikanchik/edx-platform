@@ -1,3 +1,4 @@
+<%! from django.utils.translation import ugettext as _ %>
 <%! from django_comment_client.helpers import pluralize %>
 <%! from django_comment_client.permissions import has_permission, check_permissions_by_view %>
 <%! from operator import attrgetter %>
@@ -15,6 +16,7 @@
   <div class="sidebar-comments-count"><span>${profiled_user['comments_count'] | h}</span> ${pluralize('comment', profiled_user['comments_count']) | h}</div>
   % if check_permissions_by_view(user, course.id, content=None, name='update_moderator_status'):
     % if "Moderator" in role_names:
+
       <a href="javascript:void(0)" class="sidebar-toggle-moderator-button sidebar-revoke-moderator-button">Аннулировать права модератора</a>
     % else:
       <a href="javascript:void(0)" class="sidebar-toggle-moderator-button sidebar-promote-moderator-button">Стать модератором</a>

@@ -1,3 +1,5 @@
+<%! from django.utils.translation import ugettext as _ %>
+
 <%namespace name='static' file='static_content.html'/>
 <%! from django.utils import html %>
 
@@ -18,7 +20,7 @@
   <%block name="title">
 
       <title>Пеликан</title>
-      
+
       <script type="text/javascript">
         /* immediately break out of an iframe if coming from the marketing website */
         (function(window) {
@@ -29,6 +31,8 @@
       </script>
 
   </%block>
+
+  <script type="text/javascript" src="/jsi18n/"></script>
 
   <link rel="icon" type="image/x-icon" href="${static.url(settings.FAVICON_PATH)}" />
 

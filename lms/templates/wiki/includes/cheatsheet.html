@@ -1,8 +1,10 @@
+{% load i18n %}
 <div class="modal hide fade" id="cheatsheetModal">
 	<a href="#" class="close-btn">×</a>
 	<div id="cheatsheet-body" class="modal-body">
 		<div class="left-column">
 			<section>
+
 				<h2>Помощь с синтаксисом</h2>
 				<p>Эта вики использует язык разметки Markdown. Ниже ресурсы, которые вам могут помочь:</p>
 				<ul>
@@ -23,30 +25,35 @@ $LaTeX Math Expression$</pre>
 
 		<div class="right-column">
 			<section>
+
 				<h3>Примеры:</h3>
 				<pre>
-http://wikipedia.org
-[Wikipedia](http://wikipedia.org)
-[edX Wiki](wiki:/edx/)</pre>
+{% comment %}
+	Translators: Do not translate "edX" or "Wikipedia"
+{% endcomment %}
+{% trans "http://wikipedia.org" %}
+{% trans "[Wikipedia](http://wikipedia.org)" %}
+{% trans "[edX Wiki](wiki:/edx/)" %}
+				</pre>
 				<pre>
-Huge Header
+{% trans "Huge Header" %}
 ===========</pre>
 				<pre>
-Smaller Header
+{% trans "Smaller Header" %}
 --------------</pre>
 				<pre>
-*emphasis* or _emphasis_</pre>
+{% trans "*emphasis* or _emphasis_" %}</pre>
 				<pre>
-**strong** or __strong__</pre>
+{% trans "**strong** or __strong__" %}</pre>
 				<pre>
-- Unordered List
-	- Sub Item 1
-	- Sub Item 2</pre>
+- {% trans "Unordered List" %}
+	- {% trans "Sub Item 1" %}
+    	- {% trans "Sub Item 2" %}</pre>
 				<pre>
-1. Ordered
-2. List</pre>
+1. {% trans "Ordered" %}
+2. {% trans "List" %}</pre>
 				<pre>
-> Quotes</pre>
+> {% trans "Quotes" %}</pre>
 			</section>
 		</div>
 

@@ -89,6 +89,9 @@ class @Sequence
         modx_full_url = @modx_url + '/' + @id + '/goto_position'
         $.postWithPrefix modx_full_url, position: new_position
 
+      # On Sequence change, fire custom event "sequence:change" on element.
+      # Added for aborting video bufferization, see ../video/10_main.js
+      @el.trigger "sequence:change"
       @mark_active new_position
       @$('#seq_content').html @contents.eq(new_position - 1).text()
       XModule.loadModules(@$('#seq_content'))
@@ -164,6 +167,7 @@ class @Sequence
 
   godynamo: (event) =>
     event.preventDefault()
+
     modx_full_url = @modx_url + '/' + @id + "/dynamo"
     $.postWithPrefix modx_full_url, (response) =>
       new_position = response.position

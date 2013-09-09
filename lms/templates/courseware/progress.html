@@ -1,3 +1,4 @@
+<%! from django.utils.translation import ugettext as _ %>
 <%inherit file="/main.html" />
 <%namespace name='static' file='/static_content.html'/>
 
@@ -83,6 +84,7 @@ ${progress_graph.body(grade_summary, course.grade_cutoffs, "grade-detail-graph",
                     %endfor
                   </ol>
                 %else:
+
                   <h3 class="no-scores"> В этом разделе нет результатов </h3>
                 %endif
               </section>

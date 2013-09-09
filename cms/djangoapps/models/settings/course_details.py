@@ -3,7 +3,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.inheritance import own_metadata
 import json
 from json.encoder import JSONEncoder
-from contentstore.utils import get_modulestore
+from contentstore.utils import get_modulestore, course_image_url
 from models.settings import course_grading
 from contentstore.utils import update_item
 from xmodule.fields import Date
@@ -21,8 +21,11 @@ class CourseDetails(object):
         self.enrollment_end = None
         self.syllabus = None  # a pdf file asset
         self.overview = ""  # html to render as the overview
+        self.tags = ""  # html to render as the tags
         self.intro_video = None  # a video pointer
         self.effort = None  # int hours/week
+        self.course_image_name = ""
+        self.course_image_asset_path = ""  # URL of the course image
 
     @classmethod
     def fetch(cls, course_location):
@@ -40,6 +43,8 @@ class CourseDetails(object):
         course.end_date = descriptor.end
         course.enrollment_start = descriptor.enrollment_start
         course.enrollment_end = descriptor.enrollment_end
+        course.course_image_name = descriptor.course_image
+        course.course_image_asset_path = course_image_url(descriptor)
 
         temploc = course_location.replace(category='about', name='syllabus')
         try:
@@ -51,6 +56,15 @@ class CourseDetails(object):
         try:
             course.overview = get_modulestore(temploc).get_item(temploc).data
         except ItemNotFoundError:
+            pass
+
+
+        temploc = temploc.replace(name='tags')
+        try:
+
+            course.tags = get_modulestore(temploc).get_item(temploc).data
+        except ItemNotFoundError:
+
             pass
 
         temploc = temploc.replace(name='effort')
@@ -121,6 +135,10 @@ class CourseDetails(object):
             dirty = True
             descriptor.enrollment_end = converted
 
+        if 'course_image_name' in jsondict and jsondict['course_image_name'] != descriptor.course_image:
+            descriptor.course_image = jsondict['course_image_name']
+            dirty = True
+
         if dirty:
             # Save the data that we've just changed to the underlying
             # MongoKeyValueStore before we update the mongo datastore.
@@ -135,6 +153,9 @@ class CourseDetails(object):
 
         temploc = temploc.replace(name='overview')
         update_item(temploc, jsondict['overview'])
+
+        temploc = temploc.replace(name='tags')
+        update_item(temploc, jsondict['tags'])
 
         temploc = temploc.replace(name='effort')
         update_item(temploc, jsondict['effort'])
@@ -173,7 +194,7 @@ class CourseDetails(object):
         # the right thing
         result = None
         if video_key:
-            result = '<iframe width="560" height="315" src="http://www.youtube.com/embed/' + \
+            result = '<iframe width="560" height="315" src="//www.youtube.com/embed/' + \
                 video_key + '?autoplay=1&rel=0" frameborder="0" allowfullscreen=""></iframe>'
         return result
 

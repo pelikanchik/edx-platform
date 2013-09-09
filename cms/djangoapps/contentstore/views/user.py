@@ -13,15 +13,18 @@ from django.core.context_processors import csrf
 
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import Location
+from xmodule.error_module import ErrorDescriptor
 from contentstore.utils import get_lms_link_for_item
 from util.json_request import JsonResponse
 from auth.authz import (
-    STAFF_ROLE_NAME, INSTRUCTOR_ROLE_NAME,
-    add_user_to_course_group, remove_user_from_course_group,
-    get_course_groupname_for_role)
-from course_creators.views import get_course_creator_status, add_user_with_status_unrequested, user_requested_access
+    STAFF_ROLE_NAME, INSTRUCTOR_ROLE_NAME, get_course_groupname_for_role)
+from course_creators.views import (
+    get_course_creator_status, add_user_with_status_unrequested,
+    user_requested_access)
 
 from .access import has_access
+
+from student.models import CourseEnrollment
 
 
 @login_required
@@ -51,13 +54,15 @@ def index(request):
                 'name': course.location.name,
             }),
             get_lms_link_for_item(
-                course.location,
-                course_id=course.location.course_id,
+                course.location
             ),
+            course.display_org_with_default,
+            course.display_number_with_default,
+            course.location.name
         )
 
     return render_to_response('index.html', {
-        'courses': [format_course_for_view(c) for c in courses],
+        'courses': [format_course_for_view(c) for c in courses if not isinstance(c, ErrorDescriptor)],
         'user': request.user,
         'request_course_creator_url': reverse('request_course_creator'),
         'course_creator_status': _get_course_creator_status(request.user),
@@ -154,16 +159,17 @@ def course_team_user(request, org, course, name, email):
         return JsonResponse(msg, 400)
 
     # make sure that the role groups exist
-    staff_groupname = get_course_groupname_for_role(location, "staff")
-    staff_group, __ = Group.objects.get_or_create(name=staff_groupname)
-    inst_groupname = get_course_groupname_for_role(location, "instructor")
-    inst_group, __ = Group.objects.get_or_create(name=inst_groupname)
+    groups = {}
+    for role in roles:
+        groupname = get_course_groupname_for_role(location, role)
+        group, __ = Group.objects.get_or_create(name=groupname)
+        groups[role] = group
 
     if request.method == "DELETE":
         # remove all roles in this course from this user: but fail if the user
         # is the last instructor in the course team
-        instructors = set(inst_group.user_set.all())
-        staff = set(staff_group.user_set.all())
+        instructors = set(groups["instructor"].user_set.all())
+        staff = set(groups["staff"].user_set.all())
         if user in instructors and len(instructors) == 1:
             msg = {
                 "error": _("You may not remove the last instructor from a course")
@@ -171,14 +177,14 @@ def course_team_user(request, org, course, name, email):
             return JsonResponse(msg, 400)
 
         if user in instructors:
-            user.groups.remove(inst_group)
+            user.groups.remove(groups["instructor"])
         if user in staff:
-            user.groups.remove(staff_group)
+            user.groups.remove(groups["staff"])
         user.save()
         return JsonResponse()
 
     # all other operations require the requesting user to specify a role
-    if request.META.get("CONTENT_TYPE", "") == "application/json" and request.body:
+    if request.META.get("CONTENT_TYPE", "").startswith("application/json") and request.body:
         try:
             payload = json.loads(request.body)
         except:
@@ -198,19 +204,26 @@ def course_team_user(request, org, course, name, email):
                 "error": _("Only instructors may create other instructors")
             }
             return JsonResponse(msg, 400)
-        add_user_to_course_group(request.user, user, location, role)
+        user.groups.add(groups["instructor"])
+        user.save()
+        # auto-enroll the course creator in the course so that "View Live" will work.
+        CourseEnrollment.enroll(user, location.course_id)
     elif role == "staff":
         # if we're trying to downgrade a user from "instructor" to "staff",
         # make sure we have at least one other instructor in the course team.
-        instructors = set(inst_group.user_set.all())
+        instructors = set(groups["instructor"].user_set.all())
         if user in instructors:
             if len(instructors) == 1:
                 msg = {
                     "error": _("You may not remove the last instructor from a course")
                 }
                 return JsonResponse(msg, 400)
-            remove_user_from_course_group(request.user, user, location, "instructor")
-        add_user_to_course_group(request.user, user, location, role)
+            user.groups.remove(groups["instructor"])
+        user.groups.add(groups["staff"])
+        user.save()
+        # auto-enroll the course creator in the course so that "View Live" will work.
+        CourseEnrollment.enroll(user, location.course_id)
+
     return JsonResponse()
 
 

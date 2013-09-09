@@ -1,0 +1,58 @@
+<!doctype html>
+<html style="overflow-y: scroll;">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<head>
+
+    <script type="text/javascript" src="/static/js/graph/strathausen-dracula-a6a5fa7/js/raphael-min.js"></script>
+    <script type="text/javascript" src="/static/js/graph/strathausen-dracula-a6a5fa7/js/dracula_graffle.js"></script>
+    <script type="text/javascript" src="/static/js/graph/strathausen-dracula-a6a5fa7/js/jquery-1.4.2.min.js"></script>
+    <script type="text/javascript" src="/static/js/graph/strathausen-dracula-a6a5fa7/js/dracula_graph.js"></script>
+    <script type="text/javascript" src="/static/js/graph/graph.js"></script>
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
+    <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+    <script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
+        <!---
+            jQuery UI 1.10.3 has a bug when dragging makes dialog window jump to the bottom of screen.
+            So it is advisable to use version 1.10.2 before it is fixed.
+         --->
+</head>
+<body>
+
+<!--- Костыль: я не умею получать тип модуля, поэтому я выдираю его, используя особенности форматирования вывода -->
+<!--- Возможно, стоит добавить всем модулям нужный метод -->
+<!--- (стандартная функция child.module_class не работает) -->
+    <p class="data_string" style="display:none">        {
+        % for every_unit in subsection.get_children():
+        "${every_unit.url_name}" : [
+            % for child in every_unit.get_children():
+               { "url" : "${child.url_name}", "name" : "${child.display_name_with_default}", "type" : "${child.get_class}" } ,
+            % endfor
+        {} ],<br/>
+        % endfor
+        }
+    </p>
+    <p class="names_string" style="display:none">        {
+        % for every_unit in subsection.get_children():
+        "${every_unit.url_name}" : { "name" : "${every_unit.display_name_with_default}", "location" : "${every_unit.location}"}, <br/>
+        % endfor
+        }
+    </p>
+    <p class="graph_string" style="display:none">        [
+        % for every_unit in subsection.get_children():
+            ${every_unit.direct_term_with_default} ,<br/>
+        % endfor
+        ]
+     </p>
+
+<div style="display:none">
+    <div id="node-details" title="Подробности">
+        <p class = "dialog-message">Here be dragons</p>
+        <a class="node-edit-link" href="#">Редактировать</a>
+    </div>
+</div>
+
+<div id="canvas"></div>
+<button id="redraw" onclick="redraw();">redraw</button>
+
+</body>
+</html>

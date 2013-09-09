@@ -1,3 +1,5 @@
+<%! from django.utils.translation import ugettext as _ %>
+
 <%inherit file="main.html" />
 
 <%namespace name='static' file='static_content.html'/>
@@ -11,7 +13,9 @@
 <%! from datetime import date %>
 <%! import calendar %>
 
+
 <%block name="title"><title>${settings.PLATFORM_NAME} | Регистрация</title></%block>
+
 
 <%block name="js_extra">
   <script type="text/javascript">
@@ -93,16 +97,18 @@
 
       <!-- status messages -->
       <div role="alert" class="status message">
-        <h3 class="message-title">We're sorry, ${settings.PLATFORM_NAME} enrollment is not available in your region</h3>
+        <h3 class="message-title">${_("We're sorry, {platform_name} enrollment is not available in your region").format(platform_name=settings.PLATFORM_NAME)}</h3>
         <p class="message-copy">Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Lorem ipsum dolor sit amet, consectetuer adipiscing elit.</p>
       </div>
 
       <div role="alert" class="status message submission-error" tabindex="-1">
+
         <h3 class="message-title">Ошибка: </h3>
         <ul class="message-copy"> </ul>
       </div>
 
       <p class="instructions">
+
         Пожалуйста, заполните, следующие поля для регистрации.<br />
         Необходимые для заполнения поля помечены <strong class="indicator">жирным текстом и звездочкой (*)</strong>.
       </p>
@@ -114,6 +120,7 @@
 
         <ol class="list-input">
           <li class="field required text" id="field-email">
+
             <label for="email">E-mail</label>
             <input class="" id="email" type="email" name="email" value="" placeholder="например: username@domain.com" required aria-required="true" />
           </li>
@@ -130,12 +137,14 @@
             <label for="name">Полное имя</label>
             <input id="name" type="text" name="name" value="" placeholder="например: Василий Петров" required aria-required="true" />
             <span class="tip tip-input">Необходимо для получения сертификата <strong>(не может быть изменено!)</strong></span>
+
           </li>
         </ol>
 
         % else:
 
         <div class="message">
+
           <h3 class="message-title">Здравствуйте ${extauth_id}</h3>
           <p class="message-copy">Введите ваше имя пользователя:</p>
         </div>
@@ -145,24 +154,30 @@
           % if ask_for_email:
 
           <li class="field required text" id="field-email">
+
             <label for="email">E-mail</label>
             <input class="" id="email" type="email" name="email" value="" placeholder="например: username@domain.com" />
+
           </li>
 
           % endif
 
           <li class="field required text" id="field-username">
+
             <label for="username">Имя пользователя</label>
             <input id="username" type="text" name="username" value="${extauth_username}" placeholder="например: JaneDoe" required aria-required="true" />
             <span class="tip tip-input">Публичный юзернейм, будет использоватья в дискуссиях, на форуме и т.п.</span>
+
           </li>
 
           % if ask_for_fullname:
 
           <li class="field required text" id="field-name">
+
             <label for="name">Полное имя</label>
             <input id="name" type="text" name="name" value="" placeholder="example: Jane Doe" />
             <span class="tip tip-input">Необходимо для получения сертификата <strong>(не может быть изменено!)</strong></span>
+
           </li>
 
           % endif
@@ -173,12 +188,16 @@
       </fieldset>
 
       <fieldset class="group group-form group-form-secondary group-form-personalinformation">
+
         <legend class="sr">Дополнительная информация</legend>
+
 
         <ol class="list-input">
           <li class="field-group">
             <div class="field select" id="field-education-level">
+
               <label for="education-level">Образование</label>
+
               <select id="education-level" name="level_of_education">
                 <option value="">--</option>
                 %for code, ed_level in UserProfile.LEVEL_OF_EDUCATION_CHOICES:
@@ -188,6 +207,7 @@
             </div>
 
             <div class="field select" id="field-gender">
+
               <label for="gender">Пол</label>
               <select id="gender" name="gender">
                 <option value="">--</option>
@@ -198,6 +218,7 @@
             </div>
 
             <div class="field select" id="field-yob">
+
               <label for="yob">Год рождения</label>
               <select id="yob" name="year_of_birth">
                 <option value="">--</option>
@@ -211,6 +232,7 @@
       </fieldset>
 
       <fieldset class="group group-form group-form-personalinformation2">
+
         <legend class="sr">Дополнительная информация </legend>
 
         <ol class="list-input">
@@ -220,7 +242,7 @@
           </li>
           <!--
           <li class="field text" id="field-goals">
-            <label for="goals">Please share with us your reasons for registering with ${settings.PLATFORM_NAME}</label>
+            <label for="goals">${_("Please share with us your reasons for registering with {platform_name}").format(platform_name=settings.PLATFORM_NAME)}</label>
             <textarea id="goals" name="goals" value=""></textarea>
           </li>
           -->
@@ -228,7 +250,7 @@
       </fieldset>
 
       <fieldset class="group group-form group-form-accountacknowledgements">
-        <legend class="sr">Account Acknowledgements</legend>
+        <legend class="sr">${_("Account Acknowledgements")}</legend>
 
         <ol class="list-input">
           <li class="field-group">
@@ -237,7 +259,9 @@
 
             <div class="field required checkbox" id="field-tos">
               <input id="tos-yes" type="checkbox" name="terms_of_service" value="true" required aria-required="true" />
+
               <label for="tos-yes">Я согласен с <a href="${marketing_link('TOS')}" class="new-vp">правилами пользования</a></label>
+
             </div>
 
             % endif
@@ -251,7 +275,9 @@
                 else:
                   honor_code_path = marketing_link('HONOR')
               %>
+
               <label for="honorcode-yes">Я согласен с <a href="${honor_code_path}" class="new-vp">Honor Code</a></label>
+
             </div>
           </li>
         </ol>
@@ -263,6 +289,7 @@
 % endif
 
       <div class="form-actions">
+
         <button name="submit" type="submit" id="submit" class="action action-primary action-update">Register <span class="orn-plus">+</span> Создать аккаунт</button>
       </div>
     </form>
@@ -270,12 +297,13 @@
 
   <aside role="complementary">
     <header>
-      <h3 class="sr">Registration Help</h3>
+      <h3 class="sr">${_("Registration Help")}</h3>
     </header>
 
     % if has_extauth_info is UNDEFINED:
 
     <div class="cta">
+
       <h3>Уже зарегистрированы?</h3>
       <p class="instructions">
         <a href="${reverse('signin_user')}${login_query()}">
@@ -290,22 +318,27 @@
     ##       override in a more generalizable fashion.
     % if not self.stanford_theme_enabled():
       <div class="cta cta-welcome">
+
         <h3>Добро пожаловать!</h3>
         <p>Регистрация даёт вам доступ ко всем открытым курсам сейчас и в будущем. Ещё не выбрали курс? После регистрации вы можете подписаться на рассылку для оповещения о появляющихся курсах.</p>
+
       </div>
     % endif
 
     <div class="cta cta-nextsteps">
+
       <h3>Что дальше?</h3>
       % if self.stanford_theme_enabled():
-        <p>You will receive an activation email.  You must click on the activation link to complete the process.  Don’t see the email?  Check your spam folder and mark emails from class.stanford.edu as ‘not spam’, since you'll want to be able to receive email from your courses.</p>
+        <p>${_("You will receive an activation email.  You must click on the activation link to complete the process.  Don't see the email?  Check your spam folder and mark emails from class.stanford.edu as 'not spam', since you'll want to be able to receive email from your courses.")}</p>
       % else:
+
       <p>Вы получите на e-mail письмо со ссылкой для активации аккаунта. Для завершения регистрации перейдите по этой ссылке. Не получили письмо?  Проверьте папку со спамом и пометьте письма от нас как "не спам".</p>
       % endif
     </div>
 
     % if settings.MKTG_URL_LINK_MAP.get('FAQ'):
       <div class="cta cta-help">
+
         <h3>Нужна помощь?</h3>
         <p>Нужна помощь с регистрацией?
           <a href="${marketing_link('FAQ')}">
