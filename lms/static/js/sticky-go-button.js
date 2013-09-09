@@ -6,6 +6,7 @@
 
 $(document).ready(function () {
 
+
 //var marginTopInPx = parseInt($('.go-button').css("margin-top")) * 0;
 //var offsetTop = $('.go-button').offset().top;
 //var origOffsetY = offsetTop + marginTopInPx;
@@ -57,6 +58,9 @@ var magicValue = recalcHorizontalOffset();
 
 $(window).resize(function(){
     magicValue = recalcHorizontalOffset();
+
+    // /!\
+    // bugfix here
 
 });
 
