@@ -22,17 +22,16 @@
     <input class="save" type="button" value="Сохранить" />
     % endif
     % if answer_available:
-    <button class="show" id="show_answers_button" style="display: none"><span class="show-label">Показать ответ(ы)</span> <span class="sr">(для вопросов выше - рядом с каждым полем)</span></button>
+    <button class="show" id="show_answers_button_${id}" style="display: none"><span class="show-label">Показать ответ(ы)</span> <span class="sr">(для вопросов выше - рядом с каждым полем)</span></button>
 
     % endif
     <script type='text/javascript'>
         $(document).ready(function () {
             var t = '${delay_answers}';
-            var all_id = "show_answers_button"
-            //console.log(all_id);
+            console.log(t);
             var id = setTimeout(function() {
-              var button = document.getElementById(all_id);
-              button.style.display = "block";
+              console.log("show_answers_button_${id}");
+              $("#show_answers_button_${id}").css('display','block');
             }, t*1000);
         });
 

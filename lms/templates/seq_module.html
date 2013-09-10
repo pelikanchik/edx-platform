@@ -7,11 +7,11 @@
      data-position="${position}"
      data-course_modx_root="/course/modx" >
   <nav aria-label="Section Navigation" class="sequence-nav">
-    <ul class="sequence-nav-buttons">
+    <ul class="sequence-nav-buttons" id="seq_nav_button_1" style="display: none">
       <li class="prev"><a href="#">${_('Previous')}</a></li>
     </ul>
 
-    <div class="sequence-list-wrapper">
+    <div class="sequence-list-wrapper" id="seq_nav_button_2" style="display: none">
       <ol id="sequence-list">
         % for idx, item in enumerate(items):
         ## TODO (vshnayder): add item.progress_detail either to the title or somewhere else.
@@ -30,7 +30,7 @@
       </ol>
     </div>
 
-    <ul class="sequence-nav-buttons">
+    <ul class="sequence-nav-buttons" id="seq_nav_button_3" style="display: none">
       <li class="next"><a href="#">${_("Next")}</a></li>
     </ul>
 
@@ -52,7 +52,7 @@
 
   <div id="seq_content"></div>
 
-  <nav class="sequence-bottom">
+  <nav class="sequence-bottom" id="seq_nav_button_4" style="display: none">
     <ul aria-label="${_('Section Navigation')}" class="sequence-nav-buttons">
       <li class="prev"><a href="#">${_("Previous")}</a></li>
       <li class="next"><a href="#">${_("Next")}</a></li>
