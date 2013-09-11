@@ -137,7 +137,7 @@ class CMS.Views.ModuleEdit extends Backbone.View
         time = time-1
     seconds = time%60
     minutes = ((time-seconds)/60)%60
-    hours = (time-minutes-seconds)/3600
+    hours = (time-minutes*60-seconds)/3600
     seconds_str = seconds + ""
     if seconds_str.length == 1
       seconds_str = "0" + seconds_str
