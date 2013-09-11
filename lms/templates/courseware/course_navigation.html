@@ -34,12 +34,6 @@ def url_class(is_active):
         % if masquerade is not UNDEFINED:
           % if staff_access and masquerade is not None:
           <li style="float:right"><a href="#" id="staffstatus">Учительский интерфейс</a></li>
-          <script type="text/javascript">
-              $('#seq_nav_button_1').css('display', 'block');
-              $('#seq_nav_button_2').css('display', 'block');
-              $('#seq_nav_button_3').css('display', 'block');
-              $('#seq_nav_button_4').css('display', 'block');
-          </script>
           % endif
         % endif
     </ol>
@@ -54,16 +48,8 @@ masq = (function(){
     var setstat = function(status){
         if (status=='student'){
             el.html('<font color="green">Студенческий интерфейс</font>');
-            $('#seq_nav_button_1').css('display', 'none');
-            $('#seq_nav_button_2').css('display', 'none');
-            $('#seq_nav_button_3').css('display', 'none');
-            $('#seq_nav_button_4').css('display', 'none');
         }else{
             el.html('<font color="red">Учительский интерфейс</font>');
-            $('#seq_nav_button_1').css('display', 'block');
-            $('#seq_nav_button_2').css('display', 'block');
-            $('#seq_nav_button_3').css('display', 'block');
-            $('#seq_nav_button_4').css('display', 'block');
         }
     }
     setstat('${masquerade}');
