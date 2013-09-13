@@ -305,9 +305,6 @@ class CapaModule(CapaFields, XModule):
             # So that sandboxed code execution can be cached, but still have an interesting
             # number of possibilities, cap the number of different random seeds.
             self.seed %= MAX_RANDOMIZATION_BINS
-            print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-            print self.seed
-            print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
 
     def new_lcp(self, state, text=None):
         """
