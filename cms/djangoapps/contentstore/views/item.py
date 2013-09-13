@@ -249,6 +249,7 @@ def _create_item(request):
 
     display_name = request.json.get('display_name')
     direct_term = request.json.get('direct_term')
+    random_problem_count = request.json.get('random_problem_count')
 
     if not has_access(request.user, parent_location):
         raise PermissionDenied()
@@ -270,6 +271,9 @@ def _create_item(request):
 
     if display_name is not None:
         metadata['display_name'] = display_name
+
+    if random_problem_count is not None:
+        metadata['random_problem_count'] = random_problem_count
 
 
     if direct_term is not None:

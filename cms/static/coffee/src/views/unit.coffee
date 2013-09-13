@@ -25,6 +25,18 @@ define ["jquery", "jquery.ui", "gettext", "backbone",
         model: @model
       )
 
+    @nameView = new CMS.Views.UnitEdit.NameEdit(
+      el: @$('.unit-name-input')
+      model: @model
+    )
+    @termView = new CMS.Views.UnitEdit.TermEdit(
+      el: @$('.unit-term-input')
+      model: @model
+    )
+    @randomView = new CMS.Views.UnitEdit.RandomEdit(
+      el: @$('.unit-random-problem')
+      model: @model
+    )
       @nameView = new UnitEditView.NameEdit(
         el: @$('.unit-name-input')
         model: @model
@@ -36,6 +48,8 @@ define ["jquery", "jquery.ui", "gettext", "backbone",
       )
 
       @model.on('change:state', @render)
+      
+      @cancelIndex = 0
 
       @$newComponentItem = @$('.new-component-item')
       @$newComponentTypePicker = @$('.new-component')
@@ -110,8 +124,11 @@ define ["jquery", "jquery.ui", "gettext", "backbone",
         course: course_location_analytics
         unit_id: unit_location_analytics
         type: $(event.currentTarget).data('location')
+        
+      @cancelIndex = 1
 
       @closeNewComponent(event)
+      @cancelIndex = 0
 
     components: => @$('.component').map((idx, el) -> $(el).data('locator')).get()
 
@@ -259,6 +276,7 @@ define ["jquery", "jquery.ui", "gettext", "backbone",
       metadata = $.extend({}, @model.get('metadata'))
       metadata.display_name = $('.unit-display-name-input').val()
       metadata.direct_term = $('.unit-direct-term-input').val()
+      metadata.random_problem_count = $('.unit-random-problem-input').val()
       @model.save(metadata: metadata)
 
       setTimeout('$(".save-term").val(gettext("Save")); $(".save-term").removeClass("save-term-active");', 500)
@@ -296,6 +314,7 @@ define ["jquery", "jquery.ui", "gettext", "backbone",
       metadata = $.extend({}, @model.get('metadata'))
       metadata.display_name = @$('.unit-display-name-input').val()
       metadata.direct_term = @$('.unit-direct-term-input').val()
+      metadata.random_problem_count = $('.unit-random-problem-input').val()
       @model.save(metadata: metadata)
       # Update name shown in the right-hand side location summary.
       $('.unit-location .editing .unit-name').html(metadata.display_name)

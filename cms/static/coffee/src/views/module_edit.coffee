@@ -7,12 +7,14 @@ define ["backbone", "jquery", "underscore", "gettext", "xblock/runtime.v1",
     className: 'component'
     editorMode: 'editor-mode'
 
-    events:
-      "click .component-editor .cancel-button": 'clickCancelButton'
-      "click .component-editor .save-button": 'clickSaveButton'
-      "click .component-actions .edit-button": 'clickEditButton'
-      "click .component-actions .delete-button": 'onDelete'
-      "click .mode a": 'clickModeButton'
+  events:
+    "click .component-editor .cancel-button": 'clickCancelButton'
+    "click .component-editor .save-button": 'clickSaveButton'
+    "click .component-actions .edit-button": 'clickEditButton'
+    "click .component-actions .insert-button": 'clickInsertButton'
+    "click .component-actions .insert-to-end-button": 'clickInsertToEndButton'
+    "click .component-actions .delete-button": 'onDelete'
+    "click .mode a": 'clickModeButton'
 
     initialize: ->
       @onDelete = @options.onDelete
@@ -121,8 +123,6 @@ define ["backbone", "jquery", "underscore", "gettext", "xblock/runtime.v1",
     duration_time_str = time_str.substr(time_str.indexOf('/')+2)
     console.log(cur_time_str)
     console.log(duration_time_str)
-    console.log(cur_time_str.length)
-    console.log(duration_time_str.length)
     cur_time_str_parts = cur_time_str.split(':')
     time = 0
     for elem in cur_time_str_parts
@@ -134,7 +134,7 @@ define ["backbone", "jquery", "underscore", "gettext", "xblock/runtime.v1",
         time = time-1
     seconds = time%60
     minutes = ((time-seconds)/60)%60
-    hours = (time-minutes-seconds)/3600
+    hours = (time-minutes*60-seconds)/3600
     seconds_str = seconds + ""
     if seconds_str.length == 1
       seconds_str = "0" + seconds_str
@@ -153,6 +153,44 @@ define ["backbone", "jquery", "underscore", "gettext", "xblock/runtime.v1",
         elem.click()
         elem.setAttribute 'time', time_format
         elem.setAttribute 'show_now', 'False'
+
+  clickInsertToEndButton: (event) ->
+    event.preventDefault()
+    vidtime = @$el.find('.vidtime')
+    time_str = vidtime.html()
+    duration_time_str = time_str.substr(time_str.indexOf('/')+2)
+    console.log(duration_time_str)
+    duration_time_str = duration_time_str.split(':')
+    time = 0
+    for elem in duration_time_str
+      time_part = parseInt(elem)
+      time = time*60+time_part
+    console.log(time)
+    if time == 0
+      alert "Видео ещё не проигрывается, пожалуйста, нажмите кнопку Play"
+    else
+      time = time-1
+      seconds = time%60
+      minutes = ((time-seconds)/60)%60
+      hours = (time-minutes*60-seconds)/3600
+      seconds_str = seconds + ""
+      if seconds_str.length == 1
+        seconds_str = "0" + seconds_str
+      minutes_str = minutes + ""
+      if minutes_str.length == 1
+        minutes_str = "0" + minutes_str
+      hours_str = hours + ""
+      if hours_str.length == 1
+        hours_str = "0" + hours_str
+      time_format = hours_str + ":" + minutes_str + ":" + seconds_str
+      console.log(time_format)
+      new_component = document.getElementsByClassName('multiple-templates')
+      for elem in new_component
+        if elem.getAttribute('data-type') == 'problem'
+        #if elem.data.type == 'problem'
+          elem.click()
+          elem.setAttribute 'time', time_format
+          elem.setAttribute 'show_now', 'False'
 
     clickModeButton: (event) ->
       event.preventDefault()

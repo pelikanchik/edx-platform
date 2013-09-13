@@ -320,6 +320,7 @@ def unit_handler(request, tag=None, course_id=None, branch=None, version_guid=No
         )
 
         return render_to_response('unit.html', {
+            'length': len(components),
             'context_course': course,
             'unit': item,
             'unit_locator': locator,
@@ -342,6 +343,7 @@ def unit_handler(request, tag=None, course_id=None, branch=None, version_guid=No
         })
     else:
         return HttpResponseBadRequest("Only supports html requests")
+
 
 
 @login_required

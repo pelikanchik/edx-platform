@@ -414,11 +414,13 @@
             margin-top: 21px;
             margin-right: 12px;
 
-            .edit-button,
-            .delete-button {
-                margin-top: -3px;
-            }
-        }
+              .edit-button,
+              .delete-button,
+              .insert-button,
+              .insert-to-end-button {
+                  margin-top: -3px;
+              }
+          }
 
         .expand-collapse-icon {
             @include transition(none);

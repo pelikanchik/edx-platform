@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
 from xblock.fragment import Fragment
+import random
+from random import sample
 from xmodule.x_module import XModule
 from xmodule.seq_module import SequenceDescriptor
 from xmodule.progress import Progress
 from pkg_resources import resource_string
 from xblock.fields import Integer, Scope, String
+
 
 # HACK: This shouldn't be hard-coded to two types
 # OBSOLETE: This obsoletes 'type'
@@ -19,6 +22,12 @@ class VerticalFields(object):
         scope=Scope.settings,
         default='[]'
     )
+    random_problem_count = Integer(
+        display_name="Количество отображаемых задач",
+        help="Ученику будет показано несколько случайных задач из юнита. Это число определяет количество показываемых задач.",
+        scope=Scope.settings,
+        default=-1
+    )
 
 class VerticalModule(VerticalFields, XModule):
     ''' Layout module for laying out submodules vertically.'''
@@ -26,12 +35,13 @@ class VerticalModule(VerticalFields, XModule):
     def student_view(self, context):
         fragment = Fragment()
         contents = []
+        all_contents = []
 
         for child in self.get_display_items():
             rendered_child = child.render('student_view', context)
             fragment.add_frag_resources(rendered_child)
 
-            contents.append({
+            all_contents.append({
                 'id': child.id,
                 'content': rendered_child.content,
                 'father': self.id,                
@@ -44,6 +54,11 @@ class VerticalModule(VerticalFields, XModule):
                   "time": child2.problem_time if child2.get_icon_class() == 'problem' else "video",
                   } for child2 in self.get_display_items()]
             })
+            if self.random_problem_count == -1:
+                contents = all_contents
+            else:
+                contents = random.sample(all_contents, self.random_problem_count)
+            
 
         fragment.add_content(self.system.render_template('vert_module.html', {
             'items': contents
@@ -74,6 +89,12 @@ class VerticalModule(VerticalFields, XModule):
            score = 0
         return score
 
+    def random_show(self):
+        count = self.random_problem_count
+        if count is None:
+            count = -1
+        return count
+
 
 class VerticalDescriptor(VerticalFields, SequenceDescriptor):
     module_class = VerticalModule
@@ -90,6 +111,13 @@ class VerticalDescriptor(VerticalFields, SequenceDescriptor):
         if score is None:
            score = 0
         return score
+
+    @property
+    def random_show(self):
+        count = self.random_problem_count
+        if count is None:
+            count = -1
+        return count
 
     # TODO (victor): Does this need its own definition_to_xml method?  Otherwise it looks
     # like verticals will get exported as sequentials...
