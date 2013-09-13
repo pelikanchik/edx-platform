@@ -151,7 +151,8 @@ body.course.updates {
 
 		.edit-button,
 		.delete-button,
-        .insert-button{
+        .insert-button,
+        .insert-to-end-button {
 			float: left;
 			@include white-button;
 	    padding: 3px 10px 4px;
