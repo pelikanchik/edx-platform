@@ -8,7 +8,6 @@ var redraw, g, renderer;
 
     var new_edge_line;
 
-
 function getCookie(name) {
     var cookieValue = null;
     if (document.cookie && document.cookie != '') {
@@ -81,8 +80,12 @@ window.onload = function() {
 
     var raphael_nodes = {};
 
-function generateEdgeLabel(disjunctions_array, source){
+
+
+function generateEdgeData(disjunctions_array, source){
     var edge_label;
+    var details;
+    var color = "#999";
     var is_complicated = false;
     // how many conditions? more than one?
     if (disjunctions_array.length > 1){
@@ -92,7 +95,11 @@ function generateEdgeLabel(disjunctions_array, source){
             is_complicated = true;
         }
     };
-    if (is_complicated) edge_label = "сложно";
+    if (is_complicated){
+        // blue for "it is complicated"
+        color = "#00F";
+        edge_label = details = "сложно";
+    }
     else {
         // so, there is only one condition, "if [something], then goto [somewhere]"
         // which unit this condition is related to?
@@ -103,22 +110,34 @@ function generateEdgeLabel(disjunctions_array, source){
         // parsing JSON is fun.
         var condition = disjunctions_array[0]["conjunctions"][0];
 
-        var related_vertex_name;
+        var related_vertex_name, short_related_vertex_name;
         if (condition["source_element_id"] === source) {
+            short_related_vertex_name = "";
             related_vertex_name = "";
         } else {
-            var name = names_obj[condition["source_element_id"]]["name"];
-            related_vertex_name = hideRestOfString(name) + " ";
+            var related_vertex_name = names_obj[condition["source_element_id"]]["name"];
+            short_related_vertex_name = hideRestOfString(related_vertex_name );
         }
         var percent_sign = (condition["field"] === "score_rel")? "%" : "";
         var sign = parseSign(condition["sign"]);
 
         var target_value = condition["value"];
 
-        edge_label = related_vertex_name + sign + " " + target_value + percent_sign;
+        edge_label = short_related_vertex_name + " "+ sign + " " + target_value + percent_sign;
+        details = related_vertex_name + " " + sign + " " + target_value + percent_sign;
 
+        if (target_value === "0"){
+            // green for correct answer
+            if (condition["sign"]==="more") color = "#0F0";
+            // red for incorrect
+            if (condition["sign"]==="equals") color = "#F00";
+            // purple for "I don't care, really"
+            if (condition["sign"]==="more-equals") color = "#808";
         }
-    return edge_label;
+    }
+    edge_label = "";
+    var result = {"label" : edge_label, "color" : color, "details" : details};
+    return result;
 }
 
 $("#canvas").click(function (e) {
@@ -170,11 +189,13 @@ function bindNewEdgeTo(ellipse, node){
 
                     edges_arr[origin_node_number].push(new_edge_data);
 
+                    var data = generateEdgeData(edges_arr[origin_node_number][0]["disjunctions"], origin_node);
                     g.addEdge(origin_node, node.id, {
                         directed: true,
-                        label:generateEdgeLabel(edges_arr[origin_node_number][0]["disjunctions"], origin_node)
+                        label: data.label,
+                        details: data.details,
+                        stroke: data.color
                     });
-
 
                     var metadata = $.extend({}, unit_edit.model.get('metadata'));
 
@@ -358,7 +379,8 @@ jQuery.each(edges_arr, function(node_number) {
     jQuery.each(edges_arr[node_number], function(edge_number) {
             source = ids_arr[node_number];
 
-            g.addEdge(source, this.direct_element_id, { directed : true, label: generateEdgeLabel(this.disjunctions, source) });
+            var edge_data = generateEdgeData(this.disjunctions, source)
+            g.addEdge(source, this.direct_element_id, { directed : true, label: edge_data.label, stroke: edge_data.color, details: edge_data.details });
 
     });
 });
@@ -408,8 +430,8 @@ var layouter;
 
 
 
-//    var height = 100 + 50*ids_arr.length;
-    var height = 300;
+    var height = 100 + 50*ids_arr.length;
+//    var height = 300;
 
     /* draw the graph using the RaphaelJS draw implementation */
     renderer = new Graph.Renderer.Raphael('canvas', g, width, height);

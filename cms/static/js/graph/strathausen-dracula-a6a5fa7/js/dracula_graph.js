@@ -22,6 +22,7 @@
  *
  /*--------------------------------------------------------------------------*/
 
+var HOVER_AREA_OPACITY = 0.1;
 /*
  * Edge Factory
  */
@@ -41,9 +42,17 @@ var EdgeFactory = function() {
 };
 EdgeFactory.prototype = {
     build: function(source, target) {
+        return this.build(source, target, "#F0F", "это\nребро\n");
+    },
+
+    build: function(source, target, color, details) {
+        if (color === undefined) color = "#FOF";
         var e = jQuery.extend(true, {}, this.template);
+        e.hover_area = undefined;
         e.source = source;
         e.target = target;
+        e.color = color;
+        e.details = details;
         return e;
     }
 };
@@ -76,7 +85,7 @@ Graph.prototype = {
     addEdge: function(source, target, style) {
         var s = this.addNode(source);
         var t = this.addNode(target);
-        var edge = this.edgeFactory.build(s, t);
+        var edge = this.edgeFactory.build(s, t, style.stroke, style.details);
         jQuery.extend(edge.style,style);
         s.edges.push(edge);
         this.edges.push(edge);
@@ -160,11 +169,7 @@ Graph.Renderer.Raphael = function(element, graph, width, height) {
      */
     this.isDrag = false;
     this.dragger = function (e) {
-        console.log(this);
-//        console.log(selfRef);
-//        console.log(e);
         this.dx = e.clientX;
-//        this.dy = 150;
         this.dy = e.clientY;
         selfRef.isDrag = this;
         this.set && this.set.animate({"fill-opacity": .1}, 200) && this.set.toFront();
@@ -174,6 +179,9 @@ Graph.Renderer.Raphael = function(element, graph, width, height) {
     var d = document.getElementById(element);
     d.onmousemove = function (e) {
         e = e || window.event;
+
+        // mouse_x
+
         if (selfRef.isDrag) {
             var bBox = selfRef.isDrag.set.getBBox();
             // TODO round the coordinates here (eg. for proper image representation)
@@ -195,9 +203,47 @@ Graph.Renderer.Raphael = function(element, graph, width, height) {
     d.onmouseup = function () {
         selfRef.isDrag && selfRef.isDrag.set.animate({"fill-opacity": .6}, 500);
         selfRef.isDrag = false;
+        update_hover_area(selfRef);
     };
+
+
     this.draw();
 };
+
+function update_hover_area(selfRef){
+    for (var i in selfRef.graph.edges) {
+        if(selfRef.graph.edges[i].hover_area !=undefined){
+            selfRef.graph.edges[i].hover_area.remove();
+        }
+        selfRef.graph.edges[i].hover_area = initialize_hover_area(selfRef, selfRef.graph.edges[i]);
+    }
+};
+
+function initialize_hover_area(selfRef, edge){
+    var connection = edge.connection.fg;
+    var result = connection.clone();
+//    console.log(selfRef.getCanvas());
+
+    var popup;
+    result.attr({"stroke-width": 20, "stroke-opacity" : HOVER_AREA_OPACITY, "stroke": "#F00"});
+    result.hover(
+        function () {
+            connection.attr({"stroke": "#000"});
+//            console.log(popup);
+              // XXX ?
+              if (popup != undefined) popup.remove();
+              popup = selfRef.r.popup(mouse_x, mouse_y, edge.details);
+//            popup.show();
+          },
+        function () {
+            connection.attr({"stroke": edge.color});
+            popup.hide();
+        }
+    )
+    return result;
+};
+
+
 Graph.Renderer.Raphael.prototype = {
     translate: function(point) {
         return [
@@ -221,6 +267,7 @@ Graph.Renderer.Raphael.prototype = {
         for (var i = 0; i < this.graph.edges.length; i++) {
             this.drawEdge(this.graph.edges[i]);
         }
+        update_hover_area(this);
     },
 
     drawNode: function(node) {
@@ -286,12 +333,17 @@ Graph.Renderer.Raphael.prototype = {
         if(!edge.connection) {
             edge.style && edge.style.callback && edge.style.callback(edge); // TODO move this somewhere else
             edge.connection = this.r.connection(edge.source.shape, edge.target.shape, edge.style);
+
+            edge.connection.fg.attr({"stroke-width": 2});
+            // hover area
+            edge.hover_area = initialize_hover_area(this, edge);
             return;
         }
         //FIXME showing doesn't work well
         edge.connection.fg.show();
         edge.connection.bg && edge.connection.bg.show();
         edge.connection.draw();
+
     },
     getCanvas: function() {
         return this.r;
