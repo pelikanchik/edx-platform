@@ -1,3 +1,5 @@
+var tmp_y;
+
 
 var redraw, g, renderer;
 
@@ -274,6 +276,7 @@ function showNodeDetails(ellipse, node){
 
 document.onmousemove = function (e) {
         e = e || window.event;
+        tmp_y = e.clientY;
         mouse_x = e.pageX - $('#canvas').offset().left + 5;
         mouse_y = e.pageY - $('#canvas').offset().top + 5;
         if (!add_edge_mode) return;
@@ -519,7 +522,9 @@ var layouter;
                     'display_name': new_node_name
                 },
                 success : function(answer){
-                    var location = jQuery.parseJSON(answer)["id"];
+
+//                    var location = jQuery.parseJSON(answer)["id"];
+                    var location = answer["id"];
 
 //                    var location = "i4x://Org/101/vertical/something" + 100*Math.random();
                     var i = location.lastIndexOf("/");
@@ -537,10 +542,14 @@ var layouter;
                     data_obj[node_id] = [];
 
                     renderer.draw()
-                    raphael_nodes[node_id].dx = 0;
+                    raphael_nodes[node_id].set.translate(mouse_x, mouse_y);
+
+//                    raphael_nodes[node_id].dx = 0;
 
                 // XXX
-                    raphael_nodes[node_id].dy = raphael_nodes[node_id].set.getBBox().height + 20;
+//                    raphael_nodes[node_id].dy = raphael_nodes[node_id].set.getBBox().height + 20;
+//                    raphael_nodes[node_id].dy = tmp_y;
+//                    raphael_nodes[node_id].dy = 0;
                     renderer.isDrag = raphael_nodes[node_id];
 
 //                    g.drawNode(g.nodes[g.nodes.length - 1]);
