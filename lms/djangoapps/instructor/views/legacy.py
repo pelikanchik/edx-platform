@@ -50,6 +50,7 @@ from psychometrics import psychoanalyze
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
 import track.views
 from mitxmako.shortcuts import render_to_string
+from pprint import pprint
 
 
 log = logging.getLogger(__name__)
@@ -572,6 +573,42 @@ def instructor_dashboard(request, course_id):
             datatable['data'] = [[x.student.username, x.state.decode('unicode_escape')] for x in smdat]
             datatable['title'] = 'Student state for problem %s' % problem_to_dump
             return return_csv('student_state_from_%s.csv' % problem_to_dump, datatable)
+
+    elif u'Данные всех попыток по заданию' in action:
+        log.debug(action)
+        problem_to_dump = request.POST.get('problem_to_dump', '')
+
+        if problem_to_dump[-4:] == ".xml":
+            problem_to_dump = problem_to_dump[:-4]
+        try:
+            (org, course_name, _) = course_id.split("/")
+            module_state_key = "i4x://" + org + "/" + course_name + "/problem/" + problem_to_dump
+            smdat = StudentModule.objects.filter(course_id=course_id,
+                                                 module_state_key=module_state_key)
+            smdat = smdat.order_by('student')
+            msg += "Found %d records to dump " % len(smdat)
+        except Exception as err:
+            msg += "<font color='red'>Couldn't find module with that urlname.  </font>"
+            msg += "<pre>%s</pre>" % escape(err)
+            smdat = []
+
+        if smdat:
+            datatable = {'header': ['ID', 'Пользователь', 'Полное имя', 'edX email', 'Внешний email',
+                                    'Попытки', 'Seed', 'Ответы студента']}
+            datatable['data'] = []
+            for i in smdat:
+                data = json.loads(i.state.decode('unicode_escape'))
+                answers = ''
+                for j in data['student_answers'].keys():
+                    answers = str(data['student_answers'][j].encode('utf-8')) + ','
+                datarow = [i.student.id, i.student.username, i.student.profile.name, i.student.email]
+                try:
+                    datarow.append(student.externalauthmap.external_email)
+                except:  # ExternalAuthMap.DoesNotExist
+                    datarow.append('')
+                datarow += [data['attempts'], data['seed'], answers[:-1]]
+                datatable['data'].append(datarow)
+            datatable['title'] = 'Student state for problem %s' % problem_to_dump
 
     #----------------------------------------
     # Group management
