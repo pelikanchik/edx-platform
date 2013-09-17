@@ -602,14 +602,14 @@ def instructor_dashboard(request, course_id):
                 try:
                     for j in data['student_answers'].keys():
                         answers = str(data['student_answers'][j].encode('utf-8')) + ','
+                    datarow = [i.student.id, i.student.username, i.student.profile.name, i.student.email]
+                    try:
+                        datarow.append(student.externalauthmap.external_email)
+                    except:  # ExternalAuthMap.DoesNotExist
+                        datarow.append('')
+                    datarow += [data['attempts'], data['seed'], answers[:-1]]
                 except KeyError:
                     continue
-                datarow = [i.student.id, i.student.username, i.student.profile.name, i.student.email]
-                try:
-                    datarow.append(student.externalauthmap.external_email)
-                except:  # ExternalAuthMap.DoesNotExist
-                    datarow.append('')
-                datarow += [data['attempts'], data['seed'], answers[:-1]]
                 datatable['data'].append(datarow)
             datatable['title'] = 'Student state for problem %s' % problem_to_dump
 
