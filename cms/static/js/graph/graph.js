@@ -89,6 +89,7 @@ function generateEdgeData(disjunctions_array, source){
     var details;
     var color = "#999";
     var is_complicated = false;
+    var about_source = false;
     // how many conditions? more than one?
     if (disjunctions_array.length > 1){
         is_complicated = true;
@@ -116,6 +117,8 @@ function generateEdgeData(disjunctions_array, source){
         if (condition["source_element_id"] === source) {
             short_related_vertex_name = "";
             related_vertex_name = "";
+            about_source = true;
+
         } else {
             var related_vertex_name = names_obj[condition["source_element_id"]]["name"];
             short_related_vertex_name = hideRestOfString(related_vertex_name );
@@ -128,7 +131,9 @@ function generateEdgeData(disjunctions_array, source){
         edge_label = short_related_vertex_name + " "+ sign + " " + target_value + percent_sign;
         details = related_vertex_name + " " + sign + " " + target_value + percent_sign;
 
-        if (target_value === "0"){
+        if (!about_source){
+            color = "#008";
+        } else if (target_value === "0"){
             // green for correct answer
             if (condition["sign"]==="more") color = "#0F0";
             // red for incorrect
