@@ -158,6 +158,21 @@ function bindNewEdgeTo(ellipse, node){
         // TODO
         //if( если такого ребра ещё нет)
         //
+        var exists = false;
+        for(var i=0; i<g.nodes[origin_node].edges.length; i++) {
+            console.log(g.nodes[origin_node].edges[i]);
+            var e = g.nodes[origin_node].edges[i];
+            if ((e.source.id == origin_node)&&(e.target.id == node.id)){
+                exists = true;
+            }
+        };
+        if (exists){
+            alert("Такое ребро уже есть");
+            return;
+        }
+//        origin_node, node.id
+//        if()
+//        g.nodes[node.id].edges
 
         $( "#node-add-condition" ).dialog({
             modal: true,
@@ -191,7 +206,12 @@ function bindNewEdgeTo(ellipse, node){
 
                     edges_arr[origin_node_number].push(new_edge_data);
 
-                    var data = generateEdgeData(edges_arr[origin_node_number][0]["disjunctions"], origin_node);
+                    // not 0!!!
+                    var edges_count = edges_arr[origin_node_number].length - 1;
+                    var data = generateEdgeData(
+                        edges_arr[origin_node_number][edges_count]["disjunctions"],
+                        origin_node);
+                    console.log(data);
                     g.addEdge(origin_node, node.id, {
                         directed: true,
                         label: data.label,
@@ -224,6 +244,8 @@ function bindNewEdgeTo(ellipse, node){
 
                     // TODO
                     ///!\layouter...
+                    save_layout();
+                    load_layout();
                     renderer.draw();
 
             //        for (var i = 0; i < g.edges.length; i++) {
@@ -265,12 +287,16 @@ function showNodeDetails(ellipse, node){
             "Новое ребро": function() {
                 add_edge_mode = true;
 
-                origin_x = raphael_nodes[node.id].getBBox().x;
-                origin_y = raphael_nodes[node.id].getBBox().y;
+
+                var bBox = raphael_nodes[node.id].getBBox();
+                origin_x = (bBox.x + bBox.width / 2);
+                origin_y = (bBox.y + bBox.height / 2);
 
 //                origin_x = ellipse.attr('cx');
 //                origin_y = ellipse.attr('cy');
                 origin_node = node.id;
+
+                console.log(g.nodes[node.id].edges);
                 $( this ).dialog( "close" );
             }
           }
@@ -465,8 +491,11 @@ var layouter;
             var metadata = $.extend({}, unit_edit.model.get('metadata'));
 
             var node = g.nodes[node_id];
-            metadata.coords_x = raphael_nodes[node_id].getBBox().x / width;
-            metadata.coords_y = raphael_nodes[node_id].getBBox().y / height;
+
+            var bBox = raphael_nodes[node_id].getBBox();
+
+            metadata.coords_x = (bBox.x + bBox.width / 2) / width;
+            metadata.coords_y = (bBox.y + bBox.height / 2) / height;
 
 //            console.log($("#node_" + node_id) );
 //            console.log($("#node_" + node_id).attr('cx'));
