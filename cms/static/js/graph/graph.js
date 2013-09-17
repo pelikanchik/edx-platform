@@ -240,6 +240,7 @@ function bindNewEdgeTo(ellipse, node){
         });
     }
 
+// TODO: ellipse is not needed
 function showNodeDetails(ellipse, node){
     var S;
     var message = names_obj[node.id]["name"];
@@ -263,8 +264,12 @@ function showNodeDetails(ellipse, node){
             },
             "Новое ребро": function() {
                 add_edge_mode = true;
-                origin_x = ellipse.attr('cx');
-                origin_y = ellipse.attr('cy');
+
+                origin_x = raphael_nodes[node.id].getBBox().x;
+                origin_y = raphael_nodes[node.id].getBBox().y;
+
+//                origin_x = ellipse.attr('cx');
+//                origin_y = ellipse.attr('cy');
                 origin_node = node.id;
                 $( this ).dialog( "close" );
             }
@@ -449,7 +454,7 @@ var layouter;
     save_layout = function() {
 
         // подозреваю, что это можно сделать не в цикле.
-        var counter=0;
+        var counter = 0;
         for (var node_id in g.nodes) {
             var unit_edit = new CMS.Views.UnitEdit({
               model: new CMS.Models.Module({
@@ -460,19 +465,21 @@ var layouter;
             var metadata = $.extend({}, unit_edit.model.get('metadata'));
 
             var node = g.nodes[node_id];
-            metadata.coords_x = $("#node_" + node_id).attr('cx') / width;
-            metadata.coords_y = $("#node_" + node_id).attr("cy") / height;
+            metadata.coords_x = raphael_nodes[node_id].getBBox().x / width;
+            metadata.coords_y = raphael_nodes[node_id].getBBox().y / height;
+
+//            console.log($("#node_" + node_id) );
+//            console.log($("#node_" + node_id).attr('cx'));
+//            console.log(raphael_nodes[node_id].getBBox().x);
+
+
+
 
             // what if they are undefined?
             // no, they were initialized by random
             x_arr[counter] = metadata.coords_x;
             y_arr[counter] = metadata.coords_y;
             counter++;
-
-            console.log(g.layoutMinX);
-            console.log(g.layoutMinY);
-
-//            counter++;
 
             $.ajax({
                 url: "/save_item",
@@ -484,7 +491,8 @@ var layouter;
                 },
                 data: JSON.stringify({
                     'id': names_obj[node_id]["location"],
-                    'metadata': metadata
+                    'metadata': metadata,
+                    'state': 'public'
                     })
             });
         }
