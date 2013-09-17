@@ -599,8 +599,11 @@ def instructor_dashboard(request, course_id):
             for i in smdat:
                 data = json.loads(i.state.decode('unicode_escape'))
                 answers = ''
-                for j in data['student_answers'].keys():
-                    answers = str(data['student_answers'][j].encode('utf-8')) + ','
+                try:
+                    for j in data['student_answers'].keys():
+                        answers = str(data['student_answers'][j].encode('utf-8')) + ','
+                except KeyError:
+                    continue
                 datarow = [i.student.id, i.student.username, i.student.profile.name, i.student.email]
                 try:
                     datarow.append(student.externalauthmap.external_email)
