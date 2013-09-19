@@ -17,7 +17,7 @@ from StringIO import StringIO
 
 from django.conf import settings
 from django.contrib.auth.models import User, Group
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseBadRequest
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
 from django.core.urlresolvers import reverse
@@ -26,7 +26,7 @@ from django.utils import timezone
 
 import xmodule.graders as xmgraders
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
 
 from courseware import grades
 from courseware.access import (has_access, get_access_group_name,
@@ -593,7 +593,7 @@ def instructor_dashboard(request, course_id):
             smdat = []
 
         if smdat:
-            datatable = {'header': ['ID', 'Пользователь', 'Полное имя', 'edX email', 'Внешний email',
+            datatable = {'header': ['ID', 'Пользователь', 'Полное имя', 'edX email',
                                     'Попытки', 'Seed', 'Ответы студента']}
             datatable['data'] = []
             for i in smdat:
@@ -601,18 +601,66 @@ def instructor_dashboard(request, course_id):
                 answers = ''
                 try:
                     for j in data['student_answers'].keys():
-                        answers = str(data['student_answers'][j].encode('utf-8')) + ','
+                        answers += str(data['student_answers'][j].encode('utf-8')) + ','
                     datarow = [i.student.id, i.student.username, i.student.profile.name, i.student.email]
-                    try:
-                        datarow.append(student.externalauthmap.external_email)
-                    except:  # ExternalAuthMap.DoesNotExist
-                        datarow.append('')
                     datarow += [data['attempts'], data['seed'], answers[:-1]]
                 except KeyError:
                     continue
                 datatable['data'].append(datarow)
             datatable['title'] = 'Student state for problem %s' % problem_to_dump
 
+    elif u'Данные по разделу' in action:
+        log.debug(action)
+        section_to_dump = request.POST.get('section_to_dump', '')
+        (org, course_name, _) = course_id.split("/")
+        location = "i4x://" + org + "/" + course_name + "/sequential/" + section_to_dump
+        try:
+            item = modulestore().get_item(location, depth=1)
+        except (ItemNotFoundError, InvalidLocationError):
+            return HttpResponseBadRequest()
+        units = [
+            modulestore().get_item(component.location.url(), depth=1)
+            for component
+            in item.get_children()
+        ]
+        problems_urls = []
+        for unit in units:
+            for component in unit.get_children():
+                if component.location.url().find("problem") != -1:
+                    problems_urls.append(component.location.url())
+
+        datatable = {'header': ['ID', 'Пользователь', 'Полное имя', 'edX email']}
+        datatable['header'] += ["Задача %d" % num for num in range(1, len(problems_urls) + 1)]
+        enrolled_students = User.objects.filter(
+            courseenrollment__course_id=course_id,
+            courseenrollment__is_active=1,
+        ).prefetch_related("groups").order_by('username')
+        msg += "Found %d records to dump " % len(enrolled_students)
+        datarow = []
+        for student in enrolled_students:
+            datasubrow = [student.id, student.username, student.profile.name, student.email]
+            for problem in problems_urls:
+                try:
+                    smdat = StudentModule.objects.get(student=student, 
+                                                      course_id=course_id,
+                                                      module_state_key=problem)
+                except Exception as err:
+                    msg += "<font color='red'>Couldn't find module with that urlname.  </font>"
+                    msg += "<pre>%s</pre>" % escape(err)
+                    smdat = None
+                if smdat:
+                    data = json.loads(smdat.state.decode('unicode_escape'))
+                    try:
+                        answers = ''
+                        for j in data['student_answers'].keys():
+                            answers += str(data['student_answers'][j].encode('utf-8')) + ','
+                        datasubrow.append(answers[:-1])
+                    except KeyError:
+                        datasubrow.append('')
+            datarow.append(datasubrow)
+        datatable['data'] = datarow
+        datatable['title'] = 'Students state for section %s' % section_to_dump                          
+            
     #----------------------------------------
     # Group management
 
