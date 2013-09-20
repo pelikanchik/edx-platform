@@ -626,7 +626,7 @@ def instructor_dashboard(request, course_id):
         problems_urls = []
         for unit in units:
             for component in unit.get_children():
-                if component.location.url().find("problem") != -1:
+                if component.category == 'problem':
                     problems_urls.append(component.location.url())
 
         datatable = {'header': ['ID', 'Пользователь', 'Полное имя', 'edX email']}
