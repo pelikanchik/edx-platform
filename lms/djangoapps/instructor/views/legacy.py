@@ -645,8 +645,6 @@ def instructor_dashboard(request, course_id):
                                                       course_id=course_id,
                                                       module_state_key=problem)
                 except Exception as err:
-                    msg += "<font color='red'>Couldn't find module with that urlname.  </font>"
-                    msg += "<pre>%s</pre>" % escape(err)
                     smdat = None
                 if smdat:
                     data = json.loads(smdat.state.decode('unicode_escape'))
@@ -657,6 +655,8 @@ def instructor_dashboard(request, course_id):
                         datasubrow.append(answers[:-1])
                     except KeyError:
                         datasubrow.append('')
+                else:
+                    datasubrow.append('')
             datarow.append(datasubrow)
         datatable['data'] = datarow
         datatable['title'] = 'Students state for section %s' % section_to_dump                          
