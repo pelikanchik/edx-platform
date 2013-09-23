@@ -319,7 +319,7 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
             var cachethis = this;
             var field = this.selectorToField[thisTarget.id];
             this.codeMirrors[thisTarget.id] = CodeMirror.fromTextArea(thisTarget, {
-                mode: "text", lineNumbers: true, lineWrapping: true,
+                mode: "text/html", lineNumbers: true, lineWrapping: true,
                 onChange: function (mirror) {
                     mirror.save();
                     cachethis.clearValidationErrors();
