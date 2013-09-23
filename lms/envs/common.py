@@ -75,7 +75,7 @@ MITX_FEATURES = {
     # this should remain off in production until digest notifications are online.
     'ENABLE_DISCUSSION_HOME_PANEL': False,
 
-    'ENABLE_PSYCHOMETRICS': True,  # real-time psychometrics (eg item response theory analysis in instructor dashboard)
+    'ENABLE_PSYCHOMETRICS': False,  # real-time psychometrics (eg item response theory analysis in instructor dashboard)
 
     'ENABLE_DJANGO_ADMIN_SITE': True,  # set true to enable django's admin site, even on prod (e.g. for course ops)
     'ENABLE_SQL_TRACKING_LOGS': False,
