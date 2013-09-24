@@ -600,14 +600,19 @@ def instructor_dashboard(request, course_id):
                 data = json.loads(i.state)
                 answers = ''
                 try:
+                    answers = {}
                     for j in data['student_answers'].keys():
-                        if j.find('dynamath') != -1:
-                            answers = str(data['student_answers'][j].encode('utf-8'))
-                            break
+                        found = j.find('_dynamath')
+                        if found != -1:
+                            answers[j[:found]] = str(data['student_answers'][j].encode('utf-8'))
                         else:
-                            answers = str(data['student_answers'][j].encode('utf-8'))
+                            if j not in answers:
+                                answers[j] = str(data['student_answers'][j].encode('utf-8'))
+                    answers_str = ''
+                    for key in answers.keys():
+                        answers_str += answers[key] + ', '
                     datarow = [i.student.id, i.student.username, i.student.profile.name, i.student.email]
-                    datarow += [data['attempts'], data['seed'], answers]
+                    datarow += [data['attempts'], data['seed'], answers_str[:-2]]
                 except KeyError:
                     continue
                 datatable['data'].append(datarow)
@@ -653,14 +658,18 @@ def instructor_dashboard(request, course_id):
                 if smdat:
                     data = json.loads(smdat.state)
                     try:
-                        answers = ''
+                        answers = {}
                         for j in data['student_answers'].keys():
-                            if j.find('dynamath') != -1:
-                                answers = str(data['student_answers'][j].encode('utf-8'))
-                                break
+                            found = j.find('_dynamath')
+                            if found != -1:
+                                answers[j[:found]] = str(data['student_answers'][j].encode('utf-8'))
                             else:
-                                answers = str(data['student_answers'][j].encode('utf-8'))
-                        datasubrow.append(answers)
+                                if j not in answers:
+                                    answers[j] = str(data['student_answers'][j].encode('utf-8'))
+                        answers_str = ''
+                        for key in answers.keys():
+                            answers_str += answers[key] + ', '
+                        datasubrow.append(answers_str[:-2])
                     except KeyError:
                         datasubrow.append('')
                 else:
