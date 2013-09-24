@@ -17,7 +17,7 @@ from StringIO import StringIO
 
 from django.conf import settings
 from django.contrib.auth.models import User, Group
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseBadRequest
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
 from django.core.urlresolvers import reverse
@@ -26,7 +26,7 @@ from django.utils import timezone
 
 import xmodule.graders as xmgraders
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
 
 from courseware import grades
 from courseware.access import (has_access, get_access_group_name,
@@ -50,6 +50,7 @@ from psychometrics import psychoanalyze
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
 import track.views
 from mitxmako.shortcuts import render_to_string
+from pprint import pprint
 
 
 log = logging.getLogger(__name__)
@@ -573,6 +574,101 @@ def instructor_dashboard(request, course_id):
             datatable['title'] = 'Student state for problem %s' % problem_to_dump
             return return_csv('student_state_from_%s.csv' % problem_to_dump, datatable)
 
+    elif u'Данные всех попыток по заданию' in action:
+        log.debug(action)
+        problem_to_dump = request.POST.get('problem_to_dump', '')
+
+        if problem_to_dump[-4:] == ".xml":
+            problem_to_dump = problem_to_dump[:-4]
+        try:
+            (org, course_name, _) = course_id.split("/")
+            module_state_key = "i4x://" + org + "/" + course_name + "/problem/" + problem_to_dump
+            smdat = StudentModule.objects.filter(course_id=course_id,
+                                                 module_state_key=module_state_key)
+            smdat = smdat.order_by('student')
+            msg += "Found %d records to dump " % len(smdat)
+        except Exception as err:
+            msg += "<font color='red'>Couldn't find module with that urlname.  </font>"
+            msg += "<pre>%s</pre>" % escape(err)
+            smdat = []
+
+        if smdat:
+            datatable = {'header': ['ID', 'Пользователь', 'Полное имя', 'edX email',
+                                    'Попытки', 'Seed', 'Ответы студента']}
+            datatable['data'] = []
+            for i in smdat:
+                data = json.loads(i.state)
+                answers = ''
+                try:
+                    for j in data['student_answers'].keys():
+                        if j.find('dynamath') != -1:
+                            answers = str(data['student_answers'][j].encode('utf-8'))
+                            break
+                        else:
+                            answers = str(data['student_answers'][j].encode('utf-8'))
+                    datarow = [i.student.id, i.student.username, i.student.profile.name, i.student.email]
+                    datarow += [data['attempts'], data['seed'], answers]
+                except KeyError:
+                    continue
+                datatable['data'].append(datarow)
+            datatable['title'] = 'Student state for problem %s' % problem_to_dump
+
+    elif u'Данные по разделу' in action:
+        log.debug(action)
+        section_to_dump = request.POST.get('section_to_dump', '')
+        (org, course_name, _) = course_id.split("/")
+        location = "i4x://" + org + "/" + course_name + "/sequential/" + section_to_dump
+        try:
+            item = modulestore().get_item(location, depth=1)
+        except (ItemNotFoundError, InvalidLocationError):
+            return HttpResponseBadRequest()
+        units = [
+            modulestore().get_item(component.location.url(), depth=1)
+            for component
+            in item.get_children()
+        ]
+        problems_urls = []
+        for unit in units:
+            for component in unit.get_children():
+                if component.category == 'problem':
+                    problems_urls.append(component.location.url())
+
+        datatable = {'header': ['ID', 'Пользователь', 'Полное имя', 'edX email']}
+        datatable['header'] += ["Задача %d" % num for num in range(1, len(problems_urls) + 1)]
+        enrolled_students = User.objects.filter(
+            courseenrollment__course_id=course_id,
+            courseenrollment__is_active=1,
+        ).prefetch_related("groups").order_by('username')
+        msg += "Found %d records to dump " % len(enrolled_students)
+        datarow = []
+        for student in enrolled_students:
+            datasubrow = [student.id, student.username, student.profile.name, student.email]
+            for problem in problems_urls:
+                try:
+                    smdat = StudentModule.objects.get(student=student, 
+                                                      course_id=course_id,
+                                                      module_state_key=problem)
+                except Exception as err:
+                    smdat = None
+                if smdat:
+                    data = json.loads(smdat.state)
+                    try:
+                        answers = ''
+                        for j in data['student_answers'].keys():
+                            if j.find('dynamath') != -1:
+                                answers = str(data['student_answers'][j].encode('utf-8'))
+                                break
+                            else:
+                                answers = str(data['student_answers'][j].encode('utf-8'))
+                        datasubrow.append(answers)
+                    except KeyError:
+                        datasubrow.append('')
+                else:
+                    datasubrow.append('')
+            datarow.append(datasubrow)
+        datatable['data'] = datarow
+        datatable['title'] = 'Students state for section %s' % section_to_dump                          
+            
     #----------------------------------------
     # Group management
 
