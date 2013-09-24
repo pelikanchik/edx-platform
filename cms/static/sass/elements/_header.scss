@@ -112,7 +112,7 @@
 
   // specific elements - branding
   .branding {
-    padding: 0px 0px ($baseline*0.75) 0px;
+    padding: ($baseline*0.50) 0px ($baseline*0.25) 0px;
 
     a {
       display: block;
