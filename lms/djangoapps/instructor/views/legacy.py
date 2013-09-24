@@ -597,13 +597,17 @@ def instructor_dashboard(request, course_id):
                                     'Попытки', 'Seed', 'Ответы студента']}
             datatable['data'] = []
             for i in smdat:
-                data = json.loads(i.state.decode('unicode_escape'))
+                data = json.loads(i.state)
                 answers = ''
                 try:
                     for j in data['student_answers'].keys():
-                        answers += str(data['student_answers'][j].encode('utf-8')) + ','
+                        if j.find('dynamath') != -1:
+                            answers = str(data['student_answers'][j].encode('utf-8'))
+                            break
+                        else:
+                            answers = str(data['student_answers'][j].encode('utf-8'))
                     datarow = [i.student.id, i.student.username, i.student.profile.name, i.student.email]
-                    datarow += [data['attempts'], data['seed'], answers[:-1]]
+                    datarow += [data['attempts'], data['seed'], answers]
                 except KeyError:
                     continue
                 datatable['data'].append(datarow)
@@ -647,12 +651,16 @@ def instructor_dashboard(request, course_id):
                 except Exception as err:
                     smdat = None
                 if smdat:
-                    data = json.loads(smdat.state.decode('unicode_escape'))
+                    data = json.loads(smdat.state)
                     try:
                         answers = ''
                         for j in data['student_answers'].keys():
-                            answers += str(data['student_answers'][j].encode('utf-8')) + ','
-                        datasubrow.append(answers[:-1])
+                            if j.find('dynamath') != -1:
+                                answers = str(data['student_answers'][j].encode('utf-8'))
+                                break
+                            else:
+                                answers = str(data['student_answers'][j].encode('utf-8'))
+                        datasubrow.append(answers)
                     except KeyError:
                         datasubrow.append('')
                 else:

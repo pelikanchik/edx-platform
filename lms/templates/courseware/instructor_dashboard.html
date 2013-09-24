@@ -609,7 +609,7 @@ function goto( mode)
 ##-----------------------------------------------------------------------------
 
 %if datatable and modeflag.get('Psychometrics') is None:
-
+  <%include file="../discussion/_js_body_dependencies.html" />
     <br/>
     <br/>
     <p>
@@ -624,7 +624,7 @@ function goto( mode)
         %for row in datatable['data']:
           <tr>
 	    %for value in row:
-	      <td>${value | h}</td>
+	      <td>${value}</td>
 	    %endfor
 	  </tr>
         %endfor
