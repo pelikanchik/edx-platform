@@ -172,6 +172,9 @@ class CMS.Views.UnitEdit extends Backbone.View
                 }}
               );`
             )
+            count = $(".problem").length - 1
+            $("#count_problems").html(count)
+            console.log($("#count_problems").html())
         secondary:
           text: gettext('Отмена'),
           click: (view) ->

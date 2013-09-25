@@ -8,7 +8,9 @@ import os
 import traceback
 import struct
 import sys
+import random
 
+from random import sample
 from pkg_resources import resource_string
 from capa.capa_problem import LoncapaProblem
 from capa.responsetypes import StudentInputError, \
@@ -21,7 +23,7 @@ from xmodule.vertical_module import VerticalFields, VerticalDescriptor
 from xmodule.seq_module import SequenceFields
 from xmodule.seq_module import SequenceModule
 from xmodule.exceptions import NotFoundError, ProcessingError
-from xblock.core import Scope, String, Boolean, Dict, Integer, Float
+from xblock.core import Scope, String, Boolean, Dict, Integer, Float, List
 from .fields import Timedelta, Date
 from django.utils.timezone import UTC
 
@@ -181,7 +183,7 @@ class CapaFields(object):
     )
     problem_now = Boolean(
         display_name=u"Задание сразу/во время видео",
-        help=u"True - показать задание сразу. False - задание будет показано во время видео.",
+        help=u"True - показать задание сразу. False - задание будет показано во время видео, в этом случае убедитесь, что на странице только одно видео и оно стоит выше всех задач.",
         scope=Scope.settings,
         default=True
     )
@@ -190,6 +192,13 @@ class CapaFields(object):
         help=u"Укажите момент показа задачи в виде HH:MM:SS",
         scope=Scope.settings,
         default=None
+    )
+    random_count = Integer(
+        display_name=u"Сколько вопросов показывать?",
+        help=u"Количество вопросов, которые будут показаны студенту.",
+        default=None,
+        scope=Scope.settings,
+        values={"min": 0}
     )
 
 
@@ -276,6 +285,7 @@ class CapaModule(CapaFields, XModule):
 
         assert self.seed is not None
 
+
     def choose_new_seed(self):
         """
         Choose a new seed.
@@ -340,7 +350,12 @@ class CapaModule(CapaFields, XModule):
         """
         Access the problem's max score
         """
-        return self.lcp.get_max_score()
+
+        if self.random_count is None:
+            maxscore = self.lcp.get_max_score()
+        else:
+            maxscore = self.random_count
+        return maxscore
 
     def get_progress(self):
         """
@@ -349,6 +364,9 @@ class CapaModule(CapaFields, XModule):
         d = self.get_score()
         score = d['score']
         total = d['total']
+
+        if self.random_count is not None:
+            total = self.random_count
 
         if total > 0:
             if self.weight is not None:
@@ -536,10 +554,39 @@ class CapaModule(CapaFields, XModule):
 
         Adds check, reset, save buttons as necessary based on the problem config and state.
         """
-
         try:
             html = self.lcp.get_html()
 
+            '''
+            if self.random_count is None:
+                print "This problem without randoms"
+            else:
+                pr_text = html.replace("</problem>","").split("<p>")
+                pr_text = pr_text[1:]
+                html = "<problem>"
+                seed_str = str(self.seed)
+                print type(self.problem_index)
+                print self.seed
+                print "!!!!!!!!!"
+                if self.problem_index.has_key(seed_str):
+                    indexes = self.problem_index.get(seed_str)
+                else:
+                    d = self.get_score()
+                    problem_index_array = sorted(random.sample(range(d['total']),self.random_count))
+                    problem_index_str = ""
+                    for elem in problem_index_array:
+                        elem_str = str(elem)
+                        problem_index_str += elem_str + ";"
+                    problem_index_str = problem_index_str[:-1]
+                    self.problem_index[seed_str] = problem_index_str
+                    indexes = problem_index_str
+
+                indexes_array = indexes.split(";")
+                for elem in indexes_array:
+                    elem_integer = int(elem,10)
+                    html += "\n" + "<p>" + pr_text[elem_integer]
+                html += "</problem>"
+                '''
         # If we cannot construct the problem HTML,
         # then generate an error message instead.
         except Exception as err:
@@ -1017,10 +1064,7 @@ class CapaModule(CapaFields, XModule):
             self.system.psychometrics_handler(self.get_state_for_lcp())
 
         # render problem into HTML
-        #self.id = 'input_i4x-Yandex-1-problem-528707f13bbf4f2a85f720b7dd15fde9_2_1'
-        # self.id = "ac8c5016c3af4e66ab38123ab0f0260b"
-        #self.id = "i4x://Yandex/1/problem/6903bf4724c5465597d02c58d5777c59"
-        #i4x://Yandex/1/problem/ac8c5016c3af4e66ab38123ab0f0260b
+
         html = self.get_problem_html(encapsulate=False)
 
         return {'success': success,

@@ -28,9 +28,7 @@
     <script type='text/javascript'>
         $(document).ready(function () {
             var t = '${delay_answers}';
-            console.log(t);
             var id = setTimeout(function() {
-              console.log("show_answers_button_${id}");
               $("#show_answers_button_${id}").css('display','block');
             }, t*1000);
         });

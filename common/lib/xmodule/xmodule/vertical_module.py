@@ -28,12 +28,25 @@ class VerticalFields(object):
         default=-1
     )
 
+
+def show_now(child):
+    if child.get_icon_class() == 'problem':
+        pr_now = child.problem_now
+        if pr_now:
+            return 'true'
+        else:
+            return 'false'
+    else:
+        return 'true'
+
 class VerticalModule(VerticalFields, XModule):
     ''' Layout module for laying out submodules vertically.'''
 
     def __init__(self, *args, **kwargs):
         XModule.__init__(self, *args, **kwargs)
         self.contents = None
+
+
 
     def get_html(self):
         if self.contents is None:
@@ -44,7 +57,7 @@ class VerticalModule(VerticalFields, XModule):
                 'direct_term': self.direct_term,
                 'progress_detail': Progress.to_js_detail_str(self.get_progress()),
                 'type': child.get_icon_class(),
-                'show_now': 'true' if child.get_icon_class() == 'video' or child.problem_now else 'false',
+                'show_now': show_now(child),
                 'problem_time': child.problem_time if child.get_icon_class() == 'problem' else
                 [{"id": child2.id  if child2.get_icon_class() == 'problem' else "video",
                   "time": child2.problem_time if child2.get_icon_class() == 'problem' else "video",
