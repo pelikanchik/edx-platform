@@ -8,7 +8,9 @@ from xmodule.xml_module import XmlDescriptor
 from xmodule.x_module import XModule
 from xmodule.progress import Progress
 from xmodule.exceptions import NotFoundError
-from xblock.core import Integer, Scope, String
+
+from xblock.fields import Scope, String, Integer
+
 from pkg_resources import resource_string
 
 log = logging.getLogger(__name__)
@@ -115,8 +117,8 @@ class SequenceModule(SequenceFields, XModule):
         XModule.__init__(self, *args, **kwargs)
 
         # if position is specified in system, then use that instead
-        if self.system.get('position'):
-            self.position = int(self.system.get('position'))
+        if getattr(self.system, 'position', None) is not None:
+            self.position = int(self.system.position)
 
         self.rendered = False
 
@@ -252,7 +254,7 @@ class SequenceDescriptor(SequenceFields, MakoModuleDescriptor, XmlDescriptor):
             except Exception as e:
                 log.exception("Unable to load child when parsing Sequence. Continuing...")
                 if system.error_tracker is not None:
-                    system.error_tracker("ERROR: " + str(e))
+                    system.error_tracker("ERROR: " + unicode(e))
                 continue
         return {}, children
 

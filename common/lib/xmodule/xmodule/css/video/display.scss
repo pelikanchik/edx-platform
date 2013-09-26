@@ -10,9 +10,21 @@ div.video {
   padding: 12px;
   border-radius: 5px;
 
+  &:focus, &:active, &:hover {
+    outline: 0;
+    border: 0;
+  }
+
   div.tc-wrapper {
     position: relative;
     @include clearfix;
+  }
+
+  div.focus_grabber {
+    position: relative;
+    display: inline;
+    width: 0px;
+    height: 0px;
   }
 
   article.video-wrapper {
@@ -36,12 +48,17 @@ div.video {
 
     section.video-player {
       height: 0;
-      overflow: auto;
+      overflow: hidden;
       padding-bottom: 56.25%;
       position: relative;
 
+      div {
+        &.hidden {
+          display: none;
+        }
+      }
+
       object, iframe, iproblem {
-        display: block;
         border: none;
         height: 100%;
         left: 0;
@@ -49,9 +66,17 @@ div.video {
         top: 0;
         width: 100%;
       }
-
       iproblem {
         background-color: white;
+      }
+
+      h3 {
+        text-align: center;
+        color: white;
+
+        &.hidden {
+          display: none;
+        }
       }
     }
 
@@ -215,6 +240,19 @@ div.video {
             @include transition(none);
             -webkit-font-smoothing: antialiased;
             width: 116px;
+
+            @media (max-width: 1024px) {
+              width: 86px;
+            }
+
+            h3 {
+              display: block;
+
+              @media (max-width: 1024px) {
+                display: none;
+              }
+            }
+
             outline: 0;
 
             &:focus {
@@ -237,6 +275,11 @@ div.video {
               font-weight: bold;
               margin-bottom: 0;
               padding: 0 lh(.5) 0 0;
+
+              @media (max-width: 1024px) {
+                padding: 0 lh(.5) 0 lh(.5);
+              }
+
               line-height: 46px;
               color: #fff;
             }
@@ -258,10 +301,15 @@ div.video {
             opacity: 0.0;
             position: absolute;
             width: 131px;
+
+            @media (max-width: 1024px) {
+              width: 101px;
+            }
+
             z-index: 10;
 
             li {
-              box-shadow:  0 1px 0 #555;
+              box-shadow: 0 1px 0 #555;
               border-bottom: 1px solid #000;
               color: #fff;
               cursor: pointer;
@@ -485,10 +533,17 @@ div.video {
       margin-bottom: 8px;
       padding: 0;
       line-height: lh();
+      outline-width: 0px;
+      outline-style: none;
 
       &.current {
         color: #333;
         font-weight: 700;
+      }
+
+      &.focused {
+        outline-width: 1px;
+        outline-style: dotted;
       }
 
       &:hover {
@@ -521,6 +576,12 @@ div.video {
         height: 0px;
     }
 
+    article.video-wrapper section.video-player {
+      h3 {
+        color: black;
+      }
+    }
+
     ol.subtitles {
         width: 0;
         height: 0;
@@ -546,7 +607,6 @@ div.video {
     height: 100%;
     left: 0;
     margin: 0;
-    overflow: auto;
     padding: 0;
     position: fixed;
     top: 0;
@@ -569,6 +629,12 @@ div.video {
         position: static;
     }
 
+    article.video-wrapper section.video-player {
+      h3 {
+        color: white;
+      }
+    }
+
     div.tc-wrapper {
       @include clearfix;
       display: table;
@@ -584,17 +650,13 @@ div.video {
         float: none;
       }
 
-      object, iframe, problem {
+      object, iframe {
         bottom: 0;
         height: 100%;
         left: 0;
         overflow: hidden;
         position: fixed;
         top: 0;
-      }
-
-      problem {
-
       }
 
       section.video-controls {
@@ -628,3 +690,4 @@ div.video {
     }
   }
 }
+

@@ -23,9 +23,10 @@ from xmodule.vertical_module import VerticalFields, VerticalDescriptor
 from xmodule.seq_module import SequenceFields
 from xmodule.seq_module import SequenceModule
 from xmodule.exceptions import NotFoundError, ProcessingError
-from xblock.core import Scope, String, Boolean, Dict, Integer, Float, List
+from xblock.fields import Scope, String, Boolean, Dict, Integer, Float, List
 from .fields import Timedelta, Date
 from django.utils.timezone import UTC
+from django.utils.translation import ugettext as _
 
 #from xmodule.modulestore.django import modulestore
 #from .access import has_access, get_location_and_verify_access
@@ -200,6 +201,7 @@ class CapaFields(object):
         scope=Scope.settings,
         values={"min": 0}
     )
+    rand_data = Dict(help=u"Индексы подзадач", scope=Scope.user_state_summary, default={})
 
 
 class CapaModule(CapaFields, XModule):
@@ -315,6 +317,7 @@ class CapaModule(CapaFields, XModule):
             state=state,
             seed=self.seed,
             system=self.system,
+            max_score_by_rand=self.random_count,
         )
 
     def get_state_for_lcp(self):
@@ -407,7 +410,8 @@ class CapaModule(CapaFields, XModule):
         else:
             final_check = False
 
-        return u'Ответить'
+        return _("Final Check") if final_check else _("Check")
+
 
     def should_show_check_button(self):
         """
@@ -556,8 +560,6 @@ class CapaModule(CapaFields, XModule):
         """
         try:
             html = self.lcp.get_html()
-
-            '''
             if self.random_count is None:
                 print "This problem without randoms"
             else:
@@ -565,11 +567,10 @@ class CapaModule(CapaFields, XModule):
                 pr_text = pr_text[1:]
                 html = "<problem>"
                 seed_str = str(self.seed)
-                print type(self.problem_index)
-                print self.seed
+                print self.rand_data
                 print "!!!!!!!!!"
-                if self.problem_index.has_key(seed_str):
-                    indexes = self.problem_index.get(seed_str)
+                if self.rand_data.has_key(seed_str):
+                    indexes = self.rand_data.get(seed_str)
                 else:
                     d = self.get_score()
                     problem_index_array = sorted(random.sample(range(d['total']),self.random_count))
@@ -578,7 +579,7 @@ class CapaModule(CapaFields, XModule):
                         elem_str = str(elem)
                         problem_index_str += elem_str + ";"
                     problem_index_str = problem_index_str[:-1]
-                    self.problem_index[seed_str] = problem_index_str
+                    self.rand_data[seed_str] = problem_index_str
                     indexes = problem_index_str
 
                 indexes_array = indexes.split(";")
@@ -586,7 +587,6 @@ class CapaModule(CapaFields, XModule):
                     elem_integer = int(elem,10)
                     html += "\n" + "<p>" + pr_text[elem_integer]
                 html += "</problem>"
-                '''
         # If we cannot construct the problem HTML,
         # then generate an error message instead.
         except Exception as err:

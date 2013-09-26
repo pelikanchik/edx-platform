@@ -74,21 +74,17 @@ $('#fileupload').fileupload({
     add: function(e, data) {
         submitBtn.unbind('click');
         var file = data.files[0];
-        if (file.type == "application/x-gzip") {
+        if (file.name.match(/tar\.gz$/)) {
             submitBtn.click(function(e){
                 e.preventDefault();
                 submitBtn.hide();
                 data.submit().complete(function(result, textStatus, xhr) {
-                    if (result.status != 200) {
-                        alert('${_("Your import has failed.")}\n\n' + JSON.parse(result.responseText)["ErrMsg"]);
+                    if (xhr.status != 200) {
+                        var errMsg = result.hasOwnProperty("ErrMsg") ? result["ErrMsg"] : "" ;
+                        alert('${_("Your import has failed.")}\n\n' + errMsg);
                         submitBtn.show();
                         bar.hide();
-                    } else {
-                        if (result.responseText["ImportStatus"] == 1) {
-                            bar.hide();
-                            statusBlock.show();
-                        }
-                    }
+                    } 
                 });
             });
         } else {
@@ -105,12 +101,18 @@ $('#fileupload').fileupload({
 
     done: function(e, data){
         bar.hide();
+        window.onbeforeunload = null;
         alert('${_(u"Импорт прошёл успешно.")}');
+
+
         window.location = '${successful_import_redirect_url}';
     },
+    start: function(e) {
+        window.onbeforeunload = function() {
+            return '${_("Your import is in progress; navigating away will abort it.")}';
+        }
+    },
     sequentialUploads: true
-
-
 
 });
 

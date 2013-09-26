@@ -72,7 +72,7 @@ class LoncapaProblem(object):
     Main class for capa Problems.
     '''
 
-    def __init__(self, problem_text, id, state=None, seed=None, system=None):
+    def __init__(self, problem_text, id, state=None, seed=None, system=None, max_score_by_rand=None):
         '''
         Initializes capa Problem.
 
@@ -106,6 +106,8 @@ class LoncapaProblem(object):
         #       2. Passed into capa_problem via constructor
         self.seed = state.get('seed', seed)
         assert self.seed is not None, "Seed must be provided for LoncapaProblem."
+
+        self.max_score_by_rand = max_score_by_rand
 
         self.student_answers = state.get('student_answers', {})
         if 'correct_map' in state:

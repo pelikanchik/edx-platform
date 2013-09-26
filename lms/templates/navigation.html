@@ -44,7 +44,9 @@ site_status_msg = get_site_status_msg(course_id)
   <h1 class="logo">
     <a href="${marketing_link('ROOT')}">
       <%block name="navigation_logo">
+
         <img src="${static.url(branding.get_logo_url(request.META.get('HTTP_HOST')))}" alt="На главную" />
+
       </%block>
     </a>
   </h1>
@@ -128,7 +130,7 @@ site_status_msg = get_site_status_msg(course_id)
   </nav>
 </header>
 % if course:
-<div class="ie-banner"><strong>Внимание:</strong> ваш браузер не поддерживается полностью. Рекомендуем <a href="http://browser.yandex.ru/" target="_blank">Яндекс.Браузер</a>, <a href="https://www.google.com/intl/en/chrome/browser/" target="_blank">Chrome</a> или <a href="http://www.mozilla.org/en-US/firefox/new/" target="_blank">Firefox</a>.</div>
+<div class="ie-banner" aria-hidden="true"><strong>Внимание:</strong> ваш браузер не поддерживается полностью. Рекомендуем <a href="http://browser.yandex.ru/" target="_blank">Яндекс.Браузер</a>, <a href="https://www.google.com/intl/en/chrome/browser/" target="_blank">Chrome</a> или <a href="http://www.mozilla.org/en-US/firefox/new/" target="_blank">Firefox</a>.</div>
 % endif
 
 %if not user.is_authenticated():

@@ -12,7 +12,7 @@
       <div class="group-visibility-label">Это сообщение видно только пользователям группы ${cohort_dictionary[thread['group_id']]}. </div>
     %endif
       
-        <a href="#" class="vote-btn discussion-vote discussion-vote-up"><span class="plus-icon">+</span> <span class='votes-count-number'>${thread['votes']['up_count']}</span></a>
+          <a href="#" class="vote-btn discussion-vote discussion-vote-up"><span class="plus-icon">+</span> <span class='votes-count-number'>${thread['votes']['up_count']}<span class="sr">votes (click to vote)</span></span></a>
       <h1>${thread['title']}</h1>
       <p class="posted-details">
         <span class="timeago" title="${thread['created_at'] | h}">иногда</span> пользователем

@@ -1,1 +1,2 @@
 ${settings.PLATFORM_NAME}: активация аккаунта
+

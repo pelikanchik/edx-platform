@@ -64,8 +64,8 @@ class CMS.Views.ModuleEdit extends Backbone.View
     @createItemStatus = 1
     $.post(
         "/create_item"
-        payload 
-        (data) => 
+        payload
+        (data) =>
             @model.set(id: data.id)
             @$el.data('id', data.id)
             @render()

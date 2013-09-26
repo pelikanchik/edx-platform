@@ -1,4 +1,6 @@
 <%namespace file="../main.html" import="stanford_theme_enabled" />
+<%! from django.utils.translation import ugettext as _ %>
+
 
 Благодарим вас за регистрацию в ${settings.PLATFORM_NAME}! Для активации аккаунта, пожалуйста,
 скопируйте ссылку в адресную строку браузера и перейдите по ней:
@@ -11,6 +13,7 @@
 
 ## Temporary hack until we develop a better way to adjust language
 % if stanford_theme_enabled():
+
   Если это письмо попало к вам случайно, ничего не предпринимайте; мы вам
   больше ничего не пришлём. Пожалуйста, не отвечайте на это письмо;
   если вам требуется помощь, посетите страницу описания на сайте
@@ -20,4 +23,5 @@
   больше ничего не пришлём. Пожалуйста, не отвечайте на это письмо;
   если вам требуется помощь, посетите страницу описания на сайте
   ${settings.PLATFORM_NAME}.
+
 % endif
