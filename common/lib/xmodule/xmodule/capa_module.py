@@ -567,8 +567,6 @@ class CapaModule(CapaFields, XModule):
                 pr_text = pr_text[1:]
                 html = "<problem>"
                 seed_str = str(self.seed)
-                print self.rand_data
-                print "!!!!!!!!!"
                 if self.rand_data.has_key(seed_str):
                     indexes = self.rand_data.get(seed_str)
                 else:
