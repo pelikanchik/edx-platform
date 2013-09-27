@@ -475,7 +475,7 @@ function (HTML5Video) {
         this.trigger('videoCaption.updatePlayTime', time);
 
         var int_time = parseInt(time);
-        var _problems_time = this.videoPlayer.getProblemsTime();
+        var _problems_time = getProblemsTime();
         var l_t= _problems_time.length;
         for (var _i=0; _i < l_t; _i++)
         {

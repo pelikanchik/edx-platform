@@ -562,10 +562,36 @@ class CapaModule(CapaFields, XModule):
             html = self.lcp.get_html()
             if self.random_count is None:
                 print "This problem without randoms"
+
             else:
-                pr_text = html.replace("</problem>","").split("<p>")
-                pr_text = pr_text[1:]
-                html = "<problem>"
+                max_possible = html.count("<input")
+                last_occur = []
+                last_occur.append(0)
+                num=0
+                for k in range(2, max_possible+3, 1):
+                    for_search = "_"+str(k)+"_1"
+                    ind = html.rfind(for_search)
+                    if ind > 0:
+                        num = k-1
+                        last_occur.append(ind)
+                last_occur.append(len(html))
+
+                temp_text = []
+                for k in range(0, num+1, 1):
+                    temp_text.append(html[last_occur[k]:last_occur[k+1]])
+
+                for k in range(1, num+1, 1):
+                    span_plus = temp_text[k].find("<span>")
+                    if span_plus == -1:
+                        span_plus = len(temp_text[k]) - 1
+                    span_minus = (temp_text[k])[0:span_plus].rfind("</span>")
+                    last_occur[k] = last_occur[k]+span_minus+7
+
+                product_text = []
+                for k in range(0, num+1, 1):
+                    product_text.append(html[last_occur[k]:last_occur[k+1]])
+
+                html = ""
                 seed_str = str(self.seed)
                 if self.rand_data.has_key(seed_str):
                     indexes = self.rand_data.get(seed_str)
@@ -583,8 +609,8 @@ class CapaModule(CapaFields, XModule):
                 indexes_array = indexes.split(";")
                 for elem in indexes_array:
                     elem_integer = int(elem,10)
-                    html += "\n" + "<p>" + pr_text[elem_integer]
-                html += "</problem>"
+                    html += product_text[elem_integer]
+                    print product_text[elem_integer]
         # If we cannot construct the problem HTML,
         # then generate an error message instead.
         except Exception as err:

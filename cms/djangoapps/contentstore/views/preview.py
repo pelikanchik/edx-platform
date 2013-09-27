@@ -80,10 +80,10 @@ def preview_component(request, location):
     mod_class = component.__class__.__name__
 
     current_module_class = 'other'
-    if mod_class == "CapaDescriptor":
-      current_module_class = 'problem'
-    if mod_class == "VideoDescriptor":
-      current_module_class = 'video'
+    if "CapaDescriptor" in mod_class:
+        current_module_class = 'problem'
+    if "VideoDescriptor" in mod_class:
+        current_module_class = 'video'
 
     component.get_html = wrap_xmodule(
         component.get_html,
