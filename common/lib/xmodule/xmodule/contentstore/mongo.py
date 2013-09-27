@@ -122,7 +122,7 @@ class MongoContentStore(ContentStore):
             self.export(asset_location, output_directory)
             for attr, value in asset.iteritems():
                 if attr not in ['_id', 'md5', 'uploadDate', 'length', 'chunkSize']:
-                    policy.setdefault(asset_location.url(), {})[attr] = value
+                    policy.setdefault(asset_location.name, {})[attr] = value
 
         with open(assets_policy_file, 'w') as f:
             json.dump(policy, f)
@@ -194,6 +194,8 @@ class MongoContentStore(ContentStore):
 
         :param location:  a c4x asset location
         """
+        # raises exception if location is not fully specified
+        Location.ensure_fully_specified(location)
         for attr in attr_dict.iterkeys():
             if attr in ['_id', 'md5', 'uploadDate', 'length']:
                 raise AttributeError("{} is a protected attribute.".format(attr))

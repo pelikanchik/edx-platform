@@ -482,6 +482,7 @@ def get_score(course_id, user, problem_descriptor, module_creator, field_data_ca
            Can return None if user doesn't have access, or if something else went wrong.
     cache: A FieldDataCache
     """
+
     if not user.is_authenticated():
         return (None, None)
 
@@ -493,7 +494,10 @@ def get_score(course_id, user, problem_descriptor, module_creator, field_data_ca
             return (None, None)
         score = problem.get_score()
         if score is not None:
-            return (score['score'], score['total'])
+            total = score['total']
+            if problem.random_count is not None:
+                total = problem.random_count
+            return (score['score'], total)
         else:
             return (None, None)
 
@@ -514,6 +518,10 @@ def get_score(course_id, user, problem_descriptor, module_creator, field_data_ca
     if student_module is not None and student_module.max_grade is not None:
         correct = student_module.grade if student_module.grade is not None else 0
         total = student_module.max_grade
+        problem = module_creator(problem_descriptor)
+        if problem.random_count is not None:
+            total = problem.random_count
+
     else:
         # If the problem was not in the cache, or hasn't been graded yet,
         # we need to instantiate the problem.
@@ -524,7 +532,8 @@ def get_score(course_id, user, problem_descriptor, module_creator, field_data_ca
 
         correct = 0.0
         total = problem.max_score()
-
+        if problem.random_count is not None:
+            total = problem.random_count
         # Problem may be an error module (if something in the problem builder failed)
         # In which case total might be None
         if total is None:

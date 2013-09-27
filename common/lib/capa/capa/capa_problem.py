@@ -186,6 +186,8 @@ class LoncapaProblem(object):
         maxscore = 0
         for responder in self.responders.values():
             maxscore += responder.get_max_score()
+        if self.max_score_by_rand is not None:
+            maxscore = self.max_score_by_rand
         return maxscore
 
     def get_score(self):

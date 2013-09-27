@@ -531,6 +531,14 @@ MOCK_STAFF_GRADING = False
 ################################# Jasmine ###################################
 JASMINE_TEST_DIRECTORY = PROJECT_ROOT + '/static/coffee'
 
+################################# Waffle ###################################
+
+# Name prepended to cookies set by Waffle
+WAFFLE_COOKIE = "waffle_flag_%s"
+
+# Two weeks (in sec)
+WAFFLE_MAX_AGE = 1209600
+
 ################################# Middleware ###################################
 # List of finder classes that know how to find static files in
 # various locations.
@@ -578,6 +586,9 @@ MIDDLEWARE_CLASSES = (
 
     # catches any uncaught RateLimitExceptions and returns a 403 instead of a 500
     'ratelimitbackend.middleware.RateLimitMiddleware',
+    
+    # For A/B testing
+    'waffle.middleware.WaffleMiddleware',
 )
 
 ############################### Pipeline #######################################
@@ -839,6 +850,9 @@ INSTALLED_APPS = (
 
     # Foldit integration
     'foldit',
+
+    # For A/B testing
+    'waffle',
 
     # For testing
     'django.contrib.admin',  # only used in DEBUG mode
