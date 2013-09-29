@@ -5,9 +5,6 @@ import waffle
 
 <h2>${chapter_module.display_name_with_default}</h2>
 
-<<<<<<< HEAD
-<p>В последнее время вы наиболее часто посещали раздел <a href="${prev_section_url}">${prev_section.display_name_with_default}</a>.  Если вы уже закончили с ним, выберите следующий пункт в меню слева.</p>
-=======
 <p>${_("You were most recently in {section_link}.  If you\'re done with that, choose another section on the left.").format(
 	    section_link=u'<a href="{url}">{section_name}</a>'.format(
 	        url=prev_section_url,
@@ -42,4 +39,3 @@ import waffle
     </div>
   </section>
 % endif
->>>>>>> 08cb4694090ccb829722463728e86aa9bec54f3f
