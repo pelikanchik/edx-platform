@@ -10,16 +10,16 @@
     <div class="main-article">
       {% if revision %}
         <div class="alert alert-info">
-          <strong>{% trans "Предварительный просмотр" %}:</strong>
+          <strong>{% trans "Previewing revision" %}:</strong>
           {% include "wiki/includes/revision_info.html" %}
         </div>
       {% endif %}
 
       {% if merge %}
         <div class="alert alert-info">
-          <strong>{% trans "Просмотр перед слиянием" %}:</strong>
+          <strong>{% trans "Previewing merge between" %}:</strong>
           {% include "wiki/includes/revision_info.html" with revision=merge1 %}
-          <strong>{% trans "и" %}</strong>
+          <strong>{% trans "and" %}</strong>
           {% include "wiki/includes/revision_info.html" with revision=merge2 %}
         </div>
       {% endif %}
@@ -28,10 +28,8 @@
 
       {% if revision and revision.deleted %}
         <div class="warning">
-
-          <strong>Эта ветка была удалена.</strong>
-          <p>Восстановление к этому ответвлению приведет к пометке статьи как удаленной</p>
-
+          <strong>{% trans "This revision has been deleted." %}</strong> 
+          <p>{% trans "Restoring to this revision will mark the article as deleted." %}</p>
         </div>
       {% else %}
         {% wiki_render article content %}

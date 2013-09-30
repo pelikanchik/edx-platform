@@ -187,7 +187,7 @@ class @Problem
           if e.name == "Waitfor Exception"
             alert e.message
           else
-            alert "Невозможно сохранить ваш ответ. Отправка прервана."
+            alert "Could not grade your answer. The submission was aborted."
           throw e
 
 
@@ -213,7 +213,7 @@ class @Problem
       return
 
     if not window.FormData
-      alert "Отправка прервана! Ваш браузер, к сожалению, не поддерживает загрузку файлов. Используйте, пожалуйста, Chrome, Яндекс.Браузер или FireFox."
+      alert "Submission aborted! Sorry, your browser does not support file uploads. If you can, please use Chrome or Safari which have been verified to support file uploads."
       return
 
     fd = new FormData()
@@ -284,9 +284,9 @@ class @Problem
     Logger.log 'problem_check', @answers
 
     if( responsesBeingProcessedCount == 0)
-      $('.check-all').html('Подождите...').addClass('check-all-disabled')
+      $('.check-all').html('Wait...').addClass('check-all-disabled')
 
-    $("#" + @element_id + " .check").val('Подождите...').prop('disabled', true);
+    $("#" + @element_id + " .check").val('Wait...').prop('disabled', true);
     responsesBeingProcessedCount++;
 
 
@@ -304,10 +304,10 @@ class @Problem
             @el.removeClass 'showed'
         else
           @gentle_alert response.success
-      $("#" + @element_id + " .check").val('Ответить').prop('disabled', false)
+      $("#" + @element_id + " .check").val('Check').prop('disabled', false)
       responsesBeingProcessedCount--
       if( responsesBeingProcessedCount == 0)
-        $('.check-all').html('Ответить').removeClass('check-all-disabled');
+        $('.check-all').html('Check all').removeClass('check-all-disabled');
 
       Logger.log 'problem_graded', [@answers, response.contents], @url
 
@@ -348,14 +348,14 @@ class @Problem
           @el.find('.problem > div').each (index, element) =>
             MathJax.Hub.Queue ["Typeset", MathJax.Hub, element]
 
-        @$('.show-label').text 'Скрыть ответ(ы)'
+        @$('.show-label').text 'Hide Answer(s)'
         @el.addClass 'showed'
         @updateProgress response
     else
       @$('[id^=answer_], [id^=solution_]').text ''
       @$('[correct_answer]').attr correct_answer: null
       @el.removeClass 'showed'
-      @$('.show-label').text 'Показать ответ(ы)'
+      @$('.show-label').text 'Show Answer(s)'
 
       @el.find(".capa_inputtype").each (index, inputtype) =>
         display = @inputtypeDisplays[$(inputtype).attr('id')]

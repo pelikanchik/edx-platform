@@ -92,12 +92,11 @@ def instructor_dashboard(request, course_id):
 
     # assemble some course statistics for output to instructor
     def get_course_stats_table():
-        datatable = {'header': [u'Параметр', u'Значение'],
-                     'title': u'Статистика курса. Краткий обзор',
+        datatable = {'header': ['Statistic', 'Value'],
+                     'title': 'Course Statistics At A Glance',
                      }
-
-        data = [[u'# Приглашено', CourseEnrollment.objects.filter(course_id=course_id, is_active=1).count()]]
-        data += [[u'Время', timezone.now().isoformat()]]
+        data = [['# Enrolled', CourseEnrollment.objects.filter(course_id=course_id, is_active=1).count()]]
+        data += [['Date', timezone.now().isoformat()]]
 
 
         data += compute_course_stats(course).items()
@@ -224,40 +223,40 @@ def instructor_dashboard(request, course_id):
             except Exception as err:
                 msg += '<br/><p>Error: {0}</p>'.format(escape(err))
 
-    if action == u'Список приглашенных учеников' or action == 'List enrolled students':
+    if action == 'Dump list of enrolled students' or action == 'List enrolled students':
         log.debug(action)
         datatable = get_student_grade_summary_data(request, course, course_id, get_grades=False, use_offline=use_offline)
         datatable['title'] = 'List of students enrolled in {0}'.format(course_id)
         track.views.server_track(request, "list-students", {}, page="idashboard")
 
-    elif u'Данные успеваемости' in action:
+    elif 'Dump Grades' in action:
         log.debug(action)
         datatable = get_student_grade_summary_data(request, course, course_id, get_grades=True, use_offline=use_offline)
         datatable['title'] = 'Summary Grades of students enrolled in {0}'.format(course_id)
         track.views.server_track(request, "dump-grades", {}, page="idashboard")
 
-    elif u'Сырые данные об успеваемости учеников курса' in action:
+    elif 'Dump all RAW grades' in action:
         log.debug(action)
         datatable = get_student_grade_summary_data(request, course, course_id, get_grades=True,
                                                    get_raw_scores=True, use_offline=use_offline)
         datatable['title'] = 'Raw Grades of students enrolled in {0}'.format(course_id)
         track.views.server_track(request, "dump-grades-raw", {}, page="idashboard")
 
-    elif u'Скачать CSV успеваемости' in action:
+    elif 'Download CSV of all student grades' in action:
         track.views.server_track(request, "dump-grades-csv", {}, page="idashboard")
         return return_csv('grades_{0}.csv'.format(course_id),
                           get_student_grade_summary_data(request, course, course_id, use_offline=use_offline))
 
-    elif u'Скачать CSV с сырыми данными об успеваемости' in action:
+    elif 'Download CSV of all RAW grades' in action:
         track.views.server_track(request, "dump-grades-csv-raw", {}, page="idashboard")
         return return_csv('grades_{0}_raw.csv'.format(course_id),
                           get_student_grade_summary_data(request, course, course_id, get_raw_scores=True, use_offline=use_offline))
 
-    elif u'Скачать CSV распределения ответов' in action:
+    elif 'Download CSV of answer distributions' in action:
         track.views.server_track(request, "dump-answer-dist-csv", {}, page="idashboard")
         return return_csv('answer_dist_{0}.csv'.format(course_id), get_answers_distribution(request, course_id))
 
-    elif u'Описание выставления оценок' in action:
+    elif 'Dump description of graded assignments configuration' in action:
         # what is "graded assignments configuration"?
         track.views.server_track(request, "dump-graded-assignments-config", {}, page="idashboard")
         msg += dump_grading_context(course)
@@ -534,7 +533,7 @@ def instructor_dashboard(request, course_id):
     #----------------------------------------
     # DataDump
 
-    elif u'Скачать CSV с данными пользователей' in action:
+    elif 'Download CSV of all student profile data' in action:
         enrolled_students = User.objects.filter(
             courseenrollment__course_id=course_id,
             courseenrollment__is_active=1,
@@ -551,7 +550,7 @@ def instructor_dashboard(request, course_id):
         datatable['title'] = 'Student profile data for course %s' % course_id
         return return_csv('profiledata_%s.csv' % course_id, datatable)
 
-    elif u'Скачать CSV всех попыток по заданию' in action:
+    elif 'Download CSV of all responses to problem' in action:
         problem_to_dump = request.POST.get('problem_to_dump', '')
 
         if problem_to_dump[-4:] == ".xml":
@@ -574,7 +573,7 @@ def instructor_dashboard(request, course_id):
             datatable['title'] = 'Student state for problem %s' % problem_to_dump
             return return_csv('student_state_from_%s.csv' % problem_to_dump, datatable)
 
-    elif u'Данные всех попыток по заданию' in action:
+    elif 'Dump of all responses to problem' in action:
         log.debug(action)
         problem_to_dump = request.POST.get('problem_to_dump', '')
 
@@ -593,7 +592,7 @@ def instructor_dashboard(request, course_id):
             smdat = []
 
         if smdat:
-            datatable = {'header': ['ID', 'Пользователь', 'Полное имя', 'edX email',
+            datatable = {'header': ['ID', 'Пользователь', 'Полное имя', 'E-mail',
                                     'Попытки', 'Seed', 'Ответы студента']}
             datatable['data'] = []
             for i in smdat:
@@ -618,7 +617,7 @@ def instructor_dashboard(request, course_id):
                 datatable['data'].append(datarow)
             datatable['title'] = 'Student state for problem %s' % problem_to_dump
 
-    elif u'Данные по разделу' in action:
+    elif "Dump of section results" in action:
         log.debug(action)
         section_to_dump = request.POST.get('section_to_dump', '')
         (org, course_name, _) = course_id.split("/")

@@ -5,7 +5,7 @@
 <%block name="title">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<title>Учебники</title>
+<title>${_('{course_number} Textbook').format(course_number=course.display_number_with_default) | h}</title>
 </%block>
 
 <%block name="headextra">
@@ -52,7 +52,7 @@ $(document).ready(function() {
       <div id="toolbarContainer">
         <div id="toolbarViewer">
           <div id="toolbarViewerLeft">
-            <label id="pageNumberLabel" class="toolbarLabel" for="pageNumber">Страница: </label>
+            <label id="pageNumberLabel" class="toolbarLabel" for="pageNumber">${_('Page:')} </label>
             <input type="number" id="pageNumber" class="toolbarField pageNumber" value="1" size="4" min="1" tabindex="7">
           </input>
           <span id="numPages" class="toolbarLabel"></span>
@@ -61,16 +61,16 @@ $(document).ready(function() {
         <div class="outerCenter">
           <div class="innerCenter" id="toolbarViewerMiddle">
             <div class="splitToolbarButton">
-              <button class="toolbarButton zoomOut" id="zoom_out" title="Уменьшить" tabindex="8">
-                <span>Уменьшить</span>
+              <button class="toolbarButton zoomOut" id="zoom_out" title="${_('Zoom Out')}" tabindex="8">
+                <span>${_('Zoom Out')}</span>
               </button>
               <div class="splitToolbarButtonSeparator"></div>
-              <button class="toolbarButton zoomIn" id="zoom_in" title="Увеличить" tabindex="9">
-                <span>Увеличить</span>
+              <button class="toolbarButton zoomIn" id="zoom_in" title="${_('Zoom In')}" tabindex="9">
+                <span>${_('Zoom In')}</span>
               </button>
             </div>
             <span id="scaleSelectContainer" class="dropdownToolbarButton">
-             <select id="scaleSelect" title="Масштаб" oncontextmenu="return false;" tabindex="10">
+             <select id="scaleSelect" title="${_('Zoom')}" oncontextmenu="return false;" tabindex="10">
 <!--
                     <option id="pageAutoOption" value="auto" selected="selected">${_('Automatic Zoom')}</option>
                     <option id="pageActualOption" value="page-actual">${_('Actual Size')}</option>
@@ -117,10 +117,10 @@ $(document).ready(function() {
             <nav>
               <ul>
                 <li class="last">
-                  <a id="previous">Предыдущая страница</a>
+                  <a id="previous">${_('Previous page')}</a>
                 </li>
                 <li class="next">
-                  <a id="next">Следующая страница</a>
+                  <a id="next">${_('Next page')}</a>
                 </li>
               </ul>
             </nav>

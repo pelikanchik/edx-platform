@@ -1,9 +1,9 @@
 <%namespace file="../main.html" import="stanford_theme_enabled" />
 ## TODO: fix ugly hack
 % if stanford_theme_enabled():
-  ${settings.PLATFORM_NAME} приветствует вас! Для входа, перейдите по ссылке:
+  ${settings.PLATFORM_NAME} Courses has launched! To log in, visit:
 % else:
-  ${settings.PLATFORM_NAME} приветствует вас! Для входа, перейдите по ссылке:
+  ${settings.PLATFORM_NAME} has launched! To log in, visit:
 % endif
 
 % if is_secure:
@@ -12,20 +12,21 @@
  http://${settings.SITE_NAME}
 % endif
 
-Кнопка входа расположена в правом верхнем углу страницы.
+A login button will be at the top right-hand corner of the window.
 
-Пожалуйста, убедитесь что вы используете последнюю версию Google Chrome или
-Firefox. Если вы забыли пароль, его можно сбросить.
+Please make sure you're using the latest version of Google Chrome or
+Firefox. If you've forgotten your password, the log-in form has a
+place to reset it.
 
-Спасибо, что присоединились к нам!
+Thanks for joining us for the ride!
 
 ## TODO: fix ugly hack
 % if stanford_theme_enabled():
-  Команда ${settings.PLATFORM_NAME}
+  The ${settings.PLATFORM_NAME} Courses team
 % else:
-  Команда ${settings.PLATFORM_NAME}
+  The ${settings.PLATFORM_NAME} team
 % endif
 
-(Пожалуйста, учтите, что этот адрес электронной почты не принимает письма. --
-Если вам нужна помощь, вы можете связаться с нами по адресу, указанному в разделе
-контакты на сайте.)
+(Please note that this e-mail address does not receive e-mails --
+if you need assistance, please use the help section of the web
+site)

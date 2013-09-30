@@ -1,1 +1,1 @@
-Запрос на изменение ${settings.PLATFORM_NAME} адреса электронной почты для аккаунта
+Request to change ${settings.PLATFORM_NAME} account e-mail

@@ -1,6 +1,6 @@
-Уважаемый ученик,
+Dear Student,
 
-Вы были отписаны от курса ${course_id} одним из членов персонала курса. Не обращайте внимания на ранее отправленные приглашения.
+You have been un-enrolled from course ${course_id} by a member of the course staff. Please disregard the invitation previously sent.
 
 ----
-Письмо отпралено автоматически  ${site_name} для ${first_name} ${last_name}
+This email was automatically sent from ${site_name} to ${email_address}

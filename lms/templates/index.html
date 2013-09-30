@@ -6,23 +6,23 @@
 <%namespace name='static' file='static_content.html'/>
 
 <section class="home">
-  <header>
+ <header>
     <div class="outer-wrapper">
       <div class="title">
         <hgroup>
-
-            <h1>Будущее онлайн-обучения</h1>
-
-            <h2>Для каждого, где угодно, в любое время</h2>
+          % if self.stanford_theme_enabled():
+            <h1>${_("Free courses from <strong>{university_name}</strong>").format(university_name="Stanford")}</h1>
+          % else:
+            <h1>${_("The Future of Online Education")}</h1>
+          % endif
+          <h2>${_("For anyone, anywhere, anytime")}</h2>
         </hgroup>
 
         ## Disable social buttons for non-edX sites
         % if not self.theme_enabled():
           <section class="actions">
             <div class="main-cta">
-
-              <a href="#signup-modal" id="signup_action" class="find-courses" rel="leanModal">Регистрация</a>
-
+              <a href="#signup-modal" id="signup_action" class="find-courses" rel="leanModal">${_("Sign Up")}</a>
             </div>
 
             <div class="secondary-actions">
@@ -43,13 +43,20 @@
         % endif
       </div>
 
+##        <a href="#video-modal" class="media" rel="leanModal">
+##          <div class="hero">
+##            <div class="play-intro"></div>
+##          </div>
+##        </a>
+
     </div>
   </header>
 
+
   <section class="container">
     <section class="highlighted-courses">
-      <h2>Наши курсы:</h2>
-      <section class="courses">
+      <h2>${_('Explore free courses from {span_start}{platform_name}{span_end} universities').format(platform_name="edX", span_start='<span class="edx">', span_end='</span>')}</h2>
+       <section class="courses">
           <ul class="courses-listing">
           %for course in courses:
             <li class="courses-listing-item">

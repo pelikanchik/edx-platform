@@ -1,1 +1,1 @@
-Вы отписались от ${course_id}
+You have been un-enrolled from ${course_id}

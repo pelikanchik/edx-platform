@@ -1,1 +1,1 @@
-Вы были приглашены для регистрации на курс ${course_id}
+You have been invited to register for ${course_id}

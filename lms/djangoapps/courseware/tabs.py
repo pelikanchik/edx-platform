@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Tabs configuration.  By the time the tab is being rendered, it's just a name,
 link, and css class (CourseTab tuple).  Tabs are specified in course policy.
@@ -59,25 +58,25 @@ TabImpl = namedtuple('TabImpl', 'validator generator')
 
 def _courseware(tab, user, course, active_page):
     link = reverse('courseware', args=[course.id])
-    return [CourseTab(u'Содержание', link, active_page == "courseware")]
+    return [CourseTab('Courseware', link, active_page == "courseware")]
 
 
 def _course_info(tab, user, course, active_page):
     link = reverse('info', args=[course.id])
-    return [CourseTab(u'Информация', link, active_page == "info")]
+    return [CourseTab(tab['name'], link, active_page == "info")]
 
 
 def _progress(tab, user, course, active_page):
     if user.is_authenticated():
         link = reverse('progress', args=[course.id])
-        return [CourseTab(u'Оценки', link, active_page == "progress")]
+        return [CourseTab(tab['name'], link, active_page == "progress")]
     return []
 
 
 def _wiki(tab, user, course, active_page):
     if settings.WIKI_ENABLED:
         link = reverse('course_wiki', args=[course.id])
-        return [CourseTab(u'Вики', link, active_page == 'wiki')]
+        return [CourseTab(tab['name'], link, active_page == 'wiki')]
     return []
 
 
@@ -88,7 +87,7 @@ def _discussion(tab, user, course, active_page):
     if settings.MITX_FEATURES.get('ENABLE_DISCUSSION_SERVICE'):
         link = reverse('django_comment_client.forum.views.forum_form_discussion',
                               args=[course.id])
-        return [CourseTab(u'Форум', link, active_page == 'discussion')]
+        return [CourseTab(tab['name'], link, active_page == 'discussion')]
     return []
 
 
@@ -96,7 +95,7 @@ def _external_discussion(tab, user, course, active_page):
     """
     This returns a tab that links to an external discussion service
     """
-    return [CourseTab(u'Форум', tab['link'], active_page == 'discussion')]
+    return [CourseTab('Discussion', tab['link'], active_page == 'discussion')]
 
 
 def _external_link(tab, user, course, active_page):
@@ -116,7 +115,7 @@ def _textbooks(tab, user, course, active_page):
     """
     if user.is_authenticated() and settings.MITX_FEATURES.get('ENABLE_TEXTBOOK'):
         # since there can be more than one textbook, active_page is e.g. "book/0".
-        return [CourseTab(u"Учебники", reverse('book', args=[course.id, index]),
+        return [CourseTab(textbook.title, reverse('book', args=[course.id, index]),
                           active_page == "textbook/{0}".format(index))
                 for index, textbook in enumerate(course.textbooks)]
     return []
@@ -127,7 +126,7 @@ def _pdf_textbooks(tab, user, course, active_page):
     """
     if user.is_authenticated():
         # since there can be more than one textbook, active_page is e.g. "book/0".
-        return [CourseTab(u"Учебники", reverse('pdf_book', args=[course.id, index]),
+        return [CourseTab(textbook['tab_title'], reverse('pdf_book', args=[course.id, index]),
                           active_page == "pdftextbook/{0}".format(index))
                 for index, textbook in enumerate(course.pdf_textbooks)]
     return []
@@ -138,7 +137,7 @@ def _html_textbooks(tab, user, course, active_page):
     """
     if user.is_authenticated():
         # since there can be more than one textbook, active_page is e.g. "book/0".
-        return [CourseTab(u"Учебники", reverse('html_book', args=[course.id, index]),
+        return [CourseTab(textbook['tab_title'], reverse('html_book', args=[course.id, index]),
                           active_page == "htmltextbook/{0}".format(index))
                 for index, textbook in enumerate(course.html_textbooks)]
     return []
@@ -303,7 +302,7 @@ def get_course_tabs(user, course, active_page):
 
     # Instructor tab is special--automatically added if user is staff for the course
     if has_access(user, course, 'staff'):
-        tabs.append(CourseTab(u'Администрирование',
+        tabs.append(CourseTab('Instructor',
                               reverse('instructor_dashboard', args=[course.id]),
                               active_page == 'instructor'))
 

@@ -39,7 +39,7 @@
 <div class="discussion-${discussion_type | h}-paginator discussion-paginator local">
   <div class="prev-page">
     % if page > 1:
-      ${link_to_page(page - 1, u"&lt; Предыдущая страница")}
+      ${link_to_page(page - 1, "&lt; Previous page")}
     % endif
   </div>
 
@@ -56,7 +56,7 @@
   % endif
   <div class="next-page">
     % if page < num_pages:
-      ${link_to_page(page + 1, u"Следующая страница &gt;")}
+      ${link_to_page(page + 1, "Next page &gt;")}
     % endif
   </div>
 </div>

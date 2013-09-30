@@ -9,7 +9,11 @@
 <%inherit file="../main.html" />
 
 <%block name="headextra">
-
+  % if self.theme_enabled():
+    <%include file="../theme-google-analytics.html" />
+  % else:
+    <%include file="../google_analytics.html" />
+  % endif
 </%block>
 
 <%block name="js_extra">
@@ -29,11 +33,12 @@
       } else if (xhr.status == 403) {
         location.href = "${reverse('course-specific-register', args=[course.id])}?course_id=${course.id}&enrollment_action=enroll";
       } else if (xhr.status == 400) { //This means the user did not have permission
-        $('#register_error').html('Этот курс доступен только по приглашениям. Увы, вам курс недоступен.<br />'
+        $('#register_error').html('This course has restricted enrollment.  Sorry, you do not have permission to enroll.<br />' +
+                                  'You may need to log out and re-login with a university account, such as WebAuth'
         ).css("display", "block");
       } else {
         $('#register_error').html(
-            (xhr.responseText ? xhr.responseText : 'Произошла ошибка, попробуйте ещё раз.')
+            (xhr.responseText ? xhr.responseText : 'An error occurred. Please try again later.')
         ).css("display", "block");
       }
     });
@@ -47,7 +52,7 @@
         location.href = "${reverse('register_user')}?course_id=${course.id}&enrollment_action=enroll";
       } else {
         $('#register_error').html(
-            (xhr.responseText ? xhr.responseText : 'Произошла ошибка, попробуйте ещё раз.')
+            (xhr.responseText ? xhr.responseText : 'An error occurred. Please try again later.')
         ).css("display", "block");
       }
     });
@@ -60,7 +65,7 @@
   <script src="${static.url('js/course_info.js')}"></script>
 </%block>
 
-<%block name="title"><title>О курсе: ${course.number}</title></%block>
+<%block name="title"><title>${_("About {course.display_number_with_default}").format(course=course) | h}</title></%block>
 
 <section class="course-info">
   <header class="course-profile">
@@ -82,14 +87,15 @@
                     <a href="${course_target}">
                 %endif
 
-                <span class="register disabled">Вы уже зарегистрированы на этот курс</span>
+                <span class="register disabled">${_("You are registered for this course {course.display_number_with_default}").format(course=course) | h}</span>
                 %if show_courseware_link:
-                    <strong>Содержание</strong>
+                    <strong>${_("View Courseware")}</strong>
                     </a>
                 %endif
 
         %else:
-            <a href="#" class="register">Зарегистрироваться</a>
+            <a href="#" class="register">${_("Register for {course.display_number_with_default}").format(course=course) | h}</a>
+
             <div id="register_error"></div>
         %endif
         </div>
@@ -116,13 +122,12 @@
   <section class="container">
     <section class="details">
       <nav>
-
-      <a href="#" class="active">О курсе</a>
-      ##  <a href="#">FAQ</a>
-      ##  <a href="#">Requirements</a>
-      ##  <a href="#">Text-book</a>
-      ## <a href="#">Syllabus</a>
-      ##  <a href="#">Reviews</a>
+        <a href="#" class="active">${_("Overview")}</a>
+      ##  <a href="#">${_("FAQ")}</a>
+      ##  <a href="#">${_("Requirements")}</a>
+      ##  <a href="#">${_("Text-book")}</a>
+      ##  <a href="#">${_("Syllabus")}</a>
+      ##  <a href="#">${_("Reviews")}</a>
       </nav>
 
       <div class="inner-wrapper">
@@ -132,45 +137,42 @@
 
     <section class="course-sidebar">
       <section class="course-summary">
-        ##<header>
-        ##  <div class="social-sharing">
-
-           ## <div class="sharing-message">Поделиться с друзьями!</div>
-            ## TODO: this should probably be an overrideable block,
-            ##       or something allowing themes to do whatever they
-            ##       want here (and on this whole page, really).
-          ##  % if self.stanford_theme_enabled():
-           ##   <a href="http://twitter.com/intent/tweet?text=I+just+registered+for+${course.number}+${get_course_about_section(course, 'title')}!+(http://class.stanford.edu)" class="share">
-           ##     <img src="${static.url('images/social/twitter-sharing.png')}">
-           ##   </a>
-           ##   <a href="mailto:?subject=Take%20a%20course%20at%20Stanford%20online!&body=I%20just%20registered%20for%20${course.number}%20${get_course_about_section(course, 'title')}+(http://class.stanford.edu)" class="share">
-           ##     <img src="${static.url('images/social/email-sharing.png')}">
-           ##   </a>
-           ## % else:
-           ##   <a href="http://twitter.com/intent/tweet?text=I+just+registered+for+${course.number}+${get_course_about_section(course, 'title')}+through+@edxonline:+http://www.edx.org${reverse('about_course', args=[course.id])}" class="share">
-           ##     <img src="${static.url('images/social/twitter-sharing.png')}">
-           ##   </a>
-            ##  <a href="http://www.facebook.com/EdxOnline" class="share"> <img src="${static.url('images/social/facebook-sharing.png')}">
-             ## </a>
-            ##  <a href="mailto:?subject=Take%20a%20course%20with%20edX%20online&body=I%20just%20registered%20for%20${course.number}%20${get_course_about_section(course, 'title')}%20through%20edX:+http://edx.org/${reverse('about_course', args=[course.id])}" class="share">
-            ##    <img src="${static.url('images/social/email-sharing.png')}">
-            ##  </a>
-            ## % endif
-         ## </div>
-       ## </header>
+ ##       <header>
+ ##         <div class="social-sharing">
+ ##           <div class="sharing-message">${_("Share with friends and family!")}</div>
+ ##           ## TODO: this should probably be an overrideable block,
+ ##           ##       or something allowing themes to do whatever they
+ ##           ##       want here (and on this whole page, really).
+ ##           % if self.stanford_theme_enabled():
+ ##             <a href="http://twitter.com/intent/tweet?text=I+just+registered+for+${course.number}+${get_course_about_section(course, 'title')}!+(http://class.stanford.edu)" class="share">
+ ##               <img src="${static.url('images/social/twitter-sharing.png')}">
+ ##             </a>
+ ##             <a href="mailto:?subject=Take%20a%20course%20at%20Stanford%20online!&body=I%20just%20registered%20for%20${course.number}%20${get_course_about_section(course, 'title')}+(http://class.stanford.edu)" class="share">
+ ##               <img src="${static.url('images/social/email-sharing.png')}">
+ ##             </a>
+##            % else:
+##              <a href="http://twitter.com/intent/tweet?text=I+just+registered+for+${course.number}+${get_course_about_section(course, 'title')}+through+@edxonline:+http://www.edx.org${reverse('about_course', args=[course.id])}" class="share">
+##                <img src="${static.url('images/social/twitter-sharing.png')}">
+##              </a>
+##              <a href="http://www.facebook.com/EdxOnline" class="share"> <img src="${static.url('images/social/facebook-sharing.png')}">
+##              </a>
+##              <a href="mailto:?subject=Take%20a%20course%20with%20edX%20online&body=I%20just%20registered%20for%20${course.number}%20${get_course_about_section(course, 'title')}%20through%20edX:+http://edx.org/${reverse('about_course', args=[course.id])}" class="share">
+##                <img src="${static.url('images/social/email-sharing.png')}">
+##              </a>
+##            % endif
+##          </div>
+##        </header>
 
         <ol class="important-dates">
-
-          <li><div class="icon course-number"></div><p>Номер курса</p><span class="course-number">${course.number}</span></li>
-          <li><div class="icon start"></div><p>Начало занятий</p><span class="start-date">${course.start_date_text}</span></li>
+          <li><div class="icon course-number"></div><p>${_("Course Number")}</p><span class="course-number">${course.display_number_with_default | h}</span></li>
+          <li><div class="icon start"></div><p>${_("Classes Start")}</p><span class="start-date">${course.start_date_text}</span></li>
 
             ## We plan to ditch end_date (which is not stored in course metadata),
             ## but for backwards compatibility, show about/end_date blob if it exists.
             % if get_course_about_section(course, "end_date") or course.end:
             <li>
                 <div class="icon end"></div>
-
-                <p>Окончание занятий</p><span class="final-date">
+                <p>${_("Classes End")}</p><span class="final-date">
                 % if get_course_about_section(course, "end_date"):
                     ${get_course_about_section(course, "end_date")}
                 % else:
@@ -181,15 +183,13 @@
             % endif
 
           % if get_course_about_section(course, "effort"):
-
-            <li><div class="icon effort"></div><p>Цель курса</p><span class="start-date">${get_course_about_section(course, "effort")}</span></li>
+            <li><div class="icon effort"></div><p>${_("Estimated Effort")}</p><span class="start-date">${get_course_about_section(course, "effort")}</span></li>
           % endif
 
           ##<li><div class="icon length"></div><p>${_('Course Length')}</p><span class="course-length">${_('{number} weeks').format(number=15)}</span></li>
 
           % if get_course_about_section(course, "prerequisites"):
-
-            <li class="prerequisites"><div class="icon prereq"></div><p>Необходимые условия</p><span class="start-date">${get_course_about_section(course, "prerequisites")}</span></li>
+            <li class="prerequisites"><div class="icon prereq"></div><p>${_("Prerequisites")}</p><span class="start-date">${get_course_about_section(course, "prerequisites")}</span></li>
           % endif
         </ol>
       </section>

@@ -1,7 +1,8 @@
 <%namespace file="../main.html" import="stanford_theme_enabled" />
 
-Благодарим вас за регистрацию в ${settings.PLATFORM_NAME}! Для активации аккаунта, пожалуйста,
-скопируйте ссылку в адресную строку браузера и перейдите по ней:
+Thank you for signing up for ${settings.PLATFORM_NAME}! To activate
+your account, please copy and paste this address into your web
+browser's address bar:
 
 % if is_secure:
   https://${ site }/activate/${ key }
@@ -11,13 +12,13 @@
 
 ## Temporary hack until we develop a better way to adjust language
 % if stanford_theme_enabled():
-  Если это письмо попало к вам случайно, ничего не предпринимайте; мы вам
-  больше ничего не пришлём. Пожалуйста, не отвечайте на это письмо;
-  если вам требуется помощь, посетите страницу описания на сайте
-  ${settings.PLATFORM_NAME}.
+  If you didn't request this, you don't need to do anything; you won't
+  receive any more email from us. Please do not reply to this e-mail;
+  if you require assistance, check the about section of the
+  ${settings.PLATFORM_NAME} Courses web site.
 % else:
-  Если это письмо попало к вам случайно, ничего не предпринимайте; мы вам
-  больше ничего не пришлём. Пожалуйста, не отвечайте на это письмо;
-  если вам требуется помощь, посетите страницу описания на сайте
-  ${settings.PLATFORM_NAME}.
+  If you didn't request this, you don't need to do anything; you won't
+  receive any more email from us. Please do not reply to this e-mail;
+  if you require assistance, check the help section of the
+  ${settings.PLATFORM_NAME} web site.
 % endif

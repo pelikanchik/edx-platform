@@ -1,1 +1,1 @@
-${settings.PLATFORM_NAME}: активация аккаунта
+Your account for ${settings.PLATFORM_NAME}

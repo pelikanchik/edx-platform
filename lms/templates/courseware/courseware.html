@@ -2,8 +2,7 @@
 <%inherit file="/main.html" />
 <%namespace name='static' file='/static_content.html'/>
 <%block name="bodyclass">courseware ${course.css_class}</%block>
-
-<%block name="title"><title>${course.display_name_with_default} | Содержание</title></%block>
+<%block name="title"><title>${_("{course_number} Courseware").format(course_number=course.display_number_with_default) | h}</title></%block>
 
 <%block name="headextra">
   <%static:css group='course'/>
@@ -174,8 +173,7 @@
 % if accordion:
     <section aria-label="${_('Course Navigation')}" class="course-index">
       <header id="open_close_accordion">
-
-        <a href="#">закрыть</a>
+        <a href="#">${_("close")}</a>
       </header>
 
       <div id="accordion" style="display: none">

@@ -4,15 +4,16 @@
 ## TODO: this probably needs better formatting to look nice in an
 ##       email client (Mako leaves awkward whitespace)
 % if stanford_theme_enabled():
-  Подтверждаем, что адрес электронной почты, связанный с вашим аккаунтом
-  ${settings.PLATFORM_NAME} изменен с ${old_email} на ${new_email}. Если вы не делали
-  этот запрос, пожалуйста, немедленно свяжитесь с нами. Список контактов:
+  This is to confirm that you changed the e-mail associated with
+  ${settings.PLATFORM_NAME} from ${old_email} to ${new_email}. If you
+  did not make this request, please contact us at
 
   ${settings.CONTACT_EMAIL}
 % else:
-  Подтверждаем, что адрес электронной почты, связанный с вашим аккаунтом
-  ${settings.PLATFORM_NAME} изменен с ${old_email} на ${new_email}. Если вы не делали
-  этот запрос, пожалуйста, немедленно свяжитесь с нами. Список контактов:
+  This is to confirm that you changed the e-mail associated with
+  ${settings.PLATFORM_NAME} from ${old_email} to ${new_email}. If you
+  did not make this request, please contact us immediately. Contact
+  information is listed at:
 
   % if is_secure:
     https://${ site }${reverse('contact')}
@@ -21,5 +22,5 @@
   % endif
 % endif
 
-Мы храним старые сообщения, так что если запрос был случайным, мы
-можем это проверить.
+We keep a log of old e-mails, so if this request was unintentional, we
+can investigate.

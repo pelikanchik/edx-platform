@@ -75,7 +75,7 @@ class UserProfile(models.Model):
     this_year = datetime.now(UTC).year
     VALID_YEARS = range(this_year, this_year - 120, -1)
     year_of_birth = models.IntegerField(blank=True, null=True, db_index=True)
-    GENDER_CHOICES = (('m', u'М'), ('f', u'Ж'), ('o', u'Иное'))
+    GENDER_CHOICES = (('m', 'Male'), ('f', 'Female'), ('o', 'Other'))
     gender = models.CharField(
         blank=True, null=True, max_length=6, db_index=True, choices=GENDER_CHOICES
     )
@@ -85,15 +85,15 @@ class UserProfile(models.Model):
     # ('p_se', 'Doctorate in science or engineering'),
     # ('p_oth', 'Doctorate in another field'),
     LEVEL_OF_EDUCATION_CHOICES = (
-        ('p', u'Докторская степень'),
-        ('m', u"Магистр или специалист"),
-        ('b', u"Бакалавр"),
-        ('a', u"Среднее специальное"),
-        ('hs', u"Среднее образование"),
-        ('jhs', u"Неоконченное среднее образование"),
-        ('el', u"Начальная школа"),
-        ('none', u"Нет"),
-        ('other', u"Другое")
+        ('p', 'Doctorate'),
+        ('m', "Master's or professional degree"),
+        ('b', "Bachelor's degree"),
+        ('a', "Associate's degree"),
+        ('hs', "Secondary/high school"),
+        ('jhs', "Junior secondary/junior high/middle school"),
+        ('el', "Elementary/primary school"),
+        ('none', "None"),
+        ('other', "Other")
     )
     level_of_education = models.CharField(
         blank=True, null=True, max_length=6, db_index=True,
