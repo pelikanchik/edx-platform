@@ -61,7 +61,7 @@ class VideoFields(object):
         help="This is the Youtube ID reference for the normal speed video.",
         display_name="Youtube ID",
         scope=Scope.settings,
-        default="OEoXaMPEzfM"
+        default="liKA79MIC6k"
     )
     youtube_id_0_75 = String(
         help="The Youtube ID for the .75x speed video.",
