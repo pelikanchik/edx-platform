@@ -126,15 +126,15 @@ class CMS.Views.UnitEdit extends Backbone.View
   deleteComponent: (event) =>
     event.preventDefault()
     msg = new CMS.Views.Prompt.Warning(
-      title: gettext('Удалить компонент?'),
-      message: gettext('Удаление компонента нельзя будет отменить. Никогда. Вообще.'),
+      title: gettext('Delete this component?'),
+      message: gettext('Deleting this component is permanent and cannot be undone.'),
       actions:
         primary:
-          text: gettext('Да, удалить'),
+          text: gettext('Yes, delete this component'),
           click: (view) =>
             view.hide()
             deleting = new CMS.Views.Notification.Mini
-              title: gettext('Удаление...') + '&hellip;',
+              title: gettext('Deleting') + '&hellip;',
             deleting.show()
             $component = $(event.currentTarget).parents('.component')
             $.post('/delete_item', {
@@ -157,7 +157,7 @@ class CMS.Views.UnitEdit extends Backbone.View
               );`
             )
         secondary:
-          text: gettext('Отмена'),
+          text: gettext('Cancel'),
           click: (view) ->
             view.hide()
     )
@@ -285,7 +285,7 @@ class CMS.Views.UnitEdit.TermEdit extends Backbone.View
   saveTerm: =>
     # Saving a term
 
-    $('.save-term').val("сохраняется...")
+    $('.save-term').val("Saving...")
     $('.save-term').addClass("save-term-active")
 
     metadata = $.extend({}, @model.get('metadata'))
@@ -293,7 +293,7 @@ class CMS.Views.UnitEdit.TermEdit extends Backbone.View
     metadata.direct_term = $('.unit-direct-term-input').val()
     @model.save(metadata: metadata)
 
-    setTimeout('$(".save-term").val("Сохранить"); $(".save-term").removeClass("save-term-active");', 500)
+    setTimeout('$(".save-term").val("Save"); $(".save-term").removeClass("save-term-active");', 500)
     # Update term
     $('.unit-location .editing .unit-term').html(metadata.direct_term)
     analytics.track "Edited Unit Term",

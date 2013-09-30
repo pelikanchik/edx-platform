@@ -13,8 +13,8 @@ class_priority = ['video', 'problem']
 class VerticalFields(object):
     has_children = True
     direct_term = String(
-        display_name="Условие для перенаправления",
-        help="Условие для перенаправления в другой юнит",
+        display_name="Direct Term",
+        help="Term for jumping into another unit",
         scope=Scope.settings,
         default='[]'
     )

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from pkg_resources import resource_string
 
 from xmodule.x_module import XModule
@@ -11,26 +10,26 @@ from uuid import uuid4
 class DiscussionFields(object):
     discussion_id = String(scope=Scope.settings, default="$$GUID$$")
     display_name = String(
-        display_name=u"Отображаемое имя",
-        help=u"Это имя появляется в горизонтальной навигации наверху страницы.",
-        default=u"Обсуждение",
+        display_name="Display Name",
+        help="Display name for this module",
+        default="Discussion",
         scope=Scope.settings
     )
     data = String(
-        help=u"XML-данные",
+        help="XML data for the problem",
         scope=Scope.content,
         default="<discussion></discussion>"
     )
     discussion_category = String(
-        display_name=u"Категория",
+        display_name="Category",
         default="Week 1",
-        help=u"Название категории",
+        help="A category name for the discussion. This name appears in the left pane of the discussion forum for the course.",
         scope=Scope.settings
     )
     discussion_target = String(
-        display_name=u"Подкатегория",
-        default=u"Topic-Level Student-Visible Label",
-        help=u"Название подкатегории",
+        display_name="Subcategory",
+        default="Topic-Level Student-Visible Label",
+        help="A subcategory name for the discussion. This name appears in the left pane of the discussion forum for the course.",
         scope=Scope.settings
     )
     sort_key = String(scope=Scope.settings)

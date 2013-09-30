@@ -106,7 +106,7 @@ class TestStaffMasqueradeAsStudent(ModuleStoreTestCase, LoginEnrollmentTestCase)
         resp = self.get_problem()
         html = json.loads(resp.content)['html']
         print html
-        sabut = u'<button class="show"><span class="show-label">Показать ответ(ы)</span> <span class="sr">(для вопросов выше - рядом с каждым полем)</span></button>'
+        sabut = u'<button class="show"><span class="show-label">Show Answer(s)</span> <span class="sr">(for question(s) above - adjacent to each field)</span></button>'
         self.assertTrue(sabut in html)
 
     def test_no_showanswer_for_student(self):
@@ -117,5 +117,5 @@ class TestStaffMasqueradeAsStudent(ModuleStoreTestCase, LoginEnrollmentTestCase)
         resp = self.get_problem()
         html = json.loads(resp.content)['html']
         print html
-        sabut = u'<button class="show"><span class="show-label">Показать ответ(ы)</span> <span class="sr">(для вопросов выше - рядом с каждым полем)</span></button>'
+        sabut = u'<button class="show"><span class="show-label">Show Answer(s)</span> <span class="sr">(for question(s) above - adjacent to each field)</span></button>'
         self.assertFalse(sabut in html)

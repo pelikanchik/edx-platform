@@ -448,7 +448,7 @@ def index(request, course_id, chapter=None, section=None,
            # context['content'] = section_module.runtime.render(section_module, None, 'student_view').content
 
             if not is_section_unlocked:
-                context['content'] = u'Раздел вам пока не доступен'
+                context['content'] = 'This subsection is not available for you'
             else:
                 context['content'] = section_module.runtime.render(section_module, None, 'student_view').content
                 #context['content'] = section_module.get_html()

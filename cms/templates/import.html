@@ -3,15 +3,15 @@
 <%namespace name='static' file='static_content.html'/>
 
 <%! from django.core.urlresolvers import reverse %>
-<%block name="title">${_(u"Импорт курса")}</%block>
+<%block name="title">${_("Course Import")}</%block>
 <%block name="bodyclass">is-signedin course tools import</%block>
 
 <%block name="content">
 <div class="wrapper-mast wrapper">
   <header class="mast has-subtitle">
     <h1 class="page-header">
-      <small class="subtitle">${_(u"Инструменты")}</small>
-      <span class="sr">&gt; </span>${_(u"Импорт курса")}
+      <small class="subtitle">${_("Tools")}</small>
+      <span class="sr">&gt; </span>${_("Course Import")}
     </h1>
   </header>
 </div>
@@ -20,23 +20,21 @@
   <div class="inner-wrapper">
     <article class="import-overview">
       <div class="description">
-        <p><strong>${_(u"При импорте нового курса будет удалена все информация, связанная с вашим курсом и заменена на содержимое загружаемого файла.")}</strong></p>
+        <p><strong>${_("Importing a new course will delete all content currently associated with your course and replace it with the contents of the uploaded file.")}</strong></p>
         ## Translators: ".tar.gz" is a file extension, and files with that extension are called "gzipped tar files": these terms should not be translated
-        <p>${_(u"Загружаемые файлы должны быть сжаты (.tar.gz), и должны содержать, как минимум файл {filename}.").format(filename='<code>course.xml</code>')}</p>
-        <p>${_(u"Пожалуйста, обратите внимание, если ваш курс имеет некоторые проблемы с автоматической генерацией {nodename} узлов, импорт вашего курса вновь может привести к потере информации об учащихся, связанных с этими проблемами").format(nodename='<code>url_name</code>')}</p>
+        <p>${_("File uploads must be gzipped tar files (.tar.gz) containing, at a minimum, a {filename} file.").format(filename='<code>course.xml</code>')}</p>
+        <p>${_("Please note that if your course has any problems with auto-generated {nodename} nodes, re-importing your course could cause the loss of student data associated with those problems.").format(nodename='<code>url_name</code>')}</p>
       </div>
-
       <form id="fileupload" method="post" enctype="multipart/form-data"
           class="import-form" url="${reverse('import_course', kwargs=dict(org=context_course.location.org, course=context_course.location.course, name=context_course.location.name))}">
-        <h2>Курс для импорта</h2>
+        <h2>${_("Course to import:")}</h2>
         <p class="error-block"></p>
-        <a href="#" class="choose-file-button">Выберите файл</a>
-        <p class="file-name-block"><span class="file-name"></span><a href="#" class="choose-file-button-inline">изменить</a></p>
+        <a href="#" class="choose-file-button">${_("Choose File")}</a>
+        <p class="file-name-block"><span class="file-name"></span><a href="#" class="choose-file-button-inline">${_("change")}</a></p>
         <input type="file" name="course-data" class="file-input" >
         <input type="submit" value="${_('Replace my course with the one above')}" class="submit-button" >
         <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}">
-        <p class="status-block">Распаковка...</p>
-
+        <p class="status-block">Unpacking...</p>
         <div class="progress-bar">
           <div class="progress-fill"></div>
           <div class="percent">0%</div>
@@ -102,10 +100,9 @@ $('#fileupload').fileupload({
         fill.width(percentVal);
         percent.html(percentVal);
     },
-
     done: function(e, data){
         bar.hide();
-        alert('${_(u"Импорт прошёл успешно.")}');
+        alert('${_("Your import was successful.")}');
         window.location = '${successful_import_redirect_url}';
     },
     sequentialUploads: true
@@ -113,7 +110,6 @@ $('#fileupload').fileupload({
 
 
 });
-
 
 })();
 </script>

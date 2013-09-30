@@ -553,7 +553,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       
       // replace explanations
       xml = xml.replace(/\[explanation\]\n?([^\]]*)\[\/?explanation\]/gmi, function(match, p1) {
-          var selectString = '<solution>\n<div class="detailed-solution">\nРешение\n\n' + p1 + '\n</div>\n</solution>';
+          var selectString = '<solution>\n<div class="detailed-solution">\nExplanation\n\n' + p1 + '\n</div>\n</solution>';
           return selectString;
       });
       // replace advices
@@ -574,7 +574,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
               };
           };
           var uniq_rel = 1 + Math.floor(Math.random() * 9999999);
-          var selectString = '\n<div class="advice-for-problem" rel = "' + delay + '">\n<span class ="title" rel = "'+uniq_rel+'">Подсказка</span>\n<div class = "inner">\n' + inside_text[1] + '\n</div>\n</div>\n';
+          var selectString = '\n<div class="advice-for-problem" rel = "' + delay + '">\n<span class ="title" rel = "'+uniq_rel+'">Advice</span>\n<div class = "inner">\n' + inside_text[1] + '\n</div>\n</div>\n';
           return selectString;
       });
 

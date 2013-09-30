@@ -31,7 +31,7 @@
 
     <% if(finished) { %>
       <div id="upload_confirm" class="message message-status message-status confirm is-shown" name="upload_confirm">
-        <p><%= gettext("Успешно!") %></p>
+        <p><%= gettext("Success!") %></p>
       </div>
     <% } %>
 
@@ -39,13 +39,13 @@
   </div>
 
   <div class="actions">
-    <h3 class="sr"><%= gettext('Действия') %></h3>
+    <h3 class="sr"><%= gettext('Form Actions') %></h3>
   <ul>
   <li class="action-item">
-    <a href="#" class="button action-primary action-upload <% if (!selectedFile || error) { %>disabled<% } %>"><%= gettext('Загрузить') %></a>
+    <a href="#" class="button action-primary action-upload <% if (!selectedFile || error) { %>disabled<% } %>"><%= gettext('Upload') %></a>
   </li>
   <li class="action-item">
-    <a href="#" class="button action-secondary action-cancel"><%= gettext('Отмена') %></a>
+    <a href="#" class="button action-secondary action-cancel"><%= gettext('Cancel') %></a>
   </li>
   </ul>
   </div>

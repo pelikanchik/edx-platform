@@ -1,7 +1,7 @@
 ---
 metadata:
 
-    display_name: Текст, написанный в LaTeX
+    display_name: E-text Written in LaTeX
     source_code: |
         \subsection{Example of E-text in LaTeX}
 

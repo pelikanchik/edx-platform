@@ -3,7 +3,7 @@
 <%! from auth.authz import is_user_in_course_group_role %>
 <%! import json %>
 <%inherit file="base.html" />
-<%block name="title">${_(u"Настройки команды курса")}</%block>
+<%block name="title">${_("Course Team Settings")}</%block>
 <%block name="bodyclass">is-signedin course users team</%block>
 
 
@@ -11,16 +11,16 @@
 <div class="wrapper-mast wrapper">
   <header class="mast has-actions has-subtitle">
     <h1 class="page-header">
-      <small class="subtitle">${_(u"Настройки")}</small>
-      <span class="sr">&gt; </span>${_(u"Команда курса")}
+      <small class="subtitle">${_("Settings")}</small>
+      <span class="sr">&gt; </span>${_("Course Team")}
     </h1>
 
     <nav class="nav-actions">
-      <h3 class="sr">${_(u"Действия")}</h3>
+      <h3 class="sr">${_("Page Actions")}</h3>
       <ul>
         %if allow_actions:
         <li class="nav-item">
-          <a href="#" class="button new-button create-user-button"><i class="icon-plus"></i> ${_(u"Новый член команды")}</a>
+          <a href="#" class="button new-button create-user-button"><i class="icon-plus"></i> ${_("New Team Member")}</a>
         </li>
         %endif
       </ul>
@@ -35,23 +35,24 @@
       <div class="wrapper-create-element animate wrapper-create-user">
         <form class="create-user" id="create-user-form" name="create-user-form">
           <div class="wrapper-form">
-            <h3 class="title">${_(u"Добавить члена курса")}</h3>
+            <h3 class="title">${_("Add a User to Your Course's Team")}</h3>
 
             <fieldset class="form-fields">
-              <legend class="sr">${_(u"Информация")}</legend>
+              <legend class="sr">${_("New Team Member Information")}</legend>
+
                 <ol class="list-input">
                   <li class="field text required create-user-email">
-                    <label for="user-email-input">${_(u"E-mail пользователя")}</label>
-                    <input id="user-email-input" name="user-email" type="text" placeholder="${_(u'e.g. jane.doe@gmail.com')}" value="">
-                    <span class="tip tip-stacked">${_(u"Пожалуйста, введите адрес электронной почты, по которому мы найдём пользователя")}</span>
+                    <label for="user-email-input">${_("User's Email Address")}</label>
+                    <input id="user-email-input" name="user-email" type="text" placeholder="${_('e.g. jane.doe@gmail.com')}" value="">
+                    <span class="tip tip-stacked">${_("Please provide the email address of the course staff member you'd like to add")}</span>
                   </li>
                 </ol>
             </fieldset>
           </div>
 
           <div class="actions">
-            <button class="action action-primary" type="submit">${_(u"Добавить пользователя")}</button>
-            <button class="action action-secondary action-cancel">${_(u"Отмена")}</button>
+            <button class="action action-primary" type="submit">${_("Add User")}</button>
+            <button class="action action-secondary action-cancel">${_("Cancel")}</button>
           </div>
         </form>
       </div>
@@ -72,11 +73,11 @@
           % if is_instuctor:
           <span class="wrapper-ui-badge">
             <span class="flag flag-role flag-role-admin is-hanging">
-              <span class="label sr">${_(u"Текущая роль:")}</span>
+              <span class="label sr">${_("Current Role:")}</span>
               <span class="value">
-                ${_(u"Администратор")}
+                ${_("Admin")}
                 % if request.user.id == user.id:
-                    <span class="msg-you">${_(u"Вы!")}</span>
+                    <span class="msg-you">${_("You!")}</span>
                 % endif
               </span>
             </span>
@@ -84,11 +85,11 @@
           % else:
           <span class="wrapper-ui-badge">
             <span class="flag flag-role flag-role-staff is-hanging">
-              <span class="label sr">${_(u"Текущая роль:")}</span>
+              <span class="label sr">${_("Current Role:")}</span>
               <span class="value">
-                ${_(u"Член команды курса")}
+                ${_("Staff")}
                 % if request.user.id == user.id:
-                    <span class="msg-you">${_(u"Вы!")}</span>
+                    <span class="msg-you">${_("You!")}</span>
                 % endif
               </span>
             </span>
@@ -99,7 +100,7 @@
             <h3 class="user-name">
               <span class="user-username">${user.username}</span>
               <span class="user-email">
-                <a class="action action-email" href="mailto:${user.email}" title="${_(u"отправить письмо на {email}").format(email=user.email)}">${user.email}</a>
+                <a class="action action-email" href="mailto:${user.email}" title="${_("send an email message to {email}").format(email=user.email)}">${user.email}</a>
               </span>
             </h3>
           </div>
@@ -108,13 +109,13 @@
           <ul  class="item-actions user-actions">
             <li class="action action-role">
               % if is_instuctor and len(instructors) == 1:
-                <span class="admin-role notoggleforyou">${_(u"Повысьте другого пользователя до администратора, чтобы лишить себя администраторских прав")}</span>
+                <span class="admin-role notoggleforyou">${_("Promote another member to Admin to remove your admin rights")}</span>
               % else:
-                <a href="#" class="admin-role toggle-admin-role ${'remove' if is_instuctor else 'add'}-admin-role">${_(u"Удалить администраторские права") if is_instuctor else _(u"Дать администраторские права")}</a>
+                <a href="#" class="admin-role toggle-admin-role ${'remove' if is_instuctor else 'add'}-admin-role">${_("Remove Admin Access") if is_instuctor else _("Add Admin Access")}</a>
               % endif
             </li>
             <li class="action action-delete ${"is-disabled" if request.user.id == user.id else ""}">
-                <a href="#" class="delete remove-user action-icon" data-id="${user.email}"><i class="icon-trash"></i><span class="sr">${_(u"Удалить члена команды - {username}").format(username=user.username)}</span></a>
+                <a href="#" class="delete remove-user action-icon" data-id="${user.email}"><i class="icon-trash"></i><span class="sr">${_("Delete the user, {username}").format(username=user.username)}</span></a>
             </li>
           </ul>
           % endif
@@ -127,15 +128,15 @@
       % if user_is_instuctor and len(staff) == 1:
       <div class="notice notice-incontext notice-create has-actions">
         <div class="msg">
-          <h3 class="title">${_(u'Добавить членов команды курса')}</h3>
+          <h3 class="title">${_('Add Team Members to This Course')}</h3>
           <div class="copy">
-            <p>${_(u'Добавление других членов команды позволит распределить обязанности между людьми. ')}</p>
+            <p>${_('Adding team members makes course authoring collaborative. Users must be signed up for Studio and have an active account. ')}</p>
           </div>
         </div>
 
         <ul class="list-actions">
           <li class="action-item">
-            <a href="#" class="action action-primary button new-button create-user-button"><i class="icon-plus icon-inline"></i> ${_(u'Add a New Team Member')}</a>
+            <a href="#" class="action action-primary button new-button create-user-button"><i class="icon-plus icon-inline"></i> ${_('Add a New Team Member')}</a>
           </li>
         </ul>
       </div>
@@ -144,14 +145,14 @@
 
     <aside class="content-supplementary" role="complimentary">
       <div class="bit">
-        <h3 class="title-3">${_(u"О ролях в команде")}</h3>
-        <p>${_(u"Обычные члены курса, со-авторы. Есть доступ к контенту и права редактирования. Но удалять пользователей могут только администраторы.")}</p>
+        <h3 class="title-3">${_("About Roles within Your Course Team")}</h3>
+        <p>${_("Course team members are co-authors (staff). They have full access to all the content in the course and all the same editing privileges. Admins have the unique ability to add and remove course team members.")}</p>
       </div>
 
       % if user_is_instuctor and len(instructors) == 1:
       <div class="bit">
-        <h3 class="title-3">${_(u"Передача владельца")}</h3>
-        <p>${_(u"У каждого курса обязательно должен быть администратор. Для передачи владения курсом назначьте другого администратора и удалитесь из курса.")}</p>
+        <h3 class="title-3">${_("Tranferring Ownership")}</h3>
+        <p>${_("There must always be an Admin assigned to every course. To transfer your ownership of the course, add Admin access to another user and request they remove you from the Course Team list.")}</p>
       </div>
       % endif
     </aside>
@@ -231,7 +232,7 @@
             message = unknownErrorMessage
           }
           var prompt = new CMS.Views.Prompt.Error({
-            title: gettext("Ошибка добавления пользователя"),
+            title: gettext("Error adding user"),
             message: message,
             actions: {
               primary: {
@@ -272,8 +273,8 @@
     $('.remove-user').click(function() {
       var email = $(this).data('id');
       var msg = new CMS.Views.Prompt.Warning({
-        title: gettext("Вы уверены?"),
-        message: _.template(gettext("Вы действительно хотите удалить {email} из курса “{course}”?"), {email: email, course: course.get('name')}, {interpolate: /\{(.+?)\}/g}),
+        title: gettext("Are you sure?"),
+        message: _.template(gettext("Are you sure you want to delete {email} from the course team for “{course}”?"), {email: email, course: course.get('name')}, {interpolate: /\{(.+?)\}/g}),
         actions: {
           primary: {
             text: gettext("Delete"),
@@ -297,7 +298,7 @@
                     message = unknownErrorMessage;
                   }
                   var prompt = new CMS.Views.Prompt.Error({
-                    title: gettext("Ошибка удаления пользователя"),
+                    title: gettext("Error removing user"),
                     message: message,
                     actions: {
                       primary: {
@@ -309,7 +310,6 @@
                     }
                   })
                   prompt.show();
-
                 }
               });
             }
@@ -354,7 +354,7 @@
             message = unknownErrorMessage;
           }
           var prompt = new CMS.Views.Prompt.Error({
-            title: gettext("Ошибка при изменении пользователя"),
+            title: gettext("There was an error changing the user's role"),
             message: message,
             actions: {
               primary: {

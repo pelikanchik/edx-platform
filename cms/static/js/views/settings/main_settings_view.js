@@ -68,7 +68,7 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
         // Инициализация дерева
         $("#tree").dynatree({
           children: tags_dict,
-          title: "Дерево тэгов",
+          title: "Tree of tags",
           onActivate: function(node) {
             $("#tag-title").val(node.data.title);
             $("#current").css("visibility","visible");
@@ -104,7 +104,7 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
         // добавление тэга
         $("#btnAddCode").click(function(){
           var title;
-          if (title = prompt("Введите название для тэга")){
+          if (title = prompt("Enter a tag name")){
 
               var rootNode = $("#tree").dynatree("getRoot");
               var d = new Date();
@@ -129,7 +129,7 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
 
         // удаление тэга
         $("#btnDelete").click(function(){
-          if (confirm("Вы уверены, что хотите удалить этот тэг? Связь с соответствущими тэгу заданиями будет удалена")){
+          if (confirm("Are you sure you want to remove this tag?")){
               var node = $("#tree").dynatree("getActiveNode");
               if( !node ) return;
               node.remove();

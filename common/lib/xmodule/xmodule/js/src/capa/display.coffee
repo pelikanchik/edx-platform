@@ -58,16 +58,16 @@ class @Problem
     detail = @el.data('progress_detail')
     status = @el.data('progress_status')
     # i18n
-    progress = "(баллов: #{detail})"
+    progress = "(#{detail} points)"
     if status == 'none' and detail? and detail.indexOf('/') > 0
         a = detail.split('/')
         possible = parseFloat(a[1])
         if possible == 1
             # i18n
-            progress = "(возможное количество баллов: #{possible})"
+            progress = "(#{possible} point possible)"
         else
             # i18n
-            progress = "(возможное количество баллов: #{possible})"
+            progress = "(#{possible} points possible)"
     @$('.problem-progress').html(progress)
 
   updateProgress: (response) =>

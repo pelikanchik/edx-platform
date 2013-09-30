@@ -199,8 +199,8 @@ class TestWordCloud(BaseTestXmodule):
         self._check_response(users_state_before_fail, current_users_state)
 
     def test_unicode(self):
-        input_words = [u" this is unicode Юникод"]
-        correct_words = [u"this is unicode юникод"]
+        input_words = [u" this is unicode"]
+        correct_words = [u"this is unicode"]
 
         users_state = self._post_words(input_words)
 

@@ -398,11 +398,11 @@
     }
 
     .draft-item:after {
-      content: "- черновик";
+      content: "- draft";
     }
 
     .private-item:after {
-      content: "- непубличный";
+      content: "- private";
     }
 
     .private-item {

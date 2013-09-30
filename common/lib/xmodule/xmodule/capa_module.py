@@ -122,24 +122,24 @@ class CapaFields(object):
             {"display_name": "Never", "value": "never"}]
     )
     showbuttonanswer = Integer(
-        display_name=u"Delay for Show Answer(s) button",
-        help=(u"in seconds"),
+        display_name="Delay for Show Answer(s) button",
+        help=("in seconds"),
         values={"min": 0},
         scope = Scope.settings,
         default=0
     )
     checkanswer = Integer(
-        display_name=u"Is answer correct",
-        help=(u"Is it possible to check correctness of answer"),
+        display_name="Is answer correct",
+        help=("Is it possible to check correctness of answer"),
         values=[
-            {"display_name": u"Yes", "value": 1},
-            {"display_name": u"No", "value": 0}],
+            {"display_name": "Yes", "value": 1},
+            {"display_name": "No", "value": 0}],
         scope = Scope.settings,
         default=1
     )
     tags_appended = String(
-        display_name=u" Tars",
-        help=(u"tags"),
+        display_name=" Tags",
+        help=("tags"),
         scope = Scope.settings
     )
     force_save_button = Boolean(

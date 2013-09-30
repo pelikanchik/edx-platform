@@ -1,6 +1,6 @@
 ---
 metadata:
-    display_name: Задание с математической формулой
+    display_name: Math Expression Input
     markdown: !!null
 data: |
   <problem>

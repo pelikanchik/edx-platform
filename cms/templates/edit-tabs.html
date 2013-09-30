@@ -1,7 +1,7 @@
 <%inherit file="base.html" />
 <%! from django.utils.translation import ugettext as _ %>
 <%! from django.core.urlresolvers import reverse %>
-<%block name="title">Статические страницы</%block>
+<%block name="title">Static Pages</%block>
 <%block name="bodyclass">is-signedin course pages static-pages</%block>
 
 <%block name="jsextra">
@@ -20,19 +20,15 @@
 <div class="wrapper-mast wrapper">
   <header class="mast has-actions has-subtitle">
     <h1 class="page-header">
-
-      <small class="subtitle">Содержание</small>
-      <span class="sr">&gt; </span>Статические страницы
-
+      <small class="subtitle">${_("Content")}</small>
+      <span class="sr">&gt; </span>${_("Static Pages")}
     </h1>
 
     <nav class="nav-actions">
       <h3 class="sr">${_("Page Actions")}</h3>
       <ul>
         <li class="nav-item">
-
-          <a href="#" class="button new-button new-tab"><i class="icon-plus"></i> Добавить страницу</a>
-
+        <a href="#" class="button new-button new-tab"><i class="icon-plus"></i> ${_("New Page")}</a>
         </li>
       </ul>
     </nav>
@@ -42,14 +38,12 @@
 <div class="wrapper-content wrapper">
   <section class="content">
     <div class="introduction has-links">
-
-      <p class="copy">Статические страницы - это дополнительные страницы в курсе. Это может быть расписание курса, цели, требования и т.п.</p>
+      <p class="copy">${_("Static Pages are additional pages that supplement your Courseware. Other course authors have used them to share a syllabus, calendar, handouts, and more.")}</p>
       <nav class="nav-introduction-supplementary">
         <ul>
           <li class="nav-item">
-            <a rel="modal" href="#preview-lms-staticpages"><i class="icon-question-sign"></i>Куда попадают статические страницы?</a>
-         </li>
-
+          <a rel="modal" href="#preview-lms-staticpages"><i class="icon-question-sign"></i>${_("How do Static Pages look to students in my course?")}</a>
+          </li>
         </ul>
       </nav>
     </div>
@@ -76,18 +70,15 @@
 </div>
 
 <div class="content-modal" id="preview-lms-staticpages">
-
-  <h3 class="title">Как публикуются статические страницы</h3>
+  <h3 class="title">${_("How Static Pages are Used in Your Course")}</h3>
   <figure>
-    <img src="/static/img/preview-lms-staticpages.png" alt="Preview of how Static Pages are used in your course" />
-    <figcaption class="description">Эти страницы будут в одном списке наряду с содержанием, информацией о курсе и т.п.</figcaption>
-
+    <img src="/static/img/preview-lms-staticpages.png" alt="${_('Preview of how Static Pages are used in your course')}" />
+    <figcaption class="description">${_("These pages will be presented in your course's main navigation alongside Courseware, Course Info, Discussion, etc.")}</figcaption>
   </figure>
 
   <a href="#" rel="view" class="action action-modal-close">
     <i class="icon-remove-sign"></i>
-
-    <span class="label">закрыть</span>
+    <span class="label">${_("close modal")}</span>
   </a>
 </div>
 </%block>

@@ -157,8 +157,8 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
 
         var targetModel = this.eventModel(event);
         var confirm = new CMS.Views.Prompt.Warning({
-            title: gettext('Действительно удалить?'),
-            message: gettext('Это действие нельзя отменить.'),
+            title: gettext('Are you sure you want to delete this update?'),
+            message: gettext('This action cannot be undone.'),
             actions: {
                 primary: {
                     text: gettext('OK'),
@@ -169,7 +169,7 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
                         });
                         self.modelDom(event).remove();
                         var deleting = new CMS.Views.Notification.Mini({
-                            title: gettext('Удаляется') + '&hellip;'
+                            title: gettext('Deleting') + '&hellip;'
                         });
                         deleting.show();
                         targetModel.destroy({

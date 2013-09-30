@@ -1,5 +1,5 @@
 CMS.Views.SectionShow = Backbone.View.extend({
-    template: _.template('<span data-tooltip="<%= gettext("Изменить имя раздела") %>" class="section-name-span"><%= name %></span>'),
+    template: _.template('<span data-tooltip="<%= gettext("Edit this section\'s name") %>" class="section-name-span"><%= name %></span>'),
     render: function() {
         var attrs = {
             name: this.model.escape('name')
@@ -46,7 +46,7 @@ CMS.Views.SectionEdit = Backbone.View.extend({
         var that = this;
         this.model.save("name", name, {
             success: function() {
-                analytics.track('Измененное имя', {
+                analytics.track('Edited Section Name', {
                     'course': course_location_analytics,
                     'display_name': that.model.get('name'),
                     'id': that.model.get('id')
@@ -68,11 +68,11 @@ CMS.Views.SectionEdit = Backbone.View.extend({
         model.set("name", model.previous("name"));
         var that = this;
         var prompt = new CMS.Views.Prompt.Error({
-            title: gettext("Изменения не сохранены"),
+            title: gettext("Your change could not be saved"),
             message: error,
             actions: {
                 primary: {
-                    text: gettext("Вернитесь и попробуйте ещё раз"),
+                    text: gettext("Return and resolve this issue"),
                     click: function(view) {
                         view.hide();
                         that.$("input[type=text]").focus();

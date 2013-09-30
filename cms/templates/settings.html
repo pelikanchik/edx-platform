@@ -2,7 +2,7 @@
 
 <%inherit file="base.html" />
 
-<%block name="title">Общая информация</%block>
+<%block name="title">${_("Schedule &amp; Details Settings")}</%block>
 <%block name="bodyclass">is-signedin course schedule settings</%block>
 
 <%namespace name='static' file='static_content.html'/>
@@ -107,8 +107,8 @@ div#add-tag{
 <div class="wrapper-mast wrapper">
   <header class="mast has-subtitle">
     <h1 class="page-header">
-      <small class="subtitle">Настройки</small>
-      <span class="sr">&gt; </span>Общая информация
+      <small class="subtitle">${_("Settings")}</small>
+      <span class="sr">&gt; </span>${_("Schedule & Details")}
     </h1>
   </header>
 </div>
@@ -119,39 +119,39 @@ div#add-tag{
       <form id="settings_details" class="settings-details" method="post" action="">
         <section class="group-settings basic">
           <header>
-            <h2 class="title-2">Базовая информация</h2>
-            <span class="tip"></span>
+            <h2 class="title-2">${_("Basic Information")}</h2>
+            <span class="tip">${_("The nuts and bolts of your course")}</span>
           </header>
 
           <ol class="list-input">
             <li class="field text is-not-editable" id="field-course-organization">
-              <label for="course-organization">Издатель</label>
-              <input title="${_(u'This field is disabled: this information cannot be changed.')}" type="text" class="long" id="course-organization" value="[Course Organization]" readonly />
+              <label for="course-organization">${_("Organization")}</label>
+              <input title="${_('This field is disabled: this information cannot be changed.')}" type="text" class="long" id="course-organization" value="[Course Organization]" readonly />
             </li>
 
             <li class="field text is-not-editable" id="field-course-number">
-              <label for="course-number">Номер курса</label>
-              <input title="${_(u'This field is disabled: this information cannot be changed.')}" type="text" class="short" id="course-number" value="[Course No.]" readonly>
+              <label for="course-number">${_("Course Number")}</label>
+              <input title="${_('This field is disabled: this information cannot be changed.')}" type="text" class="short" id="course-number" value="[Course No.]" readonly>
             </li>
 
             <li class="field text is-not-editable" id="field-course-name">
-              <label for="course-name">Название курса</label>
-              <input title="${_(u'This field is disabled: this information cannot be changed.')}" type="text" class="long" id="course-name" value="[Course Name]" readonly />
+              <label for="course-name">${_("Course Name")}</label>
+              <input title="${_('This field is disabled: this information cannot be changed.')}" type="text" class="long" id="course-name" value="[Course Name]" readonly />
             </li>
           </ol>
 
-         ## <div class="note note-promotion note-promotion-courseURL has-actions">
-         ##   <h3 class="title">${_(u"Course Summary Page")} <span class="tip">${_(u"(for student enrollment and access)")}</span></h3>
-        ##    <div class="copy">
-        ##      <p><a class="link-courseURL" rel="external" href="https:${utils.get_lms_link_for_about_page(course_location)}" />https:${utils.get_lms_link_for_about_page(course_location)}</a></p>
-        ##    </div>
+          <div class="note note-promotion note-promotion-courseURL has-actions">
+            <h3 class="title">${_(u"Course Summary Page")} <span class="tip">${_(u"(for student enrollment and access)")}</span></h3>
+            <div class="copy">
+              <p><a class="link-courseURL" rel="external" href="https:${utils.get_lms_link_for_about_page(course_location)}" />https:${utils.get_lms_link_for_about_page(course_location)}</a></p>
+          </div>
 
-       ##     <ul class="list-actions">
-       ##       <li class="action-item">
-       ##         <a title="${_(u'Send a note to students via email')}" href="mailto:someone@domain.com?Subject=Enroll%20in%20${context_course.display_name_with_default}&body=The%20course%20&quot;${context_course.display_name_with_default}&quot;,%20provided%20by%20edX,%20is%20open%20for%20enrollment.%20Please%20navigate%20to%20this%20course%20at%20https:${utils.get_lms_link_for_about_page(course_location)}%20to%20enroll." class="action action-primary"><i class="icon-envelope-alt icon-inline"></i>${_(u"Invite your students")}</a>
-       ##       </li>
-       ##     </ul>
-       ##   </div>
+            <ul class="list-actions">
+              <li class="action-item">
+                <a title="${_(u'Send a note to students via email')}" href="mailto:someone@domain.com?Subject=Enroll%20in%20${context_course.display_name_with_default}&body=The%20course%20&quot;${context_course.display_name_with_default}&quot;,%20provided%20by%20edX,%20is%20open%20for%20enrollment.%20Please%20navigate%20to%20this%20course%20at%20https:${utils.get_lms_link_for_about_page(course_location)}%20to%20enroll." class="action action-primary"><i class="icon-envelope-alt icon-inline"></i>${_(u"Invite your students")}</a>
+              </li>
+            </ul>
+          </div>
 
           % if not about_page_editable:
       ##    <div class="notice notice-incontext notice-workflow">
@@ -167,20 +167,20 @@ div#add-tag{
 
         <section class="group-settings schedule">
           <header>
-            <h2 class="title-2">Расписание</h2>
-            <span class="tip">Даты, определяющие время работы курса</span>
+            <h2 class="title-2">${_('Course Schedule')}</h2>
+            <span class="tip">${_('Dates that control when your course can be viewed.')}</span>
           </header>
 
           <ol class="list-input">
             <li class="field-group field-group-course-start" id="course-start">
               <div class="field date" id="field-course-start-date">
-                <label for="course-start-date">Дата начала</label>
+                <label for="course-start-date">${_("Course Start Date")}</label>
                 <input type="text" class="start-date date start datepicker" id="course-start-date" placeholder="DD.MM.YYYY" autocomplete="off" />
-                <span class="tip tip-stacked">Первый день активности курса</span>
+                <span class="tip tip-stacked">${_("First day the course begins")}</span>
               </div>
 
               <div class="field time" id="field-course-start-time">
-                <label for="course-start-time">Время начала</label>
+                <label for="course-start-time">${_("Course Start Time")}</label>
                 <input type="text" class="time start timepicker" id="course-start-time" value="" placeholder="HH:MM" autocomplete="off" />
                 <span class="tip tip-stacked" id="timezone"></span>
               </div>
@@ -188,13 +188,13 @@ div#add-tag{
 
             <li class="field-group field-group-course-end" id="course-end">
               <div class="field date" id="field-course-end-date">
-                <label for="course-end-date">Дата окончания</label>
+                <label for="course-end-date">${_("Course End Date")}</label>
                 <input type="text" class="end-date date end" id="course-end-date" placeholder="DD.MM.YYYY" autocomplete="off" />
-                <span class="tip tip-stacked">Последний день активности курса</span>
+                <span class="tip tip-stacked">${_("Last day your course is active")}</span>
               </div>
 
               <div class="field time" id="field-course-end-time">
-                <label for="course-end-time">Время окончания</label>
+                <label for="course-end-time">${_("Course End Time")}</label>
                 <input type="text" class="time end" id="course-end-time" value="" placeholder="HH:MM" autocomplete="off" />
                 <span class="tip tip-stacked" id="timezone"></span>
               </div>
@@ -205,13 +205,13 @@ div#add-tag{
           <ol class="list-input">
             <li class="field-group field-group-enrollment-start" id="enrollment-start">
               <div class="field date" id="field-enrollment-start-date">
-                <label for="course-enrollment-start-date">Дата начала регистрации</label>
+                <label for="course-enrollment-start-date">${_("Enrollment Start Date")}</label>
                 <input type="text" class="start-date date start" id="course-enrollment-start-date" placeholder="DD.MM.YYYY" autocomplete="off" />
-                <span class="tip tip-stacked">Первый день, когда студенты могут записаться на курс</span>
+                <span class="tip tip-stacked">${_("First day students can enroll")}</span>
               </div>
 
               <div class="field time" id="field-enrollment-start-time">
-                <label for="course-enrollment-start-time">Время начала регистрации</label>
+                <label for="course-enrollment-start-time">${_("Enrollment Start Time")}</label>
                 <input type="text" class="time start" id="course-enrollment-start-time" value="" placeholder="HH:MM" autocomplete="off" />
                 <span class="tip tip-stacked" id="timezone"></span>
               </div>
@@ -219,13 +219,13 @@ div#add-tag{
 
             <li class="field-group field-group-enrollment-end" id="enrollment-end">
               <div class="field date" id="field-enrollment-end-date">
-                <label for="course-enrollment-end-date">Дата окончания регистрации</label>
+                <label for="course-enrollment-end-date">${_("Enrollment End Date")}</label>
                 <input type="text" class="end-date date end" id="course-enrollment-end-date" placeholder="DD.MM.YYYY" autocomplete="off" />
-                <span class="tip tip-stacked">Последний день, когда студенты могут записаться на курс</span>
+                <span class="tip tip-stacked">${_("Last day students can enroll")}</span>
               </div>
 
               <div class="field time" id="field-enrollment-end-time">
-                <label for="course-enrollment-end-time">Время окончания регистрации</label>
+                <label for="course-enrollment-end-time">${_("Enrollment End Time")}</label>
                 <input type="text" class="time end" id="course-enrollment-end-time" value="" placeholder="HH:MM" autocomplete="off" />
                 <span class="tip tip-stacked" id="timezone"></span>
               </div>
@@ -235,10 +235,9 @@ div#add-tag{
 
           % if not about_page_editable:
           <div class="notice notice-incontext notice-workflow">
-            <h3 class="title">${_(u"Эти даты не могут быть использованы для продвижения вашего курса")}</h3>
+            <h3 class="title">${_("These Dates Are Not Used When Promoting Your Course")}</h3>
             <div class="copy">
-              <p>${_(u'Эти даты влияют <strong> на то, когда ваши курсы будут показаны </strong>, но они <strong>не показываются на странице сводки курса </strong>. ')}</p>
-            </div>
+              <p>${_('These dates impact <strong>when your courseware can be viewed</strong>, but they are <strong>not the dates shown on your course summary page</strong>.  To provide the course start and registration dates as shown on your course summary page, follow the instructions provided by your <abbr title="Program Manager">PM</abbr> or Conrad Warre <a rel="email" class="action action-email" href="mailto:conrad@edx.org">(conrad@edx.org)</a>.')}</p>            </div>
           </div>
           % endif
         </section>
@@ -246,13 +245,13 @@ div#add-tag{
         % if about_page_editable:
             <section class="group-settings marketing">
               <header>
-                <h2 class="title-2">Вводная информация</h2>
-                <span class="tip">Информация для презентации курса студентам</span>
+                <h2 class="title-2">${_("Introducing Your Course")}</h2>
+                <span class="tip">${_("Information for prospective students")}</span>
               </header>
 
               <ol class="list-input">
                 <li class="field text" id="field-course-overview">
-                  <label for="course-overview">О курсе</label>
+                  <label for="course-overview">${_("Course Overview")}</label>
                   <textarea class="tinymce text-editor" id="course-overview"></textarea>
                   <%def name='overview_text()'><%
                     a_link_start = '<a class="link-courseURL" rel="external" href="'
@@ -260,7 +259,7 @@ div#add-tag{
                     a_link = a_link_start + utils.get_lms_link_for_about_page(course_location) + a_link_end
                     text = _("Introductions, prerequisites, FAQs that are used on %s (formatted in HTML)") % a_link
                     %>${text}</%def>
-                ##  <span class="tip tip-stacked">Тэги, которые можно сопоставить заданиям</span>
+                ##  <span class="tip tip-stacked">${_("It's course overview")}</span>
                 </li>
 
 
@@ -297,18 +296,18 @@ div#add-tag{
 
 
                 <li class="field text" id="field-course-tags">
-                    <label for="field-course-tags">Тэги</label>
+                    <label for="field-course-tags">${_("Tags")}</label>
 
                       <div id="tree"></div>
 
                       <div>
                           <div id = 'current'>
                               <input type="text" class="tag-input" value = "" id = "tag-title" />
-                              <img id="btnSetTitle" width = "20" title = "Сохранить" alt = "Сохранить" src = "/static/img/save.png" />
-                              <img id="btnDelete" title = "Удалить" alt = "Удалить" src = "/static/img/Delete-icon.png" />
+                              <img id="btnSetTitle" width = "20" title = '${_("Save")}' alt = '${_("Save")}' src = "/static/img/save.png" />
+                              <img id="btnDelete" title = '${_("Delete")}' alt = '${_("Delete")}' src = "/static/img/Delete-icon.png" />
                           </div>
                           <div id = 'add-tag'>
-                              <img id="btnAddCode" title = "Добавить тэг" alt = "Добавить тэг" src  = "/static/img/plus_16.png" />
+                              <img id="btnAddCode" title = '${_("Add Tag")}' alt = '${_("Add Tag")}' src  = "/static/img/plus_16.png" />
                           </div>
                      </div>
                     <p>
@@ -317,21 +316,20 @@ div#add-tag{
                 </li>
 
 
-
                 <li class="field video" id="field-course-introduction-video">
-                  <label for="course-overview">Вводное видео</label>
+                  <label for="course-overview">${_("Course Introduction Video")}</label>
                   <div class="input input-existing">
                     <div class="current current-course-introduction-video">
                       <iframe width="618" height="350" src="" frameborder="0" allowfullscreen></iframe>
                     </div>
                     <div class="actions">
-                      <a href="#" class="remove-item remove-course-introduction-video remove-video-data"><span class="delete-icon"></span>${_(u"Удалить видео")}</a>
+                      <a href="#" class="remove-item remove-course-introduction-video remove-video-data"><span class="delete-icon"></span>${_("Delete Current Video")}</a>
                     </div>
                   </div>
 
                   <div class="input">
-                    <input type="text" class="long new-course-introduction-video add-video-data" id="course-introduction-video" value="" placeholder="ID видео с YouTube" autocomplete="off" />
-                    <span class="tip tip-stacked">Введите ID видео с YouTube</span>
+                    <input type="text" class="long new-course-introduction-video add-video-data" id="course-introduction-video" value="" placeholder="your YouTube video's ID" autocomplete="off" />
+                    <span class="tip tip-stacked">${_("Enter your YouTube video's ID (along with any restriction parameters)")}</span>
                   </div>
                 </li>
               </ol>
@@ -341,15 +339,15 @@ div#add-tag{
 
             <section class="group-settings requirements">
               <header>
-                <h2 class="title-2">Требования</h2>
-                <span class="tip">Ожидания от студентов</span>
+                <h2 class="title-2">${_("Requirements")}</h2>
+                <span class="tip">${_("Expectations of the students taking this course")}</span>
               </header>
 
               <ol class="list-input">
                 <li class="field text" id="field-course-effort">
-                  <label for="course-effort">Требуемое время в неделю</label>
+                  <label for="course-effort">${_("Hours of Effort per Week")}</label>
                   <input type="text" class="short time" id="course-effort" placeholder="HH:MM" />
-                  <span class="tip tip-inline">Время, потребущееся студентам для занятий</span>
+                  <span class="tip tip-inline">${_("Time spent on all course work")}</span>
                 </li>
               </ol>
             </section>
@@ -358,22 +356,22 @@ div#add-tag{
     </article>
     <aside class="content-supplementary" role="complimentary">
      <div class="bit">
-        <h3 class="title-3">Как настройки будут использоваться</h3>
-        <p>${_(u"Настройки расписания вашего курса определяют, когда студенты смогут зарегистрироваться и начать прохождение курса.")}</p>
+        <h3 class="title-3">${_("How will these settings be used?")}</h3>
+        <p>${_("Your course's schedule settings determine when students can enroll in and begin a course.")}</p>
 
-        <p>${_(u"Кроме того, данные указанные на этой странице, также используются в каталоге edX о курсах, которые студенты используют для выбора новых курсов")}</p>
+        <p>${_("Additionally, details provided on this page are also used in edX's catalog of courses, which new and returning students use to choose new courses to study.")}</p>
       </div>
 
       <div class="bit">
       % if context_course:
       <% ctx_loc = context_course.location %>
       <%! from django.core.urlresolvers import reverse %>
-        <h3 class="title-3">${_(u"Другие настройки курса")}</h3>
+        <h3 class="title-3">${_("Other Course Settings")}</h3>
         <nav class="nav-related">
           <ul>
-            <li class="nav-item"><a href="${reverse('contentstore.views.course_config_graders_page', kwargs={'org' : ctx_loc.org, 'course' : ctx_loc.course, 'name': ctx_loc.name})}">${_(u"Оценивание")}</a></li>
-            <li class="nav-item"><a href="${reverse('manage_users', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">${_(u"Команда курса")}</a></li>
-            <li class="nav-item"><a href="${reverse('course_advanced_settings', kwargs={'org' : ctx_loc.org, 'course' : ctx_loc.course, 'name': ctx_loc.name})}">${_(u"Специализированные настройки")}</a></li>
+            <li class="nav-item"><a href="${reverse('contentstore.views.course_config_graders_page', kwargs={'org' : ctx_loc.org, 'course' : ctx_loc.course, 'name': ctx_loc.name})}">${_("Grading")}</a></li>
+            <li class="nav-item"><a href="${reverse('manage_users', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">${_("Course Team")}</a></li>
+            <li class="nav-item"><a href="${reverse('course_advanced_settings', kwargs={'org' : ctx_loc.org, 'course' : ctx_loc.course, 'name': ctx_loc.name})}">${_("Advanced Settings")}</a></li>
           </ul>
         </nav>
       % endif

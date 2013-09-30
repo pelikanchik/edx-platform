@@ -2,7 +2,7 @@
 <%inherit file="base.html" />
 <%! from django.core.urlresolvers import reverse %>
 
-<%block name="title">${_(u"Регистрация")}</%block>
+<%block name="title">${_("Sign Up")}</%block>
 <%block name="bodyclass">not-signedin signup</%block>
 
 <%block name="content">
@@ -10,11 +10,11 @@
 <div class="wrapper-content wrapper">
   <section class="content">
     <header>
-      <h1 class="title title-1">${_(u"Зарегистрироваться в cтудии")}</h1>
-      <a href="${reverse('login')}" class="action action-signin">${_(u"Уже есть аккаунт в студии? Войдите")}</a>
+      <h1 class="title title-1">${_("Sign Up for edX Studio")}</h1>
+      <a href="${reverse('login')}" class="action action-signin">${_("Already have a Studio Account? Sign in")}</a>
     </header>
 
-    <p class="introduction">${_(u"Готовы начать создание онлайн-курсов? Зарегистрируйтесь ниже и начните создание своего первого курса в edX  сегодня")}</p>
+    <p class="introduction">${_("Ready to start creating online courses? Sign up below and start creating your first edX course today.")}</p>
 
     <article class="content-primary" role="main">
       <form id="register_form" method="post" action="register_post">
@@ -22,51 +22,51 @@
         </div>
 
         <fieldset>
-          <legend class="sr">${_(u"Необходимая информация для регистрации")}</legend>
+          <legend class="sr">${_("Required Information to Sign Up for edX Studio")}</legend>
 
           <ol class="list-input">
             <li class="field text required" id="field-email">
-              <label for="email">${_(u"E-mail")}</label>
+              <label for="email">${_("Email Address")}</label>
               <input id="email" type="email" name="email" placeholder="e.g. jane.doe@gmail.com" />
             </li>
 
             <li class="field text required" id="field-password">
-              <label for="password">${_(u"Пароль")}</label>
+              <label for="password">${_("Password")}</label>
               <input id="password" type="password" name="password" />
             </li>
 
             <li class="field text required" id="field-username">
-              <label for="username">${_(u"Логин")}</label>
+              <label for="username">${_("Public Username")}</label>
               <input id="username" type="text" name="username" placeholder="e.g. janedoe" />
-              <span class="tip tip-stacked">${_(u"Логин будет использоваться в публичных дискуссиях ваших курсов")}</span>
+              <span class="tip tip-stacked">${_("This will be used in public discussions with your courses and in our edX101 support forums")}</span>
             </li>
 
             <li class="field text required" id="field-name">
-              <label for="name">${_(u"Полное имя")}</label>
+              <label for="name">${_("Full Name")}</label>
               <input id="name" type="text" name="name" placeholder="e.g. Jane Doe" />
             </li>
 
             <li class="field-group">
               <div class="field text" id="field-location">
-                <label for="location">${_(u"Ваше местонахождение")}</label>
+                <label for="location">${_("Your Location")}</label>
                 <input class="short" id="location" type="text" name="location" />
               </div>
 
               <div class="field text" id="field-language">
-                <label for="language">${_(u"Предпочитаемый язык")}</label>
+                <label for="language">${_("Preferred Language")}</label>
                 <input class="short" id="language" type="text" name="language" />
               </div>
             </li>
 
             <li class="field checkbox required" id="field-tos">
               <input id="tos" name="terms_of_service" type="checkbox" value="true" />
-              <label for="tos">${_(u"Я согласен с условиями предоставления услуг")}</label>
+              <label for="tos">${_("I agree to the Terms of Service")}</label>
             </li>
           </ol>
         </fieldset>
 
         <div class="form-actions">
-          <button type="submit" id="submit" name="submit" class="action action-primary">${_(u"Создать аккаунт")}</button>
+          <button type="submit" id="submit" name="submit" class="action action-primary">${_("Create My Account &amp; Start Authoring Courses")}</button>
         </div>
 
         <!-- no honor code for CMS, but need it because we're using the lms student object -->
@@ -75,18 +75,22 @@
     </article>
 
     <aside class="content-supplementary" role="complimentary">
-      <h2 class="sr">${_(u"Common Studio Questions")}</h2>
+      <h2 class="sr">${_("Common Studio Questions")}</h2>
 
       <div class="bit">
-        <h3 class="title-3">${_(u"Для кого создана студия?")}</h3>
-        <p>${_(u"Студия сделана для каждого, кто хочет создавать онлайн-курсы на нашей платформе. Зачастую наши пользователи - преподаватели, ассистенты, персонал курса и члены учебных технологических групп")}</p>
+        <h3 class="title-3">${_("Who is Studio for?")}</h3>
+        <p>${_("Studio is for anyone that wants to create online courses that leverage the global edX platform. Our users are often faculty members, teaching assistants and course staff, and members of instructional technology groups.")}</p>
       </div>
 
       <div class="bit">
-        <h3 class="title-3">${_(u"Насколько технически подкованным я должен быть, чтобы создать курс в Студии?")}</h3>
-        <p>${_(u"Студия разработана для простого использования практически любого человека, знакомого с основными сетевыми средами (Wordpress, Moodle и др.).  Знание программирования не требуется, но для некоторых расширенных функций технические знания могут быть полезны. Как всегда, мы здесь, чтобы помочь вам.")}</p>
+        <h3 class="title-3">${_("How technically savvy do I need to be to create courses in Studio?")}</h3>
+        <p>${_("Studio is designed to be easy to use by almost anyone familiar with common web-based authoring environments (Wordpress, Moodle, etc.). No programming knowledge is required, but for some of the more advanced features, a technical background would be helpful. As always, we are here to help, so don't hesitate to dive right in.")}</p>
       </div>
 
+      <div class="bit">
+        <h3 class="title-3">${_("I've never authored a course online before. Is there help?")}</h3>
+        <p>${_("Absolutely. We have created an online course, edX101, that describes some best practices: from filming video, creating exercises, to the basics of running an online course. Additionally, we're always here to help, just drop us a note.")}</p>
+      </div>
     </aside>
   </section>
 </div>

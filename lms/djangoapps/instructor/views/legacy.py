@@ -592,8 +592,8 @@ def instructor_dashboard(request, course_id):
             smdat = []
 
         if smdat:
-            datatable = {'header': ['ID', 'Пользователь', 'Полное имя', 'E-mail',
-                                    'Попытки', 'Seed', 'Ответы студента']}
+            datatable = {'header': ['ID', 'Username', 'Full Name', 'E-mail',
+                                    'Tries', 'Seed', 'Student Answer']}
             datatable['data'] = []
             for i in smdat:
                 data = json.loads(i.state)
@@ -637,8 +637,8 @@ def instructor_dashboard(request, course_id):
                 if component.category == 'problem':
                     problems_urls.append(component.location.url())
 
-        datatable = {'header': ['ID', 'Пользователь', 'Полное имя', 'edX email']}
-        datatable['header'] += ["Задача %d" % num for num in range(1, len(problems_urls) + 1)]
+        datatable = {'header': ['ID', 'Username', 'Full Name', 'E-mail']}
+        datatable['header'] += ["Task %d" % num for num in range(1, len(problems_urls) + 1)]
         enrolled_students = User.objects.filter(
             courseenrollment__course_id=course_id,
             courseenrollment__is_active=1,

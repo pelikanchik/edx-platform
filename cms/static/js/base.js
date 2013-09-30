@@ -81,10 +81,10 @@ $(document).ready(function() {
     });
 
     // general link management - new window/tab
-    $('a[rel="external"]').attr('title', gettext('Эта ссылка откроется в новом окне или в новой вкладке браузера')).bind('click', linkNewWindow);
+    $('a[rel="external"]').attr('title', gettext('This link will open in a new browser window/tab')).bind('click', linkNewWindow);
 
     // general link management - lean modal window
-    $('a[rel="modal"]').attr('title', gettext('Эта ссылка откроется в новом модальном окне')).leanModal({
+    $('a[rel="modal"]').attr('title', gettext('This link will open in a modal window')).leanModal({
         overlay: 0.50,
         closeButton: '.action-modal-close'
     });
@@ -132,10 +132,10 @@ $(document).ready(function() {
     $('.save-subsection-button').bind('click', saveSubsectionOnButton);
     function saveSubsectionOnButton(){
 
-      $('.save-subsection-button').val("сохраняется...");
+      $('.save-subsection-button').val("Saving...");
       $('.save-subsection-button').addClass("save-subsection-button-active");
       saveSubsection();
-      setTimeout('$(".save-subsection-button").val("Сохранить"); $(".save-subsection-button").removeClass("save-subsection-button-active");', 1500);
+      setTimeout('$(".save-subsection-button").val("Save"); $(".save-subsection-button").removeClass("save-subsection-button-active");', 1500);
 
     }
 
@@ -215,9 +215,9 @@ function toggleSections(e) {
     sectionCount = $section.length;
     $button = $(this);
     $labelCollapsed = $('<i class="icon-arrow-up"></i> <span class="label">' +
-        gettext('Свернуть все разделы') + '</span>');
+        gettext('Collapse All Sections') + '</span>');
     $labelExpanded = $('<i class="icon-arrow-down"></i> <span class="label">' +
-        gettext('Разернуть все разделы') + '</span>');
+        gettext('Expand All Sections') + '</span>');
 
     var buttonLabel = $button.hasClass('is-activated') ? $labelCollapsed : $labelExpanded;
     $button.toggleClass('is-activated').html(buttonLabel);
@@ -256,7 +256,7 @@ function showImportSubmit(e) {
         $('.submit-button').show();
         $('.progress').show();
     } else {
-        $('.error-block').html(gettext('Формат не поддерживается. Загружайте в формате <code>tar.gz</code>.')).show();
+        $('.error-block').html(gettext('File format not supported. Please upload a file with a <code>tar.gz</code> extension.')).show();
     }
 }
 
@@ -346,7 +346,7 @@ function saveSubsection() {
             $changedInput = null;
         },
         error: function() {
-            showToastMessage(gettext('Произошла ошибка во время сохранения.'));
+            showToastMessage(gettext('There has been an error while saving your changes.'));
         }
     });
 }
@@ -377,7 +377,7 @@ function createNewUnit(e) {
     $.post('/create_item', {
         'parent_location': parent,
         'category': category,
-        'display_name': 'Новый элемент'
+        'display_name': 'New Unit'
     },
 
     function(data) {
@@ -403,11 +403,11 @@ function deleteSection(e) {
 
 function _deleteItem($el, type) {
     var confirm = new CMS.Views.Prompt.Warning({
-        title: gettext('Удалить ' + type + '?'),
-        message: gettext('Удаляется ' + type + ' is permanent and cannot be undone.'),
+        title: gettext('Delete this ' + type + '?'),
+        message: gettext('Deleting this ' + type + ' is permanent and cannot be undone.'),
         actions: {
             primary: {
-                text: gettext('Да, удалить ' + type),
+                text: gettext('Yes, delete this ' + type),
                 click: function(view) {
                     view.hide();
 
@@ -419,7 +419,7 @@ function _deleteItem($el, type) {
                     });
 
                     var deleting = new CMS.Views.Notification.Mini({
-                        title: gettext('Удаляется') + '&hellip;'
+                        title: gettext('Deleting') + '&hellip;'
                     });
                     deleting.show();
 
@@ -435,7 +435,7 @@ function _deleteItem($el, type) {
                 }
             },
             secondary: {
-                text: gettext('Отмена'),
+                text: gettext('Cancel'),
                 click: function(view) {
                     view.hide();
                 }
@@ -483,9 +483,9 @@ function toggleSock(e) {
     });
 
     if ($sock.hasClass('is-shown')) {
-        $btnLabel.text(gettext('Скрыть'));
+        $btnLabel.text(gettext('Hide Studio Help'));
     } else {
-        $btnLabel.text(gettext('Нужна помощь со студией?'));
+        $btnLabel.text(gettext('Looking for Help with Studio?'));
     }
 }
 
@@ -866,7 +866,7 @@ function saveSetSectionScheduleDate(e) {
 
     var saving = new CMS.Views.Notification.Mini({
 
-        title: gettext("Сохраняется") + "&hellip;",
+        title: gettext("Saving") + "&hellip;",
 
     });
     saving.show();
@@ -892,11 +892,11 @@ function saveSetSectionScheduleDate(e) {
         var $thisSection = $('.courseware-section[data-id="' + id + '"]');
         var html = _.template(
             '<span class="published-status">' +
-                '<strong>' + gettext("Начало:") + '&nbsp;</strong>' +
+                '<strong>' + gettext("Will Release:") + '&nbsp;</strong>' +
                 gettext("{month}/{day}/{year} - {hour}:{minute} ") +
             '</span>' +
             '<a href="#" class="edit-button" data-date="{month}/{day}/{year}" data-time="{hour}:{minute}" data-id="{id}">' +
-                gettext("Редактировать") +
+                gettext("Edit") +
             '</a>',
             {year: datetime.getUTCFullYear(), month: pad2(datetime.getUTCMonth() + 1), day: pad2(datetime.getUTCDate()),
              hour: pad2(datetime.getUTCHours()), minute: pad2(datetime.getUTCMinutes()),
