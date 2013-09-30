@@ -5,7 +5,7 @@ import waffle
 
 <h2>${chapter_module.display_name_with_default}</h2>
 
-<p>${_("You were most recently in {section_link}.  If you\'re done with that, choose another section on the left.").format(
+<p>${_("В последнее время вы наиболее часто посещали раздел {section_link}.  Если вы закончили прохождение этого раздела, пожалуйста, выберите слева другой раздел.").format(
 	    section_link=u'<a href="{url}">{section_name}</a>'.format(
 	        url=prev_section_url,
 	        section_name=prev_section.display_name_with_default,

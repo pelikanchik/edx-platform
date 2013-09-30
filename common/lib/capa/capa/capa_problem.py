@@ -84,7 +84,7 @@ class LoncapaProblem(object):
          - state        (dict): containing the following keys:
                                 - 'seed' - (int) random number generator seed
                                 - 'student_answers' - (dict) maps input id to the stored answer for that input
-                                - 'correct_map' (CorrectMap) a map of each input to their 'correctness'
+                                - '7' (CorrectMap) a map of each input to their 'correctness'
                                 - 'done' - (bool) indicates whether or not this problem is considered done
                                 - 'input_state' - (dict) maps input_id to a dictionary that holds the state for that input
          - system       (ModuleSystem): ModuleSystem instance which provides OS,

@@ -316,7 +316,7 @@ function (VideoPlayer) {
         // improper format, then set to default value.
         tempYtTestTimeout = parseInt(this.el.data('yt-test-timeout'), 10);
         if (!isFinite(tempYtTestTimeout)) {
-            tempYtTestTimeout = 1500;
+            tempYtTestTimeout = 7500;
         }
         this.config.ytTestTimeout = tempYtTestTimeout;
 

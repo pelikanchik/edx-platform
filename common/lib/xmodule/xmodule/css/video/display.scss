@@ -65,8 +65,10 @@ div.video {
         position: absolute;
         top: 0;
         width: 100%;
+        overflow: auto;
       }
       iproblem {
+        overflow: scroll;
         background-color: white;
       }
 
