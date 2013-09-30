@@ -551,7 +551,7 @@ def instructor_dashboard(request, course_id):
         datatable['title'] = 'Student profile data for course %s' % course_id
         return return_csv('profiledata_%s.csv' % course_id, datatable)
 
-    elif u'Скачать CSV всех попыток по заданию' in action:
+    elif u'Скачать CSV всех попыток' in action:
         problem_to_dump = request.POST.get('problem_to_dump', '')
 
         if problem_to_dump[-4:] == ".xml":
@@ -574,7 +574,7 @@ def instructor_dashboard(request, course_id):
             datatable['title'] = 'Student state for problem %s' % problem_to_dump
             return return_csv('student_state_from_%s.csv' % problem_to_dump, datatable)
 
-    elif u'Данные всех попыток по заданию' in action:
+    elif u'Данные всех попыток' in action:
         log.debug(action)
         problem_to_dump = request.POST.get('problem_to_dump', '')
 
@@ -607,7 +607,13 @@ def instructor_dashboard(request, course_id):
                             answers[j[:found]] = str(data['student_answers'][j].encode('utf-8'))
                         else:
                             if j not in answers:
-                                answers[j] = str(data['student_answers'][j].encode('utf-8'))
+                                if type(data['student_answers'][j]) == list:
+                                        choises = ''
+                                        for c in data['student_answers'][j]:
+                                            choises += c + ', '
+                                        answers[j] = choises[:-2].encode('utf-8')
+                                else:
+                                    answers[j] = str(data['student_answers'][j].encode('utf-8'))
                     answers_str = ''
                     for key in answers.keys():
                         answers_str += answers[key] + ', '
@@ -665,7 +671,13 @@ def instructor_dashboard(request, course_id):
                                 answers[j[:found]] = str(data['student_answers'][j].encode('utf-8'))
                             else:
                                 if j not in answers:
-                                    answers[j] = str(data['student_answers'][j].encode('utf-8'))
+                                    if type(data['student_answers'][j]) == list:
+                                        choises = ''
+                                        for c in data['student_answers'][j]:
+                                            choises += c + ', '
+                                        answers[j] = choises[:-2].encode('utf-8')
+                                    else:
+                                        answers[j] = str(data['student_answers'][j].encode('utf-8'))
                         answers_str = ''
                         for key in answers.keys():
                             answers_str += answers[key] + ', '
@@ -868,6 +880,8 @@ def instructor_dashboard(request, course_id):
     #----------------------------------------
     # context for rendering
 
+    sections = course.get_children()
+
     context = {'course': course,
                'staff_access': True,
                'admin_access': request.user.is_staff,
@@ -885,6 +899,7 @@ def instructor_dashboard(request, course_id):
                'cohorts_ajax_url': reverse('cohorts', kwargs={'course_id': course_id}),
 
                'analytics_results': analytics_results,
+               'sections' : sections,
                }
 
     if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BETA_DASHBOARD'):

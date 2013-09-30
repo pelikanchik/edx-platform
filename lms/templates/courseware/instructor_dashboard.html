@@ -390,13 +390,31 @@ function goto( mode)
     <input type="submit" name="action" value="Скачать CSV с данными пользователей">
     </p>
 
-    <p> URL задания:
-        <input type="text" name="problem_to_dump" size="40">
-        <input type="submit" name="action" value="Данные всех попыток по заданию">
-        <input type="submit" name="action" value="Скачать CSV всех попыток по заданию">
+    <p> Название задания:
+        <select name=problem_to_dump >
+          % for every_section in sections:
+            % for every_subsection in every_section.get_children():
+              % for every_item in every_subsection.get_children():
+                % for every_content in every_item.get_children():
+                  % if every_content  .category == 'problem':
+                    <option value=${every_content.url_name}> ${every_content.display_name_with_default}</option>
+                  % endif
+                % endfor
+              % endfor
+             % endfor
+          % endfor
+        </select>
+        <input type="submit" name="action" value="Данные всех попыток">
+        <input type="submit" name="action" value="Скачать CSV всех попыток">
     </p>
-    <p> URL раздела:
-      <input type="text" name="section_to_dump" size="40">
+    <p>  Название раздела:
+      <select name=section_to_dump >
+          % for every_section in sections:
+            % for every_subsection in every_section.get_children():
+              <option value=${every_subsection.url_name}> ${every_subsection.display_name_with_default}</option>
+             % endfor
+          % endfor
+      </select>
       <input type="submit" name="action" value="Данные по разделу">
     </p>
     <hr width="40%" style="align:left">
