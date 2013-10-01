@@ -25,7 +25,7 @@ class VerticalFields(object):
         display_name="Количество отображаемых задач",
         help="Ученику будет показано несколько случайных задач из юнита. Это число определяет количество показываемых задач.",
         scope=Scope.settings,
-        default=-1
+        default=None
     )
 
 
@@ -63,10 +63,19 @@ class VerticalModule(VerticalFields, XModule):
                   "time": child2.problem_time if child2.get_icon_class() == 'problem' else "video",
                   } for child2 in self.get_display_items()],
             } for child in self.get_display_items()]
-            if self.random_problem_count == -1:
+            if self.random_problem_count is None:
                 self.contents = all_contents
             else:
-                self.contents = random.sample(all_contents, self.random_problem_count)
+                int_rand_count =  int(round(self.random_problem_count))
+                if int_rand_count > len(all_contents):
+                    int_rand_count = len(all_contents)
+                if int_rand_count < 0:
+                    int_rand_count = len(all_contents)
+
+                if int_rand_count < len(all_contents):
+                    self.contents = random.sample(all_contents, int_rand_count)
+                else:
+                    self.contents = all_contents
 
         return self.system.render_template('vert_module.html', {
             'items': self.contents
@@ -99,7 +108,10 @@ class VerticalModule(VerticalFields, XModule):
     def random_show(self):
         count = self.random_problem_count
         if count is None:
-            count = -1
+            if self.contents is None:
+                count = 0
+            else:
+                count = len(self.contents)
         return count
 
 
@@ -123,7 +135,10 @@ class VerticalDescriptor(VerticalFields, SequenceDescriptor):
     def random_show(self):
         count = self.random_problem_count
         if count is None:
-            count = -1
+            if self.contents is None:
+                count = 0
+            else:
+                count = len(self.contents)
         return count
 
     # TODO (victor): Does this need its own definition_to_xml method?  Otherwise it looks

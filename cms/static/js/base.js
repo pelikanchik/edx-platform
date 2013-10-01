@@ -404,7 +404,7 @@ function deleteSection(e) {
 function _deleteItem($el, type) {
     var confirm = new CMS.Views.Prompt.Warning({
         title: gettext('Удалить ' + type + '?'),
-        message: gettext('Удаляется ' + type + ' is permanent and cannot be undone.'),
+        message: gettext('Удаляется ' + type + '. Операция необратима и не сможет быть отменена.'),
         actions: {
             primary: {
                 text: gettext('Да, удалить ' + type),

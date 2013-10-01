@@ -53,20 +53,38 @@
       <div class="main-column">
         <article class="unit-body window">
           <p class="unit-name-input"><label>Название элемента:</label><input type="text" value="${unit.display_name_with_default | h}" class="unit-display-name-input" /></p>
-          <div class="unit-random-problem">Показывать ученикам случайно <input type="text" id="unit_random_problem_input" value = "${unit.random_show | h}" class="unit-random-problem-input" /> из
-               <span class="count-of-problems" id = "count_problems"></span>
+          <div class="unit-random-problem">
+
+              <div class="random-show" id="rand_show_all" style="display: block">
+                Показывать ученикам все задачи
+                  <button class="go-to-random" onclick="comp_rand_some()">Показывать часть заданий</button>
+              </div>
+
+              <div class="random-show" id="rand_show_some" style="display: none">
+              Показывать ученикам случайно
+              <input type="number" step="1" min="0" id="unit_random_problem_input" value="${unit.random_show | h}" class="unit-random-problem-input" />
+              из
+              <span class="count-of-problems" id = "count_problems"></span>
+              задач(и)
+              <button class="go-to-all" onclick="comp_rand_all()">Показывать все задания</button>
+              </div>
                <script type='text/javascript'>
                     $(document).click(function(){
                       var count = $(".problem").length;
                       $("#count_problems").html(count);
                       var cur_value = parseInt('${unit.random_show}')
-                      if (cur_value === -1) {
-                            $("#unit_random_problem_input").attr('value', count);
-                            console.log(count);
-                        }
                     });
+                    function comp_rand_some(){
+                      $("#rand_show_all").hide();
+                      $("#rand_show_some").show();
+                    }
+                    function comp_rand_all(){
+                      $("#rand_show_all").show();
+                      $("#rand_show_some").hide();
+                    }
                </script>
           </div>
+
           <label>Условие для перенаправления:</label>
 
 
