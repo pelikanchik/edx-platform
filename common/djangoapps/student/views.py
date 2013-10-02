@@ -565,11 +565,18 @@ def _do_create_account(post_vars):
     registration.register(user)
 
     profile = UserProfile(user=user)
-    profile.name = post_vars['name']
     profile.level_of_education = post_vars.get('level_of_education')
     profile.gender = post_vars.get('gender')
     profile.mailing_address = post_vars.get('mailing_address')
     profile.goals = post_vars.get('goals')
+    profile.country = post_vars.get('country')
+    profile.city = post_vars.get('city')
+    profile.first_name = post_vars.get('first_name')
+    profile.last_name = post_vars.get('last_name')
+    profile.middle_name = post_vars.get('middle_name')
+    profile.company_name = post_vars.get('company_name')
+    profile.position = post_vars.get('position')
+    profile.name = post_vars['name']
 
     try:
         profile.year_of_birth = int(post_vars['year_of_birth'])
@@ -643,15 +650,21 @@ def create_account(request, post_override=None):
     # this is a good idea
     # TODO: Check password is sane
 
-    required_post_vars = ['username', 'email', 'name', 'password', 'terms_of_service', 'honor_code']
+    required_post_vars = ['username', 'email', 'name', 'password', 'terms_of_service', 'honor_code', 'first_name', 'last_name', 'middle_name', 'city', 'company_name', 'position']
     if tos_not_required:
-        required_post_vars = ['username', 'email', 'name', 'password', 'honor_code']
+        required_post_vars = ['username', 'email', 'name', 'password', 'honor_code', 'first_name', 'last_name', 'middle_name', 'city', 'company_name', 'position']
 
     for a in required_post_vars:
         if len(post_vars[a]) < 2:
             error_str = {'username': u'Имя пользователя не должно быть короче 2 символов.',
                          'email': u'E-mail введён неверно.',
                          'name': u'Ваше полное имя не должно быть короче 2 символов.',
+                         'first_name': u'Ваше имя не должно быть короче 2 символов.',
+                         'last_name': u'Ваша фамилия не должна быть короче 2 символов.',
+                         'middle_name': u'Ваше отчество не должно быть короче 2 символов.',
+                         'city': u'Название вашего города не должно быть короче 2 символов.',
+                         'company_name': u'Название вашей организации не должно быть короче 2 символов.',
+                         'position': u'Название вашей должности не должно быть короче 2 символов',
                          'password': u'Некорректный пароль',
                          'terms_of_service': u'Необходимо согласиться с правилами пользования',
                          'honor_code': u'Для регистрации вы должны согласиться с honor code.'}

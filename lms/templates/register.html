@@ -82,6 +82,13 @@
           html('Создание аккаунта &hellip;');
       }
     }
+
+   $('#first_name, #last_name, #middle_name').bind('keyup', function(e) {
+        var full_name = $( "#last_name").val() + " " + $( "#first_name").val() + " " + $("#middle_name").val();
+        $( "#name").val(full_name);
+
+   });
+
   </script>
 </%block>
 
@@ -130,15 +137,63 @@
           </li>
           <li class="field required text" id="field-username">
             <label for="username">Имя пользователя</label>
-            <input id="username" type="text" name="username" value="" placeholder="например: VPetrov" required aria-required="true" />
+            <input id="username" type="text" name="username" value="" placeholder="например: fbaggins" required aria-required="true" />
             <span class="tip tip-input">Публичное имя, будет использоватья в дискуссиях, на форуме и т.п.</span>
           </li>
-          <li class="field required text" id="field-name">
-            <label for="name">Полное имя</label>
-            <input id="name" type="text" name="name" value="" placeholder="например: Василий Петров" required aria-required="true" />
-            <span class="tip tip-input">Необходимо для получения сертификата <strong>(не может быть изменено!)</strong></span>
 
+          <li class="field required text" id="field-last_name">
+            <label for="last_name">Фамилия</label>
+            <input id="last_name" type="text" name="last_name" value="" placeholder="например: Бэггинс" />
           </li>
+
+          <li class="field required text" id="field-first_name">
+            <label for="first_name">Имя</label>
+            <input id="first_name" type="text" name="first_name" value="" placeholder="например: Фродо" />
+          </li>
+
+          <li class="field required text" id="field-middle_name">
+            <label for="middle_name">Отчество</label>
+            <input id="middle_name" type="text" name="middle_name" value="" placeholder="например: Бильбович" />
+          </li>
+
+          <li class="field required text" id="field-name" style = "display:none;">
+            <label for="name">Полное имя</label>
+            <input id="name" type="text" name="name" value="" required aria-required="true" />
+            <span class="tip tip-input">Необходимо для получения сертификата <strong>(не может быть изменено!)</strong></span>
+         </li>
+
+          <li class="field required text" id="field-country">
+
+              <label for="country">Страна</label>
+              <select id="country" name="country">
+                %for code, country in UserProfile.COUNTRIES:
+                <option value="${code}"
+
+                        %if code == "RU":
+                              selected
+                        %endif
+
+                        >${country}</option>
+                %endfor
+              </select>
+
+            </li>
+
+
+            <li class="field required text" id="field-city">
+               <label for="city">Город</label>
+               <input type="text" id="city" name="city" value="" placeholder="например: Москва" />
+            </li>
+            <li class="field required text" id="field-company_name">
+               <label for="company_name">Компания</label>
+               <input type="text" id="company_name" name="company_name" value="" placeholder="например: Престижио" />
+            </li>
+            <li class="field required text" id="field-position">
+               <label for="position">Должность</label>
+               <input type="text" id="position" name="position" value="" placeholder="например: Менеджер" />
+            </li>
+
+
         </ol>
 
         % else:
@@ -164,23 +219,27 @@
 
           <li class="field required text" id="field-username">
 
-            <label for="username">Имя пользователя</label>
+            <label for="username">Логин</label>
             <input id="username" type="text" name="username" value="${extauth_username}" placeholder="например: JaneDoe" required aria-required="true" />
-            <span class="tip tip-input">Публичный юзернейм, будет использоватья в дискуссиях, на форуме и т.п.</span>
+            <span class="tip tip-input">Публичное имя, будет использоватья в дискуссиях, на форуме и т.п.</span>
 
           </li>
+
+
 
           % if ask_for_fullname:
 
-          <li class="field required text" id="field-name">
+         <li class="field required text" id="field-name">
 
-            <label for="name">Полное имя</label>
+           <label for="name">Полное имя</label>
             <input id="name" type="text" name="name" value="" placeholder="example: Jane Doe" />
             <span class="tip tip-input">Необходимо для получения сертификата <strong>(не может быть изменено!)</strong></span>
 
-          </li>
+         </li>
 
           % endif
+
+
 
         </ol>
 
@@ -196,7 +255,7 @@
           <li class="field-group">
             <div class="field select" id="field-education-level">
 
-              <label for="education-level">Образование</label>
+             <label for="education-level">Образование</label>
 
               <select id="education-level" name="level_of_education">
                 <option value="">--</option>
@@ -226,14 +285,17 @@
                 <option value="${year}">${year}</option>
                 %endfor
               </select>
+
             </div>
+
+
           </li>
         </ol>
       </fieldset>
 
       <fieldset class="group group-form group-form-personalinformation2">
 
-        <legend class="sr">Дополнительная информация </legend>
+        <legend class="sr">Дополнительная информация</legend>
 
         <ol class="list-input">
           <li class="field text" id="field-address-mailing">
@@ -269,7 +331,7 @@
             <div class="field required checkbox" id="field-honorcode">
               <input id="honorcode-yes" type="checkbox" name="honor_code" value="true" />
               <%
-                ## TODO: provide a better way to override these links
+              ## TODO: provide a better way to override these links
                 if self.stanford_theme_enabled():
                   honor_code_path = marketing_link('TOS') + "#honor"
                 else:
