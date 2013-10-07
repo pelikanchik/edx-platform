@@ -316,7 +316,7 @@ section.problem {
     &.not_known{
 
       input {
-        border-color:green;
+        border-color:#e1a600;
       }
       p.status {
         @include inline-block();
@@ -426,7 +426,7 @@ section.problem {
       &.not_known{
 
         input {
-          border-color:green;
+          border-color:#e1a600;
         }
 
       }
