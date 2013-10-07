@@ -32,7 +32,7 @@ from .discussionsettings import *
 
 ################################### FEATURES ###################################
 # The display name of the platform to be used in templates/emails/etc.
-PLATFORM_NAME = "lutiX"
+PLATFORM_NAME = "Pelican"
 
 COURSEWARE_ENABLED = True
 ENABLE_JASMINE = False
@@ -353,7 +353,7 @@ USE_TZ = True
 
 # Site info
 SITE_ID = 1
-SITE_NAME = "edx.org"
+SITE_NAME = "pelic.ru"
 HTTPS = 'on'
 ROOT_URLCONF = 'lms.urls'
 IGNORABLE_404_ENDS = ('favicon.ico')
@@ -451,7 +451,7 @@ ZENDESK_USER = None
 ZENDESK_API_KEY = None
 
 ##### shoppingcart Payment #####
-PAYMENT_SUPPORT_EMAIL = 'payment@edx.org'
+PAYMENT_SUPPORT_EMAIL = 'team@pelic.ru'
 ##### Using cybersource by default #####
 CC_PROCESSOR = {
     'CyberSource': {

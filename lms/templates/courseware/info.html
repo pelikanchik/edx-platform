@@ -25,7 +25,7 @@ $(document).ready(function(){
 
 <section class="container">
   <div class="info-wrapper">
-    % if user.is_authenticated():
+    % if user.is_authenticated() and registered:
     <section class="updates">
       <h1>Последние события</h1>
       ${get_course_info_section(request, course, 'updates')}
@@ -40,7 +40,7 @@ $(document).ready(function(){
       ${get_course_info_section(request, course, 'guest_updates')}
     </section>
     <section aria-label="Handout Navigation" class="handouts">
-      <h1>Раздаточные материалы</h1>
+      <h1>Гостевые раздаточные материалы</h1>
       ${get_course_info_section(request, course, 'guest_handouts')}
     </section>
     % endif
