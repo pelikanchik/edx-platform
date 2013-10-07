@@ -10,6 +10,7 @@ from markupsafe import escape
 import os
 import re
 import requests
+import openpyxl
 from requests.status_codes import codes
 from collections import OrderedDict
 
@@ -51,7 +52,8 @@ from student.models import CourseEnrollment, CourseEnrollmentAllowed
 import track.views
 from mitxmako.shortcuts import render_to_string
 from pprint import pprint
-
+from openpyxl.style import Fill, Color, Border
+from openpyxl import Workbook
 
 log = logging.getLogger(__name__)
 
@@ -128,6 +130,42 @@ def instructor_dashboard(request, course_id):
         for datarow in datatable['data']:
             encoded_row = [unicode(s).encode('utf-8') for s in datarow]
             writer.writerow(encoded_row)
+        return response
+
+    def return_xlsx(fn, datatable, fp=None):
+        def set_style_all_boarders(cell, style):
+            cell.style.borders.top.border_style = style
+            cell.style.borders.bottom.border_style = style
+            cell.style.borders.left.border_style = style
+            cell.style.borders.right.border_style = style
+
+        if fp is None:
+            response = HttpResponse(mimetype='text/csv')
+            response['Content-Disposition'] = 'attachment; filename={0}'.format(fn)
+        else:
+            response = fp
+        wb = Workbook()
+        ws = wb.get_active_sheet()
+
+        for i, h in enumerate(datatable['header']):
+            c = ws.cell(row=0, column=i)
+            c.value = h
+            set_style_all_boarders(c, Border.BORDER_THIN)
+            c.style.fill.fill_type = Fill.FILL_SOLID
+            c.style.fill.start_color.index = openpyxl.style.Color.YELLOW
+        for i, datarow in enumerate(datatable['data'], start=1):
+            for j, data in enumerate(datarow):
+                c = ws.cell(row=i, column=j)
+                c.value = data
+                set_style_all_boarders(c, Border.BORDER_THIN)
+
+        ws.column_dimensions["A"].width = 5
+        ws.column_dimensions["B"].width = 15
+        ws.column_dimensions["C"].width = 15
+        ws.column_dimensions["D"].width = 15
+        ws.column_dimensions["F"].width = 5
+        ws.column_dimensions["G"].width = 15
+        wb.save(response)
         return response
 
     def get_staff_group(course):
@@ -551,30 +589,7 @@ def instructor_dashboard(request, course_id):
         datatable['title'] = 'Student profile data for course %s' % course_id
         return return_csv('profiledata_%s.csv' % course_id, datatable)
 
-    elif u'Скачать CSV всех попыток' in action:
-        problem_to_dump = request.POST.get('problem_to_dump', '')
-
-        if problem_to_dump[-4:] == ".xml":
-            problem_to_dump = problem_to_dump[:-4]
-        try:
-            (org, course_name, _) = course_id.split("/")
-            module_state_key = "i4x://" + org + "/" + course_name + "/problem/" + problem_to_dump
-            smdat = StudentModule.objects.filter(course_id=course_id,
-                                                 module_state_key=module_state_key)
-            smdat = smdat.order_by('student')
-            msg += "Found %d records to dump " % len(smdat)
-        except Exception as err:
-            msg += "<font color='red'>Couldn't find module with that urlname.  </font>"
-            msg += "<pre>%s</pre>" % escape(err)
-            smdat = []
-
-        if smdat:
-            datatable = {'header': ['username', 'state']}
-            datatable['data'] = [[x.student.username, x.state.decode('unicode_escape')] for x in smdat]
-            datatable['title'] = 'Student state for problem %s' % problem_to_dump
-            return return_csv('student_state_from_%s.csv' % problem_to_dump, datatable)
-
-    elif u'Данные всех попыток' in action:
+    elif u'Данные всех попыток' in action or u'Скачать XLSX всех попыток' in action:
         log.debug(action)
         problem_to_dump = request.POST.get('problem_to_dump', '')
 
@@ -604,7 +619,8 @@ def instructor_dashboard(request, course_id):
                     for j in data['student_answers'].keys():
                         found = j.find('_dynamath')
                         if found != -1:
-                            answers[j[:found]] = str(data['student_answers'][j].encode('utf-8'))
+                            if u'Данные всех попыток' in action:
+                                answers[j[:found]] = data['student_answers'][j].encode('utf-8')
                         else:
                             if j not in answers:
                                 if type(data['student_answers'][j]) == list:
@@ -613,7 +629,7 @@ def instructor_dashboard(request, course_id):
                                             choises += c + ', '
                                         answers[j] = choises[:-2].encode('utf-8')
                                 else:
-                                    answers[j] = str(data['student_answers'][j].encode('utf-8'))
+                                    answers[j] = data['student_answers'][j].encode('utf-8')
                     answers_str = ''
                     for key in answers.keys():
                         answers_str += answers[key] + ', '
@@ -623,6 +639,8 @@ def instructor_dashboard(request, course_id):
                     continue
                 datatable['data'].append(datarow)
             datatable['title'] = 'Student state for problem %s' % problem_to_dump
+            if u'Скачать XLSX всех попыток' in action:
+                return return_xlsx('student_state_from_%s.xlsx' % problem_to_dump, datatable)
 
     elif u'Данные по разделу' in action:
         log.debug(action)
@@ -668,7 +686,7 @@ def instructor_dashboard(request, course_id):
                         for j in data['student_answers'].keys():
                             found = j.find('_dynamath')
                             if found != -1:
-                                answers[j[:found]] = str(data['student_answers'][j].encode('utf-8'))
+                                answers[j[:found]] = data['student_answers'][j].encode('utf-8')
                             else:
                                 if j not in answers:
                                     if type(data['student_answers'][j]) == list:
@@ -677,7 +695,7 @@ def instructor_dashboard(request, course_id):
                                             choises += c + ', '
                                         answers[j] = choises[:-2].encode('utf-8')
                                     else:
-                                        answers[j] = str(data['student_answers'][j].encode('utf-8'))
+                                        answers[j] = data['student_answers'][j].encode('utf-8')
                         answers_str = ''
                         for key in answers.keys():
                             answers_str += answers[key] + ', '
