@@ -144,15 +144,11 @@ def get_course_about_section(course, section_key):
 
         try:
 
-
             request = get_request_for_thread()
 
             loc = course.location._replace(category='about', name=section_key)
 
 
-
-            #print (request.user)
-            print (course.id)
             # Use an empty cache
             model_data_cache = ModelDataCache([], course.id, request.user)
 
