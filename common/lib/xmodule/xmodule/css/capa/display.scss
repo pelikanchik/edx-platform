@@ -182,10 +182,21 @@ section.problem {
     }
     label.choicegroup_not_known{
       &:after{
-        content: "ok";
-        color: green;
+        content: "ответ принят";
+        color: #e1a600;
         margin-left:15px;
       }
+    }
+
+    span.not_known{
+
+      &:after{
+        content: "ответ принят";
+        font-size: 11px;
+        font-weight: bold;
+        color: #e1a600;
+      }
+
     }
 
     .indicator_container {
@@ -305,7 +316,7 @@ section.problem {
     &.not_known{
 
       input {
-        border-color:green;
+        border-color:#e1a600;
       }
       p.status {
         @include inline-block();
@@ -415,7 +426,7 @@ section.problem {
       &.not_known{
 
         input {
-          border-color:green;
+          border-color:#e1a600;
         }
 
       }

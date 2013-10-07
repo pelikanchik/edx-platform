@@ -533,6 +533,10 @@ class CapaModule(CapaFields, XModule):
         except Exception as err:
             html = self.handle_problem_html_error(err)
 
+
+        #Если в настройках указано, что правильность ответа ученик знать не должен,
+        #incorrect и correct меняются на not_known. Это не очень хорошо, т.к. в
+        #тексте слова correct и incorrect содержаться могут
         if self.checkanswer == 0:
             html = html.replace("incorrect", "not_known")
             html = html.replace("correct", "not_known")
