@@ -163,8 +163,6 @@ def instructor_dashboard(request, course_id):
         ws.column_dimensions["B"].width = 15
         ws.column_dimensions["C"].width = 15
         ws.column_dimensions["D"].width = 15
-        ws.column_dimensions["F"].width = 5
-        ws.column_dimensions["G"].width = 15
         wb.save(response)
         return response
 
@@ -609,7 +607,7 @@ def instructor_dashboard(request, course_id):
 
         if smdat:
             datatable = {'header': ['ID', 'Пользователь', 'Полное имя', 'edX email',
-                                    'Попытки', 'Seed', 'Ответы студента']}
+                                    'Попытки', 'Seed', 'Ответ']}
             datatable['data'] = []
             for i in smdat:
                 data = json.loads(i.state)
@@ -642,7 +640,7 @@ def instructor_dashboard(request, course_id):
             if u'Скачать XLSX всех попыток' in action:
                 return return_xlsx('student_state_from_%s.xlsx' % problem_to_dump, datatable)
 
-    elif u'Данные по разделу' in action:
+    elif u'Данные по разделу' in action or u'Скачать XLSX по разделу' in action:
         log.debug(action)
         section_to_dump = request.POST.get('section_to_dump', '')
         (org, course_name, _) = course_id.split("/")
@@ -686,7 +684,8 @@ def instructor_dashboard(request, course_id):
                         for j in data['student_answers'].keys():
                             found = j.find('_dynamath')
                             if found != -1:
-                                answers[j[:found]] = data['student_answers'][j].encode('utf-8')
+                                if u'Данные по разделу' in action:
+                                    answers[j[:found]] = data['student_answers'][j].encode('utf-8')
                             else:
                                 if j not in answers:
                                     if type(data['student_answers'][j]) == list:
@@ -706,7 +705,9 @@ def instructor_dashboard(request, course_id):
                     datasubrow.append('')
             datarow.append(datasubrow)
         datatable['data'] = datarow
-        datatable['title'] = 'Students state for section %s' % section_to_dump                          
+        datatable['title'] = 'Students state for section %s' % section_to_dump 
+        if u'Скачать XLSX по разделу' in action:
+            return return_xlsx('student_state_from_%s.xlsx' % section_to_dump, datatable)                        
             
     #----------------------------------------
     # Group management
