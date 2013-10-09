@@ -390,14 +390,19 @@ function goto( mode)
     <input type="submit" name="action" value="Скачать CSV с данными пользователей">
     </p>
 
-    <p> Название задания:
+    <p>
         <select name=problem_to_dump >
+          <option disabled selected>Выберите задание</option>
           % for every_section in sections:
+            <option disabled> ${every_section.display_name_with_default}</option>
             % for every_subsection in every_section.get_children():
+              <option disabled> &nbsp&nbsp&nbsp${every_subsection.display_name_with_default}</option>
               % for every_item in every_subsection.get_children():
+                <option disabled> &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp${every_item.display_name_with_default}</option>
                 % for every_content in every_item.get_children():
                   % if every_content  .category == 'problem':
-                    <option value=${every_content.url_name}> ${every_content.display_name_with_default}</option>
+                    <option value=${every_content.url_name}> &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp${every_content.display_name_with_default}
+                    </option>
                   % endif
                 % endfor
               % endfor
@@ -407,11 +412,15 @@ function goto( mode)
         <input type="submit" name="action" value="Данные всех попыток">
         <input type="submit" name="action" value="Скачать XLSX всех попыток">
     </p>
-    <p>  Название раздела:
+    <p>
       <select name=section_to_dump >
+          <option disabled selected>Выберите раздел</option>
           % for every_section in sections:
+            <option disabled> ${every_section.display_name_with_default}</option>
             % for every_subsection in every_section.get_children():
-              <option value=${every_subsection.url_name}> ${every_subsection.display_name_with_default}</option>
+              <option value=${every_subsection.url_name}> 
+              &nbsp&nbsp&nbsp${every_subsection.display_name_with_default}
+              </option>
              % endfor
           % endfor
       </select>
@@ -643,7 +652,7 @@ function goto( mode)
         %for row in datatable['data']:
           <tr>
 	    %for value in row:
-	      <td>${value}</td>
+	      <td class="correct">${value}</td>
 	    %endfor
 	  </tr>
         %endfor

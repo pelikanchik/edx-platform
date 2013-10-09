@@ -11,6 +11,8 @@ import os
 import re
 import requests
 import openpyxl
+import datetime
+
 from requests.status_codes import codes
 from collections import OrderedDict
 
@@ -54,6 +56,7 @@ from mitxmako.shortcuts import render_to_string
 from pprint import pprint
 from openpyxl.style import Fill, Color, Border
 from openpyxl import Workbook
+from datetime import datetime
 
 log = logging.getLogger(__name__)
 
@@ -636,9 +639,12 @@ def instructor_dashboard(request, course_id):
                 except KeyError:
                     continue
                 datatable['data'].append(datarow)
-            datatable['title'] = 'Student state for problem %s' % problem_to_dump
+            problem_name = modulestore().get_item(module_state_key, depth=2).display_name_with_default.encode('utf-8')
+            datatable['title'] = 'Student state for problem {0} ({1})'.format(problem_name, problem_to_dump)
             if u'Скачать XLSX всех попыток' in action:
-                return return_xlsx('student_state_from_%s.xlsx' % problem_to_dump, datatable)
+                t = datetime.now()
+                file_name = '{0}{1}{2}_{3}_{4}_{5}.xlsx'.format(t.year, t.month, t.day, t.hour, t.minute, problem_name)
+                return return_xlsx(file_name, datatable)
 
     elif u'Данные по разделу' in action or u'Скачать XLSX по разделу' in action:
         log.debug(action)
@@ -646,13 +652,13 @@ def instructor_dashboard(request, course_id):
         (org, course_name, _) = course_id.split("/")
         location = "i4x://" + org + "/" + course_name + "/sequential/" + section_to_dump
         try:
-            item = modulestore().get_item(location, depth=1)
+            section = modulestore().get_item(location, depth=1)
         except (ItemNotFoundError, InvalidLocationError):
             return HttpResponseBadRequest()
         units = [
             modulestore().get_item(component.location.url(), depth=1)
             for component
-            in item.get_children()
+            in section.get_children()
         ]
         problems_urls = []
         for unit in units:
@@ -705,9 +711,12 @@ def instructor_dashboard(request, course_id):
                     datasubrow.append('')
             datarow.append(datasubrow)
         datatable['data'] = datarow
-        datatable['title'] = 'Students state for section %s' % section_to_dump 
+        section_name = section.display_name_with_default.encode('utf-8')
+        datatable['title'] = 'Students state for section {0} ({1})'.format(section_name, section_to_dump) 
         if u'Скачать XLSX по разделу' in action:
-            return return_xlsx('student_state_from_%s.xlsx' % section_to_dump, datatable)                        
+            t = datetime.now()
+            file_name = '{0}{1}{2}_{3}_{4}_{5}.xlsx'.format(t.year, t.month, t.day, t.hour, t.minute, section_name)
+            return return_xlsx(file_name, datatable)                        
             
     #----------------------------------------
     # Group management
