@@ -614,8 +614,16 @@ def instructor_dashboard(request, course_id):
             datatable['data'] = []
             for i in smdat:
                 data = json.loads(i.state)
-                answers = ''
+                datarow = [i.student.id, i.student.username, i.student.profile.name, i.student.email]
+                try: 
+                    datarow.append(data['attempts'])
+                except KeyError: #student didnt answer the question
+                    datarow.append(0)
                 try:
+                    datarow.append(data['seed'])
+                except KeyError:
+                    datarow.append('')                
+                try: #trying to get sudent's answers if there are
                     answers = {}
                     for j in data['student_answers'].keys():
                         found = j.find('_dynamath')
@@ -634,10 +642,9 @@ def instructor_dashboard(request, course_id):
                     answers_str = ''
                     for key in answers.keys():
                         answers_str += answers[key] + ', '
-                    datarow = [i.student.id, i.student.username, i.student.profile.name, i.student.email]
-                    datarow += [data['attempts'], data['seed'], answers_str[:-2]]
-                except KeyError:
-                    continue
+                    datarow.append(answers_str[:-2])
+                except KeyError: #student didnt answer the question
+                    datarow.append('')
                 datatable['data'].append(datarow)
             problem_name = modulestore().get_item(module_state_key, depth=2).display_name_with_default.encode('utf-8')
             datatable['title'] = 'Student state for problem {0} ({1})'.format(problem_name, problem_to_dump)
@@ -673,9 +680,9 @@ def instructor_dashboard(request, course_id):
             courseenrollment__is_active=1,
         ).prefetch_related("groups").order_by('username')
         msg += "Found %d records to dump " % len(enrolled_students)
-        datarow = []
+        datatable['data'] = []
         for student in enrolled_students:
-            datasubrow = [student.id, student.username, student.profile.name, student.email]
+            datarow = [student.id, student.username, student.profile.name, student.email]
             for problem in problems_urls:
                 try:
                     smdat = StudentModule.objects.get(student=student, 
@@ -704,13 +711,12 @@ def instructor_dashboard(request, course_id):
                         answers_str = ''
                         for key in answers.keys():
                             answers_str += answers[key] + ', '
-                        datasubrow.append(answers_str[:-2])
+                        datarow.append(answers_str[:-2])
                     except KeyError:
-                        datasubrow.append('')
+                        datarow.append('')
                 else:
-                    datasubrow.append('')
-            datarow.append(datasubrow)
-        datatable['data'] = datarow
+                    datarow.append('')
+            datatable['data'].append(datarow)
         section_name = section.display_name_with_default.encode('utf-8')
         datatable['title'] = 'Students state for section {0} ({1})'.format(section_name, section_to_dump) 
         if u'Скачать XLSX по разделу' in action:
