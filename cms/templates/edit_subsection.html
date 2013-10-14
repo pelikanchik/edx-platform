@@ -248,7 +248,7 @@
 
             <p class="notice">${_(u"Вышеуказанная дата отличается от даты конца  {name}, которая не задана.").format(name=parent_item.display_name_with_default)}
             % else:
-      <p class="notice">${_(u"Вышеуказанная дата отличается от даты начала {name} - {start_time}").format(name=parent_item.display_name_with_default, start_time=get_default_time_display(parent_item.lms.start))}.
+      <p class="notice">${_(u"Вышеуказанная дата отличается от даты начала {name} - {start_time}").format(name=parent_item.display_name_with_default, start_time=get_default_time_display(parent_item.start))}.
 
 
             % endif

@@ -5,6 +5,8 @@
 <div id="sequence_${element_id}" class="sequence"
      data-id="${item_id}"
      data-position="${position}"
+     data-position="${position}"
+     data-next_attempt_set="${next_attempt_set}"
      data-course_modx_root="/course/modx" >
   <nav aria-label="Section Navigation" class="sequence-nav">
     <ul class="sequence-nav-buttons">
@@ -45,13 +47,14 @@
   % for item in items:
   <div class="seq_contents tex2jax_ignore asciimath2jax_ignore"
           data-direct_term="${item['direct_term']}"
-          data-progress_detail="${item['progress_detail']}">
+          data-progress_detail="${item['progress_detail']}"
+          data-time_delay="${item['time_delay']}"
+          data-next_attempt="${item['next_attempt']}">
       ${item['content'] | h}
   </div>
   % endfor
-
   <div id="seq_content"></div>
-
+    <button id="finish_now" class="finish-test" style="display: none"></button>
   <nav class="sequence-bottom">
     <ul aria-label="${_('Section Navigation')}" class="sequence-nav-buttons">
       <li class="prev"><a href="#">${_("Previous")}</a></li>

@@ -6,7 +6,7 @@ class @Problem
     @el = $(element).find('.problems-wrapper')
     @id = @el.data('problem-id')
     @element_id = @el.attr('id')
-    @el_show = @el.attr('show_answers_button')
+    @el_show = @el.data('delay_answers')
     @url = @el.data('url')
     @index_show = 0
     @render()
@@ -151,6 +151,8 @@ class @Problem
         @setupInputTypes()
         @bind()
         @queueing()
+        console.log(@el_show)
+        setTimeout @enable_answers, 1000*@el_show
     else
       $.postWithPrefix "#{@url}/problem_get", (response) =>
         @el.html(response.html)
@@ -159,6 +161,13 @@ class @Problem
           @bind()
           @queueing()
           @forceUpdate response
+          console.log(@el_show)
+          setTimeout @enable_answers, 1000*@el_show
+
+  enable_answers: ->
+    @$('.show').removeAttr("disabled")
+
+
 
   # TODO add hooks for problem types here by inspecting response.html and doing
   # stuff if a div w a class is found

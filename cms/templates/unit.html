@@ -53,6 +53,9 @@
       <div class="main-column">
         <article class="unit-body window">
           <p class="unit-name-input"><label>Название элемента:</label><input type="text" value="${unit.display_name_with_default | h}" class="unit-display-name-input" /></p>
+
+          <div class="unit-attempts-delay">Интервал между попытками в секундах:<input type="text" value="${unit.time_delay_with_default | h}" class="unit-attempts-delay-input" /></div>
+
           <div class="unit-random-problem">
 
               <div class="random-show" id="rand_show_all" style="display: block">
@@ -73,6 +76,9 @@
                       var count = $(".problem").length;
                       $("#count_problems").html(count);
                       var cur_value = parseInt('${unit.random_show}')
+                      if($('#rand_show_all').css('display') == 'none'){
+                          $("#unit_random_problem_input").val(count);
+                      }
                     });
                     function comp_rand_some(){
                       $("#rand_show_all").hide();
@@ -81,6 +87,8 @@
                     function comp_rand_all(){
                       $("#rand_show_all").show();
                       $("#rand_show_some").hide();
+                      var count = $(".problem").length;
+                      $("#unit_random_problem_input").val(count);
                     }
                </script>
           </div>

@@ -299,6 +299,7 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
 
     def publish(event):
         """A function that allows XModules to publish events. This only supports grade changes right now."""
+
         if event.get('event_name') != 'grade':
             return
 
@@ -386,7 +387,6 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
             'psychometrics_handler',  # set callback for updating PsychometricsData
             make_psychometrics_data_update_handler(course_id, user, descriptor.location.url())
         )
-
     try:
         module = descriptor.xmodule(system)
     except:
@@ -493,6 +493,7 @@ def xqueue_callback(request, course_id, userid, mod_id, dispatch):
     # So far, the only dispatch from xqueue will be 'score_update'
     try:
         # Can ignore the return value--not used for xqueue_callback
+
         instance.handle_ajax(dispatch, data)
         # Save any state that has changed to the underlying KeyValueStore
         instance.save()
@@ -560,7 +561,8 @@ def modx_dispatch(request, dispatch, location, course_id):
     instance = get_module(request.user, request, location, field_data_cache, course_id, grade_bucket_type='ajax')
     if instance is None:
         # Either permissions just changed, or someone is trying to be clever
-        # and load something they shouldn't have access to.
+        # and load s
+        # omething they shouldn't have access to.
         log.debug("No module {0} for user {1}--access denied?".format(location, request.user))
         raise Http404
 

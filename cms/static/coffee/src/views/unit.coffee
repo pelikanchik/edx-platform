@@ -33,6 +33,10 @@ class CMS.Views.UnitEdit extends Backbone.View
       el: @$('.unit-random-problem')
       model: @model
     )
+    @delayView = new CMS.Views.UnitEdit.DelayEdit(
+      el: @$('.unit-attempts-delay')
+      model: @model
+    )
 
     @model.on('change:state', @render)
 
@@ -271,6 +275,7 @@ class CMS.Views.UnitEdit.NameEdit extends Backbone.View
     metadata.display_name = $('.unit-display-name-input').val()
     metadata.direct_term = $('.unit-direct-term-input').val()
     metadata.random_problem_count = $('.unit-random-problem-input').val()
+    metadata.time_delay = $('.unit-attempts-delay-input').val()
     @model.save(metadata: metadata)
     # Update name shown in the right-hand side location summary.
     $('.unit-location .editing .unit-name').html(metadata.display_name)
@@ -312,6 +317,7 @@ class CMS.Views.UnitEdit.TermEdit extends Backbone.View
     metadata.display_name = $('.unit-display-name-input').val()
     metadata.direct_term = $('.unit-direct-term-input').val()
     metadata.random_problem_count = $('.unit-random-problem-input').val()
+    metadata.time_delay = $('.unit-attempts-delay-input').val()
     @model.save(metadata: metadata)
 
     setTimeout('$(".save-term").val("Сохранить"); $(".save-term").removeClass("save-term-active");', 500)
@@ -367,7 +373,41 @@ class CMS.Views.UnitEdit.RandomEdit extends Backbone.View
     metadata.display_name = $('.unit-display-name-input').val()
     metadata.direct_term = $('.unit-direct-term-input').val()
     metadata.random_problem_count = $('.unit-random-problem-input').val()
+    metadata.time_delay = $('.unit-attempts-delay-input').val()
     @model.save(metadata: metadata)
+    # Update name shown in the right-hand side location summary.
+    $('.unit-location .editing .unit-name').html(metadata.display_name)
+
+class CMS.Views.UnitEdit.DelayEdit extends Backbone.View
+  events:
+    'change .unit-attempts-delay-input': 'saveDelay'
+
+  initialize: =>
+    @model.on('change:metadata', @render)
+    @model.on('change:state', @setEnabled)
+    @setEnabled()
+    @saveDelay
+    @$spinner = $('<span class="spinner-in-field-icon"></span>');
+
+  render: =>
+    @$('.unit-attempts-delay-input').val(@model.get('metadata').time_delay)
+
+  setEnabled: =>
+    disabled = @model.get('state') == 'public'
+    if disabled
+      @$('.unit-attempts-delay-input').attr('disabled', true)
+    else
+      @$('.unit-attempts-delay-input').removeAttr('disabled')
+
+  saveDelay: =>
+    # Treat the metadata dictionary as immutable
+    metadata = $.extend({}, @model.get('metadata'))
+    metadata.display_name = $('.unit-display-name-input').val()
+    metadata.direct_term = $('.unit-direct-term-input').val()
+    metadata.random_problem_count = $('.unit-random-problem-input').val()
+    metadata.time_delay = $('.unit-attempts-delay-input').val()
+    @model.save(metadata: metadata)
+    console.log(metadata.time_delay)
     # Update name shown in the right-hand side location summary.
     $('.unit-location .editing .unit-name').html(metadata.display_name)
 

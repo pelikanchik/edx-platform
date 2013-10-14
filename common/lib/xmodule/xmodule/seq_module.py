@@ -1,7 +1,9 @@
+# -*- coding: utf-8 -*-
 import json
 import logging
 
 from lxml import etree
+from datetime import datetime, timedelta
 
 from xmodule.mako_module import MakoModuleDescriptor
 from xmodule.xml_module import XmlDescriptor
@@ -9,7 +11,7 @@ from xmodule.x_module import XModule
 from xmodule.progress import Progress
 from xmodule.exceptions import NotFoundError
 
-from xblock.fields import Scope, String, Integer
+from xblock.fields import Scope, String, Integer, Dict
 
 from pkg_resources import resource_string
 
@@ -31,6 +33,7 @@ class SequenceFields(object):
     # NOTE: Position is 1-indexed.  This is silly, but there are now student
     # positions saved on prod, so it's not easy to fix.
     position = Integer(help="Last tab viewed in this sequence", scope=Scope.user_state)
+    next_attempt_set = Dict(scope=Scope.user_state)
 
 def get_unit(unit_id, section):
         for child in section.get_children():
@@ -60,41 +63,40 @@ def elementary_conjunction(term, section):
 
             progress = unit.get_progress()
 
-            if term["field"]=="score_rel":
+            if term["field"] == "score_rel":
                 value = Progress.percent(progress)
 
 
-            if term["field"]=="score_abs":
+            if term["field"] == "score_abs":
                 str_value = Progress.frac(progress)
                 value = str_value[0]
 
         else:
             value = 0
 
-
-        if term["sign"]== "more":
+        if term["sign"] == "more":
             if value > term["value"]:
                 return True
             else:
                 return False
-        if term["sign"]== "more-equals":
+        if term["sign"] == "more-equals":
             if value >= term["value"]:
                 return True
             else:
                 return False
 
-        if term["sign"]== "less":
+        if term["sign"] == "less":
             if value < term["value"]:
                 return True
             else:
                 return False
 
-        if term["sign"]== "less-equals":
+        if term["sign"] == "less-equals":
             if value <= term["value"]:
                 return True
             else:
                 return False
-        if term["sign"]== "equals":
+        if term["sign"] == "equals":
             if value == term["value"]:
                 return True
             else:
@@ -124,7 +126,6 @@ class SequenceModule(SequenceFields, XModule):
 
     def get_instance_state(self):
         return json.dumps({'position': self.position})
-
 
     def get_html(self):
         self.render()
@@ -177,6 +178,36 @@ class SequenceModule(SequenceFields, XModule):
         if dispatch == 'goto_position':
             self.position = int(data['position'])
             return json.dumps({'success': True})
+        if dispatch == 'change_attempt_time':
+            cur_position = self.position
+            pos = 1
+            for child in self.get_display_items():
+                if pos == cur_position:
+                    delay = child.time_delay_with_default
+                    current_time = datetime.now()
+                    print current_time
+                    new_time = current_time + timedelta(0, delay)
+                    print new_time
+                    date = [0]*6
+                    date[0] = str(new_time.year)
+                    date[1] = str(new_time.month)
+                    date[2] = str(new_time.day)
+                    date[3] = str(new_time.hour)
+                    date[4] = str(new_time.minute)
+                    date[5] = str(new_time.second)
+                    i = 1
+                    full_date = date[0]
+                    while i < 6:
+                        if len(date[i]) < 2:
+                            date[i] = "0" + date[i]
+                        full_date = full_date + ":" + date[i]
+                        i += 1
+                    child.set_next_attempt(full_date)
+                    self.next_attempt_set[child.id] = full_date
+                    return json.dumps({'next_attempt': full_date})
+                pos += 1
+            return json.dumps({'next_attempt': "null"})
+
         raise NotFoundError('Unexpected dispatch type')
 
     def render(self):
@@ -191,6 +222,11 @@ class SequenceModule(SequenceFields, XModule):
         contents = []
         for child in self.get_display_items():
             progress = child.get_progress()
+            #next_attempt = child.next_attempt
+            if self.next_attempt_set.has_key(child.id):
+                next_attempt = self.next_attempt_set[child.id]
+            else:
+                next_attempt = "2013:01:02:03:04:05"
             childinfo = {
                 'content': child.get_html(),
                 'title': "\n".join(
@@ -202,7 +238,9 @@ class SequenceModule(SequenceFields, XModule):
                 'progress_detail': Progress.to_js_detail_str(progress),
                 'type': child.get_icon_class(),
                 'id': child.id,
-                'direct_term': child.direct_term_with_default
+                'direct_term': child.direct_term_with_default,
+                'time_delay': child.time_delay_with_default,
+                'next_attempt': next_attempt,
             }
             if childinfo['title'] == '':
                 childinfo['title'] = child.display_name_with_default
@@ -212,6 +250,7 @@ class SequenceModule(SequenceFields, XModule):
                   'element_id': self.location.html_id(),
                   'item_id': self.id,
                   'position': self.position,
+                  'next_attempt_set': self.next_attempt_set,
                   'tag': self.location.category
                   }
 

@@ -58,7 +58,7 @@ def randomization_bin(seed, problem_id):
 
 class Randomization(String):
     """
-    Define a field to store how to randomize a problem.
+    Define a field to store how to rand8omize a problem.
     """
     def from_json(self, value):
         if value in ("", "true"):
@@ -396,6 +396,7 @@ class CapaModule(CapaFields, XModule):
             'progress': Progress.to_js_detail_str(self.get_progress()),
             'progress_status': Progress.to_js_status_str(progress),
             'progress_detail': Progress.to_js_detail_str(progress),
+            'delay_answers': self.showbuttonanswer,
         })
 
     def check_button_name(self):
@@ -655,7 +656,6 @@ class CapaModule(CapaFields, XModule):
                    'answer_available': self.answer_available(),
                    'attempts_used': self.attempts,
                    'attempts_allowed': self.max_attempts,
-                   'delay_answers': self.showbuttonanswer,
                    'problem_now': self.problem_now,
                    'problem_time': problem_time_to_show,
                    'return_to_video_button': show_return_to_video_button,

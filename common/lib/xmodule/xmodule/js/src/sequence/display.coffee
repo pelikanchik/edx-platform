@@ -5,6 +5,7 @@ class @Sequence
     @num_contents = @contents.length
     @id = @el.data('id')
     @modx_url = @el.data('course_modx_root')
+    @next_attempt_set = @el.data('next_attempt_set')
     @initProgress()
     @bind()
     @render parseInt(@el.data('position'))
@@ -12,8 +13,9 @@ class @Sequence
   $: (selector) ->
     $(selector, @el)
 
-  bind: ->
+  bind: =>
     @$('#sequence-list a').click @goto
+    @$('.finish-test').click @finish_test
 
 
   initProgress: ->
@@ -94,17 +96,99 @@ class @Sequence
       @el.trigger "sequence:change"
       @mark_active new_position
       @$('#seq_content').html @contents.eq(new_position - 1).text()
+
       XModule.loadModules(@$('#seq_content'))
 
       #MathJax.Hub.Queue(["Typeset", MathJax.Hub, "seq_content"]) # NOTE: Actually redundant. Some other MathJax call also being performed
       window.update_schematics() # For embedded circuit simulator exercises in 6.002x
 
       @position = new_position
+
       @toggleArrows()
       @hookUpProgressEvent()
 
       sequence_links = @$('#seq_content a.seqnav')
       sequence_links.click @goto
+      console.log(@next_attempt_set)
+      @total_seconds = @contents.eq(@position - 1).data("time_delay")
+      @time_next_attempt = "2013:01:01:01:01:01"
+      try @time_next_attempt = @contents.eq(@position - 1).data("next_attempt")
+      catch error
+        console.log(error)
+      if @time_check() == true
+        @total_seconds = 0
+        @enable_button()
+      else
+        $('.check').attr('disabled', true)
+        $('.finish-test').attr('disabled', true)
+        $('.check-all').attr('disabled', true)
+        $('.dialog-finish-test').attr('disabled', true)
+        @enable_button()
+
+  finish_test: =>
+    modx_full_url = @modx_url + '/' + @id + '/change_attempt_time'
+    $('.check').attr('disabled', true)
+    $('.finish-test').attr('disabled', true)
+    $('.check-all').attr('disabled', true)
+    $('.dialog-finish-test').attr('disabled', true)
+    $.postWithPrefix modx_full_url, (response) =>
+      @time_next_attempt = response.next_attempt
+      @contents.eq(@position - 1).data("next_attempt", @time_next_attempt)
+      @contents.eq(@position - 1).attr("data-next_attempt", @time_next_attempt)
+      @time_check()
+      if @time_check == true
+        @total_seconds = 0
+        @enable_button()
+      else
+        time_array = @time_next_attempt.split(":")
+        @$('.attempt-message').html "Вы сможете снова ответить на вопросы не ранее, чем в " + time_array[3] + ":" + time_array[4] + ":" + time_array[5] + " " + time_array[2] + "." + time_array[1] + "." + time_array[0]
+        @enable_button()
+
+
+  time_check: ->
+    time_now = new Date()
+    array_now = []
+    array_next_attempt = []
+    array_next_attempt_str = @time_next_attempt.split(":")
+    i=0
+    for elem in array_next_attempt_str
+      array_next_attempt[i] = parseInt(elem)
+      i++
+    array_now[0] = parseInt(time_now.getFullYear())
+    array_now[1] = parseInt(time_now.getMonth())+1
+    array_now[2] = parseInt(time_now.getDate())
+    array_now[3] = parseInt(time_now.getHours())
+    array_now[4] = parseInt(time_now.getMinutes())
+    array_now[5] = parseInt(time_now.getSeconds())
+    for i in [0...5]
+      if array_now[i] < array_next_attempt[i]
+        @total_seconds = (array_next_attempt[5] - array_now[5]) + 60*(array_next_attempt[4] - array_now[4])+60*60*(array_next_attempt[3] - array_now[3]) + 60*60*24*(array_next_attempt[2] - array_now[2])
+        if array_now[2] > array_next_attempt[2]
+          @total_seconds = @total_seconds + 60*60*24*31
+        if array_now[1] > array_next_attempt[1]
+          @total_seconds = @total_seconds + 60*60*24*366
+        return false
+      if array_now[i] > array_next_attempt[i]
+        @total_seconds = 0
+        return true
+    return true
+
+  enable_button: =>
+    if @total_seconds < 1
+      $('.check').removeAttr('disabled')
+      $('.finish-test').removeAttr('disabled')
+      $('.check-all').removeAttr('disabled')
+      $('.dialog-finish-test').removeAttr('disabled')
+      _total_seconds = @contents.eq(@position - 1).data("time_delay")
+      @$('.attempt-message').html "После завершения ответов на вопросы вы сможете ответить заново через " + _total_seconds + " сек. \n Если указанное время прошло, а тест недоступен, пожалуйста, перезагрузите страницу."
+    else
+      $('.check').attr('disabled', true)
+      $('.finish-test').attr('disabled', true)
+      $('.check-all').attr('disabled', true)
+      $('.dialog-finish-test').attr('disabled', true)
+      @total_seconds = @total_seconds - 1
+      @$('.attempt-message').html "Вы сможете ответить заново через " + @total_seconds + " сек."
+      setTimeout @enable_button, 999
 
   goto: (event) =>
     event.preventDefault()

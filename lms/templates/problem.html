@@ -22,24 +22,7 @@
     <input class="save" type="button" value="Сохранить" />
     % endif
     % if answer_available:
-    <button class="show" id="show_answers_button_${id}" style="display: none"><span class="show-label">Показать ответ(ы)</span> <span class="sr">(для вопросов выше - рядом с каждым полем)</span></button>
-
-    % endif
-    <script type='text/javascript'>
-        $(document).ready(function () {
-            var t = '${delay_answers}';
-            var id = setTimeout(function() {
-              $("#show_answers_button_${id}").css('display','block');
-            }, t*1000);
-        });
-
-    </script>
-
-    % if return_to_video_button:
-    <!--
-    <section class="video-controls"></section>
-    <input class="return" type="button" value="Вернуться к видео" />
-    -->
+    <button class="show" disabled="disabled"><span class="show-label">Показать ответ(ы)</span> <span class="sr">(для вопросов выше - рядом с каждым полем)</span></button>
     % endif
 
     % if attempts_allowed :
