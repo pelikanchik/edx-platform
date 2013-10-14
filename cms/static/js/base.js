@@ -40,7 +40,11 @@ $(document).ready(function() {
 
     $('.unit .item-actions .delete-button').bind('click', deleteUnit);
     $('.new-unit-item').bind('click', createNewUnit);
-    $('.show-graph-item').bind('click', graphPopUpWindow);
+//    $('.show-graph-item').bind('click', graphPopUpWindow);
+//    $('.show-graph-item').attr("href", "/graph" + window.location.pathname)
+//    $('.show-graph-item').fancybox({
+//        type: 'iframe'
+//    });
 
     // lean/simple modal
     $('a[rel*=modal]').leanModal({
