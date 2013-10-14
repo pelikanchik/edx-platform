@@ -32,6 +32,7 @@ AbstractEdge.prototype = {
     hide: function() {
         this.connection.fg.hide();
         this.connection.bg && this.bg.connection.hide();
+        this.hover_area.hide();
     }
 };
 var EdgeFactory = function() {
@@ -113,7 +114,18 @@ Graph.prototype = {
                 i--;
             }
         }
+    },
+
+    removeEdge: function(source_id, target_id){
+        for(var i = 0; i < this.edges.length; i++) {
+            if (this.edges[i].source.id == source_id && this.edges[i].target.id == target_id) {
+                this.edges[i].hide();
+                this.edges.splice(i, 1);
+                i--;
+            }
+        }
     }
+
 };
 
 /*
@@ -219,27 +231,32 @@ function update_hover_area(selfRef){
     }
 };
 
+
+var popup;
 function initialize_hover_area(selfRef, edge){
     var connection = edge.connection.fg;
     var result = connection.clone();
 //    console.log(selfRef.getCanvas());
 
-    var popup;
     result.attr({"stroke-width": 20, "stroke-opacity" : HOVER_AREA_OPACITY, "stroke": "#F00"});
     result.hover(
-        function () {
+        function(){
             connection.attr({"stroke": "#000"});
-//            console.log(popup);
+    //            console.log(popup);
               // XXX ?
-              if (popup != undefined) popup.remove();
+              if (popup != undefined){
+                popup.hide();
+                popup.remove();
+              }
               popup = selfRef.r.popup(mouse_x, mouse_y, edge.details);
-//            popup.show();
-          },
-        function () {
+    //          popup.show();
+        },function(){
             connection.attr({"stroke": edge.color});
             popup.hide();
-        }
-    )
+    //          popup.remove();
+    })
+
+
     return result;
 };
 

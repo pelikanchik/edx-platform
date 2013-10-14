@@ -89,8 +89,16 @@ def show_graph(request, location):
     if item.location.category != 'sequential':
         return HttpResponseBadRequest()
 
+    dict = {}
+
+    for unit in item.get_children():
+        state = compute_unit_state(unit)
+        dict[unit.url_name] = state
+
+
     return render_to_response('graph.html',
-                              {'subsection': item})
+                              {'subsection': item,
+                               'states': dict})
 
 
 @login_required
