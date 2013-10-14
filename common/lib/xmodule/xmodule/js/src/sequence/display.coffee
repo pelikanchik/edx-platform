@@ -111,6 +111,12 @@ class @Sequence
       sequence_links.click @goto
       console.log(@next_attempt_set)
       @total_seconds = @contents.eq(@position - 1).data("time_delay")
+      if @total_seconds > 0
+        @$('.attempt-message').css("display","block")
+        @$('.dialog-finish-test').css("display","block")
+      else
+        @$('.attempt-message').css("display","none")
+        @$('.dialog-finish-test').css("display","none")
       @time_next_attempt = "2013:01:01:01:01:01"
       try @time_next_attempt = @contents.eq(@position - 1).data("next_attempt")
       catch error
