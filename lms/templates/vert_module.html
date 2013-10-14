@@ -57,7 +57,9 @@
 % endif
 -->
 <ol class="vert-mod" id="vert_all" style="display: block">
-<div class="attempt-message">${attempt_message}</div>
+%if time_delay > 0
+    <div class="attempt-message">${attempt_message}</div>
+%endif
 % for idx, item in enumerate(items):
   <li id="vert-${idx}" data-id="${item['id']}"  data-progress_detail="${item['progress_detail']}" data-problem_time="${item['problem_time']}"
       %if item['show_now'] == 'false':
@@ -70,6 +72,7 @@
     ${item['content']}
   </li>
 % endfor
+%if time_delay > 0
   <button class="dialog-finish-test" id="dialog_finish_test">Завершить тестирование</button>
     <div id="dialog_confirm" title="Завершить тест?">
     <p><span class="ui-icon ui-icon-alert" style="float: left; margin: 0 7px 20px 0;"></span>Если вы уверены, что ответили на все вопросы, на которые готовы ответить, подтвердите это.</p>
@@ -103,5 +106,6 @@
         $( "#dialog_confirm" ).dialog( "open" );
     });
     </script>
+%endif
 </ol>
 
