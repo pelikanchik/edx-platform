@@ -168,6 +168,7 @@ Graph.Renderer.Raphael = function(element, graph, width, height) {
     this.radius = 40; /* max dimension of a node */
     this.graph = graph;
     this.mouse_in = false;
+    this.draging_mode = false;
 
     /* TODO default node rendering function */
     if(!this.graph.render) {
@@ -187,7 +188,7 @@ Graph.Renderer.Raphael = function(element, graph, width, height) {
         this.set && this.set.animate({"fill-opacity": .1}, 200) && this.set.toFront();
         e.preventDefault && e.preventDefault();
     };
-    
+
     var d = document.getElementById(element);
     d.onmousemove = function (e) {
         e = e || window.event;
@@ -328,9 +329,9 @@ Graph.Renderer.Raphael.prototype = {
         /* re-reference to the node an element belongs to, needed for dragging all elements of a node */
         shape.items.forEach(function(item){
             item.set = shape;
-//            item.node.style.cursor = "move";
+            item.node.style.cursor = "pointer";
         });
-        shape.mousedown(this.dragger);
+//        shape.mousedown(this.dragger);
 
         var box = shape.getBBox();
         shape.translate(Math.round(point[0]-(box.x+box.width/2)),Math.round(point[1]-(box.y+box.height/2)))
@@ -361,6 +362,31 @@ Graph.Renderer.Raphael.prototype = {
         edge.connection.bg && edge.connection.bg.show();
         edge.connection.draw();
 
+    },
+    getDragingMode: function(){
+        return this.draging_mode;
+    },
+    flipDragingMode: function(){
+        console.log(this.draging_mode);
+//        console.log(draging_mode);
+        this.draging_mode = !this.draging_mode;
+        if (this.draging_mode){
+            for (var i in this.graph.nodes) {
+                var shape = this.graph.nodes[i].shape;
+                shape.mousedown(this.dragger);
+                shape.items.forEach(function(item){
+                    item.node.style.cursor = "move";
+                });
+            }
+        } else {
+            for (var i in this.graph.nodes) {
+                var shape = this.graph.nodes[i].shape;
+                shape.unmousedown(this.dragger);
+                shape.items.forEach(function(item){
+                    item.node.style.cursor = "pointer";
+                });
+            }
+        }
     },
     getCanvas: function() {
         return this.r;

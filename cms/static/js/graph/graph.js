@@ -349,6 +349,9 @@ function showNodeDetails(node){
             var data = generateEdgeData(edge.disjunctions, node.id).description;
             text_description = "Если набрать в " + data.related_vertex_name + " " + data.sign + " " + data.value + data.percent;
 
+            // TODO:
+            // make a normal function generating this string
+
             $( "#node-edges-list").append(
                 "<p class=\"node-data " + string_id + "\" title=\"" + text_description + "\">"
 //                + "<img class = \"close\" src = \"/static/img/Delete-icon.png\" data-bind='click: $root.removeDisjunction'/>"
@@ -471,24 +474,21 @@ document.onmousemove = function (e) {
 
                 /* set DOM node ID */
                 ellipse.node.id = "node_" + node.id;
-                ellipse.node.ondblclick = show_details;
-                ellipse.node.onclick = function(){
-                    if (add_edge_mode) bindNewEdgeTo(ellipse, node);
-                };
-
+//                ellipse.node.ondblclick = show_details;
                 var vertex_text = r.text(0, 30, node.label);
-                vertex_text.node.onclick = show_details;
-
-                ellipse.node.style.cursor = "move";
-                vertex_text.node.style.cursor = "pointer";
-
-
 
                 var shape = r.set().
 //                    r.rect(node.point[0]-30, node.point[1]-13, 60, 44).attr({"fill": "#feb", r : "12px", "stroke-width" : node.distance == 0 ? "3px" : "1px" })).push(
 //                    r.text(node.point[0], node.point[1] + 10, (node.label || n.id)  ));
                     push(ellipse).
                     push(vertex_text);
+
+                shape.items.forEach(function(item){
+                    item.node.onclick = function(){
+                        if (add_edge_mode) bindNewEdgeTo(ellipse, node);
+                        if (!renderer.getDragingMode()) show_details();
+                    };
+                });
 
                 raphael_nodes[node.id] = ellipse;
 //                console.log(ellipse);
@@ -759,6 +759,10 @@ var layouter;
             }
         }
 
+    }
+
+    moving_mode = function() {
+        renderer.flipDragingMode()
     }
 
 };
