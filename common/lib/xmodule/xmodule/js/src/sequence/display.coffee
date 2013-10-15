@@ -127,7 +127,7 @@ class @Sequence
       else
         $('.check').attr('disabled', true)
         $('.finish-test').attr('disabled', true)
-        $('.check-all').attr('disabled', true)
+        $('.check-all').css('display', 'none')
         $('.dialog-finish-test').attr('disabled', true)
         @enable_button()
 
@@ -135,7 +135,7 @@ class @Sequence
     modx_full_url = @modx_url + '/' + @id + '/change_attempt_time'
     $('.check').attr('disabled', true)
     $('.finish-test').attr('disabled', true)
-    $('.check-all').attr('disabled', true)
+    $('.check-all').css('display', 'none')
     $('.dialog-finish-test').attr('disabled', true)
     $.postWithPrefix modx_full_url, (response) =>
       @time_next_attempt = response.next_attempt
@@ -183,17 +183,40 @@ class @Sequence
     if @total_seconds < 1
       $('.check').removeAttr('disabled')
       $('.finish-test').removeAttr('disabled')
-      $('.check-all').removeAttr('disabled')
+      $('.check-all').css('display', 'block')
       $('.dialog-finish-test').removeAttr('disabled')
       _total_seconds = @contents.eq(@position - 1).data("time_delay")
       @$('.attempt-message').html "После завершения ответов на вопросы вы сможете ответить заново через " + _total_seconds + " сек. \n Если указанное время прошло, а тест недоступен, пожалуйста, перезагрузите страницу."
     else
       $('.check').attr('disabled', true)
       $('.finish-test').attr('disabled', true)
-      $('.check-all').attr('disabled', true)
+      $('.check-all').css('display', 'none')
       $('.dialog-finish-test').attr('disabled', true)
-      @total_seconds = @total_seconds - 1
-      @$('.attempt-message').html "Вы сможете ответить заново через " + @total_seconds + " сек."
+      time_now = new Date()
+      array_now = []
+      array_next_attempt = []
+      array_next_attempt_str = @time_next_attempt.split(":")
+      i=0
+      for elem in array_next_attempt_str
+        array_next_attempt[i] = parseInt(elem)
+        i++
+      array_now[0] = parseInt(time_now.getFullYear())
+      array_now[1] = parseInt(time_now.getMonth())+1
+      array_now[2] = parseInt(time_now.getDate())
+      array_now[3] = parseInt(time_now.getHours())
+      array_now[4] = parseInt(time_now.getMinutes())
+      array_now[5] = parseInt(time_now.getSeconds())
+      _total_seconds = array_next_attempt[5]-array_now[5] + (array_next_attempt[4]-array_now[4])*60 + (array_next_attempt[3]-array_now[3])*60*60 + (array_next_attempt[2]-array_now[2])*60*60*24
+
+      if _total_seconds < 0
+        @total_seconds = 1200
+        @$('.attempt-message').html "Вы сможете снова ответить на вопросы не ранее, чем в " + array_next_attempt[3] + ":" + array_next_attempt[4] + ":" + array_next_attempt[5] + " " + array_next_attempt[2] + "." + array_next_attempt[1] + "." + array_next_attempt[0]
+      else if _total_seconds > 1200
+        @total_seconds = 1200
+        @$('.attempt-message').html "Вы сможете снова ответить на вопросы не ранее, чем в " + array_next_attempt[3] + ":" + array_next_attempt[4] + ":" + array_next_attempt[5] + " " + array_next_attempt[2] + "." + array_next_attempt[1] + "." + array_next_attempt[0]
+      else
+        @total_seconds = _total_seconds
+        @$('.attempt-message').html "Вы сможете ответить заново через " + @total_seconds + " сек."
       setTimeout @enable_button, 999
 
   goto: (event) =>
