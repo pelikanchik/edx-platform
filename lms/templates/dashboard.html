@@ -10,6 +10,8 @@
 
 <%block name="title"><title>Кабинет</title></%block>
 
+
+
 <%block name="js_extra">
   <script type="text/javascript">
   (function() {
@@ -91,10 +93,13 @@
     </section>
   %endif
 
+% if user.is_active != 0 or is_demo:
+    % if not is_demo:
   <section class="profile-sidebar">
     <header class="profile">
       <h1 class="user-name">${ user.username }</h1>
     </header>
+
     <section class="user-info">
       <ul>
         <li>
@@ -125,9 +130,9 @@
 
       </ul>
     </section>
-
   </section>
 
+    % endif
   <section class="my-courses">
     <header>
       <h2>Текущие курсы</h2>
@@ -442,4 +447,5 @@
       </div>
     </div>
   </div>
+%endif
 </section>

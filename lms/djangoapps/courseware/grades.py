@@ -445,6 +445,7 @@ def progress_summary(student, request, course, model_data_cache):
                 'url_name': section_module.url_name,
                 'scores': scores,
                 'unlock_term': section_module.unlock_term,
+                'available_for_demo': section_module.available_for_demo,
 	            'section_total': section_total,
                 'format': module_format,
                 'unlocked': True,

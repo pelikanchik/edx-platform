@@ -190,6 +190,8 @@ if settings.COURSEWARE_ENABLED:
         url(r'^courses/?$', 'branding.views.courses', name="courses"),
         url(r'^change_enrollment$',
             'student.views.change_enrollment', name="change_enrollment"),
+        url(r'^demo_register$',
+            'student.views.demo_register', name="demo_register"),
 
         #About the course
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/about$',

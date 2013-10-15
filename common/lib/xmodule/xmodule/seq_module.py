@@ -26,6 +26,12 @@ class SequenceFields(object):
         scope=Scope.settings,
         default='{"disjunctions": []}'
     )
+    available_for_demo = Integer(
+        display_name="Available For Demo",
+        help="Is section available for demo?",
+        scope=Scope.settings,
+        default=0
+    )
     # NOTE: Position is 1-indexed.  This is silly, but there are now student
     # positions saved on prod, so it's not easy to fix.
     position = Integer(help="Last tab viewed in this sequence", scope=Scope.user_state)
@@ -235,6 +241,17 @@ class SequenceModule(SequenceFields, XModule):
            unlock_term = 0
         return unlock_term
 
+    @property
+    def available_for_demo_with_default(self):
+        '''
+        Return a available_for_demo
+        '''
+        available_for_demo = self.available_for_demo
+        if available_for_demo is None:
+           available_for_demo = 0
+        return available_for_demo
+
+
 
 class SequenceDescriptor(SequenceFields, MakoModuleDescriptor, XmlDescriptor):
     mako_template = 'widgets/sequence-edit.html'
@@ -272,3 +289,14 @@ class SequenceDescriptor(SequenceFields, MakoModuleDescriptor, XmlDescriptor):
         if unlock_term is None:
            unlock_term = 0
         return unlock_term
+
+
+    @property
+    def available_for_demo_with_default(self):
+        '''
+        Return a available_for_demo
+        '''
+        available_for_demo = self.available_for_demo
+        if available_for_demo is None:
+           available_for_demo = 0
+        return available_for_demo

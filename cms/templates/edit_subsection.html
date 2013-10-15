@@ -29,6 +29,28 @@
 
           <input type="text" value="${subsection.display_name_with_default | h}" class="subsection-display-name-input" data-metadata-name="display_name"/>
         </div>
+
+        <div class="subsection-name-input">
+
+          <label>Доступность раздела демопользователям:</label>
+             <select id = "available-for-demo" data-metadata-name="available_for_demo">
+
+                  <option value="0"
+                          % if not subsection.available_for_demo:
+                             selected
+                          % endif
+                  >не доступен</option>
+                  <option value="1"
+
+                          % if subsection.available_for_demo:
+                             selected
+                          % endif
+
+                  >доступен</option>
+
+              </select>
+
+        </div>
         <div class="subsection-name-input">
 
           <label>Условие для разблокировки раздела (если пусто, раздел разблокирован)</label>

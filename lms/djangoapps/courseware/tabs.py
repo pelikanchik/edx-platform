@@ -23,7 +23,7 @@ from courseware.access import has_access
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from courseware.model_data import ModelDataCache
-
+from student.models import UserProfile
 from open_ended_grading import open_ended_notifications
 
 log = logging.getLogger(__name__)
@@ -56,6 +56,7 @@ TabImpl = namedtuple('TabImpl', 'validator generator')
 
 
 #####  Generators for various tabs.
+
 
 def _courseware(tab, user, course, active_page):
     link = reverse('courseware', args=[course.id])
@@ -285,19 +286,23 @@ def get_course_tabs(user, course, active_page):
     """
     Return the tabs to show a particular user, as a list of CourseTab items.
     """
-    if not hasattr(course, 'tabs') or not course.tabs:
+    if not hasattr(course, 'tabs') or not get_course_tabs:
         return get_default_tabs(user, course, active_page)
 
     # TODO (vshnayder): There needs to be a place to call this right after course
     # load, but not from inside xmodule, since that doesn't (and probably
     # shouldn't) know about the details of what tabs are supported, etc.
     validate_tabs(course)
-
+    DISABLED_FOR_DEMO = ['discussion' ,'wiki', 'pdf_textbooks', 'html_textbooks', 'textbooks']
+    is_demo = UserProfile.objects.get(user=user).is_demo
     tabs = []
     for tab in course.tabs:
         # expect handlers to return lists--handles things that are turned off
         # via feature flags, and things like 'textbook' which might generate
         # multiple tabs.
+        if tab['type'] in DISABLED_FOR_DEMO and (not user.is_authenticated() or is_demo):
+            break
+
         gen = VALID_TAB_TYPES[tab['type']].generator
         tabs.extend(gen(tab, user, course, active_page))
 

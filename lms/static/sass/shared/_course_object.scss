@@ -53,8 +53,19 @@
         top: -6px;
         z-index: 100;
       }
+      .demo-status {
+        background: $link-color;
+        color: white;
+        font-size: 10px;
+        right: 10px;
+        padding: 2px 10px;
+        border-radius: 2px;
+        position: absolute;
+        top: -6px;
+        z-index: 100;
+      }
 
-      .status:after {
+      .status:after, .demo-status:after {
         border-bottom: 6px solid shade($link-color, 50%);
         border-right: 6px solid transparent;
         content: "";
