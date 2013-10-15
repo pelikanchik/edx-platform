@@ -728,15 +728,24 @@ def instructor_dashboard(request, course_id):
         msg += "Found %d records to dump " % len(enrolled_students)
         for student in enrolled_students:
             datarow = [student.id, student.username, student.profile.name, student.email]
-            for problem in problems_urls:
+            for problem_url in problems_urls:
                 try:
                     smdat = StudentModule.objects.get(student=student, 
                                                       course_id=course_id,
-                                                      module_state_key=problem)
+                                                      module_state_key=problem_url)
+                    problem_descriptor = modulestore().get_item(problem_url, depth=1)
                 except Exception as err:
                     smdat = []
+
                 if smdat:
+                    model_data_cache = ModelDataCache.cache_for_descriptor_descendents(
+                        course_id,
+                        request.user,
+                        problem_descriptor
+                    )
+                    problem = get_module(request.user, request, problem_url, model_data_cache, course_id)
                     data = json.loads(smdat.state)
+
                     try:
                         answers = {}
                         for j in data['student_answers'].keys():
