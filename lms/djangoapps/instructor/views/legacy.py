@@ -57,6 +57,9 @@ from pprint import pprint
 from openpyxl.style import Fill, Color, Border
 from openpyxl import Workbook
 from datetime import datetime
+from courseware.model_data import ModelDataCache
+from courseware.module_render import get_module
+from HTMLParser import HTMLParser
 
 log = logging.getLogger(__name__)
 
@@ -230,6 +233,26 @@ def instructor_dashboard(request, course_id):
             student = None
             msg += "<font color='red'>Couldn't find student with that email or username.  </font>"
         return msg, student
+
+    # for sorting problems, inverts answers dictionary and replace answers' ids with their text 
+    def modify_answers_for_sorting(problem_html, answers):
+        sorting_answers = {}
+        count = problem_html.count('<li>')
+        ind_end = 0
+        parser = HTMLParser()
+        for i in range(count):         
+            ind_beg = problem_html.find('<li>', ind_end) + len('<li>')         
+            ind_end = problem_html.find('<section', ind_beg)
+            answer_text = parser.unescape(problem_html[ind_beg:ind_end])
+            ind_beg = problem_html.find('inputtype_', ind_end) + len('inputtype_')
+            ind_end = problem_html.find('\"', ind_beg)
+            answer_id = problem_html[ind_beg:ind_end]
+            sorting_answers[answer_id] = answer_text.encode('utf-8')
+            ind_beg = problem_html.find('<li>', ind_end) + len('<li>')
+        modified_answers = {}
+        for key in answers.keys():
+            modified_answers[int(answers[key])] = sorting_answers[key]
+        return modified_answers
 
     # process actions from form POST
     action = request.POST.get('action', '')
@@ -588,30 +611,36 @@ def instructor_dashboard(request, course_id):
 
         datatable['data'] = [getdat(u) for u in enrolled_students]
         datatable['title'] = 'Student profile data for course %s' % course_id
-        return return_csv('profiledata_%s.csv' % course_id, datatable)
+        return return_csv('profiledata_%s.csv' % course_id, datatable)    
 
     elif u'Данные всех попыток' in action or u'Скачать XLSX всех попыток' in action:
         log.debug(action)
         problem_to_dump = request.POST.get('problem_to_dump', '')
-
-        if problem_to_dump[-4:] == ".xml":
-            problem_to_dump = problem_to_dump[:-4]
+        
         try:
             (org, course_name, _) = course_id.split("/")
             module_state_key = "i4x://" + org + "/" + course_name + "/problem/" + problem_to_dump
             smdat = StudentModule.objects.filter(course_id=course_id,
                                                  module_state_key=module_state_key)
             smdat = smdat.order_by('student')
+            problem_descriptor = modulestore().get_item(module_state_key, depth=1)
             msg += "Found %d records to dump " % len(smdat)
         except Exception as err:
-            msg += "<font color='red'>Couldn't find module with that urlname.  </font>"
-            msg += "<pre>%s</pre>" % escape(err)
+            error_msg = 'Failed while getting StudentModule for the course: {0}, the state: {1}'.format(course_id, module_state_key)
+            error_msg += 'Error: {0}'.format(err)
+            log.debug(error_msg)
             smdat = []
 
         if smdat:
             datatable = {'header': ['ID', 'Пользователь', 'Полное имя', 'edX email',
-                                    'Попытки', 'Seed', 'Ответ']}
-            datatable['data'] = []
+                                    'Попытки', 'Seed', 'Ответ'], 'data':[]}
+            model_data_cache = ModelDataCache.cache_for_descriptor_descendents(
+                course_id,
+                request.user,
+                problem_descriptor
+            )
+            problem = get_module(request.user, request, module_state_key, model_data_cache, course_id)
+
             for i in smdat:
                 data = json.loads(i.state)
                 datarow = [i.student.id, i.student.username, i.student.profile.name, i.student.email]
@@ -633,21 +662,32 @@ def instructor_dashboard(request, course_id):
                         else:
                             if j not in answers:
                                 if type(data['student_answers'][j]) == list:
-                                        choises = ''
-                                        for c in data['student_answers'][j]:
-                                            choises += c + ', '
-                                        answers[j] = choises[:-2].encode('utf-8')
+                                    choises = ''
+                                    for c in data['student_answers'][j]:
+                                        choises += c + ', '
+                                    answers[j] = choises[:-2].encode('utf-8')
                                 else:
                                     answers[j] = data['student_answers'][j].encode('utf-8')
+                    
+                    try:
+                        problem_html = problem.lcp.get_html()
+                    except Exception as err:
+                        problem_html = ''
+
+                    if problem_html.find('class=\"sorting') != -1:
+                        answers = modify_answers_for_sorting(problem_html, answers)
+
                     answers_str = ''
                     for key in answers.keys():
                         answers_str += answers[key] + ', '
                     datarow.append(answers_str[:-2])
                 except KeyError: #student didnt answer the question
                     datarow.append('')
+
                 datatable['data'].append(datarow)
-            problem_name = modulestore().get_item(module_state_key, depth=2).display_name_with_default.encode('utf-8')
+            problem_name = problem_descriptor.display_name_with_default.encode('utf-8')
             datatable['title'] = 'Student state for problem {0} ({1})'.format(problem_name, problem_to_dump)
+
             if u'Скачать XLSX всех попыток' in action:
                 t = datetime.now()
                 file_name = '{0}{1}{2}_{3}_{4}_{5}.xlsx'.format(t.year, t.month, t.day, t.hour, t.minute, problem_name)
@@ -673,14 +713,19 @@ def instructor_dashboard(request, course_id):
                 if component.category == 'problem':
                     problems_urls.append(component.location.url())
 
-        datatable = {'header': ['ID', 'Пользователь', 'Полное имя', 'edX email']}
+        datatable = {'header': ['ID', 'Пользователь', 'Полное имя', 'edX email'], 'data':[]}
         datatable['header'] += ["Задача %d" % num for num in range(1, len(problems_urls) + 1)]
-        enrolled_students = User.objects.filter(
-            courseenrollment__course_id=course_id,
-            courseenrollment__is_active=1,
-        ).prefetch_related("groups").order_by('username')
+        try:
+            enrolled_students = User.objects.filter(
+                courseenrollment__course_id=course_id,
+                courseenrollment__is_active=1,
+            ).prefetch_related("groups").order_by('username')
+        except Exception as err:
+            error_msg = 'Failed while getting enrolled students for the course: {0}'.format(course_id)
+            error_msg += 'Error: {0}'.format(err)
+            log.debug(error_msg)
+
         msg += "Found %d records to dump " % len(enrolled_students)
-        datatable['data'] = []
         for student in enrolled_students:
             datarow = [student.id, student.username, student.profile.name, student.email]
             for problem in problems_urls:
@@ -689,7 +734,7 @@ def instructor_dashboard(request, course_id):
                                                       course_id=course_id,
                                                       module_state_key=problem)
                 except Exception as err:
-                    smdat = None
+                    smdat = []
                 if smdat:
                     data = json.loads(smdat.state)
                     try:
@@ -708,6 +753,15 @@ def instructor_dashboard(request, course_id):
                                         answers[j] = choises[:-2].encode('utf-8')
                                     else:
                                         answers[j] = data['student_answers'][j].encode('utf-8')
+
+                        try:
+                            problem_html = problem.lcp.get_html()
+                        except Exception as err:
+                            problem_html = ''
+
+                        if problem_html.find('class=\"sorting') != -1:
+                            answers = modify_answers_for_sorting(problem_html, answers)
+
                         answers_str = ''
                         for key in answers.keys():
                             answers_str += answers[key] + ', '
@@ -719,6 +773,7 @@ def instructor_dashboard(request, course_id):
             datatable['data'].append(datarow)
         section_name = section.display_name_with_default.encode('utf-8')
         datatable['title'] = 'Students state for section {0} ({1})'.format(section_name, section_to_dump) 
+
         if u'Скачать XLSX по разделу' in action:
             t = datetime.now()
             file_name = '{0}{1}{2}_{3}_{4}_{5}.xlsx'.format(t.year, t.month, t.day, t.hour, t.minute, section_name)
