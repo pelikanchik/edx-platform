@@ -7,6 +7,7 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
     // Model class is CMS.Models.Settings.Advanced
     events : {
         'focus :input' : "focusInput",
+        'click #available_for_demo' : "updateDemo",
         'blur :input' : "blurInput"
         // TODO enable/disable save based on validation (currently enabled whenever there are changes)
     },
@@ -28,14 +29,33 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
 
         // iterate through model and produce key : value editors for each property in model.get
         var self = this;
+        listEle$.append(self.renderTemplate("available_for_demo", self.model.get("available_for_demo")));
         _.each(_.sortBy(_.keys(this.model.attributes), _.identity),
             function(key) {
-                listEle$.append(self.renderTemplate(key, self.model.get(key)));
+                if (key != "available_for_demo"){
+                    listEle$.append(self.renderTemplate(key, self.model.get(key)));
+                }
             });
 
+        var policyValues = listEle$.find('.boolean');
+        _.each(policyValues, this.attachBooleanEditor, this);
         var policyValues = listEle$.find('.json');
         _.each(policyValues, this.attachJSONEditor, this);
         return this;
+    },
+
+    attachBooleanEditor : function (select) {
+        var self = this;
+        var oldValue = $(select).val();
+        $(select).change(function(){
+
+            var message = gettext("Ваши изменения не вступят в силу пока вы их не сохраните.");
+
+            self.model.set($(select).attr("rel"),$(select).val())
+            self.showNotificationBar(message,
+                                             _.bind(self.saveView, self),
+                                             _.bind(self.revertView, self));
+        });
     },
     attachJSONEditor : function (textarea) {
         // Since we are allowing duplicate keys at the moment, it is possible that we will try to attach
@@ -43,9 +63,10 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
         if ( $(textarea).siblings().hasClass('CodeMirror')) {
             return;
         }
-
         var self = this;
         var oldValue = $(textarea).val();
+        //self.showNotificationBar(message,_.bind(self.saveView, self),_.bind(self.revertView, self));
+
         CodeMirror.fromTextArea(textarea, {
             mode: "application/json", lineNumbers: false, lineWrapping: false,
             onChange: function(instance, changeobj) {
@@ -132,5 +153,8 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
     },
     blurInput : function(event) {
         $(event.target).prev().removeClass("is-focused");
+    },
+    updateDemo : function(event) {
+        this.model.set("available_for_demo", "!!fasda!");
     }
 });
