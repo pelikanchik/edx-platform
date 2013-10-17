@@ -10,10 +10,11 @@ from courseware.courses import course_image_url, get_course_about_section
   %if course.is_newish:
     <span class="status">${_("New")}</span>
   %endif
-
   %if course.available_for_demo:
-    <span class="demo-status" title = "Начало курса доступно без регистрации">${_("Без регистрации")}</span>
-  %endif
+      %if not hasattr(user, 'profile') or user.profile.is_demo:
+        <span class="demo-status" title = "Начало курса доступно без регистрации">${_("Без регистрации")}</span>
+      %endif
+  % endif
   <a href="${reverse('about_course', args=[course.id])}">
   <div class="inner-wrapper">
       <header class="course-preview">

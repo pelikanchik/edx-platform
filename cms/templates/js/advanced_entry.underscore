@@ -14,8 +14,8 @@
     <% if (key == "available_for_demo"){ %>
 
     <select class="boolean" id="<%= valueUniqueId %>" rel = "<%= key %>">
-        <option value = "True"<% if (value == "true"){%> selected <% } %>  >Курс доступен для деморежима</option>
         <option value = "False" <% if (value == "false"){%> selected <% } %>  >Курс не доступен для деморежима</option>
+        <option value = "True"<% if (value == "true"){%> selected <% } %>  >Курс доступен для деморежима</option>
     </select>
     <% }else{ %>
 
