@@ -11,17 +11,18 @@
     <% } %>
 
   <div class="field text value">
-    <% if (key == "available_for_demo"){ %>
+    <% if(key == "show_in_lms" || key == "available_for_demo"){ %>
 
+    <label for "<%= valueUniqueId %>">
+        <% if(key == "show_in_lms"){ %>
+            Отображать курс в публичной части:
+        <% }else if (key == "available_for_demo") { %>
+            Доступность без регистрации:
+        <% } %>
+    </label>
     <select class="boolean" id="<%= valueUniqueId %>" rel = "<%= key %>">
-        <option value = "False" <% if (value == "false"){%> selected <% } %>  >Курс не доступен для деморежима</option>
-        <option value = "True"<% if (value == "true"){%> selected <% } %>  >Курс доступен для деморежима</option>
-    </select>
-    <% }else if(key == "show_in_lms"){ %>
-
-    <select class="boolean" id="<%= valueUniqueId %>" rel = "<%= key %>">
-        <option value = "True"<% if (value == "true"){%> selected <% } %>  >Курс доступен в LMS</option>
-        <option value = "False" <% if (value == "false"){%> selected <% } %>  >Курс не доступен в LMS</option>
+        <option value = "True"<% if (value == "true"){%> selected <% } %>  >Да</option>
+        <option value = "False" <% if (value == "false"){%> selected <% } %>  >Нет</option>
     </select>
 
     <% }else{ %>
