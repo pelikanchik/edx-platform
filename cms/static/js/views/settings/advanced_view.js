@@ -7,7 +7,6 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
     // Model class is CMS.Models.Settings.Advanced
     events : {
         'focus :input' : "focusInput",
-        'click #available_for_demo' : "updateDemo",
         'blur :input' : "blurInput"
         // TODO enable/disable save based on validation (currently enabled whenever there are changes)
     },
@@ -30,9 +29,10 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
         // iterate through model and produce key : value editors for each property in model.get
         var self = this;
         listEle$.append(self.renderTemplate("available_for_demo", self.model.get("available_for_demo")));
+        listEle$.append(self.renderTemplate("show_in_lms", self.model.get("show_in_lms")));
         _.each(_.sortBy(_.keys(this.model.attributes), _.identity),
             function(key) {
-                if (key != "available_for_demo"){
+                if (key != "available_for_demo" && key != "show_in_lms"){
                     listEle$.append(self.renderTemplate(key, self.model.get(key)));
                 }
             });
@@ -153,8 +153,5 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
     },
     blurInput : function(event) {
         $(event.target).prev().removeClass("is-focused");
-    },
-    updateDemo : function(event) {
-        this.model.set("available_for_demo", "!!fasda!");
     }
 });

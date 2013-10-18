@@ -87,7 +87,7 @@
 
 <section class="container dashboard">
 
-  %if message:
+  %if message and not is_demo:
     <section class="dashboard-banner">
       ${message}
     </section>

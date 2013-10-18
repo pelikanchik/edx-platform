@@ -6,6 +6,8 @@ from django.core.urlresolvers import reverse
 from courseware.courses import course_image_url, get_course_about_section
 %>
 <%page args="course" />
+
+%if course.show_in_lms:
 <article id="${course.id}" class="course">
   %if course.is_newish:
     <span class="status">${_("New")}</span>
@@ -45,3 +47,4 @@ from courseware.courses import course_image_url, get_course_about_section
     </div>
   </a>
 </article>
+%endif
