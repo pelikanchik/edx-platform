@@ -66,15 +66,6 @@ def make_track_function(request):
         return track.views.server_track(request, event_type, event, page='x_module')
     return function
 
-def has_demo(course):
-    items = course.get_display_items()
-    print "!!"
-    print items
-    print "!!"
-
-    return 1
-
-
 def toc_for_course(user, request, course, active_chapter, active_section, model_data_cache):
     '''
     Create a table of contents from the module store

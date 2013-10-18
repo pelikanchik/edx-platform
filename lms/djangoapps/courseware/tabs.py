@@ -293,14 +293,14 @@ def get_course_tabs(user, course, active_page):
     # load, but not from inside xmodule, since that doesn't (and probably
     # shouldn't) know about the details of what tabs are supported, etc.
     validate_tabs(course)
-    DISABLED_FOR_DEMO = ['discussion' ,'wiki', 'pdf_textbooks', 'html_textbooks', 'textbooks']
+    ENABLED_FOR_DEMO = ['courseware', 'course_info']
     is_demo = UserProfile.objects.get(user=user).is_demo
     tabs = []
     for tab in course.tabs:
         # expect handlers to return lists--handles things that are turned off
         # via feature flags, and things like 'textbook' which might generate
         # multiple tabs.
-        if tab['type'] in DISABLED_FOR_DEMO and (not user.is_authenticated() or is_demo):
+        if tab['type'] not in ENABLED_FOR_DEMO and (not user.is_authenticated() or is_demo):
             break
 
         gen = VALID_TAB_TYPES[tab['type']].generator
