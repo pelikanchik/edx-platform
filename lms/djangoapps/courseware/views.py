@@ -331,6 +331,12 @@ def index(request, course_id, chapter=None, section=None,
 
     request.user = user	# keep just one instance of User
     course = get_course_with_access(user, course_id, 'load', depth=2)
+
+    # Если курс помечен, как непубликуемый в LMS - отправляем на главную страницу
+    if not course.show_in_lms:
+       return redirect('/')
+
+
     staff_access = has_access(user, course, 'staff')
     registered = registered_for_course(course, user)
     if not registered:
