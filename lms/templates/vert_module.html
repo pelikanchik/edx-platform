@@ -1,63 +1,5 @@
-<!--
-% if timeout > 0:
-    <div style="font-weight: bold" id="quiz-time-left"></div>
-
-    <script type="text/javascript">
-    var total_seconds = "${timeout}";
-    alert (total_seconds);
-    var seconds  = 0;
-    var minutes = 0;
-    var hours = 0;
-    hours = parseInt(total_seconds/3600);
-    minutes = parseInt((total_seconds-hours*3600)/60);
-    seconds = parseInt(total_seconds%60);
-    ShowTime(hours,minutes,seconds);
-    function init(){
-        ShowTime(hours,minutes,seconds);
-        setTimeout("CheckTime()",1000);
-    }
-    function CheckTime(){
-        ShowTime(hours,minutes,seconds);
-        if(total_seconds <=0){
-                document.getElementsByClassName('check-all')[0].click();
-            }
-        else {
-            total_seconds = total_seconds - 1;
-            hours = parseInt(total_seconds/3600);
-            minutes = parseInt((total_seconds-hours*3600)/60);
-            seconds = parseInt(total_seconds%60);
-            setTimeout("CheckTime()",1000);
-        }
-    }
-    function ShowTime(hours,minutes,seconds){
-        if (hours > 0) {
-            document.getElementById("quiz-time-left").innerHTML = 'Оставшееся время: ' + hours + ' ч. ' + minutes + ' мин. ' + seconds + ' сек.';
-        }
-        else {
-            if (minutes > 0) {
-                document.getElementById("quiz-time-left").innerHTML = 'Оставшееся время: ' + minutes + ' мин. ' + seconds + ' сек.';
-            }
-            else{
-                document.getElementById("quiz-time-left").innerHTML = 'Оставшееся время:' + seconds + ' сек.';
-            }
-        }
-    }
-    init();
-
-    </script>
-
-    <script type="text/javascript">
-    function finishpage(){
-        document.getElementsByClassName('check-all')[0].click();
-    }
-    window.onbeforeunload= function() {
-        document.getElementsByClassName('check-all')[0].click();
-    }
-    </script>
-% endif
--->
 <ol class="vert-mod" id="vert_all" style="display: block">
-<div class="attempt-message">${attempt_message}</div>
+<div class="attempt-message"></div>
 % for idx, item in enumerate(items):
   <li id="vert-${idx}" data-id="${item['id']}"  data-progress_detail="${item['progress_detail']}" data-problem_time="${item['problem_time']}"
       %if item['show_now'] == 'false':
@@ -72,7 +14,7 @@
 % endfor
   <button class="dialog-finish-test" id="dialog_finish_test">Завершить тестирование</button>
     <div id="dialog_confirm" title="Завершить тест?">
-    <p><span class="ui-icon ui-icon-alert" style="float: left; margin: 0 7px 20px 0;"></span>Если вы уверены, что ответили на все вопросы, на которые готовы ответить, подтвердите это.</p>
+    <p><span class="ui-icon ui-icon-alert" style="float: left; margin: 0 7px 20px 0;"></span>Если вы уверены, что ответили на все вопросы и хотите завершить тест, подтвердите это.</p>
     </div>
      <script  type="text/javascript">
     $(function() {

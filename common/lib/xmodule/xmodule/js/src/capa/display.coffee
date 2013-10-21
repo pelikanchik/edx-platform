@@ -7,6 +7,7 @@ class @Problem
     @id = @el.data('problem-id')
     @element_id = @el.attr('id')
     @el_show = @el.data('delay_answers')
+    @el_last_time = @el.data('last_time')
     @url = @el.data('url')
     @index_show = 0
     @render()
@@ -151,7 +152,6 @@ class @Problem
         @setupInputTypes()
         @bind()
         @queueing()
-        console.log(@el_show)
         setTimeout @enable_answers, 1000*@el_show
     else
       $.postWithPrefix "#{@url}/problem_get", (response) =>
@@ -161,13 +161,10 @@ class @Problem
           @bind()
           @queueing()
           @forceUpdate response
-          console.log(@el_show)
           setTimeout @enable_answers, 1000*@el_show
 
   enable_answers: ->
     @$('.show').removeAttr("disabled")
-
-
 
   # TODO add hooks for problem types here by inspecting response.html and doing
   # stuff if a div w a class is found
@@ -222,6 +219,11 @@ class @Problem
 # maybe preferable to consolidate all dispatches to use FormData
 ###
   check_fd: =>
+
+    # If button is not available we shouldn't check the problem
+    is_disabled = $("#" + @element_id + " .check")[0].getAttribute('disabled')
+    if is_disabled == 'true' || is_disabled == 'disabled'
+      return
 
     # If there are no file inputs in the problem, we can fall back on @check
     if $('input:file').length == 0
@@ -302,7 +304,7 @@ class @Problem
     if( responsesBeingProcessedCount == 0)
       $('.check-all').html('Подождите...').addClass('check-all-disabled')
 
-    $("#" + @element_id + " .check").val('Подождите...').prop('disabled', true);
+    $("#" + @element_id + " .check").val('Подождите...').prop('disabled', true)
     responsesBeingProcessedCount++;
 
 
@@ -326,6 +328,19 @@ class @Problem
         $('.check-all').html('Ответить').removeClass('check-all-disabled');
 
       Logger.log 'problem_graded', [@answers, response.contents], @url
+
+      _availability = $('#seq_content')[0].getAttribute('availability')
+      _av_json = JSON.parse(_availability.split("'").join('"'))
+      for el in _av_json
+        if el['id'] == @id
+          el['test_status'] = 'answered'
+          css_status = $('#dialog_finish_test').css('display')
+          if css_status == 'block'
+            $("#" + @element_id + " .check").val('Принято').attr('disabled', true)
+      _av_string = JSON.stringify(_av_json)
+      _av_string_corr = _av_string.split('"').join("'")
+      $('#seq_content')[0].setAttribute('availability',_av_string_corr)
+
 
   reset: =>
     Logger.log 'problem_reset', @answers

@@ -183,27 +183,13 @@ class SequenceModule(SequenceFields, XModule):
             pos = 1
             for child in self.get_display_items():
                 if pos == cur_position:
-                    delay = child.time_delay_with_default
+                    timeout = child.time_delay_with_default
                     current_time = datetime.now()
-                    print current_time
-                    new_time = current_time + timedelta(0, delay)
-                    print new_time
-                    date = [0]*6
-                    date[0] = str(new_time.year)
-                    date[1] = str(new_time.month)
-                    date[2] = str(new_time.day)
-                    date[3] = str(new_time.hour)
-                    date[4] = str(new_time.minute)
-                    date[5] = str(new_time.second)
-                    i = 1
-                    full_date = date[0]
-                    while i < 6:
-                        if len(date[i]) < 2:
-                            date[i] = "0" + date[i]
-                        full_date = full_date + ":" + date[i]
-                        i += 1
-                    child.set_next_attempt(full_date)
+                    new_time = current_time + timedelta(0, timeout)
+                    full_date = new_time.strftime("%Y:%02m:%02d:%02H:%02M:%02S")
                     self.next_attempt_set[child.id] = full_date
+                    for grand_child in child.get_children():
+                        grand_child.set_test_unavailable()
                     return json.dumps({'next_attempt': full_date})
                 pos += 1
             return json.dumps({'next_attempt': "null"})
@@ -222,7 +208,7 @@ class SequenceModule(SequenceFields, XModule):
         contents = []
         for child in self.get_display_items():
             progress = child.get_progress()
-            #next_attempt = child.next_attempt
+            next_attempt = ""
             if self.next_attempt_set.has_key(child.id):
                 next_attempt = self.next_attempt_set[child.id]
             else:
@@ -239,9 +225,24 @@ class SequenceModule(SequenceFields, XModule):
                 'type': child.get_icon_class(),
                 'id': child.id,
                 'direct_term': child.direct_term_with_default,
-                'time_delay': child.time_delay_with_default,
+                'timeout': child.time_delay_with_default,
                 'next_attempt': next_attempt,
+                'availability': '',
             }
+
+            childinfo['availability'] += '['
+            for grand_child in child.get_children():
+                childinfo['availability'] += "{'id': '" + grand_child.id + "', 'test_status': '"
+                test_status = 'unanswered'
+                try:
+                    if grand_child.test_status is not None:
+                       test_status = grand_child.test_status
+                except Exception as e:
+                   continue
+                childinfo['availability'] += test_status + "'}, "
+            childinfo['availability'] = childinfo['availability'][:-2]
+            childinfo['availability'] += ']'
+
             if childinfo['title'] == '':
                 childinfo['title'] = child.display_name_with_default
             contents.append(childinfo)

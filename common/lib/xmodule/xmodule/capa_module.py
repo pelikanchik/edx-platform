@@ -19,9 +19,6 @@ from capa.util import convert_files_to_filenames
 from .progress import Progress
 from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
-from xmodule.vertical_module import VerticalFields, VerticalDescriptor
-from xmodule.seq_module import SequenceFields
-from xmodule.seq_module import SequenceModule
 from xmodule.exceptions import NotFoundError, ProcessingError
 from xblock.fields import Scope, String, Boolean, Dict, Integer, Float, List
 from .fields import Timedelta, Date
@@ -202,6 +199,13 @@ class CapaFields(object):
         values={"min": 0}
     )
     rand_data = Dict(help=u"Индексы подзадач", scope=Scope.user_state_summary, default={})
+    test_status = String(
+        scope=Scope.user_state,
+        values=[
+            {"display_name": "Ответить", "value": "unanswered"},
+            {"display_name": "Принято", "value": "answered"},
+            {"display_name": "Недоступно", "value": "unavailable"}]
+    )
 
 
 class CapaModule(CapaFields, XModule):
@@ -611,7 +615,6 @@ class CapaModule(CapaFields, XModule):
                 for elem in indexes_array:
                     elem_integer = int(elem,10)
                     html += product_text[elem_integer]
-                    print product_text[elem_integer]
         # If we cannot construct the problem HTML,
         # then generate an error message instead.
         except Exception as err:
@@ -783,6 +786,9 @@ class CapaModule(CapaFields, XModule):
         """
         d = self.get_score()
         return d['score'] == d['total']
+
+    def set_test_unavailable(self):
+        self.test_status = 'unavailable'
 
     def answer_available(self):
         """
@@ -1013,6 +1019,8 @@ class CapaModule(CapaFields, XModule):
         event_info = dict()
         event_info['state'] = self.lcp.get_state()
         event_info['problem_id'] = self.location.url()
+
+        self.test_status = 'answered'
 
         answers = self.make_dict_of_responses(data)
         event_info['answers'] = convert_files_to_filenames(answers)

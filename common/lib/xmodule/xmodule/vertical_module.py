@@ -33,20 +33,10 @@ class VerticalFields(object):
         default=None
     )
     timeout = Integer(
-        display_name=u"Время на прохождение юнита",
-        help=u"В секундах.",
-        scope=Scope.settings,
-        default=None
-    )
-    time_delay = Integer(
         display_name=u"Время задержки перед следующей попыткой",
         help=u"В секундах.",
         scope=Scope.settings,
         default=None
-    )
-    next_attempt = String(
-        help=u"Время, когда студенту будет доступна новая попытка",
-        scope=Scope.user_state
     )
 
 def show_now(child):
@@ -65,14 +55,6 @@ class VerticalModule(VerticalFields, XModule):
     def __init__(self, *args, **kwargs):
         XModule.__init__(self, *args, **kwargs)
         self.contents = None
-
-
-    def set_next_attempt(self, full_date):
-        print "\n\n\n\n"
-        print full_date
-        print "\n\n\n\n"
-        self.next_attempt = full_date
-        return
 
     def get_html(self):
         if self.contents is None:
@@ -104,25 +86,7 @@ class VerticalModule(VerticalFields, XModule):
                 else:
                     self.contents = all_contents
 
-        _time_delay = self.time_delay
-        if _time_delay is None:
-            _time_delay = 0
-        _timeout = self.timeout
-        if _timeout is None:
-            _timeout = 0
-        attempt_message = ""
-        if _time_delay > 0:
-            current_time = datetime.now()
-            #time_array = self.next_attempt.split(":")
-            #flag_time = datetime(int(time_array[0]),int(time_array[1]),int(time_array[2]),int(time_array[3]),int(time_array[4]),int(time_array[5]))
-            #attempt_message = u"После завершения ответов на вопросы вы сможете ответить заново через " + str(_time_delay) + u" сек. \n Если указанное время прошло, а тест недоступен, пожалуйста, перезагрузите страницу."
-            #if flag_time > current_time:
-            #    attempt_message = u"Вы сможете снова ответить на вопросы не ранее, чем в " + time_array[3] + u":" + time_array[4] + u":" + time_array[5] + u" " + time_array[2] + u"." + time_array[1] + u"." + time_array[0]
-
         return self.system.render_template('vert_module.html', {
-            'timeout': _timeout,
-            'time_delay': _time_delay,
-            'attempt_message': attempt_message,
             'items': self.contents,
         })
 
@@ -161,13 +125,13 @@ class VerticalModule(VerticalFields, XModule):
                 count = len(self.contents)
         return count
 
+
     @property
     def time_delay_with_default(self):
-        count = self.time_delay
+        count = self.timeout
         if count is None:
             count = 0
         return count
-
 
 class VerticalDescriptor(VerticalFields, SequenceDescriptor):
     module_class = VerticalModule
@@ -194,7 +158,7 @@ class VerticalDescriptor(VerticalFields, SequenceDescriptor):
 
     @property
     def time_delay_with_default(self):
-        count = self.time_delay
+        count = self.timeout
         if count is None:
             count = 0
         return count

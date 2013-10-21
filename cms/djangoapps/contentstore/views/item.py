@@ -116,7 +116,7 @@ def create_item(request):
     display_name = request.POST.get('display_name')
     direct_term = request.POST.get('direct_term')
     random_problem_count = request.POST.get('random_problem_count')
-    time_delay = request.POST.get('time_delay')
+    timeout = request.POST.get('timeout')
 
     if not has_access(request.user, parent_location):
         raise PermissionDenied()
@@ -142,8 +142,8 @@ def create_item(request):
     if random_problem_count is not None:
         metadata['random_problem_count'] = random_problem_count
 
-    if time_delay is not None:
-        metadata['time_delay'] = time_delay
+    if timeout is not None:
+        metadata['timeout'] = timeout
 
 
     if direct_term is not None:

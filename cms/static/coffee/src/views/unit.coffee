@@ -275,7 +275,7 @@ class CMS.Views.UnitEdit.NameEdit extends Backbone.View
     metadata.display_name = $('.unit-display-name-input').val()
     metadata.direct_term = $('.unit-direct-term-input').val()
     metadata.random_problem_count = $('.unit-random-problem-input').val()
-    metadata.time_delay = $('.unit-attempts-delay-input').val()
+    metadata.timeout = $('.unit-attempts-delay-input').val()
     @model.save(metadata: metadata)
     # Update name shown in the right-hand side location summary.
     $('.unit-location .editing .unit-name').html(metadata.display_name)
@@ -317,7 +317,7 @@ class CMS.Views.UnitEdit.TermEdit extends Backbone.View
     metadata.display_name = $('.unit-display-name-input').val()
     metadata.direct_term = $('.unit-direct-term-input').val()
     metadata.random_problem_count = $('.unit-random-problem-input').val()
-    metadata.time_delay = $('.unit-attempts-delay-input').val()
+    metadata.timeout = $('.unit-attempts-delay-input').val()
     @model.save(metadata: metadata)
 
     setTimeout('$(".save-term").val("Сохранить"); $(".save-term").removeClass("save-term-active");', 500)
@@ -373,7 +373,7 @@ class CMS.Views.UnitEdit.RandomEdit extends Backbone.View
     metadata.display_name = $('.unit-display-name-input').val()
     metadata.direct_term = $('.unit-direct-term-input').val()
     metadata.random_problem_count = $('.unit-random-problem-input').val()
-    metadata.time_delay = $('.unit-attempts-delay-input').val()
+    metadata.timeout = $('.unit-attempts-delay-input').val()
     @model.save(metadata: metadata)
     # Update name shown in the right-hand side location summary.
     $('.unit-location .editing .unit-name').html(metadata.display_name)
@@ -390,7 +390,7 @@ class CMS.Views.UnitEdit.DelayEdit extends Backbone.View
     @$spinner = $('<span class="spinner-in-field-icon"></span>');
 
   render: =>
-    @$('.unit-attempts-delay-input').val(@model.get('metadata').time_delay)
+    @$('.unit-attempts-delay-input').val(@model.get('metadata').timeout)
 
   setEnabled: =>
     disabled = @model.get('state') == 'public'
@@ -405,9 +405,9 @@ class CMS.Views.UnitEdit.DelayEdit extends Backbone.View
     metadata.display_name = $('.unit-display-name-input').val()
     metadata.direct_term = $('.unit-direct-term-input').val()
     metadata.random_problem_count = $('.unit-random-problem-input').val()
-    metadata.time_delay = $('.unit-attempts-delay-input').val()
+    metadata.timeout = $('.unit-attempts-delay-input').val()
     @model.save(metadata: metadata)
-    console.log(metadata.time_delay)
+    console.log(metadata.timeout)
     # Update name shown in the right-hand side location summary.
     $('.unit-location .editing .unit-name').html(metadata.display_name)
 
