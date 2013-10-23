@@ -10,6 +10,7 @@ import struct
 import sys
 import random
 
+from datetime import datetime
 from random import sample
 from pkg_resources import resource_string
 from capa.capa_problem import LoncapaProblem
@@ -205,6 +206,9 @@ class CapaFields(object):
             {"display_name": "Ответить", "value": "unanswered"},
             {"display_name": "Принято", "value": "answered"},
             {"display_name": "Недоступно", "value": "unavailable"}]
+    )
+    last_sent = String(
+        scope=Scope.user_state
     )
 
 
@@ -1021,6 +1025,8 @@ class CapaModule(CapaFields, XModule):
         event_info['problem_id'] = self.location.url()
 
         self.test_status = 'answered'
+        current_time = datetime.now()
+        self.last_sent = current_time.strftime("%Y:%02m:%02d:%02H:%02M:%02S")
 
         answers = self.make_dict_of_responses(data)
         event_info['answers'] = convert_files_to_filenames(answers)

@@ -188,8 +188,6 @@ class SequenceModule(SequenceFields, XModule):
                     new_time = current_time + timedelta(0, timeout)
                     full_date = new_time.strftime("%Y:%02m:%02d:%02H:%02M:%02S")
                     self.next_attempt_set[child.id] = full_date
-                    for grand_child in child.get_children():
-                        grand_child.set_test_unavailable()
                     return json.dumps({'next_attempt': full_date})
                 pos += 1
             return json.dumps({'next_attempt': "null"})
@@ -208,8 +206,7 @@ class SequenceModule(SequenceFields, XModule):
         contents = []
         for child in self.get_display_items():
             progress = child.get_progress()
-            next_attempt = ""
-            if self.next_attempt_set.has_key(child.id):
+            if child.id in self.next_attempt_set:
                 next_attempt = self.next_attempt_set[child.id]
             else:
                 next_attempt = "2013:01:02:03:04:05"
@@ -231,14 +228,37 @@ class SequenceModule(SequenceFields, XModule):
             }
 
             childinfo['availability'] += '['
+            next_attempt_array = next_attempt.split(":")
+            current_time = datetime.now()
+            now_date = current_time.strftime("%Y:%02m:%02d:%02H:%02M:%02S")
+            now_date_array = now_date.split(":")
             for grand_child in child.get_children():
                 childinfo['availability'] += "{'id': '" + grand_child.id + "', 'test_status': '"
                 test_status = 'unanswered'
                 try:
-                    if grand_child.test_status is not None:
-                       test_status = grand_child.test_status
+                    if grand_child.last_sent is not None:
+                        last_sent_array = grand_child.last_sent.split(":")
+                        i = 0
+                        while i < 6:
+                            next_attempt_array_int = int(next_attempt_array[i])
+                            last_sent_array_int = int(last_sent_array[i])
+                            now_date_array_int = int(now_date_array[i])
+                            if now_date_array_int < next_attempt_array_int:
+                                test_status = 'unavailable'
+                                i = 6
+                                break
+                            elif now_date_array_int > next_attempt_array_int:
+                                if last_sent_array_int > next_attempt_array_int:
+                                    test_status = 'answered'
+                                    i = 6
+                                    break
+                                elif last_sent_array_int < next_attempt_array_int:
+                                    test_status = 'unanswered'
+                                    i = 6
+                                    break
+                            i += 1
                 except Exception as e:
-                   continue
+                    print e
                 childinfo['availability'] += test_status + "'}, "
             childinfo['availability'] = childinfo['availability'][:-2]
             childinfo['availability'] += ']'

@@ -43,18 +43,60 @@
   </nav>
     <br/>
 
+  <div class="attempt-message"></div>
+  <br>---------------------------------------------------------------------------<br>
   % for item in items:
+  <div class="temp-data"
+          timeout="${item['timeout']}"
+          next_attempt="${item['next_attempt']}"
+          availability="${item['availability']}"
+          style="display: none"></div>
   <div class="seq_contents tex2jax_ignore asciimath2jax_ignore"
           data-direct_term="${item['direct_term']}"
-          data-progress_detail="${item['progress_detail']}"
-          data-timeout="${item['timeout']}"
-          data-next_attempt="${item['next_attempt']}"
-          data-availability="${item['availability']}">
+          data-progress_detail="${item['progress_detail']}">
       ${item['content'] | h}
   </div>
   % endfor
+
+  <div id="seq_position" position="${position}" style="display: none"></div>
   <div id="seq_content"></div>
-    <button id="finish_now" class="finish-test" style="display: none"></button>
+  <button class="finish-test" style="display: none"></button>
+  <br>---------------------------------------------------------------------------<br>
+  <button class="dialog-finish-test">Завершить тестирование</button>
+    <div class="dialog_confirm" title="Завершить тест?">
+    <p><span class="ui-icon ui-icon-alert" style="float: left; margin: 0 7px 20px 0;"></span>Если вы уверены, что ответили на все вопросы и хотите завершить тест, подтвердите это.</p>
+    </div>
+     <script  type="text/javascript">
+    $(function() {
+        $(".dialog_confirm").dialog({
+        autoOpen: false,
+        show: {
+            effect: "blind",
+            duration: 100
+        },
+        hide: {
+            effect: "explode",
+            duration: 100
+        },
+        height:300,
+        modal: true,
+        buttons: {
+            "Завершить": function() {
+            $(this).dialog( "close" );
+            $(".finish-test").click();
+                },
+            "Отмена": function() {
+            $(this).dialog("close");
+                }
+            }
+        });
+    });
+    $(".dialog-finish-test").click(function() {
+        $(".dialog_confirm").dialog("open");
+    });
+    </script>
+
+
   <nav class="sequence-bottom">
     <ul aria-label="${_('Section Navigation')}" class="sequence-nav-buttons">
       <li class="prev"><a href="#">${_("Previous")}</a></li>

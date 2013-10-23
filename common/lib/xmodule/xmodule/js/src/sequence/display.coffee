@@ -1,4 +1,5 @@
 class @Sequence
+  total_seconds = 0
   constructor: (element) ->
     @el = $(element).find('.sequence')
     @contents = @$('.seq_contents')
@@ -8,6 +9,7 @@ class @Sequence
     @next_attempt_set = @el.data('next_attempt_set')
     @initProgress()
     @bind()
+    total_seconds = 0
     @render parseInt(@el.data('position'))
 
   $: (selector) ->
@@ -87,6 +89,7 @@ class @Sequence
   render: (new_position) ->
     if @position != new_position
       if @position != undefined
+        $("#seq_position")[0].setAttribute "position", new_position
         @mark_visited @position
         modx_full_url = @modx_url + '/' + @id + '/goto_position'
         $.postWithPrefix modx_full_url, position: new_position
@@ -109,114 +112,88 @@ class @Sequence
 
       sequence_links = @$('#seq_content a.seqnav')
       sequence_links.click @goto
-      @timeout = @contents.eq(@position - 1).data("timeout")
-      @time_next_attempt = @contents.eq(@position - 1).data("next_attempt")
-      @availability = @contents.eq(@position - 1).data("availability")
-      $('#seq_content')[0].setAttribute("timeout", @timeout)
-      $('#seq_content')[0].setAttribute("next_attempt", @time_next_attempt)
-      $('#seq_content')[0].setAttribute("availability", @availability)
-      if @timeout > 0
-        @$('.attempt-message').css("display","block")
-        @$('.dialog-finish-test').css("display","block")
+      @timeout = parseInt(($('.temp-data')[@position - 1]).getAttribute("timeout"))
+      if @timeout == 0
+        $('.attempt-message').css("display","none")
+        $('.dialog-finish-test').css("display","none")
       else
-        @$('.attempt-message').css("display","none")
-        @$('.dialog-finish-test').css("display","none")
+        $('.attempt-message').css("display","block")
+        $('.dialog-finish-test').css("display","block")
+        if @time_check() == true
+          total_seconds = 0
+        else
+          total_seconds = 28211488
+        @update_check_buttons()
+        @update_sequence_buttons()
 
-      @disable_check_buttons()
-      @total_seconds = @timeout
-      @time_check()
-      @enable_button()
-
-  time_check: ->
+  time_check: =>
     time_now = new Date()
     array_now = []
     array_next_attempt = []
-    array_next_attempt_str = @time_next_attempt.split(":")
+    array_next_attempt_str = ($('.temp-data')[@position - 1]).getAttribute("next_attempt").split(":")
     i = 0
-    _i = 0
-    _len = array_next_attempt_str.length
-    while _i < _len
-      elem = array_next_attempt_str[_i]
+    for elem in array_next_attempt_str
       array_next_attempt[i] = parseInt(elem)
       i++
-      _i++
     array_now[0] = parseInt(time_now.getFullYear())
     array_now[1] = parseInt(time_now.getMonth()) + 1
     array_now[2] = parseInt(time_now.getDate())
     array_now[3] = parseInt(time_now.getHours())
     array_now[4] = parseInt(time_now.getMinutes())
     array_now[5] = parseInt(time_now.getSeconds())
-    i = _j = 0
-    while _j < 5
+    i = 0
+    while i < 6
       if array_now[i] < array_next_attempt[i]
-        @total_seconds = (array_next_attempt[5] - array_now[5]) + 60 * (array_next_attempt[4] - array_now[4]) + 60 * 60 * (array_next_attempt[3] - array_now[3]) + 60 * 60 * 24 * (array_next_attempt[2] - array_now[2])
-        @total_seconds = @total_seconds + 60 * 60 * 24 * 31  if array_now[2] > array_next_attempt[2]
-        @total_seconds = @total_seconds + 60 * 60 * 24 * 366  if array_now[1] > array_next_attempt[1]
         return false
       if array_now[i] > array_next_attempt[i]
-        @total_seconds = 0
         return true
-      i = ++_j
-    true
+      if array_now[i] == array_next_attempt[i]
+        i++
+    return true
 
-  finish_test: ->
-
+  finish_test: =>
     modx_full_url = @modx_url + "/" + @id + "/change_attempt_time"
+    _this = this
     $(".finish-test").attr "disabled", true
     $(".dialog-finish-test").attr "disabled", true
-    _availability = $("#seq_content")[0].getAttribute("availability")
+    _position = $("#seq_position")[0].getAttribute("position")
+    _availability = ($('.temp-data')[_position - 1]).getAttribute("availability")
     _availability_array = JSON.parse(_availability.split("'").join("\""))
-    _i = 0
-    _len = _availability_array.length
-    while _i < _len
-      el = _availability_array[_i]
+    for el in _availability_array
       string_id = "problem_" + el["id"].split("://").join("-").split("/").join("-")
       el.test_status = "unavailable"
       status = el.test_status
-      console.log string_id + " " + status
-      @disable_one_check_button string_id, status
-      _i++
+      @update_one_check_button string_id, status
     _av_string = JSON.stringify(_availability_array)
     _av_string_corr = _av_string.split("\"").join("'")
-    $("#seq_content")[0].setAttribute "availability", _av_string_corr
-    seqs = document.getElementsByClassName("seq_contents tex2jax_ignore asciimath2jax_ignore")
-    seqs[_this.position - 1].setAttribute "data-availability", _av_string_corr
-    console.log seqs[_this.position - 1].getAttribute("data-availability")
+    ($('.temp-data')[_position - 1]).setAttribute "availability", _av_string_corr
     $.postWithPrefix modx_full_url, (response) ->
-      _this.time_next_attempt = response.next_attempt
-      _this.contents.eq(_this.position - 1).attr "data-next_attempt", _this.time_next_attempt
-      $("#seq_content")[0].setAttribute "next_attempt", _this.time_next_attempt
-      seqs = document.getElementsByClassName("seq_contents tex2jax_ignore asciimath2jax_ignore")
-      seqs[_this.position - 1].setAttribute "data-next_attempt", _this.time_next_attempt
-      _this.time_check()
-      _this.enable_button()
+      _time_next_attempt = response.next_attempt
+      ($('.temp-data')[_position - 1]).setAttribute "next_attempt", _time_next_attempt
+      if _this.time_check() == true
+        total_seconds = 0
+      else
+        total_seconds = 28211488
+      _this.update_sequence_buttons()
 
 
-  enable_button: ->
-    if @total_seconds < 1
+  update_sequence_buttons: =>
+    _position = $("#seq_position")[0].getAttribute("position")
+    if total_seconds < 1
       $(".finish-test").removeAttr "disabled"
       $(".dialog-finish-test").removeAttr "disabled"
-      _availability = $("#seq_content")[0].getAttribute("availability")
-      _av_json = JSON.parse(_availability.split("'").join("\""))
-      _i = 0
-      _len = _av_json.length
-      while _i < _len
-        el = _av_json[_i]
-        if el["test_status"] isnt "unanswered"
+      _availability = ($('.temp-data')[_position - 1]).getAttribute("availability").split("'").join('"')
+      _availability_array = JSON.parse(_availability)
+      for  el in _availability_array
+        if el["test_status"] is "unavailable"
           el["test_status"] = "unanswered"
           string_id = "problem_" + el["id"].split("://").join("-").split("/").join("-")
           status = el["test_status"]
-          @disable_one_check_button string_id, status
-        _i++
-      _av_string = JSON.stringify(_av_json)
+          @update_one_check_button string_id, status
+      _av_string = JSON.stringify(_availability_array)
       _av_string_corr = _av_string.split("\"").join("'")
-      $("#seq_content")[0].setAttribute "availability", _av_string_corr
-      seqs = document.getElementsByClassName("seq_contents tex2jax_ignore asciimath2jax_ignore")
-      console.log seqs.length
-      console.log @position
-      seqs[@position - 1].setAttribute "data-availability", _av_string_corr
-      console.log seqs[@position - 1].getAttribute("data-availability")
-      _total_seconds = @contents.eq(@position - 1).data("timeout")
+      ($('.temp-data')[_position - 1]).setAttribute "availability", _av_string_corr
+      _total_seconds = @timeout
       _seconds = _total_seconds % 60
       _minutes = ((_total_seconds - _seconds) / 60) % 60
       _hours = ((_total_seconds - _seconds - _minutes * 60) / 60) % 24
@@ -233,15 +210,13 @@ class @Sequence
       time_now = new Date()
       array_now = []
       array_next_attempt = []
-      array_next_attempt_str = @time_next_attempt.split(":")
-      i = 0
-      _j = 0
-      _len1 = array_next_attempt_str.length
-      while _j < _len1
-        elem = array_next_attempt_str[_j]
+      array_next_attempt_str = ($('.temp-data')[_position - 1]).getAttribute("next_attempt").split(":")
+      i=0
+      for elem in array_next_attempt_str
         array_next_attempt[i] = parseInt(elem)
+        if elem.length == 1
+          elem = "0" + elem
         i++
-        _j++
       array_now[0] = parseInt(time_now.getFullYear())
       array_now[1] = parseInt(time_now.getMonth()) + 1
       array_now[2] = parseInt(time_now.getDate())
@@ -251,36 +226,38 @@ class @Sequence
       i = 0
       while i < 6
         if array_now[i] > array_next_attempt[i]
-          @total_seconds = 0
-          @enable_button()
+          total_seconds = 0
+          @update_sequence_buttons()
         if array_now[i] < array_next_attempt[i]
           i = 6
           break
         i++
       _total_seconds = array_next_attempt[5] - array_now[5] + (array_next_attempt[4] - array_now[4]) * 60 + (array_next_attempt[3] - array_now[3]) * 60 * 60 + (array_next_attempt[2] - array_now[2]) * 60 * 60 * 24
       if _total_seconds < 0
-        @total_seconds = 1200
+        total_seconds = 1200
         @$(".attempt-message").html "Вы сможете снова ответить на вопросы не ранее, чем в " + array_next_attempt_str[3] + ":" + array_next_attempt_str[4] + ":" + array_next_attempt_str[5] + " " + array_next_attempt_str[2] + "." + array_next_attempt_str[1] + "." + array_next_attempt_str[0]
       else if _total_seconds > 1200
-        @total_seconds = 1200
+        total_seconds = 1200
         @$(".attempt-message").html "Вы сможете снова ответить на вопросы не ранее, чем в " + array_next_attempt_str[3] + ":" + array_next_attempt_str[4] + ":" + array_next_attempt_str[5] + " " + array_next_attempt_str[2] + "." + array_next_attempt_str[1] + "." + array_next_attempt_str[0]
       else
-        @total_seconds = _total_seconds
+        total_seconds = _total_seconds
         _seconds = _total_seconds % 60
         _minutes = (_total_seconds - _seconds) / 60
         _seconds_str = _seconds + ""
         _seconds_str = "0" + _seconds_str  if _seconds < 10
         @$(".attempt-message").html "Вы сможете снова ответить на вопросы не ранее, чем в " + array_next_attempt[3] + ":" + array_next_attempt[4] + ":" + array_next_attempt[5] + " " + array_next_attempt[2] + "." + array_next_attempt[1] + "." + array_next_attempt[0] + ". \n\n Осталось " + _minutes + ":" + _seconds_str
-        setTimeout @enable_button, 1000
-    disable_check_buttons: ->
-      _availability = @availability.split("'").join('"')
-      _availability_array = JSON.parse(_availability)
-      for el in _availability_array
-        string_id = "problem_" + el["id"].split("://").join("-").split("/").join("-")
-        status = el.test_status
-        @disable_one_check_button(string_id, status)
+        setTimeout @update_sequence_buttons, 1000
 
-  disable_one_check_button: (string_id, status) =>
+  update_check_buttons: =>
+    _position = $("#seq_position")[0].getAttribute("position")
+    _availability = ($('.temp-data')[_position - 1]).getAttribute("availability").split("'").join('"')
+    _availability_array = JSON.parse(_availability)
+    for el in _availability_array
+      string_id = "problem_" + el["id"].split("://").join("-").split("/").join("-")
+      status = el["test_status"]
+      @update_one_check_button(string_id, status)
+
+  update_one_check_button: (string_id, status) =>
     check_b = $("#" + string_id + " .check")
     if check_b.length > 0
       if status is "answered"
@@ -293,7 +270,7 @@ class @Sequence
         check_b.val "Недоступно"
         check_b.attr "disabled", true
     else
-      setTimeout @disable_one_check_button, 1000, string_id, status
+      setTimeout @update_one_check_button, 1000, string_id, status
 
 
   goto: (event) =>

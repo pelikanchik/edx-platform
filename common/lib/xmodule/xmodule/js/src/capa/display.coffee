@@ -329,17 +329,18 @@ class @Problem
 
       Logger.log 'problem_graded', [@answers, response.contents], @url
 
-      _availability = $('#seq_content')[0].getAttribute('availability')
+      position = $("#seq_position")[0].getAttribute("position")
+      _availability = $('.temp-data')[position-1].getAttribute('availability')
       _av_json = JSON.parse(_availability.split("'").join('"'))
       for el in _av_json
         if el['id'] == @id
           el['test_status'] = 'answered'
-          css_status = $('#dialog_finish_test').css('display')
+          css_status = $('.dialog-finish-test').css('display')
           if css_status == 'block'
             $("#" + @element_id + " .check").val('Принято').attr('disabled', true)
       _av_string = JSON.stringify(_av_json)
       _av_string_corr = _av_string.split('"').join("'")
-      $('#seq_content')[0].setAttribute('availability',_av_string_corr)
+      $('.temp-data')[position-1].setAttribute('availability',_av_string_corr)
 
 
   reset: =>

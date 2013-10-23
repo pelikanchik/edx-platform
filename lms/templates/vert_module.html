@@ -1,5 +1,4 @@
 <ol class="vert-mod" id="vert_all" style="display: block">
-<div class="attempt-message"></div>
 % for idx, item in enumerate(items):
   <li id="vert-${idx}" data-id="${item['id']}"  data-progress_detail="${item['progress_detail']}" data-problem_time="${item['problem_time']}"
       %if item['show_now'] == 'false':
@@ -12,38 +11,5 @@
     ${item['content']}
   </li>
 % endfor
-  <button class="dialog-finish-test" id="dialog_finish_test">Завершить тестирование</button>
-    <div id="dialog_confirm" title="Завершить тест?">
-    <p><span class="ui-icon ui-icon-alert" style="float: left; margin: 0 7px 20px 0;"></span>Если вы уверены, что ответили на все вопросы и хотите завершить тест, подтвердите это.</p>
-    </div>
-     <script  type="text/javascript">
-    $(function() {
-        $("#dialog_confirm").dialog({
-        autoOpen: false,
-        show: {
-            effect: "blind",
-            duration: 100
-        },
-        hide: {
-            effect: "explode",
-            duration: 100
-        },
-        height:300,
-        modal: true,
-        buttons: {
-            "Завершить": function() {
-            $(this).dialog( "close" );
-            $("#finish_now").click();
-                },
-            "Отмена": function() {
-            $(this).dialog("close");
-                }
-            }
-        });
-    });
-    $("#dialog_finish_test").click(function() {
-        $( "#dialog_confirm" ).dialog( "open" );
-    });
-    </script>
 </ol>
 
