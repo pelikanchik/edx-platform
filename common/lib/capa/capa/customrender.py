@@ -48,6 +48,7 @@ class MathRenderer(object):
         else:
             mathstr = mathstr.replace(r'\displaystyle', '')
         self.mathstr = mathstr.replace('mathjaxinline]', '%s]' % mtag)
+        print self.mathstr
 
 
     def get_html(self):
