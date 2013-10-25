@@ -33,6 +33,12 @@
   </%block>
 
   <script type="text/javascript" src="/jsi18n/"></script>
+  <script type="text/javascript" src="//vk.com/js/api/openapi.js?101"></script>
+  
+  <script type="text/javascript">
+    VK.init({apiId: 3918947});
+ </script>
+
 
   <link rel="icon" type="image/x-icon" href="${static.url(settings.FAVICON_PATH)}" />
 
@@ -43,6 +49,8 @@
   % if theme_enabled():
     <%include file="theme-head-extra.html" />
   % endif
+
+  <script type="text/javascript" src="https://raw.github.com/twbs/bootstrap/master/js/dropdown.js"></script>
 
   <!--[if lt IE 9]>
   <script src="${static.url('js/html5shiv.js')}"></script>

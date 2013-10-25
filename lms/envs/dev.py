@@ -169,6 +169,7 @@ MITX_FEATURES['ACCESS_REQUIRE_STAFF_FOR_COURSE'] = False   # require that user b
 MITX_FEATURES['USE_XQA_SERVER'] = 'http://xqa:server@content-qa.mitx.mit.edu/xqa'
 
 INSTALLED_APPS += ('lms_migration',)
+INSTALLED_APPS += ('social_auth',)
 
 LMS_MIGRATION_ALLOWED_IPS = ['127.0.0.1']
 

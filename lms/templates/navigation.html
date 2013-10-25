@@ -19,7 +19,7 @@ from status.status import get_site_status_msg
 try:
     course_id = course.id
 except:
-    # can't figure out a better way to get at a possibly-defined course var
+    # can''t figure out a better way to get at a possibly-defined course var
     course_id = None
 site_status_msg = get_site_status_msg(course_id)
 %>
@@ -107,6 +107,26 @@ site_status_msg = get_site_status_msg(course_id)
           % endif
       % endif
     </ol>
+<!--
+    <ol class="right nav-courseware">
+    <li class="nav-courseware-01">
+        <div id="vk_auth"></div>
+        <script type="text/javascript">
+                VK.Widgets.Auth("vk_auth", {width: "200px", onAuth: function(data) {
+                        alert('user '+data['first_name']+' authorized');
+                }});
+        </script>
+    </li>
+    </ol>
+-->
+    <ol class="user">
+      <li class="special">
+        <a href="#" class="dropdown">&#9662;</a>
+        <ul class="dropdown-menu">
+            <%include file="social_auth_widget.html" />
+        </ul>
+      </li>
+    </ol>
 
     <ol class="right nav-courseware">
     <li class="nav-courseware-01">
@@ -119,6 +139,7 @@ site_status_msg = get_site_status_msg(course_id)
       % endif
     </li>
     </ol>
+
     % endif
   </nav>
 </header>
