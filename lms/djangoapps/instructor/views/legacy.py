@@ -162,7 +162,17 @@ def instructor_dashboard(request, course_id):
         for i, datarow in enumerate(datatable['data'], start=1):
             for j, data in enumerate(datarow):
                 c = ws.cell(row=i, column=j)
-                c.value = data
+                if type(data) == list:
+                    to_str = ''
+                    for d in data:
+                        if len(d) > 0:
+                            to_str += d[0]
+                        else:
+                            to_str += ' '
+                        to_str +=  ' | '
+                    c.value = to_str[:-3]
+                else:
+                    c.value = data
                 set_style_all_boarders(c, Border.BORDER_THIN)
 
         ws.column_dimensions["A"].width = 5
@@ -234,25 +244,64 @@ def instructor_dashboard(request, course_id):
             msg += "<font color='red'>Couldn't find student with that email or username.  </font>"
         return msg, student
 
-    # for sorting problems, inverts answers dictionary and replace answers' ids with their text 
-    def modify_answers_for_sorting(problem_html, answers):
-        sorting_answers = {}
-        count = problem_html.count('<li>')
-        ind_end = 0
+    # returns OrderedDict(), where a key is question id and a value is None
+    # if problem type sorting or choisegroup the value will be dict of answers' ids and answers' texts
+    def get_questions_id(problem_html):
+        beg_ind = 0
+        end_ind = 0      
+        question_num = problem_html.count('name=\"input_') # total questions count      
+        questions_id = OrderedDict()
         parser = HTMLParser()
-        for i in range(count):         
-            ind_beg = problem_html.find('<li>', ind_end) + len('<li>')         
-            ind_end = problem_html.find('<section', ind_beg)
-            answer_text = parser.unescape(problem_html[ind_beg:ind_end])
-            ind_beg = problem_html.find('inputtype_', ind_end) + len('inputtype_')
-            ind_end = problem_html.find('\"', ind_beg)
-            answer_id = problem_html[ind_beg:ind_end]
-            sorting_answers[answer_id] = answer_text.encode('utf-8')
-            ind_beg = problem_html.find('<li>', ind_end) + len('<li>')
-        modified_answers = {}
-        for key in answers.keys():
-            modified_answers[int(answers[key])] = sorting_answers[key]
-        return modified_answers
+        
+        for i in range(question_num):      
+            beg_ind = problem_html.find('name=\"input_', beg_ind) + len('name=\"input_')
+            span_ind = problem_html.rfind('<span>', 0, beg_ind)
+            if problem_html.find('class=\"text-input-dynamath', span_ind, beg_ind) > 0:
+                end_ind = problem_html.find('_', beg_ind)
+                end_ind = problem_html.find('_', end_ind + 1)
+                q = problem_html[beg_ind:end_ind]
+                questions_id[q] = None
+
+            elif problem_html.find('class=\"sorting', span_ind, beg_ind) > 0:
+                end_ind = problem_html.find('_', beg_ind)
+                end_ind = problem_html.find('_', end_ind + 1)
+                q = problem_html[beg_ind:end_ind]  
+                end_ind = problem_html.find('\"', beg_ind)
+                answer_id = problem_html[beg_ind:end_ind]  
+                beg_ind = problem_html.rfind('<li>', span_ind, beg_ind) + len('<li>')
+                end_ind = problem_html.find('<section', beg_ind)
+                answer_text = parser.unescape(problem_html[beg_ind:end_ind])
+                if q in questions_id:
+                    questions_id[q][answer_id] = answer_text
+                else:
+                    questions_id[q] = {answer_id:answer_text}
+                    questions_id[q]['sorting'] = True
+                end_ind = problem_html.find('</section>', beg_ind)
+
+            elif problem_html.find('class=\"choicegroup', span_ind, beg_ind) > 0:
+                end_ind = problem_html.find('_', beg_ind)
+                end_ind = problem_html.find('_', end_ind + 1)
+                q = problem_html[beg_ind:end_ind]
+                beg_ind = problem_html.find('value=\"', end_ind) + len('value=\"')      
+                end_ind = problem_html.find('\"', beg_ind)
+                choise_id = problem_html[beg_ind:end_ind]
+                beg_ind = problem_html.find('/>', end_ind) + len('/>')      
+                end_ind = problem_html.find('\n', beg_ind)
+                choise_text = parser.unescape(problem_html[beg_ind:end_ind])
+                if q in questions_id:
+                    questions_id[q][choise_id] = choise_text
+                else:
+                    questions_id[q] = {choise_id:choise_text}
+                    questions_id[q]['choicegroup'] = True
+
+            else:
+                end_ind = problem_html.find('_', beg_ind)
+                end_ind = problem_html.find('_', end_ind + 1)
+                q = problem_html[beg_ind:end_ind]  
+                questions_id[q] = None
+            beg_ind = end_ind
+
+        return questions_id
 
     # process actions from form POST
     action = request.POST.get('action', '')
@@ -633,13 +682,21 @@ def instructor_dashboard(request, course_id):
 
         if smdat:
             datatable = {'header': ['ID', 'Пользователь', 'Полное имя', 'edX email',
-                                    'Попытки', 'Seed', 'Ответ'], 'data':[]}
+                                    'Попытки', 'Seed', 'Ответ'], 'data':[], 'col_size':[]}
             model_data_cache = ModelDataCache.cache_for_descriptor_descendents(
                 course_id,
                 request.user,
                 problem_descriptor
             )
             problem = get_module(request.user, request, module_state_key, model_data_cache, course_id)
+            try:
+                problem_html = problem.lcp.get_html()
+            except Exception as err:
+                problem_html = ''
+    
+            datatable['col_size'] = [1] * (len(datatable['header']) - 1)
+            questions_id = get_questions_id(problem_html)
+            datatable['col_size'].append(len(questions_id))
 
             for i in smdat:
                 data = json.loads(i.state)
@@ -656,33 +713,58 @@ def instructor_dashboard(request, course_id):
                     answers = {}
                     for j in data['student_answers'].keys():
                         found = j.find('_dynamath')
-                        if found != -1:
+                        if found > 0:
+                            tmp = j.find('_')
+                            key = j[:j.find('_', tmp + 1)]
                             if u'Данные всех попыток' in action:
-                                answers[j[:found]] = data['student_answers'][j].encode('utf-8')
+                                correctness = data['correct_map'][j[:found]]['correctness']
+                                answers[key] = {j[:found]:[data['student_answers'][j].encode('utf-8'), correctness]}
+                                answers['dynamath'] = True
                         else:
-                            if j not in answers:
-                                if type(data['student_answers'][j]) == list:
-                                    choises = ''
-                                    for c in data['student_answers'][j]:
-                                        choises += c + ', '
-                                    answers[j] = choises[:-2].encode('utf-8')
+                            tmp = j.find('_')
+                            key = j[:j.find('_', tmp + 1)]
+                            if key not in answers:
+                                if data['student_answers'][j] == '':
+                                    answers[key] = {j:[]}
                                 else:
-                                    answers[j] = data['student_answers'][j].encode('utf-8')
-                    
-                    try:
-                        problem_html = problem.lcp.get_html()
-                    except Exception as err:
-                        problem_html = ''
+                                    correctness = data['correct_map'][j]['correctness']
+                                    answers[key] = {j:[data['student_answers'][j], correctness]}
+                            elif j not in answers[key]:
+                                answers[key][j] = [data['student_answers'][j], correctness]
 
-                    if problem_html.find('class=\"sorting') != -1:
-                        answers = modify_answers_for_sorting(problem_html, answers)
-
-                    answers_str = ''
-                    for key in answers.keys():
-                        answers_str += answers[key] + ', '
-                    datarow.append(answers_str[:-2])
+                    answers = OrderedDict(sorted(answers.items(), key=lambda t: t[0]))
+                    answers_list = []
+     
+                    for q in questions_id.keys():
+                        if q in answers:
+                            if questions_id[q] != None:
+                                if 'sorting' in questions_id[q]:
+                                    sorted_asnwers = {}
+                                    for item in answers[q].items():
+                                        sorted_asnwers[int(item[1][0])] = questions_id[q][item[0]]
+                                    sorted_asnwers = OrderedDict(sorted(sorted_asnwers.items(), key=lambda t: t[0]))
+                                    answers_str = ''
+                                    for value in sorted_asnwers.values():
+                                        answers_str += value + ' | '
+                                    answers_list.append([answers_str[:-3], answers[q].values()[0][1]])
+                                elif 'choicegroup' in questions_id[q]:
+                                    for value in answers[q].values():
+                                        answers_str = ''
+                                        if type(value[0]) == list:
+                                            for choise in value[0]:
+                                                answers_str += questions_id[q][choise] + ' | '
+                                            answers_list.append([answers_str[:-3], value[1]])
+                                        else:
+                                            answers_list.append([questions_id[q][value[0]], value[1]])
+                            else:
+                                for value in answers[q].values():
+                                    answers_list.append(value)
+                        else:
+                            answers_list.append([])
+                   
+                    datarow.append(answers_list)
                 except KeyError: #student didnt answer the question
-                    datarow.append('')
+                    datarow.append([[]] * len(questions_id))
 
                 datatable['data'].append(datarow)
             problem_name = problem_descriptor.display_name_with_default.encode('utf-8')
@@ -713,8 +795,10 @@ def instructor_dashboard(request, course_id):
                 if component.category == 'problem':
                     problems_urls.append(component.location.url())
 
-        datatable = {'header': ['ID', 'Пользователь', 'Полное имя', 'edX email'], 'data':[]}
+        datatable = {'header': ['ID', 'Пользователь', 'Полное имя', 'edX email'], 'data':[], 'col_size':[]}
+        datatable['col_size'] = [1] * len(datatable['header'])
         datatable['header'] += ["Задача %d" % num for num in range(1, len(problems_urls) + 1)]
+
         try:
             enrolled_students = User.objects.filter(
                 courseenrollment__course_id=course_id,
@@ -726,6 +810,29 @@ def instructor_dashboard(request, course_id):
             log.debug(error_msg)
 
         msg += "Found %d records to dump " % len(enrolled_students)
+
+        problems_html = {}
+        questions_id_for_problem = {}
+        for problem_url in problems_urls:
+            try:
+                problem_descriptor = modulestore().get_item(problem_url, depth=1)
+            except Exception as err:
+                log.debug(err)
+            model_data_cache = ModelDataCache.cache_for_descriptor_descendents(
+                course_id,
+                request.user,
+                problem_descriptor
+            )
+            problem = get_module(request.user, request, problem_url, model_data_cache, course_id)
+
+            try:
+                problems_html[problem_url] = problem.lcp.get_html()
+            except Exception as err:
+                problems_html[problem_url] = ''
+
+            questions_id_for_problem[problem_url] = get_questions_id(problems_html[problem_url])
+            datatable['col_size'].append(len(questions_id_for_problem[problem_url]))
+
         for student in enrolled_students:
             datarow = [student.id, student.username, student.profile.name, student.email]
             for problem_url in problems_urls:
@@ -733,52 +840,71 @@ def instructor_dashboard(request, course_id):
                     smdat = StudentModule.objects.get(student=student, 
                                                       course_id=course_id,
                                                       module_state_key=problem_url)
-                    problem_descriptor = modulestore().get_item(problem_url, depth=1)
                 except Exception as err:
                     smdat = []
 
                 if smdat:
-                    model_data_cache = ModelDataCache.cache_for_descriptor_descendents(
-                        course_id,
-                        request.user,
-                        problem_descriptor
-                    )
-                    problem = get_module(request.user, request, problem_url, model_data_cache, course_id)
                     data = json.loads(smdat.state)
-
-                    try:
+                    try: #trying to get sudent's answers if there are
                         answers = {}
                         for j in data['student_answers'].keys():
                             found = j.find('_dynamath')
-                            if found != -1:
+                            if found > 0:
+                                tmp = j.find('_')
+                                key = j[:j.find('_', tmp + 1)]
                                 if u'Данные по разделу' in action:
-                                    answers[j[:found]] = data['student_answers'][j].encode('utf-8')
+                                    correctness = data['correct_map'][j[:found]]['correctness']
+                                    answers[key] = {j[:found]:[data['student_answers'][j].encode('utf-8'), correctness]}
                             else:
-                                if j not in answers:
-                                    if type(data['student_answers'][j]) == list:
-                                        choises = ''
-                                        for c in data['student_answers'][j]:
-                                            choises += c + ', '
-                                        answers[j] = choises[:-2].encode('utf-8')
+                                tmp = j.find('_')
+                                key = j[:j.find('_', tmp + 1)]
+                                if key not in answers:
+                                    if data['student_answers'][j] == '':
+                                        answers[key] = {j:[]}
                                     else:
-                                        answers[j] = data['student_answers'][j].encode('utf-8')
+                                        correctness = data['correct_map'][j]['correctness']
+                                        answers[key] = {j:[data['student_answers'][j], correctness]}
+                                elif j not in answers[key]:
+                                    answers[key][j] = [data['student_answers'][j], correctness]
 
-                        try:
-                            problem_html = problem.lcp.get_html()
-                        except Exception as err:
-                            problem_html = ''
+                        answers = OrderedDict(sorted(answers.items(), key=lambda t: t[0]))
 
-                        if problem_html.find('class=\"sorting') != -1:
-                            answers = modify_answers_for_sorting(problem_html, answers)
+                        questions_id = questions_id_for_problem[problem_url]
+                        cur_html = problems_html[problem_url]
+                        answers_list = []
+                        for q in questions_id.keys():
+                            if q in answers:
+                                if questions_id[q] != None:
+                                    if 'sorting' in questions_id[q]:
+                                        sorted_asnwers = {}
+                                        for item in answers[q].items():
+                                            sorted_asnwers[int(item[1][0])] = questions_id[q][item[0]]
+                                        sorted_asnwers = OrderedDict(sorted(sorted_asnwers.items(), key=lambda t: t[0]))
+                                        answers_str = ''
+                                        for value in sorted_asnwers.values():
+                                            answers_str += value + ' | '
+                                        answers_list.append([answers_str[:-3], answers[q].values()[0][1]])
+                                    elif 'choicegroup' in questions_id[q]:
+                                        for value in answers[q].values():
+                                            answers_str = ''
+                                            if type(value[0]) == list:
+                                                for choise in value[0]:
+                                                    answers_str += questions_id[q][choise] + ' | '
+                                                answers_list.append([answers_str[:-3], value[1]])
+                                            else:
+                                                answers_list.append([questions_id[q][value[0]], value[1]])
+                                else:
+                                    for value in answers[q].values():
+                                        answers_list.append(value)
+                            else:
+                                answers_list.append([])
 
-                        answers_str = ''
-                        for key in answers.keys():
-                            answers_str += answers[key] + ', '
-                        datarow.append(answers_str[:-2])
-                    except KeyError:
-                        datarow.append('')
+                        datarow.append(answers_list)
+                    except KeyError: #student didnt answer the question
+                        datarow.append([[]] * len(questions_id_for_problem[problem_url]))
                 else:
-                    datarow.append('')
+                    datarow.append([[]] * len(questions_id_for_problem[problem_url]))
+
             datatable['data'].append(datarow)
         section_name = section.display_name_with_default.encode('utf-8')
         datatable['title'] = 'Students state for section {0} ({1})'.format(section_name, section_to_dump) 
@@ -989,8 +1115,8 @@ def instructor_dashboard(request, course_id):
                'course_stats': course_stats,
                'msg': msg,
                'modeflag': {idash_mode: 'selectedmode'},
-               'problems': problems,		# psychometrics
-               'plots': plots,			# psychometrics
+               'problems': problems,    # psychometrics
+               'plots': plots,      # psychometrics
                'course_errors': modulestore().get_item_errors(course.location),
                'instructor_tasks': instructor_tasks,
                'offline_grade_log': offline_grades_available(course_id),
@@ -1041,7 +1167,7 @@ def _do_remote_gradebook(user, course, action, args=None, files=None):
         return msg, {}
 
     msg = '<pre>%s</pre>' % retdict['msg'].replace('\n', '<br/>')
-    retdata = retdict['data']  	# a list of dicts
+    retdata = retdict['data']   # a list of dicts
 
     if retdata:
         datatable = {'header': retdata[0].keys()}
@@ -1263,7 +1389,7 @@ def get_student_grade_summary_data(request, course, course_id, get_grades=True, 
             else:
                 sgrades = [x['percent'] for x in gradeset['section_breakdown']]
             datarow += sgrades
-            student.grades = sgrades  	# store in student object
+            student.grades = sgrades    # store in student object
 
         data.append(datarow)
     datatable['data'] = data
@@ -1336,7 +1462,7 @@ def _do_enroll_students(course, course_id, students, overload=False, auto_enroll
     new_students, new_students_lc = get_and_clean_student_list(students)
     status = dict([x, 'unprocessed'] for x in new_students)
 
-    if overload:  	# delete all but staff
+    if overload:    # delete all but staff
         todelete = CourseEnrollment.objects.filter(course_id=course_id)
         for ce in todelete:
             if not has_access(ce.user, course, 'staff') and ce.user.email.lower() not in new_students_lc:
@@ -1596,13 +1722,13 @@ def compute_course_stats(course):
 
     def walk(module):
         children = module.get_children()
-        category = module.__class__.__name__ 	# HtmlDescriptor, CapaDescriptor, ...
+        category = module.__class__.__name__  # HtmlDescriptor, CapaDescriptor, ...
         counts[category] += 1
         for c in children:
             walk(c)
 
     walk(course)
-    stats = dict(counts)  	# number of each kind of module
+    stats = dict(counts)    # number of each kind of module
     return stats
 
 
