@@ -449,41 +449,72 @@ document.onmousemove = function (e) {
     i = states_str.lastIndexOf(",");
     states_str = states_str.slice(0, i) + states_str.slice(i+1);
 
-
-//    var names = jQuery.parseJSON('{ "9c522b8de7f349eca566c7da934aa334" : "2.2. Вероятностное пространство", "b40da5f79a4d4cc18eba6e06cc80c8dc" : "2.3. Событие, вероятность", "a09f673c00914203a66ff531c5ac8799" : "2.4. Две монетки", "67b72948e71f4d5facae44d6564e8d44" : "2.5. Две монетки", "e00c271f85884ddbb208a491830172bf" : "2.5.2. Отступление про ребра и зависание в воздухе", "6e07ca8275404ed4af030d8b05d1e0af" : "2.6. Решение", "4248689b2d7d44a9a232e89dc26dba52" : "2.7. Ответ и новая задачка", "dddf4927b92a4cd58faeedeba96e2db6" : "2.7.1. Решение", "907cfc12b07a4eefaa0f9efea5831bd5" : "2.7.2. Верно", "93845c777c67468badc9b75d23f17cb9" : "2.7.4. Неверно", "b229b18864a24819bb12fa3cb866b621" : "2.8. Простую или сложную?", "e970a8e7dd214c338bcf22fe2011a9f0" : "2.8.1. Простая задачка", "dc03b5d3bfe54dd0956638a94e2376d4" : "2.8.2. Верно, следующий вопрос", "6e9b14242b1241beb5a3676bdef1f2ec" : "2.8.3. Неверно", "4df81d49e19b4f15a9fbeef8db617f08" : "2.8.4. Оба ответа на задачку даны верно", "33605177a0fe40c287821f04531a4482" : "2.9. Задача про три монеты", "6abde8cef4894e7789e7a5a16d848f2d" : "2.9.1. Неверно", "adb35fda9df94d988823592d0647a41d" : "2.9.2. Верно, следующий вопрос", "591e25c30efc42359e7843f88f8b6ab4" : "2.9.3. Верно, следующий вопрос", "b7da075aa6594ae6bf7b9bbbbf7e5add" : "2.9.4. Всё хорошо, что делаем дальше?", "b771b98e9bce4277831588bcd2a5f068" : "3.1. Решение сложной задачки", "1455eb5e4bb84a398352c86df66e2726" : "3.2. Решение сложной задачки", "285a9823025b4ee7a04ff25f57211a96" : "3.3. Начало тренировки", "83d4e82c156e49e4bc3fb2f975880ca5" : "The End"} ');
     names_obj = jQuery.parseJSON(names_str);
     data_obj = jQuery.parseJSON(data_str);
     states_obj = jQuery.parseJSON(states_str);
 
     /* custom render function */
     var render = function(r, node) {
-                var color = Raphael.getColor();
-                var ellipse = r.ellipse(0, 0, 30, 20).attr({fill: color, stroke: color, "stroke-width": 2});
+//                var color = Raphael.getColor();
+                var color = "DEADBEEF";
+                var node_number = ids_arr.indexOf(node.id);
+                var node_size = edges_arr[node_number].length + 1;
+                var has_video = false;
+                var has_capa = false;
+                jQuery.each(data_obj[node.id], function(number) {
+                    if (data_obj[node.id][number].type != undefined){
+                        var content_type = data_obj[node.id][number].type;
+                        if (content_type === "VideoDescriptor"){
+                            has_video = true;
+                        }
+                        if (content_type === "CapaDescriptor"){
+                            has_capa= true;
+                        }
+                    }
+                });
+
+                var node_form;
+                var vertex_text;
+                color = (has_capa)? "#ffd700" : "#808080";
+
+                if (has_video){
+                    var x = 15*node_size;
+                    var y = 10*node_size;
+                    node_form = r.rect(x, y, 30*node_size, 20*node_size, 10)
+                        .attr({fill: color, stroke: color, "stroke-width": 2});
+                                    var h = node_form.getBBox().height;
+                    var cx = x + node_form.getBBox().width/2;
+                    var cy = y + node_form.getBBox().height;
+                    vertex_text = r.text(cx, cy + 10, node.label);
+                } else {
+                    node_form = r.ellipse(0, 0, 30*0.5*node_size, 20*0.5*node_size)
+                        .attr({fill: color, stroke: color, "stroke-width": 2});
+                    var h = node_form.getBBox().height;
+                    vertex_text = r.text(0, h/2 + 10, node.label);
+                }
 
                 var show_details = function(){
                     if (!add_edge_mode) showNodeDetails(node);
                 }
 
-
                 /* set DOM node ID */
-                ellipse.node.id = "node_" + node.id;
+                node_form.node.id = "node_" + node.id;
 //                ellipse.node.ondblclick = show_details;
-                var vertex_text = r.text(0, 30, node.label);
 
                 var shape = r.set().
 //                    r.rect(node.point[0]-30, node.point[1]-13, 60, 44).attr({"fill": "#feb", r : "12px", "stroke-width" : node.distance == 0 ? "3px" : "1px" })).push(
 //                    r.text(node.point[0], node.point[1] + 10, (node.label || n.id)  ));
-                    push(ellipse).
+                    push(node_form).
                     push(vertex_text);
 
                 shape.items.forEach(function(item){
                     item.node.onclick = function(){
-                        if (add_edge_mode) bindNewEdgeTo(ellipse, node);
+                        if (add_edge_mode) bindNewEdgeTo(node_form, node);
                         if (!renderer.getDragingMode()) show_details();
                     };
                 });
 
-                raphael_nodes[node.id] = ellipse;
+                raphael_nodes[node.id] = node_form;
 //                console.log(ellipse);
 
                 return shape;
