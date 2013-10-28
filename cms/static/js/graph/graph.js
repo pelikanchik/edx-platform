@@ -286,40 +286,47 @@ function bindNewEdgeTo(ellipse, node){
 function createEdgeDeletionCallback( source_node_number, edge_number, string_id){
   return function(){
 
-    var edge = edges_arr[source_node_number][edge_number];
-    var source_id = ids_arr[source_node_number];
-    var target_id = edge.direct_element_id;
+    $( "#confirm-edge-deletion" ).dialog({
+        resizable: false,
+        height: 200,
+        modal: true,
+        buttons: {
+            "Удалить": function() {
 
-    if (!is_edge_exists(source_id, target_id)){
-        alert("Такого ребра не существует!");
-        return;
-    }
+                var edge = edges_arr[source_node_number][edge_number];
+                var source_id = ids_arr[source_node_number];
+                var target_id = edge.direct_element_id;
 
-    edges_arr[source_node_number].splice(edge_number, 1)
+                if (!is_edge_exists(source_id, target_id)){
+                    alert("Такого ребра не существует!");
+                    return;
+                }
 
-    g.removeEdge(source_id, target_id);
+                edges_arr[source_node_number].splice(edge_number, 1)
 
+                g.removeEdge(source_id, target_id);
 
-//    var name1 = names_obj[target_id]["name"];
-//    var name2 = names_obj[source_id]["name"];
-//    alert('you deleted the edge from ' + name2 + ' to ' + name1);
+                var unit_edit = new CMS.Views.UnitEdit({
+                  model: new CMS.Models.Module({
+                    id: names_obj[source_id]["location"]
+                  })
+                });
 
+                var metadata = $.extend({}, unit_edit.model.get('metadata'));
 
-        var unit_edit = new CMS.Views.UnitEdit({
-    //      el: $('.main-wrapper'),
-          model: new CMS.Models.Module({
-            id: names_obj[source_id]["location"]
-          })
-        });
+                metadata.display_name = names_obj[source_id]["name"];
+                metadata.direct_term = JSON.stringify(edges_arr[source_node_number]);
 
-        var metadata = $.extend({}, unit_edit.model.get('metadata'));
-
-        metadata.display_name = names_obj[source_id]["name"];
-        metadata.direct_term = JSON.stringify(edges_arr[source_node_number]);
-
-        $(".graph_string").html(JSON.stringify(edges_arr));
-        $("." + string_id).hide();   //css( "display", "none" );
-        ajax_save_item(names_obj[source_id]["location"], metadata);
+                $(".graph_string").html(JSON.stringify(edges_arr));
+                $("." + string_id).hide();   //css( "display", "none" );
+                ajax_save_item(names_obj[source_id]["location"], metadata);
+                $( this ).dialog( "close" );
+            },
+            "Отмена": function() {
+                $( this ).dialog( "close" );
+            }
+        }
+    });
 
   }
 }
@@ -456,9 +463,10 @@ document.onmousemove = function (e) {
     /* custom render function */
     var render = function(r, node) {
 //                var color = Raphael.getColor();
-                var color = "DEADBEEF";
+                var color;
                 var node_number = ids_arr.indexOf(node.id);
-                var node_size = edges_arr[node_number].length + 1;
+//                var node_size = edges_arr[node_number].length + 1;
+                var node_size = 2;
                 var has_video = false;
                 var has_capa = false;
                 jQuery.each(data_obj[node.id], function(number) {
@@ -787,6 +795,20 @@ var layouter;
 
     moving_mode = function() {
         if (renderer.getDragingMode()) {
+            $( "#on-exiting-draging-mode" ).dialog({
+                resizable: false,
+                height: 200,
+                modal: true,
+                buttons: {
+                    "Сохранить": function() {
+                        save_layout();
+                        $( this ).dialog( "close" );
+                    },
+                    "Отмена": function() {
+                        $( this ).dialog( "close" );
+                    }
+                }
+            });
             renderer.disableDragingMode();
         } else {
             renderer.enableDragingMode();
