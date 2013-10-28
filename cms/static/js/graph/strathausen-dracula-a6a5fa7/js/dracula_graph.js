@@ -366,26 +366,28 @@ Graph.Renderer.Raphael.prototype = {
     getDragingMode: function(){
         return this.draging_mode;
     },
-    flipDragingMode: function(){
-        console.log(this.draging_mode);
-//        console.log(draging_mode);
-        this.draging_mode = !this.draging_mode;
-        if (this.draging_mode){
-            for (var i in this.graph.nodes) {
-                var shape = this.graph.nodes[i].shape;
-                shape.mousedown(this.dragger);
-                shape.items.forEach(function(item){
-                    item.node.style.cursor = "move";
-                });
-            }
-        } else {
-            for (var i in this.graph.nodes) {
-                var shape = this.graph.nodes[i].shape;
-                shape.unmousedown(this.dragger);
-                shape.items.forEach(function(item){
-                    item.node.style.cursor = "pointer";
-                });
-            }
+
+    enableDragingMode: function(){
+//        console.log(this.draging_mode);
+        if (this.draging_mode) return;
+        this.draging_mode = true;
+        for (var i in this.graph.nodes) {
+            var shape = this.graph.nodes[i].shape;
+            shape.mousedown(this.dragger);
+            shape.items.forEach(function(item){
+                item.node.style.cursor = "move";
+            });
+        }
+    },
+    disableDragingMode: function(){
+        if (!this.draging_mode) return;
+        this.draging_mode = false;
+        for (var i in this.graph.nodes) {
+            var shape = this.graph.nodes[i].shape;
+            shape.unmousedown(this.dragger);
+            shape.items.forEach(function(item){
+                item.node.style.cursor = "pointer";
+            });
         }
     },
     getCanvas: function() {

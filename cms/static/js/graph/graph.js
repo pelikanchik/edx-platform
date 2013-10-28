@@ -66,11 +66,6 @@ function parseType(S){
 /* only do all this when document has finished loading (needed for RaphaelJS) */
 window.onload = function() {
 
-/*
-
-*/
-//alert(getCookie('csrftoken'));
-
     /* JSON data */
     var edges_arr;
     var names_obj;
@@ -165,14 +160,30 @@ function exitMode(){
 
 function is_edge_exists(origin_node, target){
     var exists = false;
-    for(var i=0; i<g.nodes[origin_node].edges.length; i++) {
-//        console.log(g.nodes[origin_node].edges[i]);
+
+    var origin_node_number = ids_arr.indexOf(origin_node);
+    for(var i=0; i<edges_arr[origin_node_number].length; i++){
+        var e = edges_arr[origin_node_number][i]
+        if (e["direct_element_id"]===target){
+            exists = true;
+        }
+
+        /*
+        var e = g.nodes[origin_node].edges[i];
+        if ((e.source.id == origin_node)&&(e.target.id == target)){
+            exists = true;
+        }
+        */
+        return exists;
+    };
+/*    for(var i=0; i<g.nodes[origin_node].edges.length; i++) {
+        console.log(g.nodes[origin_node].edges[i]);
         var e = g.nodes[origin_node].edges[i];
         if ((e.source.id == origin_node)&&(e.target.id == target)){
             exists = true;
         }
     };
-    return exists;
+*/    return exists;
 }
 
 function ajax_save_item(id, metadata){
@@ -286,7 +297,7 @@ function createEdgeDeletionCallback( source_node_number, edge_number, string_id)
 
     edges_arr[source_node_number].splice(edge_number, 1)
 
-      g.removeEdge(source_id, target_id);
+    g.removeEdge(source_id, target_id);
 
 
 //    var name1 = names_obj[target_id]["name"];
@@ -367,18 +378,6 @@ function showNodeDetails(node){
 
         };
 
-/*jQuery.each(edges_arr, function(source_node_number) {
-    jQuery.each(edges_arr[source_node_number], function(edge_number) {
-            source = ids_arr[source_node_number];
-
-            var edge_data = generateEdgeData(this.disjunctions, source)
-            g.addEdge(source, this.direct_element_id, { directed : true, label: edge_data.label, stroke: edge_data.color, details: edge_data.details });
-
-    });
-});
-*/
-
-
     $( "#node-details" ).dialog({
           modal: true,
           buttons: {
@@ -397,20 +396,18 @@ function showNodeDetails(node){
 //                origin_y = ellipse.attr('cy');
                 origin_node = node.id;
 
-                console.log(g.nodes[node.id].edges);
+//                console.log(g.nodes[node.id].edges);
                 $( this ).dialog( "close" );
             }
           }
     });
-
-
 }
 
 document.onmousemove = function (e) {
         e = e || window.event;
-        // +5 - so it doesn't interfere with clicking
-        mouse_x = e.pageX - $('#canvas').offset().left + 5;
-        mouse_y = e.pageY - $('#canvas').offset().top + 5;
+        // -5 - so it doesn't interfere with clicking
+        mouse_x = e.pageX - $('#canvas').offset().left - 5;
+        mouse_y = e.pageY - $('#canvas').offset().top - 5;
         if (!add_edge_mode) return;
 
             var r = renderer.getCanvas();
@@ -424,7 +421,6 @@ document.onmousemove = function (e) {
             return;
 //        }
 }
-
 
     g = new Graph();
 
@@ -459,10 +455,7 @@ document.onmousemove = function (e) {
     data_obj = jQuery.parseJSON(data_str);
     states_obj = jQuery.parseJSON(states_str);
 
-
-
-
-        /* custom render function */
+    /* custom render function */
     var render = function(r, node) {
                 var color = Raphael.getColor();
                 var ellipse = r.ellipse(0, 0, 30, 20).attr({fill: color, stroke: color, "stroke-width": 2});
@@ -554,9 +547,7 @@ var layouter;
 //    layouter = new Graph.Layout.Spring(g);
 //    layouter = new Graph.Layout.Ordered(g, g.nodes);
 
-
     var width = $(document).width() - 20;
-
 
 //    var height = $(document).height() - 60;
 
@@ -620,7 +611,7 @@ var layouter;
                 },
                 data: JSON.stringify({
                     'id': names_obj[node_id]["location"],
-                    'metadata': metadata,
+                    'metadata': metadata
                     })
             });
             if (states_obj[node_id] == "public"){
@@ -633,7 +624,7 @@ var layouter;
                         'X-CSRFToken': getCookie('csrftoken')
                     },
                     data: JSON.stringify({
-                        'id': names_obj[node_id]["location"],
+                        'id': names_obj[node_id]["location"]
                     })
                 });
             }
@@ -692,11 +683,13 @@ var layouter;
                     data_obj[node_id] = [];
 
                     renderer.draw()
-                    raphael_nodes[node_id].set.translate(mouse_x, mouse_y);
 
 //                    raphael_nodes[node_id].dx = 0;
-
-                    renderer.isDrag = raphael_nodes[node_id];
+                    window.setTimeout(function(){
+                            raphael_nodes[node_id].set.translate(mouse_x, mouse_y);
+                            renderer.enableDragingMode();
+                            renderer.isDrag = raphael_nodes[node_id];
+                        },1000);
 
 //                    g.drawNode(g.nodes[g.nodes.length - 1]);
 
@@ -759,11 +752,15 @@ var layouter;
             }
         }
 
-    }
+    };
 
     moving_mode = function() {
-        renderer.flipDragingMode()
+        if (renderer.getDragingMode()) {
+            renderer.disableDragingMode();
+        } else {
+            renderer.enableDragingMode();
+        };
     }
-
 };
+
 

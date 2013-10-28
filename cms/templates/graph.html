@@ -1,7 +1,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 
-    <%! from django.utils.translation import ugettext as _ %>
-<%inherit file="base.html" />
+<%! from django.utils.translation import ugettext as _ %>
+<%inherit file="base_min.html" />
 <%!
    import logging
    from xmodule.util.date_utils import get_default_time_display, almost_same_datetime
@@ -11,13 +11,7 @@
 <%block name="title">Визуализация подраздела</%block>
 
 <%block name="bodyclass">is-signedin course subsection</%block>
-
-
-<%namespace name="units" file="widgets/units.html" />
-<%namespace name='static' file='static_content.html'/>
-
 <%block name="content">
-
 
     <script type="text/javascript" src="/static/js/graph/strathausen-dracula-a6a5fa7/js/raphael-min.js"></script>
     <script type="text/javascript" src="/static/js/graph/strathausen-dracula-a6a5fa7/js/g.raphael.js"></script>
@@ -28,8 +22,8 @@
     <script type="text/javascript" src="/static/js/graph/graph.js"></script>
     <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
 
-    <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
-    <script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
+    <script type="text/javascript" src="/static/js/jquery-ui/jquery-1.9.1.js"></script>
+    <script src="/static/js/jquery-ui/jquery-ui.js"></script>
         <!---
             jQuery UI 1.10.3 has a bug when dragging makes dialog window jump to the bottom of screen.
             So it is advisable to use version 1.10.2 before it is fixed.
