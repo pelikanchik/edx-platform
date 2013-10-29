@@ -49,6 +49,9 @@ table.stat_table td {
 .td_incorrect {
   background-color: #f2dedf;
 }
+.td_empty {
+  background-color: #ffffff;
+}
 .td_inner{
   border-left-width: 0px
 }
@@ -508,8 +511,8 @@ function goto( mode)
       %for row in analytics_results['StudentsDropoffPerDay']['data']:
         <tr>
           ## For now, just discard the non-date portion
-          <td>${row['last_day'].split("T")[0]}</td>
-          <td>${row['num_students']}</td>
+          <td class="td_empty">${row['last_day'].split("T")[0]}</td>
+          <td class="td_empty">${row['num_students']}</td>
         </tr>
       %endfor
       </table>
@@ -530,10 +533,10 @@ function goto( mode)
         </tr>
       %for row in analytics_results['ProblemGradeDistribution']['data']:
         <tr>
-          <td>${row['module_id'].split('/')[-1]}</td>
-          <td>${max(grade_record['max_grade'] for grade_record in row["grade_info"])}
+          <td class="td_empty">${row['module_id'].split('/')[-1]}</td>
+          <td class="td_empty">${max(grade_record['max_grade'] for grade_record in row["grade_info"])}
           %for grade_record in row["grade_info"]:
-          <td>
+          <td class="td_empty">
             %if isinstance(grade_record["grade"], float):
               ${"{grade:.2f}".format(**grade_record)}
             %else:
@@ -566,8 +569,8 @@ function goto( mode)
         </tr>
       %for row in analytics_results['StudentsPerProblemCorrect']['data']:
         <tr>
-          <td>${row['module_id'].split('/')[-1]}</td>
-          <td>${row['count']}</td>
+          <td class="td_empty">${row['module_id'].split('/')[-1]}</td>
+          <td class="td_empty">${row['count']}</td>
         </tr>
       %endfor
       </table>
@@ -672,11 +675,11 @@ function goto( mode)
                     <td class="td_incorrect">${i[0]}</td>
                   %endif
                 %else:
-                  <td> </td>
+                  <td class="td_empty"> </td>
                 %endif
               %endfor
             %else:
-              <td>${value}</td>
+              <td class="td_empty">${value}</td>
             %endif
           %endfor
         </tr>
@@ -706,11 +709,11 @@ function goto( mode)
         <tr id="task-progress-entry-${tasknum}" class="task-progress-entry"
 	    data-task-id="${instructor_task.task_id}"
 	    data-in-progress="true">
-          <td>${instructor_task.task_type}</td>
-          <td>${instructor_task.task_input}</td>
+          <td class="td_empty">${instructor_task.task_type}</td>
+          <td class="td_empty">${instructor_task.task_input}</td>
           <td class="task-id">${instructor_task.task_id}</td>
-          <td>${instructor_task.requester}</td>
-          <td>${instructor_task.created}</td>
+          <td class="td_empty">${instructor_task.requester}</td>
+          <td class="td_empty">${instructor_task.created}</td>
           <td class="task-state">${instructor_task.task_state}</td>
           <td class="task-duration">${_("unknown")}</td>
           <td class="task-progress">${_("unknown")}</td>
@@ -740,7 +743,7 @@ function goto( mode)
         %for row in course_stats['data']:
           <tr>
 	    %for value in row:
-	      <td>${value | h}</td>
+	      <td class="td_empty">${value | h}</td>
 	    %endfor
 	  </tr>
         %endfor
