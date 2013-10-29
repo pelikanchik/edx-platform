@@ -139,11 +139,18 @@ def instructor_dashboard(request, course_id):
         return response
 
     def return_xlsx(fn, datatable, fp=None):
-        def set_style_all_boarders(cell, style):
-            cell.style.borders.top.border_style = style
-            cell.style.borders.bottom.border_style = style
-            cell.style.borders.left.border_style = style
-            cell.style.borders.right.border_style = style
+        def set_border(ws, row_num, column_num, style):
+            for i in range(row_num):
+                for j in range(column_num):
+                    c = ws.cell(row=i, column=j)
+                    c.style.borders.top.border_style = style
+                    c.style.borders.bottom.border_style = style
+                    c.style.borders.left.border_style = style
+                    c.style.borders.right.border_style = style
+
+        Color.Correct = 'def0d8'
+        Color.Incorrect = 'f2dedf'
+        Color.Header = 'f5f59e'
 
         if fp is None:
             response = HttpResponse(mimetype='text/csv')
@@ -153,27 +160,40 @@ def instructor_dashboard(request, course_id):
         wb = Workbook()
         ws = wb.get_active_sheet()
 
+        set_border(ws, len(datatable['data']) + 1, sum(datatable['col_size']), Border.BORDER_THIN)
+        cur_column = 0
         for i, h in enumerate(datatable['header']):
-            c = ws.cell(row=0, column=i)
+            ws.merge_cells(start_row=0, start_column=cur_column, end_row=0, end_column=cur_column+datatable['col_size'][i] - 1)
+            c = ws.cell(row=0, column=cur_column)
+            cur_column += datatable['col_size'][i]
             c.value = h
-            set_style_all_boarders(c, Border.BORDER_THIN)
             c.style.fill.fill_type = Fill.FILL_SOLID
-            c.style.fill.start_color.index = openpyxl.style.Color.YELLOW
+            c.style.fill.start_color.index = openpyxl.style.Color.Header
+
+        signs = set([u'>', u'<', u'='])
         for i, datarow in enumerate(datatable['data'], start=1):
+            cur_column = 0
             for j, data in enumerate(datarow):
-                c = ws.cell(row=i, column=j)
                 if type(data) == list:
-                    to_str = ''
-                    for d in data:
-                        if len(d) > 0:
-                            to_str += d[0]
+                    for k, item in enumerate(data):
+                        c = ws.cell(row=i, column=cur_column)
+                        cur_column += 1
+                        if len(item) != 0:
+                            if item[0] in signs:
+                                c.value = '\"' + item[0] + '\"'
+                            else:
+                                c.value = item[0]
+                            c.style.fill.fill_type = Fill.FILL_SOLID
+                            if item[1] == 'correct':
+                                c.style.fill.start_color.index = openpyxl.style.Color.Correct
+                            elif item[1] == 'incorrect':
+                                c.style.fill.start_color.index = openpyxl.style.Color.Incorrect
                         else:
-                            to_str += ' '
-                        to_str +=  ' | '
-                    c.value = to_str[:-3]
+                            c.value = ' '
                 else:
-                    c.value = data
-                set_style_all_boarders(c, Border.BORDER_THIN)
+                    c = ws.cell(row=i, column=cur_column)
+                    cur_column +=1
+                    c.value = data   
 
         ws.column_dimensions["A"].width = 5
         ws.column_dimensions["B"].width = 15
