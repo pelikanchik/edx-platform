@@ -29,6 +29,38 @@
 
           <input type="text" value="${subsection.display_name_with_default | h}" class="subsection-display-name-input" data-metadata-name="display_name"/>
         </div>
+
+        <div class="subsection-name-input">
+
+          <label>Доступность раздела пользователям без регистрации:</label>
+             <select id = "available-for-demo" data-metadata-name="available_for_demo">
+
+                  <option value="0"
+                          % if not subsection.available_for_demo:
+                             selected
+                          % endif
+                  >Раздел не доступен без регистрации</option>
+
+                  <option value="1"
+
+                          % if subsection.available_for_demo:
+                             selected
+                          % endif
+
+                  >Раздел доступен без регистрации</option>
+              </select>
+
+               <% ctx_loc = context_course.location %>
+               <p style = "font-size:10px">(курс <b>
+                          % if context_course.available_for_demo:
+                             доступен
+                          % else:
+                             не доступен
+                          % endif
+                             </b> без регистрации - <a href = "${reverse('course_advanced_settings', kwargs={'org' : ctx_loc.org, 'course' : ctx_loc.course, 'name': ctx_loc.name})}">изменить настройки курса</a>)</p>
+
+
+        </div>
         <div class="subsection-name-input">
 
           <label>Условие для разблокировки раздела (если пусто, раздел разблокирован)</label>

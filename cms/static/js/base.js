@@ -316,7 +316,8 @@ function saveSubsection() {
     var id = $('.subsection-body').data('id');
 
     // pull all 'normalized' metadata editable fields on page
-    var metadata_fields = $('input[data-metadata-name]');
+    // добавлено поле select
+    var metadata_fields = $('input[data-metadata-name], select[data-metadata-name]');
 
     var metadata = {};
     for (var i = 0; i < metadata_fields.length; i++) {

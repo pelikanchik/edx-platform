@@ -18,6 +18,7 @@ from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
 from markupsafe import escape
 
+from student.models import UserProfile
 from courseware import grades
 from courseware.access import has_access
 from courseware.courses import (get_courses, get_course_with_access,
@@ -109,7 +110,7 @@ def render_accordion(request, course, chapter, section, model_data_cache):
         if not staff_access:
             raise Http404
         student = User.objects.get(id=int(student_id))
- 
+
     student = User.objects.prefetch_related("groups").get(id=student.id)
 
     model_data_cache = ModelDataCache.cache_for_descriptor_descendents(
@@ -118,17 +119,16 @@ def render_accordion(request, course, chapter, section, model_data_cache):
     courseware_summary = grades.progress_summary(student, request, course,
                                                  model_data_cache)
 
-    print("<-------------")
-    print(courseware_summary)
-    print("------------->")
 
     # grab the table of contents
     user = User.objects.prefetch_related("groups").get(id=request.user.id)
     request.user = user	# keep just one instance of User
     toc = toc_for_course(user, request, course, chapter, section, model_data_cache)
+    is_demo = UserProfile.objects.get(user=request.user).is_demo
 
     context = dict([('toc', toc),
                     ('course_id', course.id),
+                    ('is_demo', is_demo),
                     ('csrf', csrf(request)['csrf_token']),
                     ('show_timezone', course.show_timezone),
                     ('courseware_summary',courseware_summary),] + template_imports.items())
@@ -300,7 +300,6 @@ def chat_settings(course, user):
         ),
     }
 
-
 @login_required
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
@@ -332,6 +331,12 @@ def index(request, course_id, chapter=None, section=None,
 
     request.user = user	# keep just one instance of User
     course = get_course_with_access(user, course_id, 'load', depth=2)
+
+    # Если курс помечен, как непубликуемый в LMS - отправляем на главную страницу
+    if not course.show_in_lms:
+       return redirect('/')
+
+
     staff_access = has_access(user, course, 'staff')
     registered = registered_for_course(course, user)
     if not registered:
@@ -426,6 +431,12 @@ def index(request, course_id, chapter=None, section=None,
 
 
             is_section_unlocked = grades.return_section_by_id(section_module.url_name, courseware_summary)['unlocked']
+
+
+            #Контент раздела закрыт для демопользователя
+            is_demo = UserProfile.objects.get(user=request.user).is_demo
+            if is_demo and not section_module.available_for_demo:
+                is_section_unlocked = False
 
             # Save where we are in the chapter
             save_child_position(chapter_module, section)
@@ -561,7 +572,7 @@ def jump_to(request, course_id, location):
     else:
         return redirect('courseware_position', course_id=course_id, chapter=chapter, section=section, position=position)
 
-
+@login_required
 @ensure_csrf_cookie
 def course_info(request, course_id):
     """

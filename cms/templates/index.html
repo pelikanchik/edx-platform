@@ -170,11 +170,19 @@
       %if len(courses) > 0:
       <div class="courses">
         <ul class="list-courses">
-          %for course, url, lms_link, org, num, run in sorted(courses, key=lambda s: s[0].lower() if s[0] is not None else ''):
-          <li class="course-item">
-            <a class="course-link" href="${url}">
-              <h3 class="course-title">${course}</h3>
+          %for course, url, lms_link, org, num, run, available_for_demo, show_in_lms, advanced_settings_link in sorted(courses, key=lambda s: s[7], reverse = True):
 
+          <li class="course-item"
+
+                  %if not show_in_lms:
+                     style = "background:#fdd"
+                  %elif available_for_demo:
+                     style = "background:#dfd"
+                  %endif
+                  >
+            <a class="course-link" href="${url}">
+              <h3 class="course-title">${course}
+                 </h3>
               <div class="course-metadata">
                 <span class="course-org metadata-item">
                   <span class="label">${_("Organization:")}</span> <span class="value">${org}</span>
@@ -194,7 +202,21 @@
                 <a href="${lms_link}" rel="external" class="button view-button view-live-button">${_("Live")}</a>
               </li>
             </ul>
-          </li>
+            <div style="font-size:10px;"><a href = "${advanced_settings_link}">Настройки курса:</a>
+                  %if show_in_lms:
+                     курс отображается
+                  %else:
+                     курс не отображается
+                  %endif
+                  |
+                  %if available_for_demo:
+                     без регистрации
+                  %else:
+                     необходима регистрация
+                  %endif
+
+         </div>
+         </li>
           %endfor
         </ul>
       </div>

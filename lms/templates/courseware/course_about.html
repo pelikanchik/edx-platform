@@ -17,9 +17,29 @@
   <script type="text/javascript">
   (function() {
     $(".register").click(function(event) {
-      $("#class_enroll_form").submit();
+
+
+       %if user.is_authenticated() and user.profile.is_demo and not course.available_for_demo:
+            location.href = "${reverse('register_user')}?course_id=${course.id}&enrollment_action=enroll";
+       %else:
+            $("#class_enroll_form").submit();
+       %endif
       event.preventDefault();
     });
+
+    $(".demo").click(function(event) {
+      $("#demo_register_form").submit();
+      event.preventDefault();
+    });
+
+
+    $('#demo_register_form').on('ajax:complete', function(event, xhr) {
+      if(xhr.status == 200) {
+        location.href = "${reverse('dashboard')}";
+      }
+    });
+
+
 
     ## making the conditional around this entire JS block for sanity
     %if settings.MITX_FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
@@ -41,6 +61,7 @@
     %else:
 
     $('#class_enroll_form').on('ajax:complete', function(event, xhr) {
+
       if(xhr.status == 200) {
         location.href = "${reverse('dashboard')}";
       } else if (xhr.status == 403) {
@@ -88,7 +109,27 @@
                     </a>
                 %endif
 
-        %else:
+        %elif user.is_authenticated() and user.profile.is_demo and course.available_for_demo:
+            <a href="#" class="register">Демонстрационный вход</a>
+            <div id="register_error"></div>
+
+
+        %elif user.is_authenticated() and user.profile.is_demo and not course.available_for_demo:
+            <a href="" class="register">Зарегистрироваться</a>
+            <div id="register_error"></div>
+
+        %elif user.is_authenticated() and not user.profile.is_demo:
+
+            <a href="#" class="register">Зарегистрироваться</a>
+            <div id="register_error"></div>
+
+
+        %elif not user.is_authenticated() and course.available_for_demo:
+            <a href="#" class="register">Зарегистрироваться</a><br>
+            <a href="#" class="demo">Демонстрационный вход</a>
+            <div id="register_error"></div>
+
+        %elif not user.is_authenticated() and not course.available_for_demo:
             <a href="#" class="register">Зарегистрироваться</a>
             <div id="register_error"></div>
         %endif
@@ -219,6 +260,23 @@
     <form id="class_enroll_form" method="post" data-remote="true" action="${reverse('change_enrollment')}">
       <fieldset class="enroll_fieldset">
         <input name="course_id" type="hidden" value="${course.id}">
+        <input name="is_demo" type="hidden" value="0">
+        <input name="enrollment_action" type="hidden" value="enroll">
+      </fieldset>
+      <div class="submit">
+        <input name="submit" type="submit" value="enroll">
+      </div>
+    </form>
+  </div>
+%endif
+
+## форма для демонстрационного входа
+%if not user.is_authenticated():
+  <div style="display: none;">
+    <form id="demo_register_form" method="post" data-remote="true" action="${reverse('demo_register')}">
+      <fieldset class="enroll_fieldset">
+        <input name="course_id" type="hidden" value="${course.id}">
+        <input name="is_demo" type="hidden" value="1">
         <input name="enrollment_action" type="hidden" value="enroll">
       </fieldset>
       <div class="submit">

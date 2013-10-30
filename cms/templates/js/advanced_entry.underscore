@@ -1,11 +1,35 @@
 <li class="field-group course-advanced-policy-list-item">
-	<div class="field is-not-editable text key" id="<%= key %>">
-		<label for="<%= keyUniqueId %>">Ключ:</label>
-		<input readonly title="This field is disabled: policy keys cannot be edited." type="text" class="short policy-key" id="<%= keyUniqueId %>" value="<%= key %>" />
-  </div>
+
+    <% if (key != "available_for_demo" && key != "show_in_lms"){ %>
+
+
+      <div class="field is-not-editable text key" id="<%= key %>">
+            <label for="<%= keyUniqueId %>">Ключ:</label>
+            <input readonly title="This field is disabled: policy keys cannot be edited." type="text" class="short policy-key" id="<%= keyUniqueId %>" value="<%= key %>" />
+      </div>
+
+    <% } %>
 
   <div class="field text value">
+    <% if(key == "show_in_lms" || key == "available_for_demo"){ %>
+
+    <label for "<%= valueUniqueId %>">
+        <% if(key == "show_in_lms"){ %>
+            Отображать курс в публичной части:
+        <% }else if (key == "available_for_demo") { %>
+            Доступность без регистрации:
+        <% } %>
+    </label>
+    <select class="boolean" id="<%= valueUniqueId %>" rel = "<%= key %>">
+        <option value = "True"<% if (value == "true"){%> selected <% } %>  >Да</option>
+        <option value = "False" <% if (value == "false"){%> selected <% } %>  >Нет</option>
+    </select>
+
+    <% }else{ %>
+
     <label for="<%= valueUniqueId %>">Значение:</label>
     <textarea class="json text" id="<%= valueUniqueId %>"><%= value %></textarea>
+
+    <% } %>
   </div>
 </li>

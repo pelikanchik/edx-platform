@@ -158,7 +158,7 @@ def edit_subsection(request, location):
         for field
         in item.fields
 
-        if field.name not in ['display_name', 'start', 'due', 'format', 'unlock_term']
+        if field.name not in ['display_name', 'start', 'due', 'format', 'unlock_term', 'available_for_demo']
             and field.scope == Scope.settings
 
     )

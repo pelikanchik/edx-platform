@@ -27,7 +27,7 @@
      <% prev_score = 100 %>
      % for section in chapter['sections']:
 
-            % if section['unlocked'] == True:
+            % if section['unlocked'] == True and (not is_demo or section['available_for_demo']):
 
 
             <li class="${'active' if 'active' in section and section['active'] else ''} ${'graded'  if 'graded' in section and section['graded'] else ''}">
@@ -35,8 +35,8 @@
                 <p>${section['display_name']} ${'<span class="sr">, current section</span>' if 'active' in section and section['active'] else ''}</p>
                 <p class="subtitle">${section['format']} ${u"до " + get_default_time_display(section['due'], show_timezone) if section.get('due') is not None else ''}</p>
               </a>
-              
             </li>
+
             % endif
 
       % endfor

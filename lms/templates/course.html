@@ -6,10 +6,17 @@ from django.core.urlresolvers import reverse
 from courseware.courses import course_image_url, get_course_about_section
 %>
 <%page args="course" />
+
+%if course.show_in_lms:
 <article id="${course.id}" class="course">
   %if course.is_newish:
     <span class="status">${_("New")}</span>
   %endif
+  %if course.available_for_demo:
+      %if not hasattr(user, 'profile') or user.profile.is_demo:
+        <span class="demo-status" title = "Начало курса доступно без регистрации">${_("Без регистрации")}</span>
+      %endif
+  % endif
   <a href="${reverse('about_course', args=[course.id])}">
   <div class="inner-wrapper">
       <header class="course-preview">
@@ -40,3 +47,4 @@ from courseware.courses import course_image_url, get_course_about_section
     </div>
   </a>
 </article>
+%endif
