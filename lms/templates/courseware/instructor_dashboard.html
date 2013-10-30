@@ -38,13 +38,23 @@ table.stat_table td {
 	padding: 8px;
 	border-style: solid;
 	border-color: #666666;
-	background-color: #ffffff;
 }
 .divScroll {
 	height: 200px;
 	overflow: scroll;
 }
-
+.td_correct {
+  background-color: #def0d8;
+}
+.td_incorrect {
+  background-color: #f2dedf;
+}
+.td_empty {
+  background-color: #ffffff;
+}
+.td_inner{
+  border-left-width: 0px
+}
 a.selectedmode { background-color: yellow; }
 
 textarea {
@@ -390,14 +400,42 @@ function goto( mode)
     <input type="submit" name="action" value="Скачать CSV с данными пользователей">
     </p>
 
-    <p> URL задания:
-        <input type="text" name="problem_to_dump" size="40">
-        <input type="submit" name="action" value="Данные всех попыток по заданию">
-        <input type="submit" name="action" value="Скачать CSV всех попыток по заданию">
+    <p>
+        <select name=problem_to_dump >
+          <option disabled selected>Выберите задание</option>
+          % for every_section in sections:
+            <option disabled> ${every_section.display_name_with_default}</option>
+            % for every_subsection in every_section.get_children():
+              <option disabled> &nbsp&nbsp&nbsp${every_subsection.display_name_with_default}</option>
+              % for every_item in every_subsection.get_children():
+                <option disabled> &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp${every_item.display_name_with_default}</option>
+                % for every_content in every_item.get_children():
+                  % if every_content  .category == 'problem':
+                    <option value=${every_content.url_name}> &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp${every_content.display_name_with_default}
+                    </option>
+                  % endif
+                % endfor
+              % endfor
+             % endfor
+          % endfor
+        </select>
+        <input type="submit" name="action" value="Данные всех попыток">
+        <input type="submit" name="action" value="Скачать XLSX всех попыток">
     </p>
-    <p> URL раздела:
-      <input type="text" name="section_to_dump" size="40">
+    <p>
+      <select name=section_to_dump >
+          <option disabled selected>Выберите раздел</option>
+          % for every_section in sections:
+            <option disabled> ${every_section.display_name_with_default}</option>
+            % for every_subsection in every_section.get_children():
+              <option value=${every_subsection.url_name}> 
+              &nbsp&nbsp&nbsp${every_subsection.display_name_with_default}
+              </option>
+             % endfor
+          % endfor
+      </select>
       <input type="submit" name="action" value="Данные по разделу">
+      <input type="submit" name="action" value="Скачать XLSX по разделу">
     </p>
     <hr width="40%" style="align:left">
 %endif
@@ -473,8 +511,8 @@ function goto( mode)
       %for row in analytics_results['StudentsDropoffPerDay']['data']:
         <tr>
           ## For now, just discard the non-date portion
-          <td>${row['last_day'].split("T")[0]}</td>
-          <td>${row['num_students']}</td>
+          <td class="td_empty">${row['last_day'].split("T")[0]}</td>
+          <td class="td_empty">${row['num_students']}</td>
         </tr>
       %endfor
       </table>
@@ -495,10 +533,10 @@ function goto( mode)
         </tr>
       %for row in analytics_results['ProblemGradeDistribution']['data']:
         <tr>
-          <td>${row['module_id'].split('/')[-1]}</td>
-          <td>${max(grade_record['max_grade'] for grade_record in row["grade_info"])}
+          <td class="td_empty">${row['module_id'].split('/')[-1]}</td>
+          <td class="td_empty">${max(grade_record['max_grade'] for grade_record in row["grade_info"])}
           %for grade_record in row["grade_info"]:
-          <td>
+          <td class="td_empty">
             %if isinstance(grade_record["grade"], float):
               ${"{grade:.2f}".format(**grade_record)}
             %else:
@@ -531,8 +569,8 @@ function goto( mode)
         </tr>
       %for row in analytics_results['StudentsPerProblemCorrect']['data']:
         <tr>
-          <td>${row['module_id'].split('/')[-1]}</td>
-          <td>${row['count']}</td>
+          <td class="td_empty">${row['module_id'].split('/')[-1]}</td>
+          <td class="td_empty">${row['count']}</td>
         </tr>
       %endfor
       </table>
@@ -610,26 +648,44 @@ function goto( mode)
 
 %if datatable and modeflag.get('Psychometrics') is None:
   <%include file="../discussion/_js_body_dependencies.html" />
-    <br/>
-    <br/>
-    <p>
-      <hr width="100%">
-      <h2>${datatable['title'] | h}</h2>
-      <table class="stat_table">
-        <tr>
-	%for hname in datatable['header']:
-	  <th>${hname.decode("utf-8") | h}</th>
-	%endfor
-	</tr>
-        %for row in datatable['data']:
-          <tr>
-	    %for value in row:
-	      <td>${value}</td>
-	    %endfor
-	  </tr>
+  <br/>
+  <br/>
+  <p>
+    <hr width="100%">
+    <h2>${datatable['title'] | h}</h2>
+    <table class="stat_table" cellspacing = "0" cellpadding = "0">
+      <tr>
+        %for i, header in enumerate(datatable['header']):
+          %if 'col_size' in datatable:
+            <th colspan=${datatable['col_size'][i]}}>${header.decode("utf-8") | h}</th>
+          %else:
+            <th>${header.decode("utf-8") | h}</th>
+          %endif
         %endfor
-      </table>
-    </p>
+      </tr>
+      %for row in datatable['data']:
+        <tr>
+          %for value in row:
+            %if type(value) == list:
+              %for i in value:  
+                %if len(i) != 0:    
+                  %if i[1] == 'correct':
+                    <td class="td_correct">${i[0]}</td>
+                  %elif i[1] == 'incorrect':
+                    <td class="td_incorrect">${i[0]}</td>
+                  %endif
+                %else:
+                  <td class="td_empty"> </td>
+                %endif
+              %endfor
+            %else:
+              <td class="td_empty">${value}</td>
+            %endif
+          %endfor
+        </tr>
+      %endfor
+    </table>
+  </p>
 %endif
 
 ## Output tasks in progress
@@ -653,11 +709,11 @@ function goto( mode)
         <tr id="task-progress-entry-${tasknum}" class="task-progress-entry"
 	    data-task-id="${instructor_task.task_id}"
 	    data-in-progress="true">
-          <td>${instructor_task.task_type}</td>
-          <td>${instructor_task.task_input}</td>
+          <td class="td_empty">${instructor_task.task_type}</td>
+          <td class="td_empty">${instructor_task.task_input}</td>
           <td class="task-id">${instructor_task.task_id}</td>
-          <td>${instructor_task.requester}</td>
-          <td>${instructor_task.created}</td>
+          <td class="td_empty">${instructor_task.requester}</td>
+          <td class="td_empty">${instructor_task.created}</td>
           <td class="task-state">${instructor_task.task_state}</td>
           <td class="task-duration">${_("unknown")}</td>
           <td class="task-progress">${_("unknown")}</td>
@@ -687,7 +743,7 @@ function goto( mode)
         %for row in course_stats['data']:
           <tr>
 	    %for value in row:
-	      <td>${value | h}</td>
+	      <td class="td_empty">${value | h}</td>
 	    %endfor
 	  </tr>
         %endfor
