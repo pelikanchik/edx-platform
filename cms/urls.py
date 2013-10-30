@@ -20,6 +20,8 @@ urlpatterns = ('',  # nopep8
     url(r'^graph/subsection/(?P<location>.*?)$', 'contentstore.views.show_graph', name='show_graph'),
 
     url(r'^preview_component/(?P<location>.*?)$', 'contentstore.views.preview_component', name='preview_component'),
+    url(r'^save_template$', 'contentstore.views.save_template', name='save_template'),
+    url(r'^delete_template$', 'contentstore.views.delete_template', name='delete_template'),
     url(r'^save_item$', 'contentstore.views.save_item', name='save_item'),
     url(r'^delete_item$', 'contentstore.views.delete_item', name='delete_item'),
     url(r'^create_item$', 'contentstore.views.create_item', name='create_item'),

@@ -324,7 +324,7 @@ class ResourceTemplates(object):
     It finds the templates as directly in this directory under 'templates'.
     """
     @classmethod
-    def templates(cls):
+    def templates(cls, username=None):
         """
         Returns a list of dictionary field: value objects that describe possible templates that can be used
         to seed a module of this type.
@@ -342,9 +342,26 @@ class ResourceTemplates(object):
                 template_content = resource_string(__name__, os.path.join(dirname, template_file))
                 template = yaml.safe_load(template_content)
                 template['template_id'] = template_file
+                template['author'] = None
                 templates.append(template)
+            if username is not None:
+                userpath = str(dirname) + "/" + username
+                try:
+                    resource_listdir(__name__, userpath)
+                    for template_file in resource_listdir(__name__, userpath):
+                        if not template_file.endswith('.yaml'):
+                            log.warning("Skipping unknown template file %s", template_file)
+                            continue
+                        template_content = resource_string(__name__, os.path.join(userpath, template_file))
+                        template = yaml.safe_load(template_content)
+                        template['template_id'] = template_file
+                        template['author'] = username
+                        templates.append(template)
+                except KeyError:
+                    print "There are no directory"
 
         return templates
+
 
     @classmethod
     def get_template_dir(cls):
@@ -362,13 +379,16 @@ class ResourceTemplates(object):
             return None
 
     @classmethod
-    def get_template(cls, template_id):
+    def get_template(cls, template_id, username=None):
         """
         Get a single template by the given id (which is the file name identifying it w/in the class's
         template_dir_name)
 
         """
         dirname = cls.get_template_dir()
+
+        if username is not None:
+            dirname += "/" + username
         if dirname is not None:
             try:
                 template_content = resource_string(__name__, os.path.join(dirname, template_id))

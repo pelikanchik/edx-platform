@@ -3,6 +3,7 @@ class CMS.Views.UnitEdit extends Backbone.View
     'click .new-component .new-component-type a.multiple-templates': 'showComponentTemplates'
     'click .new-component .new-component-type a.single-template': 'saveNewComponent'
     'click .new-component .cancel-button': 'closeNewComponent'
+    'click .new-component-templates .new-component-template em': 'deleteTemplate'
     'click .new-component-templates .new-component-template a': 'saveNewComponent'
     'click .new-component-templates .cancel-button': 'closeNewComponent'
     'click .delete-draft': 'deleteDraft'
@@ -142,6 +143,37 @@ class CMS.Views.UnitEdit extends Backbone.View
 
   saveDraft: =>
     @model.save()
+
+  deleteTemplate: (event) =>
+    event.preventDefault()
+    msg = new CMS.Views.Prompt.Warning(
+      title: gettext('Удалить шаблон?'),
+      message: gettext('Удаление шаблона нельзя будет отменить. Никогда. Вообще.'),
+      actions:
+        primary:
+          text: gettext('Да, удалить'),
+          click: (view) =>
+            view.hide()
+            deleting = new CMS.Views.Notification.Mini
+              title: gettext('Удаление...') + '&hellip;',
+            deleting.show()
+            $component = $(event.currentTarget).parents('.editor-manual')
+            if $component.length < 1
+              $component = $(event.currentTarget).parents('.editor-md')
+            $template = $component.find('.user-template')
+            console.log $template.data('boilerplate')
+            $.post('/delete_template', {
+              name: $template.data('boilerplate')
+            }, =>
+              deleting.hide()
+            )
+            $component.remove()
+        secondary:
+          text: gettext('Отмена'),
+          click: (view) ->
+            view.hide()
+    )
+    msg.show()
 
   deleteComponent: (event) =>
     event.preventDefault()

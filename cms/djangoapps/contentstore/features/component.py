@@ -25,6 +25,7 @@ def add_components(step):
 
 @step(u'I see the following components')
 def check_components(step):
+    print "\n111\n"
     for component in [step_hash['Component'] for step_hash in step.hashes]:
         assert component in COMPONENT_DICTIONARY
         assert_true(COMPONENT_DICTIONARY[component]['found_func'](), "{} couldn't be found".format(component))

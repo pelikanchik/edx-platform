@@ -222,6 +222,7 @@ def edit_unit(request, location):
     component_templates = defaultdict(list)
     for category in COMPONENT_TYPES:
         component_class = load_mixed_class(category)
+        user_component_class = load_mixed_class(category)
         # add the default template
         # TODO: Once mixins are defined per-application, rather than per-runtime,
         # this should use a cms mixed-in class. (cpennington)
@@ -235,16 +236,18 @@ def edit_unit(request, location):
             False,  # No defaults have markdown (hardcoded current default)
             None  # no boilerplate for overrides
         ))
+
         # add boilerplates
         if hasattr(component_class, 'templates'):
-            for template in component_class.templates():
+            for template in component_class.templates(str(request.user)):
+                print template['author']
+                template['metadata']['author'] = template['author']
                 component_templates[category].append((
                     template['metadata'].get('display_name'),
                     category,
                     template['metadata'].get('markdown') is not None,
                     template.get('template_id')
                 ))
-
     # Check if there are any advanced modules specified in the course policy.
     # These modules should be specified as a list of strings, where the strings
     # are the names of the modules in ADVANCED_COMPONENT_TYPES that should be
@@ -327,6 +330,7 @@ def edit_unit(request, location):
         )
 
     unit_state = compute_unit_state(item)
+
 
     return render_to_response('unit.html', {
         'length': len(components),
@@ -462,3 +466,4 @@ def module_info(request, module_location):
             location, request.POST
         )
     return JsonResponse(rsp)
+

@@ -390,30 +390,34 @@
                               <li>
                                 <a class="link-tab" href="#tab2">Продвинутые задания</a>
                               </li>
+                              <li>
+                                <a class="link-tab" href="#tab3">Мои шаблоны</a>
+                              </li>
 
                             </ul>
                     % endif
                     <div class="tab current" id="tab1">
                       <ul class="new-component-template">
                           % for name, category, has_markdown, boilerplate_name in sorted(templates):
-                            % if has_markdown or type != "problem":
-                                % if boilerplate_name is None:
-                                  <li class="editor-md empty">
-                                    <a href="#" data-category="${category}">
-                                      <span class="name">${name}</span>
-                                    </a>
-                                  </li>
+                                % if has_markdown or type != "problem":
+                                    % if boilerplate_name is None:
+                                      <li class="editor-md empty">
+                                        <a href="#" data-category="${category}">
+                                          <span class="name">${name}</span>
+                                        </a>
+                                      </li>
 
-                                % else:
-                                  <li class="editor-md">
-                                    <a href="#" data-category="${category}"
-                                       data-boilerplate="${boilerplate_name}">
-                                      <span class="name">${name}</span>
-                                    </a>
-                                  </li>
+                                    % else:
+                                      %if "_user_" not in boilerplate_name:
+                                      <li class="editor-md">
+                                        <a href="#" data-category="${category}"
+                                           data-boilerplate="${boilerplate_name}">
+                                          <span class="name">${name}</span>
+                                        </a>
+                                      </li>
+                                      % endif
+                                    % endif
                                 % endif
-                            % endif
-
                           %endfor
                       </ul>
                     </div>
@@ -421,14 +425,58 @@
                         <div class="tab" id="tab2">
                           <ul class="new-component-template">
                               % for name, category, has_markdown, boilerplate_name in sorted(templates):
-                                % if not has_markdown:
-                                  <li class="editor-manual">
-                                    <a href="#" data-category="${category}"
-                                       data-boilerplate="${boilerplate_name}">
-                                      <span class="name">${name}</span>
-                                    </a>
-                                  </li>
-                                % endif
+                                    % if not has_markdown:
+                                        % if boilerplate_name is None:
+                                          <li class="editor-manual">
+                                            <a href="#" data-category="${category}"
+                                               data-boilerplate="${boilerplate_name}">
+                                              <span class="name">${name}</span>
+                                            </a>
+                                          </li>
+
+                                        % else:
+                                          %if "_user_" not in boilerplate_name:
+                                          <li class="editor-manual">
+                                            <a href="#" data-category="${category}"
+                                               data-boilerplate="${boilerplate_name}">
+                                              <span class="name">${name}</span>
+                                            </a>
+                                          </li>
+                                          % endif
+                                        % endif
+                                    % endif
+                              % endfor
+                          </ul>
+                        </div>
+                        <div class="tab" id="tab3">
+                          <ul class="new-component-template">
+                              % for name, category, has_markdown, boilerplate_name in sorted(templates):
+                                % if boilerplate_name is not None:
+                                    %if "_user_" in boilerplate_name:
+                                        % if not has_markdown:
+                                        <li class="editor-manual">
+                                            <a class="user-template" href="#" data-category="${category}"
+                                            data-boilerplate="${boilerplate_name}">
+                                            <span class="name">${name}</span>
+                                            </a>
+                                                <em class="delete-template"
+                                                   data-tooltip="Удалить шаблон" href="#" style="color:#ff0000; cursor:pointer">Удалить
+                                                </em>
+                                        </li>
+                                        % endif
+                                        % if has_markdown or type != "problem":
+                                              <li class="editor-md">
+                                                <a class="user-template" href="#" data-category="${category}"
+                                                   data-boilerplate="${boilerplate_name}">
+                                                  <span class="name">${name}</span>
+                                                </a>
+                                                <em class="delete-template"
+                                                   data-tooltip="Удалить шаблон" href="#" style="color:#ff0000; cursor:pointer">Удалить
+                                                </em>
+                                              </li>
+                                        % endif
+                                    % endif
+                                %endif
                               % endfor
                           </ul>
                         </div>

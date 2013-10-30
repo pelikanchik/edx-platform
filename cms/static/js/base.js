@@ -373,7 +373,6 @@ function createNewUnit(e) {
         'parent_location': parent
     });
 
-
     $.post('/create_item', {
         'parent_location': parent,
         'category': category,
@@ -608,7 +607,7 @@ function saveNewSection(e) {
     $.post('/create_item', {
         'parent_location': parent,
         'category': category,
-        'display_name': display_name,
+        'display_name': display_name
     },
 
     function(data) {

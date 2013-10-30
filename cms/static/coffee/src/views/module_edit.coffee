@@ -6,6 +6,9 @@ class CMS.Views.ModuleEdit extends Backbone.View
   events:
     "click .component-editor .cancel-button": 'clickCancelButton'
     "click .component-editor .save-button": 'clickSaveButton'
+    "click .component-editor .template-button": 'clickTemplateButton'
+    "click .component-editor .template-save-button": 'clickTemplateSaveButton'
+    "click .component-editor .template-cancel-button": 'clickTemplateCancelButton'
     "click .component-actions .edit-button": 'clickEditButton'
     "click .component-actions .insert-button": 'clickInsertButton'
     "click .component-actions .insert-to-end-button": 'clickInsertToEndButton'
@@ -108,6 +111,48 @@ class CMS.Views.ModuleEdit extends Backbone.View
     ).fail( ->
       showToastMessage(gettext("Возникли проблемы при сохранении. Попробуйте ещё раз"), null, 3)
     )
+
+  clickTemplateButton: (event) =>
+    event.preventDefault()
+    @$(".template-save-button").show()
+    @$(".template-cancel-button").show()
+    @$(".template-name-field").show()
+
+  clickTemplateCancelButton: (event) =>
+    event.preventDefault()
+    @$(".template-save-button").hide()
+    @$(".template-cancel-button").hide()
+    @$(".template-name-field").hide()
+
+  clickTemplateSaveButton: (event) =>
+    event.preventDefault()
+    data = @module.save()
+
+    analytics.track "Saved Module",
+      course: course_location_analytics
+      id: _this.model.id
+
+    data.metadata = _.extend(data.metadata || {}, @changedMetadata())
+    template_name = @$(".template-name-field").val()
+    console.log template_name
+    saving = new CMS.Views.Notification.Mini
+      title: gettext('Сохраняется') + '&hellip;'
+    saving.show()
+    @model.save(data).done( =>
+    #   # showToastMessage("Your changes have been saved.", null, 3)
+      saving.hide()
+    ).fail( ->
+      showToastMessage(gettext("Возникли проблемы при сохранении. Попробуйте ещё раз"), null, 3)
+    )
+    $.post(
+        "/save_template",
+        {'all_data': data,
+        'template_name': template_name}
+    )
+    @$(".template-save-button").hide()
+    @$(".template-cancel-button").hide()
+    @$(".template-name-field").hide()
+
 
   clickCancelButton: (event) ->
     event.preventDefault()

@@ -1,5 +1,9 @@
 import logging
+import os
 from uuid import uuid4
+
+import time
+from datetime import datetime
 
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.decorators import login_required
@@ -15,7 +19,7 @@ from .access import has_access
 from .requests import _xmodule_recurse
 from xmodule.x_module import XModuleDescriptor
 
-__all__ = ['save_item', 'create_item', 'delete_item']
+__all__ = ['save_item', 'create_item', 'delete_item', 'save_template', 'delete_template']
 
 # cdodge: these are categories which should not be parented, they are detached from the hierarchy
 DETACHED_CATEGORIES = ['about', 'static_tab', 'course_info']
@@ -131,7 +135,12 @@ def create_item(request):
     if template_id is not None:
         clz = XModuleDescriptor.load_class(category)
         if clz is not None:
-            template = clz.get_template(template_id)
+            if "_user_" in template_id:
+                template = clz.get_template(template_id, str(request.user))
+            else:
+                template = clz.get_template(template_id)
+            print "\n\n"
+            print template_id
             if template is not None:
                 metadata = template.get('metadata', {})
                 data = template.get('data')
@@ -197,5 +206,56 @@ def delete_item(request):
                 children.remove(item_url)
                 parent.children = children
                 modulestore('direct').update_children(parent.location, parent.children)
+    return JsonResponse()
 
+@login_required
+@expect_json
+def save_template(request):
+    save_data = request.POST
+    try:
+        template_name = request.POST['template_name'].encode('utf-8')
+    except KeyError:
+        template_name = None
+    if template_name is None:
+        template_name = ""
+    print save_data
+    try:
+        item_metadata = (request.POST['all_data[metadata][markdown]']).encode('utf-8')
+    except KeyError:
+        item_metadata = None
+    item_data = (request.POST['all_data[data]']).encode('utf-8')
+    to_save = os.getcwd() + "/common/lib/xmodule/xmodule/templates/html/" + str(request.user)
+    if not os.path.exists(to_save):
+        os.makedirs(to_save)
+    to_save = os.getcwd() + "/common/lib/xmodule/xmodule/templates/about/" + str(request.user)
+    if not os.path.exists(to_save):
+        os.makedirs(to_save)
+    to_save = os.getcwd() + "/common/lib/xmodule/xmodule/templates/problem/" + str(request.user)
+    if not os.path.exists(to_save):
+        os.makedirs(to_save)
+    t = datetime.now()
+    prefix = t.strftime("%Y_%m_%d_%H_%M_%S")
+    myFile = open(to_save + "/_user_template" + prefix + ".yaml", 'w')
+    myFile.write("---\n")
+    myFile.write("metadata:\n")
+    myFile.write("    display_name: " + template_name.replace("\n", "") + "\n")
+    myFile.write("    markdown: ")
+    if item_metadata is None:
+        myFile.write("!!null")
+    else:
+        myFile.write("|\n")
+        myFile.write("       ")
+        myFile.write(item_metadata.replace("\n", "\n       "))
+    myFile.write("\ndata: |\n")
+    myFile.write("   ")
+    myFile.write(item_data.replace("\n", "\n   "))
+    myFile.close()
+    return JsonResponse()
+
+@login_required
+@expect_json
+def delete_template(request):
+    filename = request.POST['name']
+    to_delete = os.getcwd() + "/common/lib/xmodule/xmodule/templates/problem/" + str(request.user) + "/" + filename
+    os.remove(to_delete)
     return JsonResponse()
