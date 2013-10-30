@@ -67,8 +67,18 @@ def is_section_exist(section_id, sections):
 
     return False
 
-
+#@require_http_methods(("GET", "POST", "PUT"))
+#@ensure_csrf_cookie
+@login_required
 def show_graph(request, location):
+    # check that we have permissions to edit this item
+    try:
+        course = get_course_for_item(location)
+    except InvalidLocationError:
+        return HttpResponseBadRequest()
+
+    if not has_access(request.user, course.location):
+        raise PermissionDenied()
 
     try:
         item = modulestore().get_item(location, depth=1)
@@ -79,8 +89,16 @@ def show_graph(request, location):
     if item.location.category != 'sequential':
         return HttpResponseBadRequest()
 
+    dict = {}
+
+    for unit in item.get_children():
+        state = compute_unit_state(unit)
+        dict[unit.url_name] = state
+
+
     return render_to_response('graph.html',
-                              {'subsection': item})
+                              {'subsection': item,
+                               'states': dict})
 
 
 @login_required

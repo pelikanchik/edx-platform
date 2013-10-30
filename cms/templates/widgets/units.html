@@ -40,8 +40,34 @@ This def will enumerate through a passed in subsection and list all of the units
         </a>
   </li>
 </ol>
-            <a href="#" class="show-graph-item"> Граф </a>
+
+            <a href="#" class="show-graph-item"> Граф</a>
+
+<script type="text/javascript" src="/static/js/fancybox/source/jquery.fancybox.pack.js"></script>
+<link rel="stylesheet" href="/static/js/fancybox/source/jquery.fancybox.css" type="text/css" media="screen" />
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('.show-graph-item').attr("href", "/graph" + window.location.pathname);
+    //    $('.show-graph-item').prop("href", "/google");
+        $('.show-graph-item').fancybox({
+//            minWidth      : '600',
+            width         : '95%',
+            height        : '95%',
+            autoScale     : false,
+            autoSize      : false,
+            autoDimensions: false,
+            fitToView     : false,
+            type          : 'iframe',
+//            hideOnOverlayClick:false,
+//            hideOnContentClick:false,
+            closeClick: false,
+            helpers     : {
+                overlay : {closeClick: false} // prevents closing when clicking OUTSIDE fancybox
+            }
+
+        })
+    });
+</script>
+
 </%def>
-
-
-
