@@ -294,6 +294,24 @@ body.course.unit {
               }
             }
 
+            .editor-md {
+              .delete-template {
+                      color: rgb(255, 0, 0);
+                      cursor: pointer;
+                      padding-right: 30px;
+                      font-size: 10px;
+                  }
+            }
+
+            .editor-manual {
+              .delete-template {
+                      color: rgb(255, 0, 0);
+                      cursor: pointer;
+                      padding-right: 30px;
+                      font-size: 10px;
+                  }
+            }
+
             a {
               @include clearfix();
               display: block;

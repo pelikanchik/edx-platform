@@ -114,12 +114,14 @@ class CMS.Views.ModuleEdit extends Backbone.View
 
   clickTemplateButton: (event) =>
     event.preventDefault()
+    @$(".template-button").hide()
     @$(".template-save-button").show()
     @$(".template-cancel-button").show()
     @$(".template-name-field").show()
 
   clickTemplateCancelButton: (event) =>
     event.preventDefault()
+    @$(".template-button").show()
     @$(".template-save-button").hide()
     @$(".template-cancel-button").hide()
     @$(".template-name-field").hide()
@@ -149,6 +151,7 @@ class CMS.Views.ModuleEdit extends Backbone.View
         {'all_data': data,
         'template_name': template_name}
     )
+    @$(".template-button").show()
     @$(".template-save-button").hide()
     @$(".template-cancel-button").hide()
     @$(".template-name-field").hide()
