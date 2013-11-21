@@ -64,6 +64,7 @@ AUDIT_LOG = logging.getLogger("audit")
 
 Article = namedtuple('Article', 'title url author image deck publication publish_date')
 
+ACCEPTED_DOMAINS = ['asbis.ru']
 
 def csrf_token(context):
     ''' A csrf token that can be included in a form.
@@ -590,6 +591,11 @@ def create_account(request, post_override=None):
     JSON call to create new edX account.
     Used by form in signup_modal.html, which is included into navigation.html
     '''
+    def validate_domain(email, accepted_domains):
+        domain = email[email.find('@') + 1:]
+        if domain not in accepted_domains:
+            raise ValidationError(_(u'Enter email with accepted domain.'), code='invalid')
+
     js = {'success': False}
 
     post_vars = post_override if post_override else request.POST
@@ -663,6 +669,14 @@ def create_account(request, post_override=None):
         validate_email(post_vars['email'])
     except ValidationError:
         js['value'] = _(u"Необходимо ввести корректный e-mail").format(field=a)
+        js['field'] = 'email'
+        return HttpResponse(json.dumps(js))
+
+    try:
+        validate_domain(post_vars['email'], ACCEPTED_DOMAINS)
+    except ValidationError:
+        accepted_domains = ' или '.join(domain for domain in ACCEPTED_DOMAINS)
+        js['value'] = _("Домен e-mail должен быть {0}.".format(accepted_domains)).format(field=a)
         js['field'] = 'email'
         return HttpResponse(json.dumps(js))
 
