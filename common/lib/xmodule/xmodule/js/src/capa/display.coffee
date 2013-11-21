@@ -45,6 +45,8 @@ class @Problem
       else
          $(this).parent().addClass "active"
 
+    @bindResetCorrectness()
+
     # Collapsibles
     Collapsible.setCollapsibles(@el)
 
@@ -274,7 +276,7 @@ class @Problem
             @updateProgress response
           else
             @gentle_alert response.success
-        Logger.log 'problem_graded', [@answers, response.contents], @url
+        Logger.log 'problem_graded', [@answers, response.contents], @id
 
     if not abort_submission
       $.ajaxWithPrefix("#{@url}/problem_check", settings)
@@ -309,7 +311,7 @@ class @Problem
       if( responsesBeingProcessedCount == 0)
         $('.check-all').html('Check all').removeClass('check-all-disabled');
 
-      Logger.log 'problem_graded', [@answers, response.contents], @url
+      Logger.log 'problem_graded', [@answers, response.contents], @id
 
   reset: =>
     Logger.log 'problem_reset', @answers
@@ -409,6 +411,56 @@ class @Problem
     @$(".CodeMirror").each (index, element) ->
       element.CodeMirror.save() if element.CodeMirror.save
     @answers = @inputs.serialize()
+
+  bindResetCorrectness: ->
+    # Loop through all input types
+    # Bind the reset functions at that scope.
+    $inputtypes = @el.find(".capa_inputtype").add(@el.find(".inputtype"))
+    $inputtypes.each (index, inputtype) =>
+      classes = $(inputtype).attr('class').split(' ')
+      for cls in classes
+        bindMethod = @bindResetCorrectnessByInputtype[cls]
+        if bindMethod?
+          bindMethod(inputtype)
+
+  # Find all places where each input type displays its correct-ness
+  # Replace them with their original state--'unanswered'.
+  bindResetCorrectnessByInputtype:
+    # These are run at the scope of the capa inputtype
+    # They should set handlers on each <input> to reset the whole.
+    formulaequationinput: (element) ->
+      $(element).find('input').on 'input', ->
+        $p = $(element).find('p.status')
+        $p.text gettext("unanswered")
+        $p.parent().removeClass().addClass "unanswered"
+
+    choicegroup: (element) ->
+      $element = $(element)
+      id = ($element.attr('id').match /^inputtype_(.*)$/)[1]
+      $element.find('input').on 'change', ->
+        $status = $("#status_#{id}")
+        if $status[0]  # We found a status icon.
+          $status.removeClass().addClass "unanswered"
+          $status.empty().css 'display', 'inline-block'
+        else
+          # Recreate the unanswered dot on left.
+          $("<span>", {"class": "unanswered", "style": "display: inline-block;", "id": "status_#{id}"})
+
+        $element.find("label").removeClass()
+
+    'option-input': (element) ->
+      $select = $(element).find('select')
+      id = ($select.attr('id').match /^input_(.*)$/)[1]
+      $select.on 'change', ->
+        $status = $("#status_#{id}")
+          .removeClass().addClass("unanswered")
+          .find('span').text(gettext('Status: unsubmitted'))
+
+    textline: (element) ->
+      $(element).find('input').on 'input', ->
+        $p = $(element).find('p.status')
+        $p.text "unanswered"
+        $p.parent().removeClass().addClass "unanswered"
 
   inputtypeSetupMethods:
 

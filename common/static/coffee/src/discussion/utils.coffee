@@ -3,7 +3,7 @@ $ ->
     window.$$contents = {}
   $.fn.extend
     loading: ->
-      @$_loading = $("<div class='loading-animation'></div>")
+      @$_loading = $("<div class='loading-animation'><span class='sr'>Loading content</span></div>")
       $(this).after(@$_loading)
     loaded: ->
       @$_loading.remove()
@@ -26,7 +26,7 @@ class @DiscussionUtil
     @loadFlagModerator($("#discussion-container").data("flag-moderator"))
 
   @isStaff: (user_id) ->
-    staff = _.union(@roleIds['Staff'], @roleIds['Moderator'], @roleIds['Administrator'])
+    staff = _.union(@roleIds['Moderator'], @roleIds['Administrator'])
     _.include(staff, parseInt(user_id))
 
   @isTA: (user_id) ->

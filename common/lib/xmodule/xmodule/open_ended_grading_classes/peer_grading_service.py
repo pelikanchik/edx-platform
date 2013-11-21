@@ -1,13 +1,9 @@
 import json
 import logging
 
-from .grading_service_module import GradingService
+from .grading_service_module import GradingService, GradingServiceError
 
 log = logging.getLogger(__name__)
-
-
-class GradingServiceError(Exception):
-    pass
 
 
 class PeerGradingService(GradingService):
@@ -94,9 +90,9 @@ class MockPeerGradingService(object):
             'success': True,
             'submission_id': 1,
             'submission_key': "",
-            'student_response': 'fake student response',
-            'prompt': 'fake submission prompt',
-            'rubric': 'fake rubric',
+            'student_response': 'Sample student response.',
+            'prompt': 'Sample submission prompt.',
+            'rubric': 'Placeholder text for the full rubric.',
             'max_score': 4
         }
 
@@ -110,9 +106,9 @@ class MockPeerGradingService(object):
         return {'success': True,
                 'submission_id': 1,
                 'submission_key': '',
-                'student_response': 'fake student response',
-                'prompt': 'fake submission prompt',
-                'rubric': 'fake rubric',
+                'student_response': 'Sample student response.',
+                'prompt': 'Sample submission prompt.',
+                'rubric': 'Placeholder text for the full rubric.',
                 'max_score': 4}
 
     def save_calibration_essay(self, **kwargs):

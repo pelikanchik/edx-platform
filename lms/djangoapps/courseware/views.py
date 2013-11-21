@@ -24,22 +24,20 @@ from courseware.courses import (get_courses, get_course_with_access,
                                 get_courses_by_university, sort_by_announcement)
 import courseware.tabs as tabs
 from courseware.masquerade import setup_masquerade
-from courseware.model_data import ModelDataCache
+from courseware.model_data import FieldDataCache
 from .module_render import toc_for_course, get_module_for_descriptor, get_module
 from courseware.models import StudentModule, StudentModuleHistory
 from course_modes.models import CourseMode
 
-from django_comment_client.utils import get_discussion_title
-
 from student.models import UserTestGroup, CourseEnrollment
 from util.cache import cache, cache_if_anonymous
+from xblock.fragment import Fragment
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundError, NoPathToItem
 from xmodule.modulestore.search import path_to_location
 from xmodule.course_module import CourseDescriptor
-
-import comment_client
+import shoppingcart
 
 log = logging.getLogger("mitx.courseware")
 
@@ -80,7 +78,7 @@ def courses(request):
     return render_to_response("courseware/courses.html", {'courses': courses})
 
 
-def render_accordion(request, course, chapter, section, model_data_cache):
+def render_accordion(request, course, chapter, section, field_data_cache):
     """
     Draws navigation bar. Takes current position in accordion as
     parameter.
@@ -125,13 +123,14 @@ def render_accordion(request, course, chapter, section, model_data_cache):
     # grab the table of contents
     user = User.objects.prefetch_related("groups").get(id=request.user.id)
     request.user = user	# keep just one instance of User
-    toc = toc_for_course(user, request, course, chapter, section, model_data_cache)
+    toc = toc_for_course(user, request, course, chapter, section, field_data_cache)
 
     context = dict([('toc', toc),
                     ('course_id', course.id),
                     ('csrf', csrf(request)['csrf_token']),
                     ('show_timezone', course.show_timezone),
-                    ('courseware_summary',courseware_summary),] + template_imports.items())
+                    ('courseware_summary',courseware_summary),
+                    ('due_date_display_format', course.due_date_display_format)] + template_imports.items())
     return render_to_string('courseware/accordion.html', context)
 
 
@@ -174,7 +173,7 @@ def redirect_to_course_position(course_module):
     the first child.
 
     """
-    urlargs = {'course_id': course_module.descriptor.id}
+    urlargs = {'course_id': course_module.id}
     chapter = get_current_child(course_module)
     if chapter is None:
         # oops.  Something bad has happened.
@@ -220,7 +219,7 @@ def check_for_active_timelimit_module(request, course_id, course):
             # get the corresponding section_descriptor for the given StudentModel entry:
             module_state_key = timelimit_student_module.module_state_key
             timelimit_descriptor = modulestore().get_instance(course_id, Location(module_state_key))
-            timelimit_module_cache = ModelDataCache.cache_for_descriptor_descendents(course.id, request.user,
+            timelimit_module_cache = FieldDataCache.cache_for_descriptor_descendents(course.id, request.user,
                                                                                      timelimit_descriptor, depth=None)
             timelimit_module = get_module_for_descriptor(request.user, request, timelimit_descriptor,
                                                          timelimit_module_cache, course.id, position=None)
@@ -241,7 +240,7 @@ def check_for_active_timelimit_module(request, course_id, course):
     return context
 
 
-def update_timelimit_module(user, course_id, model_data_cache, timelimit_descriptor, timelimit_module):
+def update_timelimit_module(user, course_id, field_data_cache, timelimit_descriptor, timelimit_module):
     """
     Updates the state of the provided timing module, starting it if it hasn't begun.
     Returns dict with timer-related values to enable display of time remaining.
@@ -342,10 +341,10 @@ def index(request, course_id, chapter=None, section=None,
     masq = setup_masquerade(request, staff_access)
 
     try:
-        model_data_cache = ModelDataCache.cache_for_descriptor_descendents(
+        field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
             course.id, user, course, depth=2)
 
-        course_module = get_module_for_descriptor(user, request, course, model_data_cache, course.id)
+        course_module = get_module_for_descriptor(user, request, course, field_data_cache, course.id)
         if course_module is None:
             log.warning('If you see this, something went wrong: if we got this'
                         ' far, should have gotten a course module for this user')
@@ -356,11 +355,11 @@ def index(request, course_id, chapter=None, section=None,
 
         context = {
             'csrf': csrf(request)['csrf_token'],
-            'accordion': render_accordion(request, course, chapter, section, model_data_cache),
+            'accordion': render_accordion(request, course, chapter, section, field_data_cache),
             'COURSE_TITLE': course.display_name_with_default,
             'course': course,
             'init': '',
-            'content': '',
+            'fragment': Fragment(),
             'staff_access': staff_access,
             'masquerade': masq,
             'xqa_server': settings.MITX_FEATURES.get('USE_XQA_SERVER', 'http://xqa:server@content-qa.mitx.mit.edu/xqa')
@@ -408,11 +407,16 @@ def index(request, course_id, chapter=None, section=None,
 
             # Load all descendants of the section, because we're going to display its
             # html, which in general will need all of its children
-            section_model_data_cache = ModelDataCache.cache_for_descriptor_descendents(
+            section_field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
                 course_id, user, section_descriptor, depth=None)
-            section_module = get_module(request.user, request,
-                                section_descriptor.location,
-                                section_model_data_cache, course_id, position, depth=None)
+
+            section_module = get_module_for_descriptor(request.user,
+                request,
+                section_descriptor,
+                section_field_data_cache,
+                course_id,
+                position
+            )
 
             if section_module is None:
                 # User may be trying to be clever and access something
@@ -432,7 +436,7 @@ def index(request, course_id, chapter=None, section=None,
 
             # check here if this section *is* a timed module.
             if section_module.category == 'timelimit':
-                timer_context = update_timelimit_module(user, course_id, student_module_cache,
+                timer_context = update_timelimit_module(user, course_id, section_field_data_cache,
                                                         section_descriptor, section_module)
                 if 'timer_expiration_duration' in timer_context:
                     context.update(timer_context)
@@ -444,14 +448,15 @@ def index(request, course_id, chapter=None, section=None,
                 # add in the appropriate timer information to the rendering context:
                 context.update(check_for_active_timelimit_module(request, course_id, course))
 
-
            # context['content'] = section_module.runtime.render(section_module, None, 'student_view').content
 
             if not is_section_unlocked:
-                context['content'] = 'This subsection is not available for you'
+                context['fragment'] = 'This subsection is not available for you'
             else:
-                context['content'] = section_module.runtime.render(section_module, None, 'student_view').content
+                # remove this if works fine
+                #context['fragment'] = section_module.runtime.render(section_module, None, 'student_view').content
                 #context['content'] = section_module.get_html()
+                context['fragment'] = section_module.render('student_view')
 
         else:
             # section is none, so display a message
@@ -463,11 +468,15 @@ def index(request, course_id, chapter=None, section=None,
             prev_section_url = reverse('courseware_section', kwargs={'course_id': course_id,
                                                                      'chapter': chapter_descriptor.url_name,
                                                                      'section': prev_section.url_name})
-            context['content'] = render_to_string('courseware/welcome-back.html',
-                                                  {'course': course,
-                                                   'chapter_module': chapter_module,
-                                                   'prev_section': prev_section,
-                                                   'prev_section_url': prev_section_url})
+            context['fragment'] = Fragment(content=render_to_string(
+                'courseware/welcome-back.html',
+                {
+                    'course': course,
+                    'chapter_module': chapter_module,
+                    'prev_section': prev_section,
+                    'prev_section_url': prev_section_url
+                }
+            ))
 
         result = render_to_response('courseware/courseware.html', context)
     except Exception as e:
@@ -651,10 +660,28 @@ def course_about(request, course_id):
     show_courseware_link = (has_access(request.user, course, 'load') or
                             settings.MITX_FEATURES.get('ENABLE_LMS_MIGRATION'))
 
+    # Note: this is a flow for payment for course registration, not the Verified Certificate flow.
+    registration_price = 0
+    in_cart = False
+    reg_then_add_to_cart_link = ""
+    if (settings.MITX_FEATURES.get('ENABLE_SHOPPING_CART') and
+        settings.MITX_FEATURES.get('ENABLE_PAID_COURSE_REGISTRATION')):
+        registration_price = CourseMode.min_course_price_for_currency(course_id,
+                                                                      settings.PAID_COURSE_REGISTRATION_CURRENCY[0])
+        if request.user.is_authenticated():
+            cart = shoppingcart.models.Order.get_cart_for_user(request.user)
+            in_cart = shoppingcart.models.PaidCourseRegistration.contained_in_order(cart, course_id)
+
+        reg_then_add_to_cart_link = "{reg_url}?course_id={course_id}&enrollment_action=add_to_cart".format(
+            reg_url=reverse('register_user'), course_id=course.id)
+
     return render_to_response('courseware/course_about.html',
                               {'course': course,
                                'registered': registered,
                                'course_target': course_target,
+                               'registration_price': registration_price,
+                               'in_cart': in_cart,
+                               'reg_then_add_to_cart_link': reg_then_add_to_cart_link,
                                'show_courseware_link': show_courseware_link})
 
 
@@ -697,29 +724,6 @@ def mktg_course_about(request, course_id):
                               })
 
 
-def render_notifications(request, course, notifications):
-    context = {
-        'notifications': notifications,
-        'get_discussion_title': partial(get_discussion_title, request=request, course=course),
-        'course': course,
-    }
-    return render_to_string('courseware/notifications.html', context)
-
-
-@login_required
-def news(request, course_id):
-    course = get_course_with_access(request.user, course_id, 'load')
-
-    notifications = comment_client.get_notifications(request.user.id)
-
-    context = {
-        'course': course,
-        'content': render_notifications(request, course, notifications),
-    }
-
-    return render_to_response('courseware/news.html', context)
-
-
 @login_required
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def progress(request, course_id, student_id=None):
@@ -746,12 +750,12 @@ def progress(request, course_id, student_id=None):
     # additional DB lookup (this kills the Progress page in particular).
     student = User.objects.prefetch_related("groups").get(id=student.id)
 
-    model_data_cache = ModelDataCache.cache_for_descriptor_descendents(
+    field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
         course_id, student, course, depth=None)
 
     courseware_summary = grades.progress_summary(student, request, course,
-                                                 model_data_cache)
-    grade_summary = grades.grade(student, request, course, model_data_cache)
+                                                 field_data_cache)
+    grade_summary = grades.grade(student, request, course, field_data_cache)
 
     if courseware_summary is None:
         #This means the student didn't have access to the course (which the instructor requested)
@@ -775,6 +779,7 @@ def submission_history(request, course_id, student_username, location):
     Right now this only works for problems because that's all
     StudentModuleHistory records.
     """
+
     course = get_course_with_access(request.user, course_id, 'load')
     staff_access = has_access(request.user, course, 'staff')
 

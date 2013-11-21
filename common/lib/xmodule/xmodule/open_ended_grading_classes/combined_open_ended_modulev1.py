@@ -1,15 +1,17 @@
 import json
 import logging
+import traceback
 from lxml import etree
 from xmodule.timeinfo import TimeInfo
 from xmodule.capa_module import ComplexEncoder
 from xmodule.progress import Progress
 from xmodule.stringify import stringify_children
-import self_assessment_module
-import open_ended_module
+from  xmodule.open_ended_grading_classes import self_assessment_module
+from  xmodule.open_ended_grading_classes import open_ended_module
 from functools import partial
 from .combined_open_ended_rubric import CombinedOpenEndedRubric, GRADER_TYPE_IMAGE_DICT, HUMAN_GRADER_TYPE, LEGEND_LIST
-from peer_grading_service import PeerGradingService, MockPeerGradingService, GradingServiceError
+from xmodule.open_ended_grading_classes.peer_grading_service import PeerGradingService, MockPeerGradingService, GradingServiceError
+from xmodule.open_ended_grading_classes.openendedchild import OpenEndedChild
 
 log = logging.getLogger("mitx.courseware")
 
@@ -127,6 +129,9 @@ class CombinedOpenEndedV1Module():
         self.peer_grader_count = instance_state.get('peer_grader_count', 3)
         self.min_to_calibrate = instance_state.get('min_to_calibrate', 3)
         self.max_to_calibrate = instance_state.get('max_to_calibrate', 6)
+        self.peer_grade_finished_submissions_when_none_pending = instance_state.get(
+            'peer_grade_finished_submissions_when_none_pending', False
+        )
 
         due_date = instance_state.get('due', None)
 
@@ -158,6 +163,9 @@ class CombinedOpenEndedV1Module():
                 'peer_grader_count': self.peer_grader_count,
                 'min_to_calibrate': self.min_to_calibrate,
                 'max_to_calibrate': self.max_to_calibrate,
+                'peer_grade_finished_submissions_when_none_pending': (
+                    self.peer_grade_finished_submissions_when_none_pending
+                ),
             }
         }
 
@@ -165,6 +173,104 @@ class CombinedOpenEndedV1Module():
         self.location = location
         self.fix_invalid_state()
         self.setup_next_task()
+
+    def validate_task_states(self, tasks_xml, task_states):
+        """
+        Check whether the provided task_states are valid for the supplied task_xml.
+
+        Returns a list of messages indicating what is invalid about the state.
+        If the list is empty, then the state is valid
+        """
+        msgs = []
+        #Loop through each task state and make sure it matches the xml definition
+        for task_xml, task_state in zip(tasks_xml, task_states):
+            tag_name = self.get_tag_name(task_xml)
+            children = self.child_modules()
+            task_descriptor = children['descriptors'][tag_name](self.system)
+            task_parsed_xml = task_descriptor.definition_from_xml(etree.fromstring(task_xml), self.system)
+            try:
+                task = children['modules'][tag_name](
+                    self.system,
+                    self.location,
+                    task_parsed_xml,
+                    task_descriptor,
+                    self.static_data,
+                    instance_state=task_state,
+                )
+                #Loop through each attempt of the task and see if it is valid.
+                for attempt in task.child_history:
+                    if "post_assessment" not in attempt:
+                        continue
+                    post_assessment = attempt['post_assessment']
+                    try:
+                        post_assessment = json.loads(post_assessment)
+                    except ValueError:
+                        #This is okay, the value may or may not be json encoded.
+                        pass
+                    if tag_name == "openended" and isinstance(post_assessment, list):
+                        msgs.append("Type is open ended and post assessment is a list.")
+                        break
+                    elif tag_name == "selfassessment" and not isinstance(post_assessment, list):
+                        msgs.append("Type is self assessment and post assessment is not a list.")
+                        break
+                #See if we can properly render the task.  Will go into the exception clause below if not.
+                task.get_html(self.system)
+            except Exception:
+                #If one task doesn't match, the state is invalid.
+                msgs.append("Could not parse task with xml {xml!r} and states {state!r}: {err}".format(
+                    xml=task_xml,
+                    state=task_state,
+                    err=traceback.format_exc()
+                ))
+                break
+        return msgs
+
+    def is_initial_child_state(self, task_child):
+        """
+        Returns true if this is a child task in an initial configuration
+        """
+        task_child = json.loads(task_child)
+        return (
+            task_child['child_state'] == self.INITIAL and
+            task_child['child_history'] == []
+        )
+
+    def is_reset_task_states(self, task_state):
+        """
+        Returns True if this task_state is from something that was just reset
+        """
+        return all(self.is_initial_child_state(child) for child in task_state)
+
+
+    def states_sort_key(self, idx_task_states):
+        """
+        Return a key for sorting a list of indexed task_states, by how far the student got
+        through the tasks, what their highest score was, and then the index of the submission.
+        """
+        idx, task_states = idx_task_states
+
+        state_values = {
+            OpenEndedChild.INITIAL: 0,
+            OpenEndedChild.ASSESSING: 1,
+            OpenEndedChild.POST_ASSESSMENT: 2,
+            OpenEndedChild.DONE: 3
+        }
+
+        if not task_states:
+            return (0, 0, state_values[OpenEndedChild.INITIAL], idx)
+
+        final_child_state = json.loads(task_states[-1])
+        scores = [attempt.get('score', 0) for attempt in final_child_state.get('child_history', [])]
+        if scores:
+            best_score = max(scores)
+        else:
+            best_score = 0
+        return (
+            len(task_states),
+            best_score,
+            state_values.get(final_child_state.get('child_state', OpenEndedChild.INITIAL), 0),
+            idx
+        )
 
     def fix_invalid_state(self):
         """
@@ -182,44 +288,67 @@ class CombinedOpenEndedV1Module():
         if len(self.task_xml) < len(self.task_states):
             self.current_task_number = len(self.task_xml) - 1
             self.task_states = self.task_states[:len(self.task_xml)]
-        #Loop through each task state and make sure it matches the xml definition
-        for (i, t) in enumerate(self.task_states):
-            tag_name = self.get_tag_name(self.task_xml[i])
-            children = self.child_modules()
-            task_xml = self.task_xml[i]
-            task_descriptor = children['descriptors'][tag_name](self.system)
-            task_parsed_xml = task_descriptor.definition_from_xml(etree.fromstring(task_xml), self.system)
-            try:
-                task = children['modules'][tag_name](
-                    self.system,
-                    self.location,
-                    task_parsed_xml,
-                    task_descriptor,
-                    self.static_data,
-                    instance_state=t,
-                )
-                #Loop through each attempt of the task and see if it is valid.
-                for att in task.child_history:
-                    if "post_assessment" not in att:
-                        continue
-                    pa = att['post_assessment']
-                    try:
-                        pa = json.loads(pa)
-                    except ValueError:
-                        #This is okay, the value may or may not be json encoded.
-                        pass
-                    if tag_name == "openended" and isinstance(pa, list):
-                        self.reset_task_state("Type is open ended and post assessment is a list.")
-                        break
-                    elif tag_name == "selfassessment" and not isinstance(pa, list):
-                        self.reset_task_state("Type is self assessment and post assessment is not a list.")
-                        break
-                #See if we can properly render the task.  Will go into the exception clause below if not.
-                task.get_html(self.system)
-            except Exception as err:
-                #If one task doesn't match, the state is invalid.
-                self.reset_task_state("Could not parse task. {0}".format(err))
-                break
+
+        if not self.old_task_states and not self.task_states:
+            # No validation needed when a student first looks at the problem
+            return
+
+        # Pick out of self.task_states and self.old_task_states the state that is
+        # a) valid for the current task definition
+        # b) not the result of a reset due to not having a valid task state
+        # c) has the highest total score
+        # d) is the most recent (if the other two conditions are met)
+
+        valid_states = [
+            task_states
+            for task_states
+            in self.old_task_states + [self.task_states]
+            if (
+                len(self.validate_task_states(self.task_xml, task_states)) == 0 and
+                not self.is_reset_task_states(task_states)
+            )
+        ]
+
+        # If there are no valid states, don't try and use an old state
+        if len(valid_states) == 0:
+            # If this isn't an initial task state, then reset to an initial state
+            if not self.is_reset_task_states(self.task_states):
+                self.reset_task_state('\n'.join(self.validate_task_states(self.task_xml, self.task_states)))
+
+            return
+
+        sorted_states = sorted(enumerate(valid_states), key=self.states_sort_key, reverse=True)
+        idx, best_task_states = sorted_states[0]
+
+        if best_task_states == self.task_states:
+            return
+
+        log.warning(
+            "Updating current task state for %s to %r for student with anonymous id %r",
+            self.system.location,
+            best_task_states,
+            self.system.anonymous_student_id
+        )
+
+        self.old_task_states.remove(best_task_states)
+        self.old_task_states.append(self.task_states)
+        self.task_states = best_task_states
+
+        # The state is ASSESSING unless all of the children are done, or all
+        # of the children haven't been started yet
+        children = [json.loads(child) for child in best_task_states]
+        if all(child['child_state'] == self.DONE for child in children):
+            self.state = self.DONE
+        elif all(child['child_state'] == self.INITIAL for child in children):
+            self.state = self.INITIAL
+        else:
+            self.state = self.ASSESSING
+
+        # The current task number is the index of the last completed child + 1,
+        # limited by the number of tasks
+        last_completed_child = next((i for i, child in reversed(list(enumerate(children))) if child['child_state'] == self.DONE), 0)
+        self.current_task_number = min(last_completed_child + 1, len(best_task_states) - 1)
+
 
     def reset_task_state(self, message=""):
         """
@@ -386,7 +515,8 @@ class CombinedOpenEndedV1Module():
             'accept_file_upload': self.accept_file_upload,
             'location': self.location,
             'legend_list': LEGEND_LIST,
-            'human_state': HUMAN_STATES.get(self.state, "Not started.")
+            'human_state': HUMAN_STATES.get(self.state, "Not started."),
+            'is_staff': self.system.user_is_staff,
         }
 
         return context
@@ -547,6 +677,11 @@ class CombinedOpenEndedV1Module():
         return last_response_dict
 
     def extract_human_name_from_task(self, task_xml):
+        """
+        Given the xml for a task, pull out the human name for it.
+        Input: xml string
+        Output: a human readable task name (ie Self Assessment)
+        """
         tree = etree.fromstring(task_xml)
         payload = tree.xpath("/openended/openendedparam/grader_payload")
         if len(payload) == 0:
@@ -644,7 +779,13 @@ class CombinedOpenEndedV1Module():
         all_responses = []
         success, can_see_rubric, error = self.check_if_student_has_done_needed_grading()
         if not can_see_rubric:
-            return {'html' : self.system.render_template('{0}/combined_open_ended_hidden_results.html'.format(self.TEMPLATE_DIR), {'error' : error}), 'success' : True, 'hide_reset' : True}
+            return {
+                'html': self.system.render_template(
+                    '{0}/combined_open_ended_hidden_results.html'.format(self.TEMPLATE_DIR),
+                    {'error': error}),
+                'success': True,
+                'hide_reset': True
+            }
 
         contexts = []
         rubric_number = self.current_task_number
@@ -717,6 +858,9 @@ class CombinedOpenEndedV1Module():
         return json.dumps(d, cls=ComplexEncoder)
 
     def get_current_state(self, data):
+        """
+        Gets the current state of the module.
+        """
         return self.get_context()
 
     def get_last_response_ajax(self, data):
@@ -769,6 +913,7 @@ class CombinedOpenEndedV1Module():
             self.task_states[self.current_task_number] = self.current_task.get_instance_state()
         self.current_task_number = 0
         self.ready_to_reset = False
+
         self.setup_next_task()
         return {'success': True, 'html': self.get_html_nonsystem()}
 
@@ -797,10 +942,14 @@ class CombinedOpenEndedV1Module():
         Output: The status html to be rendered
         """
         status = []
+        current_task_human_name = ""
         for i in xrange(0, len(self.task_xml)):
             human_task_name = self.extract_human_name_from_task(self.task_xml[i])
 
-            task_data = {'task_number': i + 1, 'human_task' : human_task_name, 'current' : self.current_task_number==i}
+            # Extract the name of the current task for screen readers.
+            if self.current_task_number == i:
+                current_task_human_name = human_task_name
+            task_data = {'task_number': i + 1, 'human_task': human_task_name, 'current': self.current_task_number==i}
             status.append(task_data)
 
         context = {
@@ -808,6 +957,7 @@ class CombinedOpenEndedV1Module():
             'grader_type_image_dict': GRADER_TYPE_IMAGE_DICT,
             'legend_list': LEGEND_LIST,
             'render_via_ajax': render_via_ajax,
+            'current_task_human_name': current_task_human_name,
         }
         status_html = self.system.render_template("{0}/combined_open_ended_status.html".format(self.TEMPLATE_DIR),
                                                   context)
@@ -823,6 +973,16 @@ class CombinedOpenEndedV1Module():
         """
         return (self.state == self.DONE or self.ready_to_reset) and self.is_scored
 
+    def get_weight(self):
+        """
+        Return the weight of the problem.  The old default weight was None, so set to 1 in that case.
+        Output - int weight
+        """
+        weight = self.weight
+        if weight is None:
+            weight = 1
+        return weight
+
     def get_score(self):
         """
         Score the student received on the problem, or None if there is no
@@ -837,9 +997,7 @@ class CombinedOpenEndedV1Module():
         score = None
 
         #The old default was None, so set to 1 if it is the old default weight
-        weight = self.weight
-        if weight is None:
-            weight = 1
+        weight = self.get_weight()
         if self.is_scored:
             # Finds the maximum score of all student attempts and keeps it.
             score_mat = []
@@ -858,7 +1016,6 @@ class CombinedOpenEndedV1Module():
             if len(score_mat) > 0:
                 # Currently, assume that the final step is the correct one, and that those are the final scores.
                 # This will change in the future, which is why the machinery above exists to extract all scores on all steps
-                # TODO: better final score handling.
                 scores = score_mat[-1]
                 score = max(scores)
             else:
@@ -879,27 +1036,35 @@ class CombinedOpenEndedV1Module():
         return score_dict
 
     def max_score(self):
-        ''' Maximum score. Two notes:
-
-            * This is generic; in abstract, a problem could be 3/5 points on one
-              randomization, and 5/7 on another
-        '''
+        """
+        Maximum score possible in this module.  Returns the max score if finished, None if not.
+        """
         max_score = None
         if self.check_if_done_and_scored():
             max_score = self._max_score
         return max_score
 
     def get_progress(self):
-        ''' Return a progress.Progress object that represents how far the
+        """
+        Generate a progress object. Progress objects represent how far the
         student has gone in this module.  Must be implemented to get correct
-        progress tracking behavior in nesting modules like sequence and
-        vertical.
+        progress tracking behavior in nested modules like sequence and
+        vertical.  This behavior is consistent with capa.
 
-        If this module has no notion of progress, return None.
-        '''
-        progress_object = Progress(self.current_task_number, len(self.task_xml))
+        If the module is unscored, return None (consistent with capa).
+        """
 
-        return progress_object
+        d = self.get_score()
+
+        if d['total'] > 0 and self.is_scored:
+
+            try:
+                return Progress(d['score'], d['total'])
+            except (TypeError, ValueError):
+                log.exception("Got bad progress")
+                return None
+
+        return None
 
     def out_of_sync_error(self, data, msg=''):
         """

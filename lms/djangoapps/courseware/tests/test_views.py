@@ -1,10 +1,15 @@
-from mock import MagicMock
-import datetime
+"""
+Tests courseware views.py
+"""
+import unittest
+from mock import MagicMock, patch
+from datetime import datetime
+from pytz import UTC
 
 from django.test import TestCase
 from django.http import Http404
 from django.test.utils import override_settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, AnonymousUser
 from django.test.client import RequestFactory
 
 from django.conf import settings
@@ -12,14 +17,18 @@ from django.core.urlresolvers import reverse
 
 from student.models import CourseEnrollment
 from student.tests.factories import AdminFactory
+from mitxmako.middleware import MakoMiddleware
 
+from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from student.tests.factories import UserFactory
 
 import courseware.views as views
-from xmodule.modulestore import Location
-from pytz import UTC
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from course_modes.models import CourseMode
+import shoppingcart
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
@@ -30,9 +39,8 @@ class TestJumpTo(TestCase):
 
     def setUp(self):
 
-        # Load toy course from XML
+        # Use toy course from XML
         self.course_name = 'edX/toy/2012_Fall'
-        self.toy_course = modulestore().get_course(self.course_name)
 
     def test_jumpto_invalid_location(self):
         location = Location('i4x', 'edX', 'toy', 'NoSuchPlace', None)
@@ -61,22 +69,47 @@ class TestJumpTo(TestCase):
         self.assertEqual(response.status_code, 404)
 
 
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class ViewsTestCase(TestCase):
+    """ Tests for views.py methods. """
     def setUp(self):
         self.user = User.objects.create(username='dummy', password='123456',
                                         email='test@mit.edu')
-        self.date = datetime.datetime(2013, 1, 22, tzinfo=UTC)
+        self.date = datetime(2013, 1, 22, tzinfo=UTC)
         self.course_id = 'edX/toy/2012_Fall'
         self.enrollment = CourseEnrollment.enroll(self.user, self.course_id)
         self.enrollment.created = self.date
         self.enrollment.save()
         self.location = ['tag', 'org', 'course', 'category', 'name']
 
-        # This is a CourseDescriptor object
-        self.toy_course = modulestore().get_course('edX/toy/2012_Fall')
         self.request_factory = RequestFactory()
         chapter = 'Overview'
         self.chapter_url = '%s/%s/%s' % ('/courses', self.course_id, chapter)
+
+    @unittest.skipUnless(settings.MITX_FEATURES.get('ENABLE_SHOPPING_CART'), "Shopping Cart not enabled in settings")
+    @patch.dict(settings.MITX_FEATURES, {'ENABLE_PAID_COURSE_REGISTRATION': True})
+    def test_course_about_in_cart(self):
+        in_cart_span = '<span class="add-to-cart">'
+        # don't mock this course due to shopping cart existence checking
+        course = CourseFactory.create(org="new", number="unenrolled", display_name="course")
+        request = self.request_factory.get(reverse('about_course', args=[course.id]))
+        request.user = AnonymousUser()
+        response = views.course_about(request, course.id)
+        self.assertEqual(response.status_code, 200)
+        self.assertNotIn(in_cart_span, response.content)
+
+        # authenticated user with nothing in cart
+        request.user = self.user
+        response = views.course_about(request, course.id)
+        self.assertEqual(response.status_code, 200)
+        self.assertNotIn(in_cart_span, response.content)
+
+        # now add the course to the cart
+        cart = shoppingcart.models.Order.get_cart_for_user(self.user)
+        shoppingcart.models.PaidCourseRegistration.add_to_order(cart, course.id)
+        response = views.course_about(request, course.id)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(in_cart_span, response.content)
 
     def test_user_groups(self):
         # depreciated function
@@ -135,6 +168,10 @@ class ViewsTestCase(TestCase):
     def verify_end_date(self, course_id, expected_end_text=None):
         request = self.request_factory.get("foo")
         request.user = self.user
+
+        # TODO: Remove the dependency on MakoMiddleware (by making the views explicitly supply a RequestContext)
+        MakoMiddleware().process_request(request)
+
         result = views.course_about(request, course_id)
         if expected_end_text is not None:
             self.assertContains(result, "Classes End")
@@ -217,3 +254,116 @@ class ViewsTestCase(TestCase):
         })
         response = self.client.get(url)
         self.assertFalse('<script>' in response.content)
+
+
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+class BaseDueDateTests(ModuleStoreTestCase):
+    """
+    Base class that verifies that due dates are rendered correctly on a page
+    """
+    __test__ = False
+
+    def get_text(self, course):  # pylint: disable=unused-argument
+        """Return the rendered text for the page to be verified"""
+        raise NotImplementedError
+
+    def set_up_course(self, **course_kwargs):
+        """
+        Create a stock course with a specific due date.
+
+        :param course_kwargs: All kwargs are passed to through to the :class:`CourseFactory`
+        """
+        course = CourseFactory(**course_kwargs)
+        chapter = ItemFactory(category='chapter', parent_location=course.location)  # pylint: disable=no-member
+        section = ItemFactory(category='sequential', parent_location=chapter.location, due=datetime(2013, 9, 18, 11, 30, 00))
+        vertical = ItemFactory(category='vertical', parent_location=section.location)
+        ItemFactory(category='problem', parent_location=vertical.location)
+
+        course = modulestore().get_instance(course.id, course.location)  # pylint: disable=no-member
+        self.assertIsNotNone(course.get_children()[0].get_children()[0].due)
+        return course
+
+    def setUp(self):
+        self.request_factory = RequestFactory()
+        self.user = UserFactory.create()
+        self.request = self.request_factory.get("foo")
+        self.request.user = self.user
+
+        self.time_with_utc = "due Sep 18, 2013 at 11:30 UTC"
+        self.time_without_utc = "due Sep 18, 2013 at 11:30"
+
+    def test_backwards_compatability(self):
+        # The test course being used has show_timezone = False in the policy file
+        # (and no due_date_display_format set). This is to test our backwards compatibility--
+        # in course_module's init method, the date_display_format will be set accordingly to
+        # remove the timezone.
+        course = self.set_up_course(due_date_display_format=None, show_timezone=False)
+        text = self.get_text(course)
+        self.assertIn(self.time_without_utc, text)
+        self.assertNotIn(self.time_with_utc, text)
+        # Test that show_timezone has been cleared (which means you get the default value of True).
+        self.assertTrue(course.show_timezone)
+
+    def test_defaults(self):
+        course = self.set_up_course()
+        text = self.get_text(course)
+        self.assertIn(self.time_with_utc, text)
+
+    def test_format_none(self):
+        # Same for setting the due date to None
+        course = self.set_up_course(due_date_display_format=None)
+        text = self.get_text(course)
+        self.assertIn(self.time_with_utc, text)
+
+    def test_format_plain_text(self):
+        # plain text due date
+        course = self.set_up_course(due_date_display_format="foobar")
+        text = self.get_text(course)
+        self.assertNotIn(self.time_with_utc, text)
+        self.assertIn("due foobar", text)
+
+    def test_format_date(self):
+
+        # due date with no time
+        course = self.set_up_course(due_date_display_format=u"%b %d %y")
+        text = self.get_text(course)
+        self.assertNotIn(self.time_with_utc, text)
+        self.assertIn("due Sep 18 13", text)
+
+    def test_format_hidden(self):
+        # hide due date completely
+        course = self.set_up_course(due_date_display_format=u"")
+        text = self.get_text(course)
+        self.assertNotIn("due ", text)
+
+    def test_format_invalid(self):
+        # improperly formatted due_date_display_format falls through to default
+        # (value of show_timezone does not matter-- setting to False to make that clear).
+        course = self.set_up_course(due_date_display_format=u"%%%", show_timezone=False)
+        text = self.get_text(course)
+        self.assertNotIn("%%%", text)
+        self.assertIn(self.time_with_utc, text)
+
+
+class TestProgressDueDate(BaseDueDateTests):
+    """
+    Test that the progress page displays due dates correctly
+    """
+    __test__ = True
+
+    def get_text(self, course):
+        """ Returns the HTML for the progress page """
+        return views.progress(self.request, course.id, self.user.id).content
+
+
+class TestAccordionDueDate(BaseDueDateTests):
+    """
+    Test that the accordion page displays due dates correctly
+    """
+    __test__ = True
+
+    def get_text(self, course):
+        """ Returns the HTML for the accordion """
+        return views.render_accordion(
+            self.request, course, course.get_children()[0].id, None, None
+        )

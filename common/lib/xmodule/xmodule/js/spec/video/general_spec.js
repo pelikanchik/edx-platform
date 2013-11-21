@@ -11,8 +11,6 @@
 
         afterEach(function () {
             window.OldVideoPlayer = undefined;
-            window.onYouTubePlayerAPIReady = undefined;
-            window.onHTML5PlayerAPIReady = undefined;
             $('source').remove();
         });
 
@@ -55,46 +53,6 @@
                         expect(this.state.speed).toEqual('0.75');
                     });
                 });
-
-                describe('Check Youtube link existence', function () {
-                    var statusList = {
-                        error: 'html5',
-                        timeout: 'html5',
-                        abort: 'html5',
-                        parsererror: 'html5',
-                        success: 'youtube',
-                        notmodified: 'youtube'
-                    };
-
-                    function stubDeffered(data, status) {
-                        return {
-                            always: function(callback) {
-                                callback.call(window, data, status);
-                            }
-                        }
-                    }
-
-                    function checkPlayer(videoType, data, status) {
-                        this.state = new window.Video('#example');
-                        spyOn(this.state , 'getVideoMetadata')
-                            .andReturn(stubDeffered(data, status));
-                        this.state.initialize('#example');
-
-                        expect(this.state.videoType).toEqual(videoType);
-                    }
-
-                    it('if video id is incorrect', function () {
-                        checkPlayer('html5', { error: {} }, 'success');
-                    });
-
-                    $.each(statusList, function(status, mode){
-                        it('Status:' + status + ', mode:' + mode, function () {
-                            checkPlayer(mode, {}, status);
-                        });
-                    });
-
-                });
-
             });
 
             describe('HTML5', function () {
@@ -138,7 +96,10 @@
                         });
                     });
 
-                    it('parse the videos if subtitles do not exist', function () {
+                    it(
+                        'parse the videos if subtitles do not exist',
+                        function ()
+                    {
                         var sub = '';
 
                         $('#example').find('.video').data('sub', '');
@@ -154,10 +115,47 @@
 
                     it('parse Html5 sources', function () {
                         var html5Sources = {
-                            mp4: 'xmodule/include/fixtures/test.mp4',
-                            webm: 'xmodule/include/fixtures/test.webm',
-                            ogg: 'xmodule/include/fixtures/test.ogv'
-                        };
+                                mp4: null,
+                                webm: null,
+                                ogg: null
+                            }, v = document.createElement('video');
+
+                        if (
+                            !!(
+                                v.canPlayType &&
+                                v.canPlayType(
+                                    'video/webm; codecs="vp8, vorbis"'
+                                ).replace(/no/, '')
+                            )
+                        ) {
+                            html5Sources['webm'] =
+                                'xmodule/include/fixtures/test.webm';
+                        }
+
+                        if (
+                            !!(
+                                v.canPlayType &&
+                                v.canPlayType(
+                                    'video/mp4; codecs="avc1.42E01E, ' +
+                                    'mp4a.40.2"'
+                                ).replace(/no/, '')
+                            )
+                        ) {
+                            html5Sources['mp4'] =
+                                'xmodule/include/fixtures/test.mp4';
+                        }
+
+                        if (
+                            !!(
+                                v.canPlayType &&
+                                v.canPlayType(
+                                    'video/ogg; codecs="theora"'
+                                ).replace(/no/, '')
+                            )
+                        ) {
+                            html5Sources['ogg'] =
+                                'xmodule/include/fixtures/test.ogv';
+                        }
 
                         expect(state.html5Sources).toEqual(html5Sources);
                     });
@@ -173,10 +171,10 @@
                     });
                 });
 
-                // Note that the loading of stand alone HTML5 player API is handled by
-                // Require JS. When state.videoPlayer is created, the stand alone HTML5
-                // player object is already loaded, so no further testing in that case
-                // is required.
+                // Note that the loading of stand alone HTML5 player API is
+                // handled by Require JS. When state.videoPlayer is created,
+                // the stand alone HTML5 player object is already loaded, so no
+                // further testing in that case is required.
                 describe('HTML5 API is available', function () {
                     beforeEach(function () {
                         state = new Video('#example');
@@ -202,8 +200,10 @@
 
             describe('with speed', function () {
                 it('return the video id for given speed', function () {
-                    expect(state.youtubeId('0.75')).toEqual(this['7tqY6eQzVhE']);
-                    expect(state.youtubeId('1.0')).toEqual(this['cogebirgzzM']);
+                    expect(state.youtubeId('0.75'))
+                        .toEqual(this['7tqY6eQzVhE']);
+                    expect(state.youtubeId('1.0'))
+                        .toEqual(this['cogebirgzzM']);
                 });
             });
 
@@ -211,6 +211,115 @@
                 it('return the video id for current speed', function () {
                     expect(state.youtubeId()).toEqual(this.cogebirgzzM);
                 });
+            });
+        });
+
+        describe('checking start and end times', function () {
+            var miniTestSuite = [
+                {
+                    itDescription: 'both times are proper',
+                    data: {start: 12, end: 24},
+                    expectData: {start: 12, end: 24}
+                },
+                {
+                    itDescription: 'start time is invalid',
+                    data: {start: '', end: 24},
+                    expectData: {start: 0, end: 24}
+                },
+                {
+                    itDescription: 'end time is invalid',
+                    data: {start: 12, end: ''},
+                    expectData: {start: 12, end: null}
+                },
+                {
+                    itDescription: 'start time is less than 0',
+                    data: {start: -12, end: 24},
+                    expectData: {start: 0, end: 24}
+                },
+                {
+                    itDescription: 'start time is greater than end time',
+                    data: {start: 42, end: 24},
+                    expectData: {start: 42, end: null}
+                }
+            ];
+
+            beforeEach(function () {
+                loadFixtures('video.html');
+
+            });
+
+            $.each(miniTestSuite, function (index, test) {
+                itFabrique(test.itDescription, test.data, test.expectData);
+            });
+
+            return;
+
+            function itFabrique(itDescription, data, expectData) {
+                it(itDescription, function () {
+                    $('#example').find('.video')
+                        .data({
+                            'start': data.start,
+                            'end': data.end
+                        });
+
+                    state = new Video('#example');
+
+                    expect(state.config.startTime).toBe(expectData.start);
+                    expect(state.config.endTime).toBe(expectData.end);
+                });
+            }
+        });
+
+        // Disabled 10/29/13 due to flakiness in master
+        xdescribe('multiple YT on page', function () {
+            var state1, state2, state3;
+
+            beforeEach(function () {
+                loadFixtures('video_yt_multiple.html');
+
+                spyOn($, 'ajaxWithPrefix');
+
+                $.ajax.calls.length = 0;
+                $.ajaxWithPrefix.calls.length = 0;
+
+                // Because several other tests have run, the variable
+                // that stores the value of the first ajax request must be
+                // cleared so that we test a pristine state of the video
+                // module.
+                Video.clearYoutubeXhr();
+
+                state1 = new Video('#example1');
+                state2 = new Video('#example2');
+                state3 = new Video('#example3');
+            });
+
+            it(
+                'check for YT availability is performed only once',
+                function ()
+            {
+                var numAjaxCalls = 0;
+
+                // Total ajax calls made.
+                numAjaxCalls = $.ajax.calls.length;
+
+                // Subtract ajax calls to get captions via
+                // state.videoCaption.fetchCaption() function.
+                numAjaxCalls -= $.ajaxWithPrefix.calls.length;
+
+                // Subtract ajax calls to get metadata for each video via
+                // state.getVideoMetadata() function.
+                numAjaxCalls -= 3;
+
+                // Subtract ajax calls to log event 'pause_video' via
+                // state.videoPlayer.log() function.
+                numAjaxCalls -= 3;
+
+                // This should leave just one call. It was made to check
+                // for YT availability. This is done in state.initialize()
+                // function. SPecifically, with the statement
+                //
+                //     this.youtubeXhr = this.getVideoMetadata();
+                expect(numAjaxCalls).toBe(1);
             });
         });
 
@@ -231,10 +340,14 @@
                     });
 
                     it('save setting for new speed', function () {
-                        expect($.cookie).toHaveBeenCalledWith('video_speed', '0.75', {
-                            expires: 3650,
-                            path: '/'
-                        });
+                        expect($.cookie).toHaveBeenCalledWith(
+                            'video_speed',
+                            '0.75',
+                            {
+                                expires: 3650,
+                                path: '/'
+                            }
+                        );
                     });
                 });
 
@@ -265,10 +378,14 @@
                     });
 
                     it('save setting for new speed', function () {
-                        expect($.cookie).toHaveBeenCalledWith('video_speed', '0.75', {
-                            expires: 3650,
-                            path: '/'
-                        });
+                        expect($.cookie).toHaveBeenCalledWith(
+                            'video_speed',
+                            '0.75',
+                            {
+                                expires: 3650,
+                                path: '/'
+                            }
+                        );
                     });
                 });
 

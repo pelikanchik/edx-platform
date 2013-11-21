@@ -9,16 +9,17 @@ Run like this:
 
 import json
 import os
+import pprint
 import unittest
 
-import fs
-import fs.osfs
-import numpy
 from mock import Mock
 from path import path
 
-import calc
-from xmodule.x_module import ModuleSystem, XModuleDescriptor
+from xblock.field_data import DictFieldData
+from xmodule.x_module import ModuleSystem, XModuleDescriptor, XModuleMixin
+from xmodule.modulestore.inheritance import InheritanceMixin
+from xmodule.mako_module import MakoDescriptorSystem
+from xmodule.error_module import ErrorDescriptor
 
 
 # Location of common test DATA directory
@@ -37,7 +38,7 @@ open_ended_grading_interface = {
     }
 
 
-def get_test_system():
+def get_test_system(course_id=''):
     """
     Construct a test ModuleSystem instance.
 
@@ -51,20 +52,46 @@ def get_test_system():
 
     """
     return ModuleSystem(
+        static_url='/static',
         ajax_url='courses/course_id/modx/a_location',
         track_function=Mock(),
         get_module=Mock(),
-        render_template=lambda template, context: repr(context),
-        replace_urls=lambda html: str(html),
+        render_template=mock_render_template,
+        replace_urls=str,
         user=Mock(is_staff=False),
         filestore=Mock(),
         debug=True,
+        hostname="edx.org",
         xqueue={'interface': None, 'callback_url': '/', 'default_queuename': 'testqueue', 'waittime': 10, 'construct_callback' : Mock(side_effect="/")},
         node_path=os.environ.get("NODE_PATH", "/usr/local/lib/node_modules"),
-        xblock_model_data=lambda descriptor: descriptor._model_data,
         anonymous_student_id='student',
-        open_ended_grading_interface= open_ended_grading_interface
+        open_ended_grading_interface=open_ended_grading_interface,
+        course_id=course_id,
+        error_descriptor_class=ErrorDescriptor,
     )
+
+
+def get_test_descriptor_system():
+    """
+    Construct a test DescriptorSystem instance.
+    """
+    return MakoDescriptorSystem(
+        load_item=Mock(),
+        resources_fs=Mock(),
+        error_tracker=Mock(),
+        render_template=mock_render_template,
+        mixins=(InheritanceMixin, XModuleMixin),
+    )
+
+
+def mock_render_template(*args, **kwargs):
+    """
+    Pretty-print the args and kwargs.
+
+    Allows us to not depend on any actual template rendering mechanism,
+    while still returning a unicode object
+    """
+    return pprint.pformat((args, kwargs)).decode()
 
 
 class ModelsTest(unittest.TestCase):
@@ -89,7 +116,7 @@ class PostData(object):
 class LogicTest(unittest.TestCase):
     """Base class for testing xmodule logic."""
     descriptor_class = None
-    raw_model_data = {}
+    raw_field_data = {}
 
     def setUp(self):
         class EmptyClass:
@@ -102,7 +129,8 @@ class LogicTest(unittest.TestCase):
 
         self.xmodule_class = self.descriptor_class.module_class
         self.xmodule = self.xmodule_class(
-            self.system, self.descriptor, self.raw_model_data)
+            self.descriptor, self.system, DictFieldData(self.raw_field_data), Mock()
+        )
 
     def ajax_request(self, dispatch, data):
         """Call Xmodule.handle_ajax."""

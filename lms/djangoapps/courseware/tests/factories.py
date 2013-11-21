@@ -8,8 +8,9 @@ from student.tests.factories import GroupFactory as StudentGroupFactory
 from student.tests.factories import UserProfileFactory as StudentUserProfileFactory
 from student.tests.factories import CourseEnrollmentAllowedFactory as StudentCourseEnrollmentAllowedFactory
 from student.tests.factories import RegistrationFactory as StudentRegistrationFactory
-from courseware.models import StudentModule, XModuleContentField, XModuleSettingsField
+from courseware.models import StudentModule, XModuleUserStateSummaryField
 from courseware.models import XModuleStudentInfoField, XModuleStudentPrefsField
+from instructor.access import allow_access
 
 from xmodule.modulestore import Location
 from pytz import UTC
@@ -33,6 +34,26 @@ class UserFactory(StudentUserFactory):
     date_joined = datetime.now(UTC)
 
 
+def InstructorFactory(course):  # pylint: disable=invalid-name
+    """
+    Given a course object, returns a User object with instructor
+    permissions for `course`.
+    """
+    user = StudentUserFactory.create(last_name="Instructor")
+    allow_access(course, user, "instructor")
+    return user
+
+
+def StaffFactory(course):  # pylint: disable=invalid-name
+    """
+    Given a course object, returns a User object with staff
+    permissions for `course`.
+    """
+    user = StudentUserFactory.create(last_name="Staff")
+    allow_access(course, user, "staff")
+    return user
+
+
 class GroupFactory(StudentGroupFactory):
     name = 'test_group'
 
@@ -53,20 +74,12 @@ class StudentModuleFactory(DjangoModelFactory):
     done = 'na'
 
 
-class ContentFactory(DjangoModelFactory):
-    FACTORY_FOR = XModuleContentField
+class UserStateSummaryFactory(DjangoModelFactory):
+    FACTORY_FOR = XModuleUserStateSummaryField
 
     field_name = 'existing_field'
     value = json.dumps('old_value')
-    definition_id = location('def_id').url()
-
-
-class SettingsFactory(DjangoModelFactory):
-    FACTORY_FOR = XModuleSettingsField
-
-    field_name = 'existing_field'
-    value = json.dumps('old_value')
-    usage_id = '%s-%s' % ('edX/test_course/test', location('def_id').url())
+    usage_id = location('def_id').url()
 
 
 class StudentPrefsFactory(DjangoModelFactory):

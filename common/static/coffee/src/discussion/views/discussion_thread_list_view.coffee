@@ -64,10 +64,8 @@ if Backbone?
 
       sidebar = $(".sidebar")
       if scrollTop > discussionsBodyTop - @sidebar_padding
-        sidebar.addClass('fixed');
-        sidebar.css('top', @sidebar_padding);
+        sidebar.css('top', scrollTop - discussionsBodyTop + @sidebar_padding);
       else
-        sidebar.removeClass('fixed');
         sidebar.css('top', '0');
 
       sidebarWidth = .31 * $(".discussion-body").width();
@@ -97,6 +95,7 @@ if Backbone?
       @timer = 0
       @$el.html(@template())
 
+      $(window).bind "load", @updateSidebar
       $(window).bind "scroll", @updateSidebar
       $(window).bind "resize", @updateSidebar
 
@@ -125,7 +124,7 @@ if Backbone?
     loadMorePages: (event) ->
       if event
         event.preventDefault()
-      @$(".more-pages").html('<div class="loading-animation"></div>')
+      @$(".more-pages").html('<div class="loading-animation"><span class="sr">Loading more threads</span></div>')
       @$(".more-pages").addClass("loading")
       options = {}
       switch @mode
@@ -145,6 +144,18 @@ if Backbone?
             options.group_id = @group_id
         
     
+      lastThread = @collection.last()?.get('id')
+      if lastThread
+        # Pagination; focus the first thread after what was previously the last thread
+        @once("threads:rendered", ->
+          $(".post-list li:has(a[data-id='#{lastThread}']) + li a").focus()
+        )
+      else
+        # Totally refreshing the list (e.g. from clicking a sort button); focus the first thread
+        @once("threads:rendered", ->
+          $(".post-list a").first()?.focus()
+        )
+
       @collection.retrieveAnotherPage(@mode, options, {sort_key: @sortBy})
 
     renderThread: (thread) =>
@@ -355,9 +366,13 @@ if Backbone?
       @loadMorePages(event)
 
     sortThreads: (event) ->
-      @$(".sort-bar a").removeClass("active")
-      $(event.target).addClass("active")
-      @sortBy = $(event.target).data("sort")
+      activeSort = @$(".sort-bar a[class='active']")
+      activeSort.removeClass("active")
+      activeSort.attr("aria-checked", "false")
+      newSort = $(event.target)
+      newSort.addClass("active")
+      newSort.attr("aria-checked", "true")
+      @sortBy = newSort.data("sort")
 
       @displayedCollection.comparator = switch @sortBy
         when 'date' then @displayedCollection.sortByDateRecentFirst
@@ -390,7 +405,7 @@ if Backbone?
         type: "GET"
         $loading: $
         loadingCallback: =>
-          @$(".post-list").html('<li class="loading"><div class="loading-animation"></div></li>')
+          @$(".post-list").html('<li class="loading"><div class="loading-animation"><span class="sr">Loading thread list</span></div></li>')
         loadedCallback: =>
           if callback
             callback.apply @, [value]

@@ -16,11 +16,14 @@ TEST_DATA_DRAFT_MONGO_MODULESTORE = draft_mongo_store_config(TEST_DATA_DIR)
 # Map all XML course fixtures so they are accessible through
 # the MixedModuleStore
 MAPPINGS = {
+    'edX/simple/2012_Fall': 'xml',
     'edX/toy/2012_Fall': 'xml',
     'edX/toy/TT_2012_Fall': 'xml',
     'edX/test_end/2012_Fall': 'xml',
     'edX/test_about_blob_end_date/2012_Fall': 'xml',
     'edX/graded/2012_Fall': 'xml',
     'edX/open_ended/2012_Fall': 'xml',
+    'edX/due_date/2013_fall': 'xml',
+    'edX/open_ended_nopath/2012_Fall': 'xml',
 }
 TEST_DATA_MIXED_MODULESTORE = mixed_store_config(TEST_DATA_DIR, MAPPINGS)

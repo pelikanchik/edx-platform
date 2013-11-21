@@ -12,20 +12,26 @@ from .common import *
 from logsettings import get_logger_config
 import os
 
-# specified as an environment variable.  Typically this is set
-# in the service's upstart script and corresponds exactly to the service name.
-# Service variants apply config differences via env and auth JSON files,
-# the names of which correspond to the variant.
+from path import path
+from dealer.git import git
+
+# SERVICE_VARIANT specifies name of the variant used, which decides what JSON
+# configuration files are read during startup.
 SERVICE_VARIANT = os.environ.get('SERVICE_VARIANT', None)
 
-# when not variant is specified we attempt to load an unvaried
-# config set.
-CONFIG_PREFIX = ""
+# CONFIG_ROOT specifies the directory where the JSON configuration
+# files are expected to be found. If not specified, use the project
+# directory.
+CONFIG_ROOT = path(os.environ.get('CONFIG_ROOT', ENV_ROOT))
 
-if SERVICE_VARIANT:
-    CONFIG_PREFIX = SERVICE_VARIANT + "."
+# CONFIG_PREFIX specifies the prefix of the JSON configuration files,
+# based on the service variant. If no variant is use, don't use a
+# prefix.
+CONFIG_PREFIX = SERVICE_VARIANT + "." if SERVICE_VARIANT else ""
+
 
 ############### ALWAYS THE SAME ################################
+
 DEBUG = False
 TEMPLATE_DEBUG = False
 
@@ -77,8 +83,15 @@ CELERY_QUEUES = {
 
 ############# NON-SECURE ENV CONFIG ##############################
 # Things like server locations, ports, etc.
-with open(ENV_ROOT / CONFIG_PREFIX + "env.json") as env_file:
+with open(CONFIG_ROOT / CONFIG_PREFIX + "env.json") as env_file:
     ENV_TOKENS = json.load(env_file)
+
+# STATIC_ROOT specifies the directory where static files are
+# collected
+
+STATIC_ROOT_BASE = ENV_TOKENS.get('STATIC_ROOT_BASE', None)
+if STATIC_ROOT_BASE:
+    STATIC_ROOT = path(STATIC_ROOT_BASE) / git.revision
 
 EMAIL_BACKEND = ENV_TOKENS.get('EMAIL_BACKEND', EMAIL_BACKEND)
 EMAIL_FILE_PATH = ENV_TOKENS.get('EMAIL_FILE_PATH', None)
@@ -127,10 +140,14 @@ LOGGING = get_logger_config(LOG_DIR,
 #theming start:
 PLATFORM_NAME = ENV_TOKENS.get('PLATFORM_NAME', 'edX')
 
+# Event Tracking
+if "TRACKING_IGNORE_URL_PATTERNS" in ENV_TOKENS:
+    TRACKING_IGNORE_URL_PATTERNS = ENV_TOKENS.get("TRACKING_IGNORE_URL_PATTERNS")
+
 
 ################ SECURE AUTH ITEMS ###############################
 # Secret things: passwords, access keys, etc.
-with open(ENV_ROOT / CONFIG_PREFIX + "auth.json") as auth_file:
+with open(CONFIG_ROOT / CONFIG_PREFIX + "auth.json") as auth_file:
     AUTH_TOKENS = json.load(auth_file)
 
 # If Segment.io key specified, load it and turn on Segment.io if the feature flag is set
@@ -145,9 +162,14 @@ AWS_SECRET_ACCESS_KEY = AUTH_TOKENS["AWS_SECRET_ACCESS_KEY"]
 DATABASES = AUTH_TOKENS['DATABASES']
 MODULESTORE = AUTH_TOKENS['MODULESTORE']
 CONTENTSTORE = AUTH_TOKENS['CONTENTSTORE']
-
+DOC_STORE_CONFIG = AUTH_TOKENS['DOC_STORE_CONFIG']
 # Datadog for events!
-DATADOG_API = AUTH_TOKENS.get("DATADOG_API")
+DATADOG = AUTH_TOKENS.get("DATADOG", {})
+DATADOG.update(ENV_TOKENS.get("DATADOG", {}))
+
+# TODO: deprecated (compatibility with previous settings)
+if 'DATADOG_API' in AUTH_TOKENS:
+    DATADOG['api_key'] = AUTH_TOKENS['DATADOG_API']
 
 # Celery Broker
 CELERY_BROKER_TRANSPORT = ENV_TOKENS.get("CELERY_BROKER_TRANSPORT", "")
@@ -161,3 +183,6 @@ BROKER_URL = "{0}://{1}:{2}@{3}/{4}".format(CELERY_BROKER_TRANSPORT,
                                             CELERY_BROKER_PASSWORD,
                                             CELERY_BROKER_HOSTNAME,
                                             CELERY_BROKER_VHOST)
+
+# Event tracking
+TRACKING_BACKENDS.update(AUTH_TOKENS.get("TRACKING_BACKENDS", {}))

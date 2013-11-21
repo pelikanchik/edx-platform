@@ -30,6 +30,10 @@ urlpatterns = ('',  # nopep8
     url(r'^t/(?P<template>[^/]*)$', 'static_template_view.views.index'),   # TODO: Is this used anymore? What is STATIC_GRAB?
 
     url(r'^accounts/login$', 'student.views.accounts_login', name="accounts_login"),
+    url(r'^accounts/manage_user_standing', 'student.views.manage_user_standing',
+        name='manage_user_standing'),
+    url(r'^accounts/disable_account_ajax$', 'student.views.disable_account_ajax',
+        name="disable_account_ajax"),
 
     url(r'^login_ajax$', 'student.views.login_user', name="login"),
     url(r'^login_ajax/(?P<error>[^/]*)$', 'student.views.login_user'),
@@ -58,7 +62,16 @@ urlpatterns = ('',  # nopep8
     url(r'^heartbeat$', include('heartbeat.urls')),
 
     url(r'^user_api/', include('user_api.urls')),
+
+    url(r'^', include('waffle.urls')),
 )
+
+# if settings.MITX_FEATURES.get("MULTIPLE_ENROLLMENT_ROLES"):
+urlpatterns += (
+    url(r'^verify_student/', include('verify_student.urls')),
+    url(r'^course_modes/', include('course_modes.urls')),
+)
+
 
 js_info_dict = {
     'domain': 'djangojs',
@@ -190,6 +203,7 @@ if settings.COURSEWARE_ENABLED:
         url(r'^courses/?$', 'branding.views.courses', name="courses"),
         url(r'^change_enrollment$',
             'student.views.change_enrollment', name="change_enrollment"),
+        url(r'^change_email_settings$', 'student.views.change_email_settings', name="change_email_settings"),
 
         #About the course
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/about$',
@@ -260,8 +274,6 @@ if settings.COURSEWARE_ENABLED:
             'open_ended_grading.staff_grading_service.get_next', name='staff_grading_get_next'),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/staff_grading/save_grade$',
             'open_ended_grading.staff_grading_service.save_grade', name='staff_grading_save_grade'),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/staff_grading/save_grade$',
-            'open_ended_grading.staff_grading_service.save_grade', name='staff_grading_save_grade'),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/staff_grading/get_problem_list$',
             'open_ended_grading.staff_grading_service.get_problem_list', name='staff_grading_get_problem_list'),
 
@@ -315,8 +327,6 @@ if settings.COURSEWARE_ENABLED:
     # discussion forums live within courseware, so courseware must be enabled first
     if settings.MITX_FEATURES.get('ENABLE_DISCUSSION_SERVICE'):
         urlpatterns += (
-            url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/news$',
-                'courseware.views.news', name="news"),
             url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/discussion/',
                 include('django_comment_client.urls')),
             url(r'^notification_prefs/enable/', 'notification_prefs.views.ajax_enable'),
@@ -336,6 +346,7 @@ if settings.COURSEWARE_ENABLED:
                 'courseware.views.submission_history',
                 name='submission_history'),
         )
+
 
 if settings.COURSEWARE_ENABLED and settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BETA_DASHBOARD'):
     urlpatterns += (
@@ -360,6 +371,12 @@ if settings.MITX_FEATURES.get('AUTH_USE_OPENID'):
 if settings.MITX_FEATURES.get('AUTH_USE_SHIB'):
     urlpatterns += (
         url(r'^shib-login/$', 'external_auth.views.shib_login', name='shib-login'),
+    )
+
+if settings.MITX_FEATURES.get('AUTH_USE_CAS'):
+    urlpatterns += (
+        url(r'^cas-auth/login/$', 'external_auth.views.cas_login', name="cas-login"),
+        url(r'^cas-auth/logout/$', 'django_cas.views.logout', {'next_page': '/'}, name="cas-logout"),
     )
 
 if settings.MITX_FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD'):

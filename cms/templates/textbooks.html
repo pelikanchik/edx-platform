@@ -2,8 +2,52 @@
 <%inherit file="base.html" />
 <%! from django.core.urlresolvers import reverse %>
 
-<%block name="title">${_("Sign Up")}</%block>
-<%block name="bodyclass">not-signedin signup</%block>
+<%block name="title">${_("Textbooks")}</%block>
+<%block name="bodyclass">is-signedin course view-textbooks feature-upload</%block>
+
+<%block name="header_extras">
+% for template_name in ["edit-textbook", "show-textbook", "edit-chapter", "no-textbooks", "upload-dialog"]:
+  <script type="text/template" id="${template_name}-tpl">
+    <%static:include path="js/${template_name}.underscore" />
+  </script>
+% endfor
+</%block>
+
+<%block name="jsextra">
+<script type="text/javascript">
+window.CMS = window.CMS || {};
+CMS.URL = CMS.URL || {};
+CMS.URL.UPLOAD_ASSET = "${upload_asset_url}"
+CMS.URL.TEXTBOOKS = "${textbook_url}"
+CMS.URL.LMS_BASE = "${settings.LMS_BASE}"
+require(["js/models/section", "js/collections/textbook", "js/views/list_textbooks"],
+        function(Section, TextbookCollection, ListTextbooksView) {
+  window.section = new Section({
+      id: "${course.id}",
+      name: "${course.display_name_with_default | h}",
+      url_name: "${course.location.name | h}",
+      org: "${course.location.org | h}",
+      num: "${course.location.course | h}",
+      revision: "${course.location.revision | h}"
+  });
+  var textbooks = new TextbookCollection(${json.dumps(course.pdf_textbooks)}, {parse: true});
+  var tbView = new ListTextbooksView({collection: textbooks});
+
+  $(function() {
+      $(".content-primary").append(tbView.render().el);
+      $(".nav-actions .new-button").click(function(e) {
+          tbView.addOne(e);
+      })
+      $(window).on("beforeunload", function() {
+          var dirty = textbooks.find(function(textbook) { return textbook.isDirty(); });
+          if(dirty) {
+              return gettext("You have unsaved changes. Do you really want to leave this page?");
+          }
+      })
+  })
+});
+</script>
+</%block>
 
 <%block name="content">
 

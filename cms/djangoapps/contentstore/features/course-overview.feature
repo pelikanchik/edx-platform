@@ -1,4 +1,5 @@
-Feature: Course Overview
+@shard_1
+Feature: CMS.Course Overview
     In order to quickly view the details of a course's section and set release dates and grading
     As a course author
     I want to use the course overview page
@@ -57,20 +58,3 @@ Feature: Course Overview
         And I click the "Expand All Sections" link
         Then I see the "Collapse All Sections" link
         And all sections are expanded
-
-   Scenario: Notification is shown on grading status changes
-        Given I have a course with 1 section
-        When I navigate to the course overview page
-        And I change an assignment's grading status
-        Then I am shown a notification
-
-    # Notification is not shown on reorder for IE
-    # Safari does not have moveMouseTo implemented
-    @skip_internetexplorer
-    @skip_safari
-   Scenario: Notification is shown on subsection reorder
-        Given I have opened a new course section in Studio
-        And I have added a new subsection
-        And I have added a new subsection
-        When I reorder subsections
-        Then I am shown a notification

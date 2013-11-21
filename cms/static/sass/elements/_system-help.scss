@@ -7,12 +7,12 @@
   margin-bottom: $baseline;
 
   .title {
-    @extend .t-title4;
+    @extend %t-title4;
     font-weight: 600;
   }
 
   .copy {
-    @extend .t-copy-sub1;
+    @extend %t-copy-sub1;
   }
 
   strong {
@@ -30,14 +30,14 @@
     }
 
     .nav-introduction-supplementary {
-      @extend .t-copy-sub2;
+      @extend %t-copy-sub2;
       float: right;
       width: flex-grid(4,12);
       display: block;
       text-align: right;
 
       .icon {
-        @extend .t-action3;
+        @extend %t-action3;
         display: inline-block;
         vertical-align: middle;
         margin-right: ($baseline/4);
@@ -48,20 +48,20 @@
 
 // notices - in-context: to be used as notices to users within the context of a form/action
 .notice-incontext {
-  @extend .ui-well;
+  @extend %ui-well;
   border-radius: ($baseline/10);
   position: relative;
   overflow: hidden;
   margin-bottom: $baseline;
 
   .title {
-    @extend .t-title6;
+    @extend %t-title6;
     margin-bottom: ($baseline/2);
     font-weight: 700;
   }
 
   .copy {
-    @extend .t-copy-sub1;
+    @extend %t-copy-sub1;
     @include transition(opacity $tmg-f2 ease-in-out 0s);
     opacity: 0.75;
     margin-bottom: $baseline;
@@ -99,8 +99,8 @@
       }
 
       .action-primary {
-        @extend .btn-primary-blue;
-        @extend .t-action3;
+        @extend %btn-primary-blue;
+        @extend %t-action3;
       }
     }
   }
@@ -160,8 +160,8 @@
       }
 
       .action-primary {
-        @extend .btn-primary-blue;
-        @extend .t-action3;
+        @extend %btn-primary-blue;
+        @extend %t-action3;
       }
     }
   }
@@ -188,8 +188,8 @@
       }
 
       .action-primary {
-        @extend .btn-primary-green;
-        @extend .t-action3;
+        @extend %btn-primary-green;
+        @extend %t-action3;
       }
     }
   }
@@ -209,5 +209,73 @@
 
   .copy {
     color: $gray;
+  }
+}
+
+// ====================
+
+// informational bits (rename once UI pattern is further defined)
+.bit {
+  @extend %t-copy-sub1;
+  margin: 0 0 $baseline 0;
+  border-bottom: 1px solid $gray-l4;
+  padding: 0 0 $baseline 0;
+  color: $gray-l1;
+
+  &:last-child {
+    margin-bottom: 0;
+    border: none;
+    padding-bottom: 0;
+  }
+
+  h3, .title {
+    @extend %t-title7;
+    margin: 0 0 ($baseline/4) 0;
+    color: $gray-d2;
+    font-weight: 600;
+  }
+
+  p, .copy {
+    margin: 0 0 $baseline 0;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  // actions
+  .list-actions {
+    @extend %cont-no-list;
+
+    .action-item {
+      @extend %wipe-last-child;
+      margin-bottom: ($baseline/4);
+      border-bottom: 1px dotted $gray-l4;
+      padding-bottom: ($baseline/4);
+    }
+  }
+
+  // details
+  .list-details {
+    @extend %cont-no-list;
+
+    .item-detail {
+      @extend %wipe-last-child;
+      margin-bottom: ($baseline/4);
+      border-bottom: 1px dotted $gray-l4;
+      padding-bottom: ($baseline/4);
+    }
+  }
+
+  // navigation
+  .nav-related, .nav-page {
+    @extend %cont-no-list;
+
+    .nav-item {
+      @extend %wipe-last-child;
+      margin-bottom: ($baseline/4);
+      border-bottom: 1px dotted $gray-l4;
+      padding-bottom: ($baseline/4);
+    }
   }
 }

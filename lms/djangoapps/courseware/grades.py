@@ -11,8 +11,8 @@ from collections import defaultdict
 from django.conf import settings
 from django.contrib.auth.models import User
 
-from .model_data import ModelDataCache, LmsKeyValueStore
-from xblock.core import Scope
+from courseware.model_data import FieldDataCache, DjangoKeyValueStore
+from xblock.fields import Scope
 from .module_render import get_module, get_module_for_descriptor
 from xmodule import graders
 from xmodule.capa_module import CapaModule
@@ -155,6 +155,8 @@ def yield_dynamic_descriptor_descendents(descriptor, module_creator):
     def get_dynamic_descriptor_children(descriptor):
         if descriptor.has_dynamic_children():
             module = module_creator(descriptor)
+            if module is None:
+                return []
             return module.get_child_descriptors()
         else:
             return descriptor.get_children()
@@ -192,10 +194,10 @@ def yield_problems(request, course, student):
                     sections_to_list.append(section_descriptor)
                     break
 
-    model_data_cache = ModelDataCache(sections_to_list, course.id, student)
+    field_data_cache = FieldDataCache(sections_to_list, course.id, student)
     for section_descriptor in sections_to_list:
         section_module = get_module(student, request,
-                                    section_descriptor.location, model_data_cache,
+                                    section_descriptor.location, field_data_cache,
                                     course.id)
         if section_module is None:
             # student doesn't have access to this module, or something else
@@ -236,7 +238,7 @@ def answer_distributions(request, course):
     return counts
 
 
-def grade(student, request, course, model_data_cache=None, keep_raw_scores=False):
+def grade(student, request, course, field_data_cache=None, keep_raw_scores=False):
     """
     This grades a student as quickly as possible. It returns the
     output from the course grader, augmented with the final letter
@@ -258,8 +260,8 @@ def grade(student, request, course, model_data_cache=None, keep_raw_scores=False
     grading_context = course.grading_context
     raw_scores = []
 
-    if model_data_cache is None:
-        model_data_cache = ModelDataCache(grading_context['all_descriptors'], course.id, student)
+    if field_data_cache is None:
+        field_data_cache = FieldDataCache(grading_context['all_descriptors'], course.id, student)
 
     totaled_scores = {}
     # This next complicated loop is just to collect the totaled_scores, which is
@@ -279,15 +281,15 @@ def grade(student, request, course, model_data_cache=None, keep_raw_scores=False
                     should_grade_section = True
                     break
 
-                # Create a fake key to pull out a StudentModule object from the ModelDataCache
+                # Create a fake key to pull out a StudentModule object from the FieldDataCache
 
-                key = LmsKeyValueStore.Key(
+                key = DjangoKeyValueStore.Key(
                     Scope.user_state,
                     student.id,
                     moduledescriptor.location,
                     None
                 )
-                if model_data_cache.find(key):
+                if field_data_cache.find(key):
                     should_grade_section = True
                     break
 
@@ -298,11 +300,11 @@ def grade(student, request, course, model_data_cache=None, keep_raw_scores=False
                     '''creates an XModule instance given a descriptor'''
                     # TODO: We need the request to pass into here. If we could forego that, our arguments
                     # would be simpler
-                    return get_module_for_descriptor(student, request, descriptor, model_data_cache, course.id)
+                    return get_module_for_descriptor(student, request, descriptor, field_data_cache, course.id)
 
                 for module_descriptor in yield_dynamic_descriptor_descendents(section_descriptor, create_module):
 
-                    (correct, total) = get_score(course.id, student, module_descriptor, create_module, model_data_cache)
+                    (correct, total) = get_score(course.id, student, module_descriptor, create_module, field_data_cache)
                     if correct is None and total is None:
                         continue
 
@@ -312,7 +314,7 @@ def grade(student, request, course, model_data_cache=None, keep_raw_scores=False
                         else:
                             correct = total
 
-                    graded = module_descriptor.lms.graded
+                    graded = module_descriptor.graded
                     if not total > 0:
                         #We simply cannot grade a problem that is 12/0, because we might need it as a percentage
                         graded = False
@@ -375,7 +377,7 @@ def grade_for_percentage(grade_cutoffs, percentage):
 # then converted over and performance is not good. Once the progress page is redesigned
 # to not have the progress summary this method should be deleted (so it won't be copied).
 
-def progress_summary(student, request, course, model_data_cache):
+def progress_summary(student, request, course, field_data_cache):
     """
     This pulls a summary of all problems in the course.
 
@@ -389,7 +391,7 @@ def progress_summary(student, request, course, model_data_cache):
     Arguments:
         student: A User object for the student to grade
         course: A Descriptor containing the course to grade
-        model_data_cache: A ModelDataCache initialized with all
+        field_data_cache: A FieldDataCache initialized with all
              instance_modules for the student
 
     If the student does not have access to load the course module, this function
@@ -399,7 +401,7 @@ def progress_summary(student, request, course, model_data_cache):
 
     # TODO: We need the request to pass into here. If we could forego that, our arguments
     # would be simpler
-    course_module = get_module(student, request, course.location, model_data_cache, course.id, depth=None)
+    course_module = get_module(student, request, course.location, field_data_cache, course.id, depth=None)
     if not course_module:
         # This student must not have access to the course.
         return None
@@ -408,26 +410,27 @@ def progress_summary(student, request, course, model_data_cache):
     # Don't include chapters that aren't displayable (e.g. due to error)
     for chapter_module in course_module.get_display_items():
         # Skip if the chapter is hidden
-        if chapter_module.lms.hide_from_toc:
+        if chapter_module.hide_from_toc:
             continue
 
         sections = []
         for section_module in chapter_module.get_display_items():
 
             # Skip if the section is hidden
-            if section_module.lms.hide_from_toc:
+            if section_module.hide_from_toc:
                 continue
 
-            graded = section_module.lms.graded
+            # Same for sections
+            graded = section_module.graded
             scores = []
 
-            module_creator = section_module.system.get_module
+            module_creator = section_module.xmodule_runtime.get_module
 
-            for module_descriptor in yield_dynamic_descriptor_descendents(section_module.descriptor, module_creator):
+            for module_descriptor in yield_dynamic_descriptor_descendents(section_module, module_creator):
 
                 course_id = course.id
-                (correct, total) = get_score(course_id, student, module_descriptor, module_creator, model_data_cache)
 
+                (correct, total) = get_score(course_id, student, module_descriptor, module_creator, field_data_cache)
                 if correct is None and total is None:
                     continue
 
@@ -439,7 +442,7 @@ def progress_summary(student, request, course, model_data_cache):
             section_total, _ = graders.aggregate_scores(
                 scores, section_module.display_name_with_default)
 
-            module_format = section_module.lms.format if section_module.lms.format is not None else ''
+            module_format = section_module.format if section_module.format is not None else ''
             sections.append({
                 'display_name': section_module.display_name_with_default,
                 'url_name': section_module.url_name,
@@ -448,7 +451,7 @@ def progress_summary(student, request, course, model_data_cache):
 	            'section_total': section_total,
                 'format': module_format,
                 'unlocked': True,
-                'due': section_module.lms.due,
+                'due': section_module.due,
                 'graded': graded,
             })
 
@@ -460,7 +463,7 @@ def progress_summary(student, request, course, model_data_cache):
     return chapters
 
 
-def get_score(course_id, user, problem_descriptor, module_creator, model_data_cache):
+def get_score(course_id, user, problem_descriptor, module_creator, field_data_cache):
     """
     Return the score for a user on a problem, as a tuple (correct, total).
     e.g. (5,7) if you got 5 out of 7 points.
@@ -472,7 +475,7 @@ def get_score(course_id, user, problem_descriptor, module_creator, model_data_ca
     problem_descriptor: an XModuleDescriptor
     module_creator: a function that takes a descriptor, and returns the corresponding XModule for this user.
            Can return None if user doesn't have access, or if something else went wrong.
-    cache: A ModelDataCache
+    cache: A FieldDataCache
     """
     if not user.is_authenticated():
         return (None, None)
@@ -494,14 +497,14 @@ def get_score(course_id, user, problem_descriptor, module_creator, model_data_ca
         return (None, None)
 
     # Create a fake KeyValueStore key to pull out the StudentModule
-    key = LmsKeyValueStore.Key(
+    key = DjangoKeyValueStore.Key(
         Scope.user_state,
         user.id,
         problem_descriptor.location,
         None
     )
 
-    student_module = model_data_cache.find(key)
+    student_module = field_data_cache.find(key)
 
     if student_module is not None and student_module.max_grade is not None:
         correct = student_module.grade if student_module.grade is not None else 0

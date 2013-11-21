@@ -15,15 +15,16 @@ from capa.responsetypes import StudentInputError, \
     ResponseError, LoncapaProblemError
 from capa.util import convert_files_to_filenames
 from .progress import Progress
-from xmodule.x_module import XModule
+from xmodule.x_module import XModule, module_attr
 from xmodule.raw_module import RawDescriptor
 from xmodule.vertical_module import VerticalFields, VerticalDescriptor
 from xmodule.seq_module import SequenceFields
 from xmodule.seq_module import SequenceModule
 from xmodule.exceptions import NotFoundError, ProcessingError
-from xblock.core import Scope, String, Boolean, Dict, Integer, Float
+from xblock.fields import Scope, String, Boolean, Dict, Integer, Float
 from .fields import Timedelta, Date
 from django.utils.timezone import UTC
+from django.utils.translation import ugettext as _
 
 #from xmodule.modulestore.django import modulestore
 #from .access import has_access, get_location_and_verify_access
@@ -178,6 +179,17 @@ class CapaFields(object):
     markdown = String(help="Markdown source of this module", default=None, scope=Scope.settings)
     source_code = String(
         help="Source code for LaTeX and Word problems. This feature is not well-supported.",
+        scope=Scope.settings
+    )
+    text_customization = Dict(
+        help="String customization substitutions for particular locations",
+        scope=Scope.settings
+        # TODO: someday it should be possible to not duplicate this definition here
+        # and in inheritance.py
+    )
+    use_latex_compiler = Boolean(
+        help="Enable LaTeX templates?",
+        default=False,
         scope=Scope.settings
     )
 
@@ -371,14 +383,26 @@ class CapaModule(CapaFields, XModule):
         Determine the name for the "check" button.
 
         Usually it is just "Check", but if this is the student's
-        final attempt, change the name to "Final Check"
+        final attempt, change the name to "Final Check".
+        The text can be customized by the text_customization setting.
         """
-        if self.max_attempts is not None:
-            final_check = (self.attempts >= self.max_attempts - 1)
-        else:
-            final_check = False
+        # The logic flow is a little odd so that _('xxx') strings can be found for
+        # translation while also running _() just once for each string.
+        check = _('Check')
+        final_check = _('Final Check')
 
-        return "Final Check" if final_check else "Check"
+        # Apply customizations if present
+        if 'custom_check' in self.text_customization:
+            check = _(self.text_customization.get('custom_check'))
+        if 'custom_final_check' in self.text_customization:
+            final_check = _(self.text_customization.get('custom_final_check'))
+        # TODO: need a way to get the customized words into the list of
+        # words to be translated
+
+        if self.max_attempts is not None and self.attempts >= self.max_attempts - 1:
+            return final_check
+        else:
+            return check
 
     def should_show_check_button(self):
         """
@@ -615,7 +639,7 @@ class CapaModule(CapaFields, XModule):
         )
 
         if dispatch not in handlers:
-            return 'Error'
+            return 'Error: {} is not a known capa action'.format(dispatch)
 
         before = self.get_progress()
 
@@ -902,6 +926,8 @@ class CapaModule(CapaFields, XModule):
             'max_value': score['total'],
         })
 
+        return {'grade': score['score'], 'max_grade': score['total']}
+
     def check_problem(self, data):
         """
         Checks whether answers to a problem are correct
@@ -969,7 +995,7 @@ class CapaModule(CapaFields, XModule):
                 return {'success': msg}
             raise
 
-        self.publish_grade()
+        published_grade = self.publish_grade()
 
         # success = correct if ALL questions in this problem are correct
         success = 'correct'
@@ -979,6 +1005,8 @@ class CapaModule(CapaFields, XModule):
 
         # NOTE: We are logging both full grading and queued-grading submissions. In the latter,
         #       'success' will always be incorrect
+        event_info['grade'] = published_grade['grade']
+        event_info['max_grade'] = published_grade['max_grade']
         event_info['correct_map'] = correct_map.get_dict()
         event_info['success'] = success
         event_info['attempts'] = self.attempts
@@ -1198,10 +1226,23 @@ class CapaDescriptor(CapaFields, RawDescriptor):
     def get_class(self):
         return "CapaDescriptor"
 
+    @classmethod
+    def filter_templates(cls, template, course):
+        """
+        Filter template that contains 'latex' from templates.
+
+        Show them only if use_latex_compiler is set to True in
+        course settings.
+        """
+        return (not 'latex' in template['template_id'] or course.use_latex_compiler)
+
     def get_context(self):
         _context = RawDescriptor.get_context(self)
-        _context.update({'markdown': self.markdown,
-                         'enable_markdown': self.markdown is not None})
+        _context.update({
+            'markdown': self.markdown,
+            'enable_markdown': self.markdown is not None,
+            'enable_latex_compiler': self.use_latex_compiler,
+        })
         return _context
 
     # VS[compat]
@@ -1217,6 +1258,42 @@ class CapaDescriptor(CapaFields, RawDescriptor):
     @property
     def non_editable_metadata_fields(self):
         non_editable_fields = super(CapaDescriptor, self).non_editable_metadata_fields
-        non_editable_fields.extend([CapaDescriptor.due, CapaDescriptor.graceperiod,
-                                    CapaDescriptor.force_save_button, CapaDescriptor.markdown])
+        non_editable_fields.extend([
+            CapaDescriptor.due,
+            CapaDescriptor.graceperiod,
+            CapaDescriptor.force_save_button,
+            CapaDescriptor.markdown,
+            CapaDescriptor.text_customization,
+            CapaDescriptor.use_latex_compiler,
+        ])
         return non_editable_fields
+
+    # Proxy to CapaModule for access to any of its attributes
+    answer_available = module_attr('answer_available')
+    check_button_name = module_attr('check_button_name')
+    check_problem = module_attr('check_problem')
+    choose_new_seed = module_attr('choose_new_seed')
+    closed = module_attr('closed')
+    get_answer = module_attr('get_answer')
+    get_problem = module_attr('get_problem')
+    get_problem_html = module_attr('get_problem_html')
+    get_state_for_lcp = module_attr('get_state_for_lcp')
+    handle_input_ajax = module_attr('handle_input_ajax')
+    handle_problem_html_error = module_attr('handle_problem_html_error')
+    handle_ungraded_response = module_attr('handle_ungraded_response')
+    is_attempted = module_attr('is_attempted')
+    is_correct = module_attr('is_correct')
+    is_past_due = module_attr('is_past_due')
+    is_submitted = module_attr('is_submitted')
+    lcp = module_attr('lcp')
+    make_dict_of_responses = module_attr('make_dict_of_responses')
+    new_lcp = module_attr('new_lcp')
+    publish_grade = module_attr('publish_grade')
+    rescore_problem = module_attr('rescore_problem')
+    reset_problem = module_attr('reset_problem')
+    save_problem = module_attr('save_problem')
+    set_state_from_lcp = module_attr('set_state_from_lcp')
+    should_show_check_button = module_attr('should_show_check_button')
+    should_show_reset_button = module_attr('should_show_reset_button')
+    should_show_save_button = module_attr('should_show_save_button')
+    update_score = module_attr('update_score')

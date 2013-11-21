@@ -18,21 +18,44 @@ import json
 import logging
 import uuid
 
-
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.auth.signals import user_logged_in, user_logged_out
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+import django.dispatch
 from django.forms import ModelForm, forms
 
+from course_modes.models import CourseMode
 import comment_client as cc
 from pytz import UTC
 
+unenroll_done = django.dispatch.Signal(providing_args=["course_enrollment"])
 
 log = logging.getLogger(__name__)
 AUDIT_LOG = logging.getLogger("audit")
+
+class UserStanding(models.Model):
+    """
+    This table contains a student's account's status.
+    Currently, we're only disabling accounts; in the future we can imagine
+    taking away more specific privileges, like forums access, or adding
+    more specific karma levels or probationary stages.
+    """
+    ACCOUNT_DISABLED = "disabled"
+    ACCOUNT_ENABLED = "enabled"
+    USER_STANDING_CHOICES = (
+        (ACCOUNT_DISABLED, u"Account Disabled"),
+        (ACCOUNT_ENABLED, u"Account Enabled"),
+    )
+
+    user = models.ForeignKey(User, db_index=True, related_name='standing', unique=True)
+    account_status = models.CharField(
+        blank=True, max_length=31, choices=USER_STANDING_CHOICES
+    )
+    changed_by = models.ForeignKey(User, blank=True)
+    standing_last_changed_at = models.DateTimeField(auto_now=True)
 
 
 class UserProfile(models.Model):
@@ -805,6 +828,7 @@ class CourseEnrollment(models.Model):
             record = CourseEnrollment.objects.get(user=user, course_id=course_id)
             record.is_active = False
             record.save()
+            unenroll_done.send(sender=cls, course_enrollment=record)
         except cls.DoesNotExist:
             err_msg = u"Tried to unenroll student {} from {} but they were not enrolled"
             log.error(err_msg.format(user, course_id))
@@ -845,6 +869,48 @@ class CourseEnrollment(models.Model):
             return False
 
     @classmethod
+    def is_enrolled_by_partial(cls, user, course_id_partial):
+        """
+        Returns `True` if the user is enrolled in a course that starts with
+        `course_id_partial`. Otherwise, returns False.
+
+        Can be used to determine whether a student is enrolled in a course
+        whose run name is unknown.
+
+        `user` is a Django User object. If it hasn't been saved yet (no `.id`
+               attribute), this method will automatically save it before
+               adding an enrollment for it.
+
+        `course_id_partial` is a starting substring for a fully qualified
+               course_id (e.g. "edX/Test101/").
+        """
+        try:
+            return CourseEnrollment.objects.filter(
+                user=user,
+                course_id__startswith=course_id_partial,
+                is_active=1
+            ).exists()
+        except cls.DoesNotExist:
+            return False
+
+    @classmethod
+    def enrollment_mode_for_user(cls, user, course_id):
+        """
+        Returns the enrollment mode for the given user for the given course
+
+        `user` is a Django User object
+        `course_id` is our usual course_id string (e.g. "edX/Test101/2013_Fall)
+        """
+        try:
+            record = CourseEnrollment.objects.get(user=user, course_id=course_id)
+            if record.is_active:
+                return record.mode
+            else:
+                return None
+        except cls.DoesNotExist:
+            return None
+
+    @classmethod
     def enrollments_for_user(cls, user):
         return CourseEnrollment.objects.filter(user=user, is_active=1)
 
@@ -861,6 +927,18 @@ class CourseEnrollment(models.Model):
         if self.is_active:
             self.is_active = False
             self.save()
+
+    def refundable(self):
+        """
+        For paid/verified certificates, students may receive a refund IFF they have
+        a verified certificate and the deadline for refunds has not yet passed.
+        """
+        course_mode = CourseMode.mode_for_course(self.course_id, 'verified')
+        if course_mode is None:
+            return False
+        else:
+            return True
+
 
 
 class CourseEnrollmentAllowed(models.Model):

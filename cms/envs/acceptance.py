@@ -14,9 +14,10 @@ from lms.envs.sauce import *
 # otherwise the browser will not render the pages correctly
 DEBUG = True
 
-# Disable warnings for acceptance tests, to make the logs readable
+# Output Django logs to a file
 import logging
-logging.disable(logging.ERROR)
+logging.basicConfig(filename=TEST_ROOT / "log" / "cms_acceptance.log", level=logging.ERROR)
+
 import os
 from random import choice, randint
 
@@ -24,11 +25,14 @@ from random import choice, randint
 def seed():
     return os.getppid()
 
-MODULESTORE_OPTIONS = {
-    'default_class': 'xmodule.raw_module.RawDescriptor',
+DOC_STORE_CONFIG = {
     'host': 'localhost',
     'db': 'acceptance_xmodule',
     'collection': 'acceptance_modulestore_%s' % seed(),
+}
+
+MODULESTORE_OPTIONS = {
+    'default_class': 'xmodule.raw_module.RawDescriptor',
     'fs_root': TEST_ROOT / "data",
     'render_template': 'mitxmako.shortcuts.render_to_string',
 }
@@ -36,21 +40,24 @@ MODULESTORE_OPTIONS = {
 MODULESTORE = {
     'default': {
         'ENGINE': 'xmodule.modulestore.draft.DraftModuleStore',
+        'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
         'OPTIONS': MODULESTORE_OPTIONS
     },
     'direct': {
         'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
+        'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
         'OPTIONS': MODULESTORE_OPTIONS
     },
     'draft': {
         'ENGINE': 'xmodule.modulestore.draft.DraftModuleStore',
+        'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
         'OPTIONS': MODULESTORE_OPTIONS
     }
 }
 
 CONTENTSTORE = {
     'ENGINE': 'xmodule.contentstore.mongo.MongoContentStore',
-    'OPTIONS': {
+    'DOC_STORE_CONFIG': {
         'host': 'localhost',
         'db': 'acceptance_xcontent_%s' % seed(),
     },
@@ -68,8 +75,8 @@ CONTENTSTORE = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': TEST_ROOT / "db" / "test_mitx_%s.db" % seed(),
-        'TEST_NAME': TEST_ROOT / "db" / "test_mitx_%s.db" % seed(),
+        'NAME': TEST_ROOT / "db" / "test_edx.db",
+        'TEST_NAME': TEST_ROOT / "db" / "test_edx.db"
     }
 }
 
@@ -84,5 +91,39 @@ USE_I18N = True
 # Include the lettuce app for acceptance testing, including the 'harvest' django-admin command
 INSTALLED_APPS += ('lettuce.django',)
 LETTUCE_APPS = ('contentstore',)
-LETTUCE_SERVER_PORT = choice(PORTS) if SAUCE.get('SAUCE_ENABLED') else randint(1024, 65535)
 LETTUCE_BROWSER = os.environ.get('LETTUCE_BROWSER', 'chrome')
+
+# Where to run: local, saucelabs, or grid
+LETTUCE_SELENIUM_CLIENT = os.environ.get('LETTUCE_SELENIUM_CLIENT', 'local')
+
+SELENIUM_GRID = {
+    'URL': 'http://127.0.0.1:4444/wd/hub',
+    'BROWSER': LETTUCE_BROWSER,
+}
+
+#####################################################################
+# Lastly, see if the developer has any local overrides.
+try:
+    from .private import *  # pylint: disable=F0401
+except ImportError:
+    pass
+
+# Because an override for where to run will affect which ports to use,
+# set this up after the local overrides.
+if LETTUCE_SELENIUM_CLIENT == 'saucelabs':
+    LETTUCE_SERVER_PORT = choice(PORTS)
+else:
+    LETTUCE_SERVER_PORT = randint(1024, 65535)
+
+
+# Set up Video information so that the cms will send
+# requests to a mock Youtube server running locally
+if LETTUCE_SELENIUM_CLIENT == 'saucelabs':
+    VIDEO_PORT = choice(PORTS)
+    PORTS.remove(VIDEO_PORT)
+else:
+    VIDEO_PORT = randint(1024, 65535)
+
+# for testing Youtube
+YOUTUBE_API['url'] = "http://127.0.0.1:" + str(VIDEO_PORT) + '/test_transcripts_youtube/'
+

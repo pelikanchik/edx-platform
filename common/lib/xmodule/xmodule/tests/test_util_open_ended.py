@@ -2,6 +2,8 @@ from xmodule.modulestore import Location
 from xmodule.modulestore.xml import XMLModuleStore
 from xmodule.tests import DATA_DIR, get_test_system
 
+from StringIO import StringIO
+
 OPEN_ENDED_GRADING_INTERFACE = {
     'url': 'blah/',
     'username': 'incorrect',
@@ -12,10 +14,64 @@ OPEN_ENDED_GRADING_INTERFACE = {
 }
 
 S3_INTERFACE = {
-    'aws_access_key': "",
-    'aws_secret_key': "",
-    "aws_bucket_name": "",
+    'access_key': "",
+    'secret_access_key': "",
+    "storage_bucket_name": "",
 }
+
+class MockS3Key(object):
+    """
+    Mock an S3 Key object from boto.  Used for file upload testing.
+    """
+    def __init__(self, bucket):
+        pass
+
+    def set_metadata(self, key, value):
+        setattr(self, key, value)
+
+    def set_contents_from_file(self, fileobject):
+        self.data = fileobject.read()
+
+    def set_acl(self, acl):
+        self.set_metadata("acl", acl)
+
+    def generate_url(self, timeout):
+        return "http://www.edx.org/sample_url"
+
+
+class MockS3Connection(object):
+    """
+    Mock boto S3Connection for testing image uploads.
+    """
+    def __init__(self, access_key, secret_key, **kwargs):
+        """
+        Mock the init call.  S3Connection has a lot of arguments, but we don't need them.
+        """
+        pass
+
+    def create_bucket(self, bucket_name, **kwargs):
+        return "edX Bucket"
+
+    def lookup(self, bucket_name):
+        return None
+
+
+class MockUploadedFile(object):
+    """
+    Create a mock uploaded file for image submission tests.
+    value - String data to place into the mock file.
+    return - A StringIO object that behaves like a file.
+    """
+    def __init__(self, name, value):
+        self.mock_file = StringIO()
+        self.mock_file.write(value)
+        self.name = name
+
+    def seek(self, index):
+        return self.mock_file.seek(index)
+
+    def read(self):
+        return self.mock_file.read()
 
 
 class MockQueryDict(dict):
@@ -51,7 +107,8 @@ class DummyModulestore(object):
         if not isinstance(location, Location):
             location = Location(location)
         descriptor = self.modulestore.get_instance(course.id, location, depth=None)
-        return descriptor.xmodule(self.test_system)
+        descriptor.xmodule_runtime = self.test_system
+        return descriptor
 
 # Task state for a module with self assessment then instructor assessment.
 TEST_STATE_SA_IN = ["{\"child_created\": false, \"child_attempts\": 2, \"version\": 1, \"child_history\": [{\"answer\": \"However venture pursuit he am mr cordial. Forming musical am hearing studied be luckily. Ourselves for determine attending how led gentleman sincerity. Valley afford uneasy joy she thrown though bed set. In me forming general prudent on country carried. Behaved an or suppose justice. Seemed whence how son rather easily and change missed. Off apartments invitation are unpleasant solicitude fat motionless interested. Hardly suffer wisdom wishes valley as an. As friendship advantages resolution it alteration stimulated he or increasing. \\r<br><br>Now led tedious shy lasting females off. Dashwood marianne in of entrance be on wondered possible building. Wondered sociable he carriage in speedily margaret. Up devonshire of he thoroughly insensible alteration. An mr settling occasion insisted distance ladyship so. Not attention say frankness intention out dashwoods now curiosity. Stronger ecstatic as no judgment daughter speedily thoughts. Worse downs nor might she court did nay forth these. \", \"post_assessment\": \"[3, 3, 2, 2, 2]\", \"score\": 12}, {\"answer\": \"Delightful remarkably mr on announcing themselves entreaties favourable. About to in so terms voice at. Equal an would is found seems of. The particular friendship one sufficient terminated frequently themselves. It more shed went up is roof if loud case. Delay music in lived noise an. Beyond genius really enough passed is up. \\r<br><br>John draw real poor on call my from. May she mrs furnished discourse extremely. Ask doubt noisy shade guest did built her him. Ignorant repeated hastened it do. Consider bachelor he yourself expenses no. Her itself active giving for expect vulgar months. Discovery commanded fat mrs remaining son she principle middleton neglected. Be miss he in post sons held. No tried is defer do money scale rooms. \", \"post_assessment\": \"[3, 3, 2, 2, 2]\", \"score\": 12}], \"max_score\": 12, \"child_state\": \"done\"}", "{\"child_created\": false, \"child_attempts\": 0, \"version\": 1, \"child_history\": [{\"answer\": \"However venture pursuit he am mr cordial. Forming musical am hearing studied be luckily. Ourselves for determine attending how led gentleman sincerity. Valley afford uneasy joy she thrown though bed set. In me forming general prudent on country carried. Behaved an or suppose justice. Seemed whence how son rather easily and change missed. Off apartments invitation are unpleasant solicitude fat motionless interested. Hardly suffer wisdom wishes valley as an. As friendship advantages resolution it alteration stimulated he or increasing. \\r<br><br>Now led tedious shy lasting females off. Dashwood marianne in of entrance be on wondered possible building. Wondered sociable he carriage in speedily margaret. Up devonshire of he thoroughly insensible alteration. An mr settling occasion insisted distance ladyship so. Not attention say frankness intention out dashwoods now curiosity. Stronger ecstatic as no judgment daughter speedily thoughts. Worse downs nor might she court did nay forth these. \", \"post_assessment\": \"{\\\"submission_id\\\": 1460, \\\"score\\\": 12, \\\"feedback\\\": \\\"{\\\\\\\"feedback\\\\\\\": \\\\\\\"\\\\\\\"}\\\", \\\"success\\\": true, \\\"grader_id\\\": 5413, \\\"grader_type\\\": \\\"IN\\\", \\\"rubric_scores_complete\\\": true, \\\"rubric_xml\\\": \\\"<rubric><category><description>\\\\nIdeas\\\\n</description><score>3</score><option points='0'>\\\\nDifficult for the reader to discern the main idea.  Too brief or too repetitive to establish or maintain a focus.\\\\n</option><option points='1'>\\\\nAttempts a main idea.  Sometimes loses focus or ineffectively displays focus.\\\\n</option><option points='2'>\\\\nPresents a unifying theme or main idea, but may include minor tangents.  Stays somewhat focused on topic and task.\\\\n</option><option points='3'>\\\\nPresents a unifying theme or main idea without going off on tangents.  Stays completely focused on topic and task.\\\\n</option></category><category><description>\\\\nContent\\\\n</description><score>3</score><option points='0'>\\\\nIncludes little information with few or no details or unrelated details.  Unsuccessful in attempts to explore any facets of the topic.\\\\n</option><option points='1'>\\\\nIncludes little information and few or no details.  Explores only one or two facets of the topic.\\\\n</option><option points='2'>\\\\nIncludes sufficient information and supporting details. (Details may not be fully developed; ideas may be listed.)  Explores some facets of the topic.\\\\n</option><option points='3'>\\\\nIncludes in-depth information and exceptional supporting details that are fully developed.  Explores all facets of the topic.\\\\n</option></category><category><description>\\\\nOrganization\\\\n</description><score>2</score><option points='0'>\\\\nIdeas organized illogically, transitions weak, and response difficult to follow.\\\\n</option><option points='1'>\\\\nAttempts to logically organize ideas.  Attempts to progress in an order that enhances meaning, and demonstrates use of transitions.\\\\n</option><option points='2'>\\\\nIdeas organized logically.  Progresses in an order that enhances meaning.  Includes smooth transitions.\\\\n</option></category><category><description>\\\\nStyle\\\\n</description><score>2</score><option points='0'>\\\\nContains limited vocabulary, with many words used incorrectly.  Demonstrates problems with sentence patterns.\\\\n</option><option points='1'>\\\\nContains basic vocabulary, with words that are predictable and common.  Contains mostly simple sentences (although there may be an attempt at more varied sentence patterns).\\\\n</option><option points='2'>\\\\nIncludes vocabulary to make explanations detailed and precise.  Includes varied sentence patterns, including complex sentences.\\\\n</option></category><category><description>\\\\nVoice\\\\n</description><score>2</score><option points='0'>\\\\nDemonstrates language and tone that may be inappropriate to task and reader.\\\\n</option><option points='1'>\\\\nDemonstrates an attempt to adjust language and tone to task and reader.\\\\n</option><option points='2'>\\\\nDemonstrates effective adjustment of language and tone to task and reader.\\\\n</option></category></rubric>\\\"}\", \"score\": 12}, {\"answer\": \"Delightful remarkably mr on announcing themselves entreaties favourable. About to in so terms voice at. Equal an would is found seems of. The particular friendship one sufficient terminated frequently themselves. It more shed went up is roof if loud case. Delay music in lived noise an. Beyond genius really enough passed is up. \\r<br><br>John draw real poor on call my from. May she mrs furnished discourse extremely. Ask doubt noisy shade guest did built her him. Ignorant repeated hastened it do. Consider bachelor he yourself expenses no. Her itself active giving for expect vulgar months. Discovery commanded fat mrs remaining son she principle middleton neglected. Be miss he in post sons held. No tried is defer do money scale rooms. \", \"post_assessment\": \"{\\\"submission_id\\\": 1462, \\\"score\\\": 12, \\\"feedback\\\": \\\"{\\\\\\\"feedback\\\\\\\": \\\\\\\"\\\\\\\"}\\\", \\\"success\\\": true, \\\"grader_id\\\": 5418, \\\"grader_type\\\": \\\"IN\\\", \\\"rubric_scores_complete\\\": true, \\\"rubric_xml\\\": \\\"<rubric><category><description>\\\\nIdeas\\\\n</description><score>3</score><option points='0'>\\\\nDifficult for the reader to discern the main idea.  Too brief or too repetitive to establish or maintain a focus.\\\\n</option><option points='1'>\\\\nAttempts a main idea.  Sometimes loses focus or ineffectively displays focus.\\\\n</option><option points='2'>\\\\nPresents a unifying theme or main idea, but may include minor tangents.  Stays somewhat focused on topic and task.\\\\n</option><option points='3'>\\\\nPresents a unifying theme or main idea without going off on tangents.  Stays completely focused on topic and task.\\\\n</option></category><category><description>\\\\nContent\\\\n</description><score>3</score><option points='0'>\\\\nIncludes little information with few or no details or unrelated details.  Unsuccessful in attempts to explore any facets of the topic.\\\\n</option><option points='1'>\\\\nIncludes little information and few or no details.  Explores only one or two facets of the topic.\\\\n</option><option points='2'>\\\\nIncludes sufficient information and supporting details. (Details may not be fully developed; ideas may be listed.)  Explores some facets of the topic.\\\\n</option><option points='3'>\\\\nIncludes in-depth information and exceptional supporting details that are fully developed.  Explores all facets of the topic.\\\\n</option></category><category><description>\\\\nOrganization\\\\n</description><score>2</score><option points='0'>\\\\nIdeas organized illogically, transitions weak, and response difficult to follow.\\\\n</option><option points='1'>\\\\nAttempts to logically organize ideas.  Attempts to progress in an order that enhances meaning, and demonstrates use of transitions.\\\\n</option><option points='2'>\\\\nIdeas organized logically.  Progresses in an order that enhances meaning.  Includes smooth transitions.\\\\n</option></category><category><description>\\\\nStyle\\\\n</description><score>2</score><option points='0'>\\\\nContains limited vocabulary, with many words used incorrectly.  Demonstrates problems with sentence patterns.\\\\n</option><option points='1'>\\\\nContains basic vocabulary, with words that are predictable and common.  Contains mostly simple sentences (although there may be an attempt at more varied sentence patterns).\\\\n</option><option points='2'>\\\\nIncludes vocabulary to make explanations detailed and precise.  Includes varied sentence patterns, including complex sentences.\\\\n</option></category><category><description>\\\\nVoice\\\\n</description><score>2</score><option points='0'>\\\\nDemonstrates language and tone that may be inappropriate to task and reader.\\\\n</option><option points='1'>\\\\nDemonstrates an attempt to adjust language and tone to task and reader.\\\\n</option><option points='2'>\\\\nDemonstrates effective adjustment of language and tone to task and reader.\\\\n</option></category></rubric>\\\"}\", \"score\": 12}], \"max_score\": 12, \"child_state\": \"post_assessment\"}"]

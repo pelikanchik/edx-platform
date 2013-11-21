@@ -1,19 +1,32 @@
+"""Views for items (modules)."""
+
+import logging
 from uuid import uuid4
 
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.decorators import login_required
 
 from xmodule.modulestore import Location
-from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.django import modulestore, loc_mapper
 from xmodule.modulestore.inheritance import own_metadata
+from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
 
 from util.json_request import expect_json, JsonResponse
-from ..utils import get_modulestore
-from .access import has_access
-from .requests import _xmodule_recurse
-from xmodule.x_module import XModuleDescriptor
 
-__all__ = ['save_item', 'create_item', 'delete_item']
+from ..transcripts_utils import manage_video_subtitles_save
+
+from ..utils import get_modulestore
+
+from .access import has_access
+from .helpers import _xmodule_recurse
+from xmodule.x_module import XModuleDescriptor
+from django.views.decorators.http import require_http_methods
+from xmodule.modulestore.locator import CourseLocator, BlockUsageLocator
+from student.models import CourseEnrollment
+
+__all__ = ['save_item', 'create_item', 'delete_item', 'orphan']
+
+log = logging.getLogger(__name__)
 
 # cdodge: these are categories which should not be parented, they are detached from the hierarchy
 DETACHED_CATEGORIES = ['about', 'static_tab', 'course_info']
@@ -22,7 +35,40 @@ DETACHED_CATEGORIES = ['about', 'static_tab', 'course_info']
 @login_required
 @expect_json
 def save_item(request):
-    item_location = request.POST['id']
+    """
+    Will carry a json payload with these possible fields
+    :id (required): the id
+    :data (optional): the new value for the data
+    :metadata (optional): new values for the metadata fields.
+        Any whose values are None will be deleted not set to None! Absent ones will be left alone
+    :nullout (optional): which metadata fields to set to None
+    """
+    # The nullout is a bit of a temporary copout until we can make module_edit.coffee and the metadata editors a
+    # little smarter and able to pass something more akin to {unset: [field, field]}
+
+    try:
+        item_location = request.json['id']
+    except KeyError:
+        import inspect
+
+        log.exception(
+            '''Request missing required attribute 'id'.
+                Request info:
+                %s
+                Caller:
+                Function %s in file %s
+            ''',
+            request.META,
+            inspect.currentframe().f_back.f_code.co_name,
+            inspect.currentframe().f_back.f_code.co_filename
+        )
+        return JsonResponse({"error": "Request missing required attribute 'id'."}, 400)
+
+    try:
+        old_item = modulestore().get_item(item_location)
+    except (ItemNotFoundError, InvalidLocationError):
+        log.error("Can't find item by location.")
+        return JsonResponse({"error": "Can't find item by location"}, 404)
 
     # check permissions for this user within this course
     if not has_access(request.user, item_location):
@@ -30,40 +76,36 @@ def save_item(request):
 
     store = get_modulestore(Location(item_location))
 
-    if request.POST.get('data') is not None:
-        data = request.POST['data']
+    if request.json.get('data'):
+        data = request.json['data']
         store.update_item(item_location, data)
 
-    # cdodge: note calling request.POST.get('children') will return None if children is an empty array
-    # so it lead to a bug whereby the last component to be deleted in the UI was not actually
-    # deleting the children object from the children collection
-    if 'children' in request.POST and request.POST['children'] is not None:
-        children = request.POST['children']
+    if request.json.get('children') is not None:
+        children = request.json['children']
         store.update_children(item_location, children)
 
-    # cdodge: also commit any metadata which might have been passed along in the
-    # POST from the client, if it is there
-    # NOTE, that the postback is not the complete metadata, as there's system metadata which is
-    # not presented to the end-user for editing. So let's fetch the original and
-    # 'apply' the submitted metadata, so we don't end up deleting system metadata
-    if request.POST.get('metadata') is not None:
-        posted_metadata = request.POST['metadata']
-        # fetch original
+    # cdodge: also commit any metadata which might have been passed along
+    if request.json.get('nullout') is not None or request.json.get('metadata') is not None:
+        # the postback is not the complete metadata, as there's system metadata which is
+        # not presented to the end-user for editing. So let's fetch the original and
+        # 'apply' the submitted metadata, so we don't end up deleting system metadata
         existing_item = modulestore().get_item(item_location)
-
-        for metadata_key in request.POST.get('nullout', []):
-            _get_xblock_field(existing_item, metadata_key).write_to(existing_item, None)
+        for metadata_key in request.json.get('nullout', []):
+            setattr(existing_item, metadata_key, None)
 
         # update existing metadata with submitted metadata (which can be partial)
         # IMPORTANT NOTE: if the client passed 'null' (None) for a piece of metadata that means 'remove it'. If
         # the intent is to make it None, use the nullout field
-        for metadata_key, value in request.POST.get('metadata', {}).items():
-            field = _get_xblock_field(existing_item, metadata_key)
+        for metadata_key, value in request.json.get('metadata', {}).items():
+            field = existing_item.fields[metadata_key]
 
             if value is None:
                 field.delete_from(existing_item)
             else:
-                value = field.from_json(value)
+                try:
+                    value = field.from_json(value)
+                except ValueError:
+                    return JsonResponse({"error": "Invalid data"}, 400)
                 field.write_to(existing_item, value)
         # Save the data that we've just changed to the underlying
         # MongoKeyValueStore before we update the mongo datastore.
@@ -72,27 +114,21 @@ def save_item(request):
         # TODO (cpennington): This really shouldn't have to do this much reaching in to get the metadata
         store.update_metadata(item_location, own_metadata(existing_item))
 
+        if existing_item.category == 'video':
+            manage_video_subtitles_save(old_item, existing_item)
+
     return JsonResponse()
 
-
-def _get_xblock_field(xblock, field_name):
-    """
-    A temporary function to get the xblock field either from the xblock or one of its namespaces by name.
-    :param xblock:
-    :param field_name:
-    """
-    for field in xblock.iterfields():
-        if field.name == field_name:
-            return field
 
 @login_required
 @expect_json
 def create_item(request):
-    parent_location = Location(request.POST['parent_location'])
-    category = request.POST['category']
+    """View for create items."""
+    parent_location = Location(request.json['parent_location'])
+    category = request.json['category']
 
-    display_name = request.POST.get('display_name')
-    direct_term = request.POST.get('direct_term')
+    display_name = request.json.get('display_name')
+    direct_term = request.json.get('direct_term')
 
     if not has_access(request.user, parent_location):
         raise PermissionDenied()
@@ -103,7 +139,7 @@ def create_item(request):
     # get the metadata, display_name, and definition from the request
     metadata = {}
     data = None
-    template_id = request.POST.get('boilerplate')
+    template_id = request.json.get('boilerplate')
     if template_id is not None:
         clz = XModuleDescriptor.load_class(category)
         if clz is not None:
@@ -135,7 +171,8 @@ def create_item(request):
 @login_required
 @expect_json
 def delete_item(request):
-    item_location = request.POST['id']
+    """View for removing items."""
+    item_location = request.json['id']
     item_location = Location(item_location)
 
     # check permissions for this user within this course
@@ -143,8 +180,8 @@ def delete_item(request):
         raise PermissionDenied()
 
     # optional parameter to delete all children (default False)
-    delete_children = request.POST.get('delete_children', False)
-    delete_all_versions = request.POST.get('delete_all_versions', False)
+    delete_children = request.json.get('delete_children', False)
+    delete_all_versions = request.json.get('delete_all_versions', False)
 
     store = get_modulestore(item_location)
 
@@ -169,3 +206,34 @@ def delete_item(request):
                 modulestore('direct').update_children(parent.location, parent.children)
 
     return JsonResponse()
+
+# pylint: disable=W0613
+@login_required
+@require_http_methods(("GET", "DELETE"))
+def orphan(request, tag=None, course_id=None, branch=None, version_guid=None, block=None):
+    """
+    View for handling orphan related requests. GET gets all of the current orphans.
+    DELETE removes all orphans (requires is_staff access)
+
+    An orphan is a block whose category is not in the DETACHED_CATEGORY list, is not the root, and is not reachable
+    from the root via children
+
+    :param request:
+    :param course_id: Locator syntax course_id
+    """
+    location = BlockUsageLocator(course_id=course_id, branch=branch, version_guid=version_guid, usage_id=block)
+    # DHM: when split becomes back-end, move or conditionalize this conversion
+    old_location = loc_mapper().translate_locator_to_location(location)
+    if request.method == 'GET':
+        if has_access(request.user, old_location):
+            return JsonResponse(modulestore().get_orphans(old_location, DETACHED_CATEGORIES, 'draft'))
+        else:
+            raise PermissionDenied()
+    if request.method == 'DELETE':
+        if request.user.is_staff:
+            items = modulestore().get_orphans(old_location, DETACHED_CATEGORIES, 'draft')
+            for item in items:
+                modulestore('draft').delete_item(item, True)
+            return JsonResponse({'deleted': items})
+        else:
+            raise PermissionDenied()

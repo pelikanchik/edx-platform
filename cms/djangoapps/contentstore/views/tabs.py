@@ -9,14 +9,15 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django_future.csrf import ensure_csrf_cookie
 from mitxmako.shortcuts import render_to_response
-
 from xmodule.modulestore import Location
 from xmodule.modulestore.inheritance import own_metadata
 from xmodule.modulestore.django import modulestore
-from ..utils import get_course_for_item, get_modulestore
-from .access import get_location_and_verify_access
 
-__all__ = ['edit_tabs', 'reorder_static_tabs', 'static_pages']
+from ..utils import get_course_for_item, get_modulestore
+
+from django.utils.translation import ugettext as _
+
+__all__ = ['edit_tabs', 'reorder_static_tabs']
 
 
 def initialize_course_tabs(course):
@@ -30,11 +31,13 @@ def initialize_course_tabs(course):
 
     # This logic is repeated in xmodule/modulestore/tests/factories.py
     # so if you change anything here, you need to also change it there.
-    course.tabs = [{"type": "courseware"},
-                   {"type": "course_info", "name": "Course Info"},
-                   {"type": "discussion", "name": "Discussion"},
-                   {"type": "wiki", "name": "Wiki"},
-                   {"type": "progress", "name": "Progress"}]
+    course.tabs = [
+        {"type": "courseware", "name": _("Courseware")},
+        {"type": "course_info", "name": _("Course Info")},
+        {"type": "discussion", "name": _("Discussion")},
+        {"type": "wiki", "name": _("Wiki")},
+        {"type": "progress", "name": _("Progress")},
+    ] 
 
     modulestore('direct').update_metadata(course.location.url(), own_metadata(course))
 
@@ -43,7 +46,7 @@ def initialize_course_tabs(course):
 @expect_json
 def reorder_static_tabs(request):
     "Order the static tabs in the requested order"
-    tabs = request.POST['tabs']
+    tabs = request.json['tabs']
     course = get_course_for_item(tabs[0])
 
     if not has_access(request.user, course.location):
@@ -84,6 +87,7 @@ def reorder_static_tabs(request):
     # MongoKeyValueStore before we update the mongo datastore.
     course.save()
     modulestore('direct').update_metadata(course.location, own_metadata(course))
+    # TODO: above two lines are used for the primitive-save case. Maybe factor them out?
     return HttpResponse()
 
 
@@ -124,15 +128,41 @@ def edit_tabs(request, org, course, coursename):
     })
 
 
-@login_required
-@ensure_csrf_cookie
-def static_pages(request, org, course, coursename):
-    "Static pages view"
+# "primitive" tab edit functions driven by the command line.
+# These should be replaced/deleted by a more capable GUI someday.
+# Note that the command line UI identifies the tabs with 1-based
+# indexing, but this implementation code is standard 0-based.
 
-    location = get_location_and_verify_access(request, org, course, coursename)
+def validate_args(num, tab_type):
+    "Throws for the disallowed cases."
+    if num <= 1:
+        raise ValueError('Tabs 1 and 2 cannot be edited')
+    if tab_type == 'static_tab':
+        raise ValueError('Tabs of type static_tab cannot be edited here (use Studio)')
 
-    course = modulestore().get_item(location)
 
-    return render_to_response('static-pages.html', {
-        'context_course': course,
-    })
+def primitive_delete(course, num):
+    "Deletes the given tab number (0 based)."
+    tabs = course.tabs
+    validate_args(num, tabs[num].get('type', ''))
+    del tabs[num]
+    # Note for future implementations: if you delete a static_tab, then Chris Dodge
+    # points out that there's other stuff to delete beyond this element.
+    # This code happens to not delete static_tab so it doesn't come up.
+    primitive_save(course)
+
+
+def primitive_insert(course, num, tab_type, name):
+    "Inserts a new tab at the given number (0 based)."
+    validate_args(num, tab_type)
+    new_tab = {u'type': unicode(tab_type), u'name': unicode(name)}
+    tabs = course.tabs
+    tabs.insert(num, new_tab)
+    primitive_save(course)
+
+
+def primitive_save(course):
+    "Saves the course back to modulestore."
+    # This code copied from reorder_static_tabs above
+    course.save()
+    modulestore('direct').update_metadata(course.location, own_metadata(course))

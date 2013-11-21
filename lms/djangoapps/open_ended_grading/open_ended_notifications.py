@@ -1,17 +1,19 @@
-from django.conf import settings
-from xmodule.open_ended_grading_classes import peer_grading_service
-from .staff_grading_service import StaffGradingService
-from xmodule.open_ended_grading_classes.controller_query_service import ControllerQueryService
-import json
-from student.models import unique_id_for_user
-from courseware.models import StudentModule
-import logging
-from courseware.access import has_access
-from util.cache import cache
 import datetime
+import json
+import logging
+
+from django.conf import settings
+
+from xmodule.open_ended_grading_classes import peer_grading_service
+from xmodule.open_ended_grading_classes.controller_query_service import ControllerQueryService
+
+from courseware.access import has_access
 from xmodule.x_module import ModuleSystem
 from mitxmako.shortcuts import render_to_string
-import datetime
+from student.models import unique_id_for_user
+from util.cache import cache
+
+from .staff_grading_service import StaffGradingService
 
 log = logging.getLogger(__name__)
 
@@ -68,7 +70,6 @@ def peer_grading_notifications(course, user):
         get_module = None,
         render_template=render_to_string,
         replace_urls=None,
-        xblock_model_data= {}
     )
     peer_gs = peer_grading_service.PeerGradingService(settings.OPEN_ENDED_GRADING_INTERFACE, system)
     pending_grading = False
@@ -124,12 +125,12 @@ def combined_notifications(course, user):
 
     #Define a mock modulesystem
     system = ModuleSystem(
+        static_url="/static",
         ajax_url=None,
         track_function=None,
         get_module = None,
         render_template=render_to_string,
         replace_urls=None,
-        xblock_model_data= {}
     )
     #Initialize controller query service using our mock system
     controller_qs = ControllerQueryService(settings.OPEN_ENDED_GRADING_INTERFACE, system)
@@ -152,8 +153,9 @@ def combined_notifications(course, user):
         controller_response = controller_qs.check_combined_notifications(course.id, student_id, user_is_staff,
                                                                          last_time_viewed)
         notifications = json.loads(controller_response)
-        if notifications['success']:
-            if notifications['staff_needs_to_grade'] or notifications['student_needs_to_peer_grade']:
+        if notifications.get('success'):
+            if (notifications.get('staff_needs_to_grade') or
+                notifications.get('student_needs_to_peer_grade')):
                 pending_grading = True
     except:
         #Non catastrophic error, so no real action

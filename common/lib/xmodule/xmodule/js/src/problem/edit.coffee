@@ -575,20 +575,24 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
           };
           var uniq_rel = 1 + Math.floor(Math.random() * 9999999);
           var selectString = '\n<div class="advice-for-problem" rel = "' + delay + '">\n<span class ="title" rel = "'+uniq_rel+'">Advice</span>\n<div class = "inner">\n' + inside_text[1] + '\n</div>\n</div>\n';
+      
+      // replace code blocks
+      xml = xml.replace(/\[code\]\n?([^\]]*)\[\/?code\]/gmi, function(match, p1) {
+          var selectString = '<pre><code>\n' + p1 + '</code></pre>';
           return selectString;
       });
 
-      // split scripts and wrap paragraphs
-      var splits = xml.split(/(\<\/?script.*?\>)/g);
+      // split scripts and preformatted sections, and wrap paragraphs
+      var splits = xml.split(/(\<\/?(?:script|pre).*?\>)/g);
       var scriptFlag = false;
       for(var i = 0; i < splits.length; i++) {
-        if(/\<script/.test(splits[i])) {
+        if(/\<(script|pre)/.test(splits[i])) {
           scriptFlag = true;
         }
         if(!scriptFlag) {
           splits[i] = splits[i].replace(/(^(?!\s*\<|$).*$)/gm, '<p>$1</p>');
         }
-        if(/\<\/script/.test(splits[i])) {
+        if(/\<\/(script|pre)/.test(splits[i])) {
           scriptFlag = false;
         }
       }

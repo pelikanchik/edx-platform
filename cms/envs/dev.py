@@ -9,6 +9,7 @@ from .common import *
 from logsettings import get_logger_config
 
 DEBUG = True
+USE_I18N = True
 TEMPLATE_DEBUG = DEBUG
 LOGGING = get_logger_config(ENV_ROOT / "log",
                             logging_env="dev",
@@ -16,11 +17,14 @@ LOGGING = get_logger_config(ENV_ROOT / "log",
                             dev_env=True,
                             debug=True)
 
-modulestore_options = {
-    'default_class': 'xmodule.raw_module.RawDescriptor',
+DOC_STORE_CONFIG = {
     'host': 'localhost',
     'db': 'xmodule',
     'collection': 'modulestore',
+}
+
+modulestore_options = {
+    'default_class': 'xmodule.raw_module.RawDescriptor',
     'fs_root': GITHUB_REPO_ROOT,
     'render_template': 'mitxmako.shortcuts.render_to_string',
 }
@@ -28,14 +32,17 @@ modulestore_options = {
 MODULESTORE = {
     'default': {
         'ENGINE': 'xmodule.modulestore.draft.DraftModuleStore',
+        'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
         'OPTIONS': modulestore_options
     },
     'direct': {
         'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
+        'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
         'OPTIONS': modulestore_options
     },
     'split': {
         'ENGINE': 'xmodule.modulestore.split_mongo.SplitMongoModuleStore',
+        'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
         'OPTIONS': modulestore_options
     }
 }
@@ -45,7 +52,7 @@ MODULESTORE = {
 # This is for static content for courseware, not system static content (e.g. javascript, css, edX branding, etc)
 CONTENTSTORE = {
     'ENGINE': 'xmodule.contentstore.mongo.MongoContentStore',
-    'OPTIONS': {
+    'DOC_STORE_CONFIG': {
         'host': 'localhost',
         'db': 'xcontent',
     },
@@ -185,6 +192,6 @@ if SEGMENT_IO_KEY:
 #####################################################################
 # Lastly, see if the developer has any local overrides.
 try:
-    from .private import *      # pylint: disable=F0401
+    from .private import *  # pylint: disable=F0401
 except ImportError:
     pass

@@ -28,7 +28,7 @@ from uuid import uuid4
 from pymongo import MongoClient
 
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
-TEST_DATA_CONTENTSTORE['OPTIONS']['db'] = 'test_xcontent_%s' % uuid4().hex
+TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().hex
 
 
 @override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE, MODULESTORE=TEST_MODULESTORE)
@@ -61,7 +61,7 @@ class ContentStoreImportNoStaticTest(ModuleStoreTestCase):
         self.client.login(username=uname, password=password)
 
     def tearDown(self):
-        MongoClient().drop_database(TEST_DATA_CONTENTSTORE['OPTIONS']['db'])
+        MongoClient().drop_database(TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'])
         _CONTENTSTORE.clear()
 
     def load_test_import_course(self):
@@ -97,9 +97,9 @@ class ContentStoreImportNoStaticTest(ModuleStoreTestCase):
 
         self.assertIsNotNone(content)
 
-        # make sure course.lms.static_asset_path is correct
-        print "static_asset_path = {0}".format(course.lms.static_asset_path)
-        self.assertEqual(course.lms.static_asset_path, 'test_import_course')
+        # make sure course.static_asset_path is correct
+        print "static_asset_path = {0}".format(course.static_asset_path)
+        self.assertEqual(course.static_asset_path, 'test_import_course')
 
     def test_asset_import_nostatic(self):
         '''

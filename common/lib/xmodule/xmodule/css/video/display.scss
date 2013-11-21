@@ -10,9 +10,48 @@ div.video {
   padding: 12px;
   border-radius: 5px;
 
+  &:focus, &:active, &:hover {
+    outline: 0;
+    border: 0;
+  }
+
   div.tc-wrapper {
     position: relative;
     @include clearfix;
+  }
+
+  div.focus_grabber {
+    position: relative;
+    display: inline;
+    width: 0px;
+    height: 0px;
+  }
+
+  .wrapper-downloads {
+    margin: 0;
+    padding: 0;
+
+    .video-sources,
+    .video-tracks {
+      display: inline-block;
+      margin: ($baseline*.75) ($baseline/2) 0 0;
+
+      a {
+        @include transition(all 0.25s ease-in-out 0s);
+        @include font-size(14);
+        display: inline-block;
+        border-radius: 3px 3px 3px 3px;
+        background-color: $very-light-text;
+        padding: ($baseline*.75);
+        color: $lighter-base-font-color;
+
+        &:hover {
+          background-color: $action-primary-active-bg;
+          color: $very-light-text;
+        }
+      }
+
+    }
   }
 
   article.video-wrapper {
@@ -35,18 +74,28 @@ div.video {
     }
 
     section.video-player {
-      height: 0;
       overflow: hidden;
-      padding-bottom: 56.25%;
-      position: relative;
+      min-height: 300px;
 
-      object, iframe {
+      div {
+        &.hidden {
+          display: none;
+        }
+      }
+
+      object, iframe, video {
         border: none;
         height: 100%;
-        left: 0;
-        position: absolute;
-        top: 0;
         width: 100%;
+      }
+
+      h3 {
+        text-align: center;
+        color: white;
+
+        &.hidden {
+          display: none;
+        }
       }
     }
 
@@ -90,6 +139,24 @@ div.video {
           box-shadow: inset 0 1px 0 #999;
         }
 
+        div.ui-corner-all.slider-range {
+          background-color: #1e91d3;
+
+          /* We add opacity so that we can discern the amount of video that has
+           * been played. The progress will advance as a gray-shaded area. When
+           * it will overlap with the range, you will see a different shade of
+           * the range for part that has been played, and for part that is
+           * still to be played.
+           *
+           * For CSS opacity, different browsers are handled differently.
+           */
+          -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=30)";
+          filter: alpha(opacity=30);
+          -moz-opacity: 0.3;
+          -khtml-opacity: 0.3;
+          opacity: 0.3;
+        }
+
         a.ui-slider-handle {
           background: $pink url(../images/slider-handle.png) center center no-repeat;
           background-size: 50%;
@@ -109,7 +176,7 @@ div.video {
 
           &:focus, &:hover {
             background-color: lighten($pink, 10%);
-            outline: none;
+            outline: 0;
           }
         }
       }
@@ -135,9 +202,16 @@ div.video {
             text-indent: -9999px;
             width: 14px;
             background: url('../images/vcr.png') 15px 15px no-repeat;
-            outline: 0;
 
             &:focus {
+              position: relative;
+              z-index: 10000;
+              outline: #fff dotted thin;
+              outline-offset: -2px;
+              background: #333;
+            }
+
+            &:hover {
               outline: 0;
             }
 
@@ -149,7 +223,7 @@ div.video {
             &.play {
               background-position: 17px -114px;
 
-              &:hover, &:focus {
+              &:hover {
                 background-color: #444;
               }
             }
@@ -157,7 +231,7 @@ div.video {
             &.pause {
               background-position: 16px -50px;
 
-              &:hover, &:focus {
+              &:hover {
                 background-color: #444;
               }
             }
@@ -175,6 +249,19 @@ div.video {
 
       div.secondary-controls {
         float: right;
+
+        div.speeds>a, div.volume>a, a.add-fullscreen, a.quality_control,
+        a.hide-subtitles {
+          // overflow is used to bypass Firefox CSS :focus outline bug
+          // http://johndoesdesign.com/blog/2012/css/firefox-and-its-css-focus-outline-bug/
+          &:focus {
+            position: relative;
+            z-index: 10000;
+            outline: #fff dotted thin;
+            outline-offset: -2px;
+            overflow: auto;
+          }
+        }
 
         div.speeds {
           float: left;
@@ -210,10 +297,28 @@ div.video {
             @include transition(none);
             -webkit-font-smoothing: antialiased;
             width: 116px;
-            outline: 0;
 
-            &:focus {
+            @media (max-width: 1024px) {
+              width: 86px;
+            }
+
+            h3 {
+              display: block;
+
+              @media (max-width: 1024px) {
+                display: none;
+              }
+            }
+
+            &:hover {
               outline: 0;
+              opacity: 1.0;
+              background-color: #444;
+            }
+
+            &:active {
+              opacity: 1.0;
+              background-color: #444;
             }
 
             h3 {
@@ -232,13 +337,13 @@ div.video {
               font-weight: bold;
               margin-bottom: 0;
               padding: 0 lh(.5) 0 0;
+
+              @media (max-width: 1024px) {
+                padding: 0 lh(.5) 0 lh(.5);
+              }
+
               line-height: 46px;
               color: #fff;
-            }
-
-            &:hover, &:active, &:focus {
-              opacity: 1.0;
-              background-color: #444;
             }
           }
 
@@ -253,6 +358,11 @@ div.video {
             opacity: 0.0;
             position: absolute;
             width: 131px;
+
+            @media (max-width: 1024px) {
+              width: 101px;
+            }
+
             z-index: 10;
 
             li {
@@ -270,6 +380,7 @@ div.video {
                 &:hover {
                   background-color: #666;
                   color: #aaa;
+                  outline-offset: -4px;
                 }
               }
 
@@ -322,8 +433,11 @@ div.video {
             -webkit-font-smoothing: antialiased;
             width: 30px;
 
-            &:hover, &:active, &:focus {
+            &:hover, &:active {
               background-color: #444;
+              color: #fff;
+              text-decoration: none;
+              outline: 0;
             }
           }
 
@@ -384,12 +498,14 @@ div.video {
           @include transition(none);
           width: 30px;
 
-          &:hover, &:active, &:focus {
+          &:hover, &:active {
             background-color: #444;
             color: #fff;
             text-decoration: none;
+            outline: 0;
           }
         }
+
 
         a.quality_control {
           background: url(../images/hd.png) center no-repeat;
@@ -405,16 +521,18 @@ div.video {
           @include transition(none);
           width: 30px;
 
-          &:hover, &:focus {
+          &:hover {
             background-color: #444;
             color: #fff;
             text-decoration: none;
+            outline: 0;
           }
 
           &.active {
             background-color: #F44;
             color: #0ff;
             text-decoration: none;
+            outline: 0;
           }
         }
 
@@ -433,10 +551,11 @@ div.video {
           -webkit-font-smoothing: antialiased;
           width: 30px;
 
-          &:hover, &:focus {
+          &:hover {
             background-color: #444;
             color: #fff;
             text-decoration: none;
+            outline: 0;
           }
 
           &.off {
@@ -472,22 +591,29 @@ div.video {
     margin: 0;
     font-size: 14px;
     list-style: none;
+    visibility: visible;
 
     li {
       border: 0;
-      color: #666;
+      color: rgb(29,157,217);
       cursor: pointer;
       margin-bottom: 8px;
       padding: 0;
       line-height: lh();
+      outline: 0;
 
       &.current {
         color: #333;
         font-weight: 700;
       }
 
+      &.focused {
+        outline: #000 dotted thin;
+        outline-offset: -1px;
+      }
+
       &:hover {
-        color: $blue;
+        text-decoration: underline;
       }
 
       &:empty {
@@ -514,6 +640,12 @@ div.video {
 
     article.video-wrapper div.video-player-pre, article.video-wrapper div.video-player-post {
         height: 0px;
+    }
+
+    article.video-wrapper section.video-player {
+      h3 {
+        color: black;
+      }
     }
 
     ol.subtitles {
@@ -563,6 +695,12 @@ div.video {
         position: static;
     }
 
+    article.video-wrapper section.video-player {
+      h3 {
+        color: white;
+      }
+    }
+
     div.tc-wrapper {
       @include clearfix;
       display: table;
@@ -576,15 +714,12 @@ div.video {
         display: table-cell;
         vertical-align: middle;
         float: none;
-      }
 
-      object, iframe {
-        bottom: 0;
-        height: 100%;
-        left: 0;
-        overflow: hidden;
-        position: fixed;
-        top: 0;
+        object, iframe, video{
+          position: absolute;
+          width: auto;
+          height: auto;
+        }
       }
 
       section.video-controls {
@@ -606,6 +741,7 @@ div.video {
       position: fixed;
       right: 0;
       top: 0;
+      visibility: visible;
       @include transition(none);
 
       li {

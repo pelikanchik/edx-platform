@@ -3,7 +3,8 @@
 <%namespace name='static' file='/static_content.html'/>
 
 <%block name="headextra">
-  <%static:css group='course'/>
+<%static:css group='style-course-vendor'/>
+<%static:css group='style-course'/>
 </%block>
 
 <%namespace name="progress_graph" file="/courseware/progress_graph.js"/>
@@ -14,7 +15,7 @@
     from django.core.urlresolvers import reverse
 %>
 
-<%! from xmodule.util.date_utils import get_default_time_display %>
+<%! from xmodule.util.date_utils import get_time_display %>
 
 <%block name="js_extra">
 <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.js')}"></script>
@@ -69,8 +70,12 @@ ${progress_graph.body(grade_summary, course.grade_cutoffs, "grade-detail-graph",
                 ${section['format']}
 
                 %if section.get('due') is not None:
+                  <%
+                      formatted_string = get_time_display(section['due'], course.due_date_display_format)
+                      due_date = '' if len(formatted_string)==0 else _('due {date}'.format(date=formatted_string))
+                  %>
                   <em>
-                  due ${get_default_time_display(section['due'], course.show_timezone)}
+                  ${due_date}
                   </em>
                 %endif
               </p>

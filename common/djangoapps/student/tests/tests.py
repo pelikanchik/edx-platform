@@ -8,23 +8,34 @@ import logging
 import json
 import re
 import unittest
+from datetime import datetime, timedelta
+import pytz
 
 from django.conf import settings
 from django.test import TestCase
+from django.test.utils import override_settings
 from django.test.client import RequestFactory
 from django.contrib.auth.models import User
 from django.contrib.auth.hashers import UNUSABLE_PASSWORD
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import int_to_base36
+from django.core.urlresolvers import reverse
 
+from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from courseware.tests.tests import TEST_DATA_MIXED_MODULESTORE
 
 from mock import Mock, patch
 from textwrap import dedent
 
 from student.models import unique_id_for_user, CourseEnrollment
-from student.views import process_survey_link, _cert_info, password_reset, password_reset_confirm_wrapper
-from student.tests.factories import UserFactory
+from student.views import (process_survey_link, _cert_info, password_reset, password_reset_confirm_wrapper,
+                           change_enrollment, complete_course_mode_info)
+from student.tests.factories import UserFactory, CourseModeFactory
 from student.tests.test_email import mock_render_to_string
+
+import shoppingcart
+
 COURSE_1 = 'edX/toy/2012_Fall'
 COURSE_2 = 'edx/full/6.002_Spring_2012'
 
@@ -207,29 +218,95 @@ class CourseEndingTest(TestCase):
                           })
 
 
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+class DashboardTest(TestCase):
+    """
+    Tests for dashboard utility functions
+    """
+    # arbitrary constant
+    COURSE_SLUG = "100"
+    COURSE_NAME = "test_course"
+    COURSE_ORG = "EDX"
+
+    def setUp(self):
+        self.course = CourseFactory.create(org=self.COURSE_ORG, display_name=self.COURSE_NAME, number=self.COURSE_SLUG)
+        self.assertIsNotNone(self.course)
+        self.user = UserFactory.create(username="jack", email="jack@fake.edx.org")
+        CourseModeFactory.create(
+            course_id=self.course.id,
+            mode_slug='honor',
+            mode_display_name='Honor Code',
+        )
+
+    def test_course_mode_info(self):
+        verified_mode = CourseModeFactory.create(
+            course_id=self.course.id,
+            mode_slug='verified',
+            mode_display_name='Verified',
+            expiration_date=(datetime.now(pytz.UTC) + timedelta(days=1)).date()
+        )
+        enrollment = CourseEnrollment.enroll(self.user, self.course.id)
+        course_mode_info = complete_course_mode_info(self.course.id, enrollment)
+        self.assertTrue(course_mode_info['show_upsell'])
+        self.assertEquals(course_mode_info['days_for_upsell'], 1)
+
+        verified_mode.expiration_date = datetime.now(pytz.UTC) + timedelta(days=-1)
+        verified_mode.save()
+        course_mode_info = complete_course_mode_info(self.course.id, enrollment)
+        self.assertFalse(course_mode_info['show_upsell'])
+        self.assertIsNone(course_mode_info['days_for_upsell'])
+
+    def test_refundable(self):
+        verified_mode = CourseModeFactory.create(
+            course_id=self.course.id,
+            mode_slug='verified',
+            mode_display_name='Verified',
+            expiration_date=(datetime.now(pytz.UTC) + timedelta(days=1)).date()
+        )
+        enrollment = CourseEnrollment.enroll(self.user, self.course.id, mode='verified')
+
+        self.assertTrue(enrollment.refundable())
+
+        verified_mode.expiration_date = (datetime.now(pytz.UTC) - timedelta(days=1)).date()
+        verified_mode.save()
+        self.assertFalse(enrollment.refundable())
+
+
+
 class EnrollInCourseTest(TestCase):
     """Tests enrolling and unenrolling in courses."""
 
     def test_enrollment(self):
         user = User.objects.create_user("joe", "joe@joe.com", "password")
         course_id = "edX/Test101/2013"
+        course_id_partial = "edX/Test101"
 
         # Test basic enrollment
         self.assertFalse(CourseEnrollment.is_enrolled(user, course_id))
+        self.assertFalse(CourseEnrollment.is_enrolled_by_partial(user,
+            course_id_partial))
         CourseEnrollment.enroll(user, course_id)
         self.assertTrue(CourseEnrollment.is_enrolled(user, course_id))
+        self.assertTrue(CourseEnrollment.is_enrolled_by_partial(user,
+            course_id_partial))
 
         # Enrolling them again should be harmless
         CourseEnrollment.enroll(user, course_id)
         self.assertTrue(CourseEnrollment.is_enrolled(user, course_id))
+        self.assertTrue(CourseEnrollment.is_enrolled_by_partial(user,
+            course_id_partial))
 
         # Now unenroll the user
         CourseEnrollment.unenroll(user, course_id)
         self.assertFalse(CourseEnrollment.is_enrolled(user, course_id))
+        self.assertFalse(CourseEnrollment.is_enrolled_by_partial(user,
+            course_id_partial))
 
         # Unenrolling them again should also be harmless
         CourseEnrollment.unenroll(user, course_id)
         self.assertFalse(CourseEnrollment.is_enrolled(user, course_id))
+        self.assertFalse(CourseEnrollment.is_enrolled_by_partial(user,
+            course_id_partial))
 
         # The enrollment record should still exist, just be inactive
         enrollment_record = CourseEnrollment.objects.get(
@@ -332,3 +409,32 @@ class EnrollInCourseTest(TestCase):
         # for that user/course_id combination
         CourseEnrollment.enroll(user, course_id)
         self.assertTrue(CourseEnrollment.is_enrolled(user, course_id))
+
+
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+class PaidRegistrationTest(ModuleStoreTestCase):
+    """
+    Tests for paid registration functionality (not verified student), involves shoppingcart
+    """
+    # arbitrary constant
+    COURSE_SLUG = "100"
+    COURSE_NAME = "test_course"
+    COURSE_ORG = "EDX"
+
+    def setUp(self):
+        # Create course
+        self.req_factory = RequestFactory()
+        self.course = CourseFactory.create(org=self.COURSE_ORG, display_name=self.COURSE_NAME, number=self.COURSE_SLUG)
+        self.assertIsNotNone(self.course)
+        self.user = User.objects.create(username="jack", email="jack@fake.edx.org")
+
+    @unittest.skipUnless(settings.MITX_FEATURES.get('ENABLE_SHOPPING_CART'), "Shopping Cart not enabled in settings")
+    def test_change_enrollment_add_to_cart(self):
+        request = self.req_factory.post(reverse('change_enrollment'), {'course_id': self.course.id,
+                                                                       'enrollment_action': 'add_to_cart'})
+        request.user = self.user
+        response = change_enrollment(request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, reverse('shoppingcart.views.show_cart'))
+        self.assertTrue(shoppingcart.models.PaidCourseRegistration.contained_in_order(
+            shoppingcart.models.Order.get_cart_for_user(self.user), self.course.id))
