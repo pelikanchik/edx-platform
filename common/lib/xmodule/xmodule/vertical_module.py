@@ -4,7 +4,7 @@ from xmodule.x_module import XModule
 from xmodule.seq_module import SequenceDescriptor
 from xmodule.progress import Progress
 from pkg_resources import resource_string
-from xblock.core import Integer, Scope, String
+from xblock.fields import Integer, Scope, String
 
 # HACK: This shouldn't be hard-coded to two types
 # OBSOLETE: This obsoletes 'type'

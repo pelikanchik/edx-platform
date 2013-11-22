@@ -743,10 +743,11 @@
         visibility: hidden;
       }
 */
-  }
+    }
 
-  // UI: DnD - specific elems/cases - empty parents splint
-  .ui-splint-indicator {
-    position: relative;
+    // UI: DnD - specific elems/cases - empty parents splint
+    .ui-splint-indicator {
+      position: relative;
+    }
   }
 }
