@@ -3118,7 +3118,7 @@ msgstr "Войти с помощью OpenID"
 msgid ""
 "You can now start learning with {platform_name} by logging in with your <a "
 "rel=\"external\" href=\"http://openid.net/\">OpenID account</a>."
-msgstr "Теперь вы можете начать изучать курсы {platform name}, используя свой внешний <a rel=\"external\" href=\"http://openid.net/\">OpenID account</a>."
+msgstr "Теперь вы можете начать изучать курсы {platform_name}, используя свой внешний <a rel=\"external\" href=\"http://openid.net/\">OpenID account</a>."
 
 #: lms/templates/login.html:179
 msgid "Not Enrolled?"
@@ -3130,7 +3130,7 @@ msgstr "Зарегистрируйтесь для доступа к {platform_na
 
 #: lms/templates/login.html:185
 msgid "Looking for help in logging in or with your {platform_name} account?"
-msgstr "Нужна помощь при входе или с вашим аккаунтом {platform name}?"
+msgstr "Нужна помощь при входе или с вашим аккаунтом {platform_name}?"
 
 #: lms/templates/login.html:187
 msgid "View our help section for answers to commonly asked questions."
