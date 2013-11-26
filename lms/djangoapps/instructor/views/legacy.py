@@ -756,13 +756,13 @@ def instructor_dashboard(request, course_id):
     #----------------------------------------
     # enrollment
 
-    elif action == 'List students who may enroll but may not have yet signed up':
+    elif action == u'Список учеников, которые возможно приглашены, но до сих пор не зарегистрировались':
         ceaset = CourseEnrollmentAllowed.objects.filter(course_id=course_id)
         datatable = {'header': ['StudentEmail']}
         datatable['data'] = [[x.email] for x in ceaset]
         datatable['title'] = action
 
-    elif action == 'Enroll multiple students':
+    elif action == u'Пригласить учеников':
 
         students = request.POST.get('multiple_students', '')
         auto_enroll = bool(request.POST.get('auto_enroll'))
@@ -770,29 +770,29 @@ def instructor_dashboard(request, course_id):
         ret = _do_enroll_students(course, course_id, students, auto_enroll=auto_enroll, email_students=email_students)
         datatable = ret['datatable']
 
-    elif action == 'Unenroll multiple students':
+    elif action == u'Отменить приглашения учеников':
 
         students = request.POST.get('multiple_students', '')
         email_students = bool(request.POST.get('email_students'))
         ret = _do_unenroll_students(course_id, students, email_students=email_students)
         datatable = ret['datatable']
 
-    elif action == 'List sections available in remote gradebook':
+    elif action == u'Список доступных разделов в журнале':
 
         msg2, datatable = _do_remote_gradebook(request.user, course, 'get-sections')
         msg += msg2
 
-    elif action in ['List students in section in remote gradebook',
-                    'Overload enrollment list using remote gradebook',
-                    'Merge enrollment list with remote gradebook']:
+    elif action in [u'Список доступных разделов в журнале',
+                    u'Перезагрузить список приглашенных из журнала',
+                    u'Объединить список приглашенных со списокм из журнала']:
 
         section = request.POST.get('gradebook_section', '')
         msg2, datatable = _do_remote_gradebook(request.user, course, 'get-membership', dict(section=section))
         msg += msg2
 
-        if not 'List' in action:
+        if not u'Список' in action:
             students = ','.join([x['email'] for x in datatable['retdata']])
-            overload = 'Overload' in action
+            overload = u'Перезагрузить' in action
             ret = _do_enroll_students(course, course_id, students, overload=overload)
             datatable = ret['datatable']
 
