@@ -3,6 +3,7 @@
 Convenience methods for working with datetime objects
 """
 from datetime import timedelta
+from django.utils.translation import ugettext as _
 
 
 def get_default_time_display(dtime):
