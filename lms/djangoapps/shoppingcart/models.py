@@ -400,7 +400,7 @@ class CertificateItem(OrderItem):
     course_enrollment = models.ForeignKey(CourseEnrollment)
     mode = models.SlugField()
 
-    @receiver(unenroll_done, sender=CourseEnrollment)
+    @receiver(unenroll_done)
     def refund_cert_callback(sender, course_enrollment=None, **kwargs):
         """
         When a CourseEnrollment object calls its unenroll method, this function checks to see if that unenrollment
@@ -422,6 +422,8 @@ class CertificateItem(OrderItem):
             return
         target_cert.status = 'refunded'
         target_cert.save()
+        target_cert.order.status = 'refunded'
+        target_cert.order.save()
 
         order_number = target_cert.order_id
         # send billing an email so they can handle refunding
@@ -464,10 +466,7 @@ class CertificateItem(OrderItem):
 
         """
         super(CertificateItem, cls).add_to_order(order, course_id, cost, currency=currency)
-        try:
-            course_enrollment = CourseEnrollment.objects.get(user=order.user, course_id=course_id)
-        except ObjectDoesNotExist:
-            course_enrollment = CourseEnrollment.create_enrollment(order.user, course_id, mode=mode)
+        course_enrollment = CourseEnrollment.get_or_create_enrollment(order.user, course_id)
 
         # do some validation on the enrollment mode
         valid_modes = CourseMode.modes_for_course_dict(course_id)
@@ -506,8 +505,7 @@ class CertificateItem(OrderItem):
                 "Could not submit verification attempt for enrollment {}".format(self.course_enrollment)
             )
 
-        self.course_enrollment.mode = self.mode
-        self.course_enrollment.save()
+        self.course_enrollment.change_mode(self.mode)
         self.course_enrollment.activate()
 
     @property
