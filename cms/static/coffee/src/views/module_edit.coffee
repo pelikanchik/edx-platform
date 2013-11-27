@@ -143,13 +143,18 @@ class CMS.Views.ModuleEdit extends Backbone.View
     @model.save(data).done( =>
     #   # showToastMessage("Your changes have been saved.", null, 3)
       saving.hide()
+      $.ajax "/save_template",
+        type: 'post',
+        data:{
+          'all_data': data,
+          'template_name': template_name
+        },
+        success: =>
+          vertical_id = $(".main-wrapper.edit-state-private").data('id')
+          console.log vertical_id
+          location.href = "/edit/" + vertical_id
     ).fail( ->
       showToastMessage(gettext("Возникли проблемы при сохранении. Попробуйте ещё раз"), null, 3)
-    )
-    $.post(
-        "/save_template",
-        {'all_data': data,
-        'template_name': template_name}
     )
     @$(".template-button").show()
     @$(".template-save-button").hide()

@@ -357,7 +357,7 @@ class ResourceTemplates(object):
                         template['template_id'] = template_file
                         template['author'] = username
                         templates.append(template)
-                except KeyError:
+                except OSError:
                     print "There are no directory"
 
         return templates
