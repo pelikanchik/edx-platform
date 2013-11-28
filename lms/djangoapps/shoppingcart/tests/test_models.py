@@ -373,6 +373,7 @@ class CertificateItemTest(ModuleStoreTestCase):
         CourseEnrollment.unenroll(self.user, self.course_id)
         target_certs = CertificateItem.objects.filter(course_id=self.course_id, user_id=self.user, status='refunded', mode='verified')
         self.assertTrue(target_certs[0])
+        self.assertEquals(target_certs[0].order.status, 'refunded')
 
     def test_refund_cert_callback_before_expiration(self):
         # If the expiration date has not yet passed on a verified mode, the user can be refunded
@@ -384,7 +385,7 @@ class CertificateItemTest(ModuleStoreTestCase):
                                  mode_slug="verified",
                                  mode_display_name="verified cert",
                                  min_price=self.cost,
-                                 expiration_date=(datetime.datetime.now(pytz.utc).date() + many_days))
+                                 expiration_datetime=(datetime.datetime.now(pytz.utc) + many_days))
         course_mode.save()
 
         CourseEnrollment.enroll(self.user, course_id, 'verified')
@@ -395,6 +396,7 @@ class CertificateItemTest(ModuleStoreTestCase):
         CourseEnrollment.unenroll(self.user, course_id)
         target_certs = CertificateItem.objects.filter(course_id=course_id, user_id=self.user, status='refunded', mode='verified')
         self.assertTrue(target_certs[0])
+        self.assertEquals(target_certs[0].order.status, 'refunded')
 
     @patch('shoppingcart.models.log.error')
     def test_refund_cert_callback_before_expiration_email_error(self, error_logger):
@@ -407,7 +409,7 @@ class CertificateItemTest(ModuleStoreTestCase):
                                  mode_slug="verified",
                                  mode_display_name="verified cert",
                                  min_price=self.cost,
-                                 expiration_date=(datetime.datetime.now(pytz.utc).date() + many_days))
+                                 expiration_datetime=datetime.datetime.now(pytz.utc) + many_days)
         course_mode.save()
 
         CourseEnrollment.enroll(self.user, course_id, 'verified')
@@ -436,7 +438,7 @@ class CertificateItemTest(ModuleStoreTestCase):
         CertificateItem.add_to_order(cart, course_id, self.cost, 'verified')
         cart.purchase()
 
-        course_mode.expiration_date = (datetime.datetime.now(pytz.utc).date() - many_days)
+        course_mode.expiration_datetime = (datetime.datetime.now(pytz.utc) - many_days)
         course_mode.save()
 
         CourseEnrollment.unenroll(self.user, course_id)

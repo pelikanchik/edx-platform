@@ -28,7 +28,7 @@ import lms.envs.common
 from lms.envs.common import USE_TZ, TECH_SUPPORT_EMAIL, PLATFORM_NAME, BUGS_EMAIL
 from path import path
 
-from lms.xblock.mixin import LmsBlockMixin
+from lms.lib.xblock.mixin import LmsBlockMixin
 from cms.xmodule_namespace import CmsBlockMixin
 from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.x_module import XModuleMixin
@@ -137,6 +137,7 @@ XQUEUE_INTERFACE = {
 STATICFILES_FINDERS = (
     'staticfiles.finders.FileSystemFinder',
     'staticfiles.finders.AppDirectoriesFinder',
+    'pipeline.finders.PipelineFinder',
 )
 
 # List of callables that know how to import templates from various sources.
@@ -157,6 +158,7 @@ MIDDLEWARE_CLASSES = (
     'cache_toolbox.middleware.CacheBackedAuthenticationMiddleware',
     'student.middleware.UserStandingMiddleware',
     'contentserver.middleware.StaticContentServer',
+    'crum.CurrentRequestUserMiddleware',
 
     'django.contrib.messages.middleware.MessageMiddleware',
     'track.middleware.TrackMiddleware',
@@ -228,9 +230,9 @@ STATICFILES_DIRS = [
 
 # Locale/Internationalization
 TIME_ZONE = 'Europe/Moscow'   # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
-LANGUAGE_CODE = 'ru'  # http://www.i18nguy.com/unicode/language-identifiers.html
-USE_I18N = True
-LANGUAGES = (('ru', 'Russian'), )
+LANGUAGE_CODE = 'en'  # http://www.i18nguy.com/unicode/language-identifiers.html
+USE_I18N = False
+LANGUAGES = (('en', 'English'), )
 
 ## We want i18n to be turned off in production, at least until we have full localizations.
 ## Thus we want the Django translation engine to be disabled. Otherwise even without
@@ -270,6 +272,12 @@ PIPELINE_CSS = {
             'sass/style-app.css',
         ],
         'output_filename': 'css/cms-style-app.css',
+    },
+    'style-app-extend1': {
+        'source_filenames': [
+            'sass/style-app-extend1.css',
+        ],
+        'output_filename': 'css/cms-style-app-extend1.css',
     },
     'style-xmodule': {
         'source_filenames': [

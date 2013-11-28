@@ -14,17 +14,12 @@
 
 <%block name="content">
 
-<script type='text/javascript' src='/static/js/knockout.js'></script>
-<script type='text/javascript' src='/static/js/knockout-mapping.js'></script>
-<script type='text/javascript' src='/static/js/numeric.js'></script>
-
 
 <div class="main-wrapper">
   <div class="inner-wrapper">
     <div class="main-column">
-      <article class="subsection-body window" data-id="${subsection.location}">
+      <article class="subsection-body window" data-locator="${locator}">
         <div class="subsection-name-input">
-
           <label>${_("Display Name:")}</label>
 
           <input type="text" value="${subsection.display_name_with_default | h}" class="subsection-display-name-input" data-metadata-name="display_name"/>
@@ -37,7 +32,7 @@
                         <tbody data-bind="foreach: disjunctions">
                             <tr>
                                 <td>
-                                    <div><img class = "close" src = "/static/img/Delete-icon.png" data-bind='click: $root.removeDisjunction'/></div>
+                                    <div><img class = "close" src = '${static.url("img/Delete-icon.png")}' data-bind='click: $root.removeDisjunction'/></div>
                                 </td>
 
                                 <td align = "center">
@@ -79,12 +74,12 @@
 
                                                 </td>
                                                 <td><input  data-bind='value: value, valueUpdate: "afterkeydown"' class = "value" /></td>
-                                                <td style="vertical-align: middle"><img width="20" src = "/static/img/edit_remove.png"  data-bind='click: $root.removeConjunction' class = "del" /></td>
+                                                <td style="vertical-align: middle"><img width="20" src = "${static.url('img/edit_remove.png')}"  data-bind='click: $root.removeConjunction' class = "del" /></td>
                                             </tr>
                                         </tbody>
                                     </table>
                                      <div style = "width:100%">
-                                         <img class = "add" src  = "/static/img/plus_16.png" data-bind='click: $root.addConjunction' />
+                                         <img class = "add" src  = '${static.url("img/plus_16.png")}' data-bind='click: $root.addConjunction' />
                                      </div>
                                 </td>
                             </tr>
@@ -92,7 +87,7 @@
                     </table>
 
                  <div style="width: 100%; padding:10px 0px ">
-                    <img class = "add" style="width:20px; margin: 3px;" src = "/static/img/plus_32.png" data-bind='click: addDisjunction' />
+                    <img class = "add" style="width:20px; margin: 3px;" src = '${static.url("img/plus_32.png")}' data-bind='click: addDisjunction' />
                 </div>
                 </div>
                 <p style = "text-align: center;"><input type = "button" class = "save-subsection-button" value='${_("Save term")}'/></p>
@@ -100,111 +95,117 @@
                 <input disabled data-bind='value: term_string' style="font-size: 10px; display:none;" class="subsection-display-name-input" data-metadata-name="unlock_term">
 
         <script>
+            require(['jquery','knockout', 'knockout-mapping', 'numeric'], function($, ko, mapping, numeric) {
 
-            var unlock_term = '${subsection.unlock_term_with_default|h}'.replace(/\&#34;/g, '"');
-            var dataFromDB = ko.utils.parseJson(unlock_term).disjunctions;
+                var unlock_term = '${subsection.unlock_term_with_default|h}'.replace(/\&#34;/g, '"');
+                var dataFromDB = ko.utils.parseJson(unlock_term).disjunctions;
 
-            var initialData = [
-                    { conjunctions: [
-                        { source_section_id: ko.observable(), field: "score_rel" , sign: "less" , value: "123" }]
-                   }
-               ];
+                var initialData = [
+                        { conjunctions: [
+                            { source_section_id: ko.observable(), field: "score_rel" , sign: "less" , value: "123" }]
+                       }
+                   ];
 
-            var DisjunctionsModel = function(disjunctions) {
-                var self = this;
 
-                self.disjunctions = ko.mapping.fromJS(dataFromDB);
+                var DisjunctionsModel = function(disjunctions) {
+                    var self = this;
 
-                self.addDisjunction = function() {
-                    self.disjunctions.push({
-                        conjunctions: ko.observableArray([{
+                    self.disjunctions = mapping.fromJS(dataFromDB);
+                    self.addDisjunction = function() {
+                        self.disjunctions.push({
+                            conjunctions: ko.observableArray([{
+                                source_section_id: ko.observable(),
+                                field: ko.observable("score_abs"),
+                                sign: ko.observable("more"),
+                                value: ko.observable("0")
+                            }])
+                        });
+
+                        check_numeric();
+                        hovers();
+                    };
+
+                    self.removeDisjunction = function(disjunction) {
+                        self.disjunctions.remove(disjunction);
+
+
+                    };
+
+                    self.addConjunction = function(disjunction) {
+                        disjunction.conjunctions.push({
                             source_section_id: ko.observable(),
                             field: ko.observable("score_abs"),
                             sign: ko.observable("more"),
                             value: ko.observable("0")
-                        }])
+                        });
+
+                        check_numeric();
+                        hovers();
+                    };
+
+                    self.removeConjunction = function(conjunction) {
+                        $.each(self.disjunctions(), function() { this.conjunctions.remove(conjunction) })
+
+
+                    };
+
+
+                    self.term_string = ko.computed(function () {
+                        return ko.toJSON({disjunctions: self.disjunctions});
+
                     });
 
-                    check_numeric();
-                    hovers();
+
+                    function update(){
+                        self.lastSavedJson(JSON.stringify(ko.toJS({disjunctions: self.disjunctions}), null, 0));
+                    }
+                    //self.lastSavedJson = ko.observable(unlock_term)
                 };
 
-                self.removeDisjunction = function(disjunction) {
-                    self.disjunctions.remove(disjunction);
+                ko.applyBindings(new DisjunctionsModel());
+
+                function hovers(){
+                    $("img.close").hover(
+                        function () {
+                            $(this).parent().parent().parent().css("background-color","#fcc");
+                        },
+                        function () {
+                            $(this).parent().parent().parent().css("background-color","");
+                        }
+                    );
 
 
+                    $("img.del").hover(
+                        function () {
+                            $(this).parent().parent().css("background-color","#fcc");
+                        },
+                        function () {
+                            $(this).parent().parent().css("background-color","");
+                        }
+                    );
+
+                    $("img.add").hover(
+                        function () {
+                            $(this).parent().css("background-color","#cfc");
+                        },
+                        function () {
+                            $(this).parent().css("background-color","");
+                        }
+                    );
                 };
 
-                self.addConjunction = function(disjunction) {
-                    disjunction.conjunctions.push({
-                        source_section_id: ko.observable(),
-                        field: ko.observable("score_abs"),
-                        sign: ko.observable("more"),
-                        value: ko.observable("0")
-                    });
+                hovers();
 
-                    check_numeric();
-                    hovers();
-                };
-
-                self.removeConjunction = function(conjunction) {
-                    $.each(self.disjunctions(), function() { this.conjunctions.remove(conjunction) })
-
-
-                };
-
-
-                self.term_string = ko.computed(function () {
-                    return ko.toJSON({disjunctions: self.disjunctions});
-
-                });
-
-
-                function update(){
-                    self.lastSavedJson(JSON.stringify(ko.toJS({disjunctions: self.disjunctions}), null, 0));
+                function check_numeric(){
+                    $("input.value").numeric();
                 }
-                //self.lastSavedJson = ko.observable(unlock_term)
-            };
 
-            ko.applyBindings(new DisjunctionsModel());
-
-            function hovers(){
-                $("img.close").hover(
-                    function () {
-                        $(this).parent().parent().parent().css("background-color","#fcc");
-                    },
-                    function () {
-                        $(this).parent().parent().parent().css("background-color","");
-                    }
-                );
+                check_numeric();
 
 
-                $("img.del").hover(
-                    function () {
-                        $(this).parent().parent().css("background-color","#fcc");
-                    },
-                    function () {
-                        $(this).parent().parent().css("background-color","");
-                    }
-                );
 
-                $("img.add").hover(
-                    function () {
-                        $(this).parent().css("background-color","#cfc");
-                    },
-                    function () {
-                        $(this).parent().css("background-color","");
-                    }
-                );
-            };
+            });
 
-            hovers();
-
-            function check_numeric(){
-                $("input.value").numeric();
-            }
-
-            check_numeric();
 
         </script>
 
@@ -223,8 +224,7 @@
     </div>
 
     <div class="sidebar">
-      <div class="unit-settings window id-holder" data-id="${subsection.location}">
-
+      <div class="unit-settings window id-holder" data-locator="${locator}">
     <h4 class="header">${_("Subsection Settings")}</h4>
     <div class="window-contents">
       <div class="scheduled-date-input row">
@@ -312,7 +312,6 @@ require(["domReady!", "jquery", "js/models/location", "js/views/overview_assignm
     // but we really should change that behavior.
     if (!window.graderTypes) {
         window.graderTypes = new CourseGraderCollection(${course_graders|n}, {parse:true});
-        window.graderTypes.course_location = new Location('${parent_location}');
     }
 
     $(".gradable-status").each(function(index, ele) {
