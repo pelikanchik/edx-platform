@@ -541,7 +541,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
             string = '<stringresponse answer="' + answers.join('_or_') + '" type="ci">\n  <textline size="20"/>\n</stringresponse>\n\n';
         }
         return string;
-      });
+    });
 
       // replace selects
       xml = xml.replace(/\[\[(.+?)\]\]/g, function(match, p) {

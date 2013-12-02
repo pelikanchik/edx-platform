@@ -11,7 +11,6 @@ from xmodule.modulestore.django import loc_mapper
 <%block name="jsextra">
 
   <script type='text/javascript'>
-
 require(["domReady!", "jquery", "js/models/module_info", "coffee/src/views/unit", "jquery.ui"],
     function(doc, $, ModuleModel, UnitEditView, ui) {
   window.unit_location_analytics = '${unit_locator}';
@@ -43,8 +42,6 @@ require(["domReady!", "jquery", "js/models/module_info", "coffee/src/views/unit"
 
 
 <%namespace name='static' file='static_content.html'/>
-
-
 
 <%block name="content">
   <div class="main-wrapper edit-state-${unit_state}" data-locator="${unit_locator}">
