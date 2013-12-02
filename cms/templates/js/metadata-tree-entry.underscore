@@ -24,6 +24,7 @@
 </div>
 <div class="tree-of-tags  <%=randval %>"></div>
  <%
+ /*
 var appended_tags;
  $(document).ready(function(){
             if (!CMS.Views['Settings']) CMS.Views.Settings = {};
@@ -97,5 +98,5 @@ var appended_tags;
               });
 
  });
-
+*/
 %>

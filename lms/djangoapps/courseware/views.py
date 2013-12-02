@@ -111,11 +111,7 @@ def render_accordion(request, course, chapter, section, field_data_cache):
  
     student = User.objects.prefetch_related("groups").get(id=student.id)
 
-    model_data_cache = ModelDataCache.cache_for_descriptor_descendents(
-        course_id, student, course, depth=None)
-
-    courseware_summary = grades.progress_summary(student, request, course,
-                                                 model_data_cache)
+    courseware_summary = grades.progress_summary(student, request, course)
 
     print("<-------------")
     print(courseware_summary)
@@ -129,7 +125,6 @@ def render_accordion(request, course, chapter, section, field_data_cache):
     context = dict([('toc', toc),
                     ('course_id', course.id),
                     ('csrf', csrf(request)['csrf_token']),
-                    ('show_timezone', course.show_timezone),
                     ('courseware_summary',courseware_summary),
                     ('due_date_display_format', course.due_date_display_format)] + template_imports.items())
     return render_to_string('courseware/accordion.html', context)
@@ -329,7 +324,6 @@ def index(request, course_id, chapter=None, section=None,
      - HTTPresponse
     """
     user = User.objects.prefetch_related("groups").get(id=request.user.id)
-
     request.user = user	# keep just one instance of User
     course = get_course_with_access(user, course_id, 'load', depth=2)
     staff_access = has_access(user, course, 'staff')
@@ -353,7 +347,7 @@ def index(request, course_id, chapter=None, section=None,
 
         if chapter is None:
             return redirect_to_course_position(course_module)
-
+        print(field_data_cache);
         context = {
             'csrf': csrf(request)['csrf_token'],
             'accordion': render_accordion(request, course, chapter, section, field_data_cache),
@@ -424,10 +418,9 @@ def index(request, course_id, chapter=None, section=None,
                 # they don't have access to.
                 raise Http404
 
-            model_data_cache_for_check = ModelDataCache.cache_for_descriptor_descendents(course_id, user, course, depth=None)
+            # model_data_cache_for_check = ModelDataCache.cache_for_descriptor_descendents(course_id, user, course, depth=None)
 
-            courseware_summary = grades.progress_summary(user, request, course,
-                                                 model_data_cache_for_check)
+            courseware_summary = grades.progress_summary(user, request, course)
 
 
             is_section_unlocked = grades.return_section_by_id(section_module.url_name, courseware_summary)['unlocked']

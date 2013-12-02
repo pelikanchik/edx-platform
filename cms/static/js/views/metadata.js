@@ -36,6 +36,9 @@ function(Backbone, _, MetadataModel, AbstractEditor, VideoList) {
                     else if(model.getType() === MetadataModel.LIST_TYPE) {
                         new Metadata.List(data);
                     }
+                    else if (model.get('help') === "tags") {
+                        new Metadata.Tree(data);
+                    }
                     else if(model.getType() === MetadataModel.VIDEO_LIST_TYPE) {
                         new VideoList(data);
                     }
@@ -88,11 +91,32 @@ function(Backbone, _, MetadataModel, AbstractEditor, VideoList) {
 
         events : {
             "change input" : "updateModel",
+            "click .tree-of-tags" : "updateModel",
             "keypress .setting-input" : "showClearButton"  ,
             "click .setting-clear" : "clear"
         },
 
         templateName: "metadata-string-entry",
+
+        getValueFromEditor : function () {
+            return this.$el.find('#' + this.uniqueId).val();
+        },
+
+        setValueInEditor : function (value) {
+            this.$el.find('input').val(value);
+        }
+    });
+
+    Metadata.Tree = AbstractEditor.extend({
+
+        events : {
+            "change input" : "updateModel",
+            "click .tree-of-tags" : "updateModel",
+            "keypress .setting-input" : "showClearButton"  ,
+            "click .setting-clear" : "clear"
+        },
+
+        templateName: "metadata-tree-entry",
 
         getValueFromEditor : function () {
             return this.$el.find('#' + this.uniqueId).val();

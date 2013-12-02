@@ -541,7 +541,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
             string = '<stringresponse answer="' + answers.join('_or_') + '" type="ci">\n  <textline size="20"/>\n</stringresponse>\n\n';
         }
         return string;
-    });
+      });
 
       // replace selects
       xml = xml.replace(/\[\[(.+?)\]\]/g, function(match, p) {
@@ -583,7 +583,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
           };
           var uniq_rel = 1 + Math.floor(Math.random() * 9999999);
           var selectString = '\n<div class="advice-for-problem" rel = "' + delay + '">\n<span class ="title" rel = "'+uniq_rel+'">Advice</span>\n<div class = "inner">\n' + inside_text[1] + '\n</div>\n</div>\n';
-      
+      });
       // replace code blocks
       xml = xml.replace(/\[code\]\n?([^\]]*)\[\/?code\]/gmi, function(match, p1) {
           var selectString = '<pre><code>\n' + p1 + '</code></pre>';

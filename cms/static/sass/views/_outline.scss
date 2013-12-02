@@ -490,12 +490,8 @@
         border-radius: 3px 3px 0 0;
     }
 
-      .subsection-list {
-          margin: 0 12px;
-      // ditto for graph
-        .show-graph-item {
-          display: none;
-        }
+    .subsection-list {
+        margin: 0 12px;
 
         > ol {
             @include tree-view;
@@ -737,17 +733,11 @@
       > .section-item {
         background-color: $ui-update-color !important; // nasty, but needed for specificity
       }
-
-      // ditto for graph
-/*      .show-graph-item {
-        visibility: hidden;
-      }
-*/
     }
+  }
 
-    // UI: DnD - specific elems/cases - empty parents splint
-    .ui-splint-indicator {
-      position: relative;
-    }
+  // UI: DnD - specific elems/cases - empty parents splint
+  .ui-splint-indicator {
+    position: relative;
   }
 }

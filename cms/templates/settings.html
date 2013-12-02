@@ -298,15 +298,15 @@ div#add-tag{
                       <div>
                           <div id = 'current'>
                               <input type="text" class="tag-input" value = "" id = "tag-title" />
-                              <img id="btnSetTitle" width = "20" title = '${_("Save")}' alt = '${_("Save")}' src = "/static/img/save.png" />
-                              <img id="btnDelete" title = '${_("Delete")}' alt = '${_("Delete")}' src = "/static/img/Delete-icon.png" />
+                              <img id="btnSetTitle" width = "20" title = '${_("Save")}' alt = '${_("Save")}' src = "${static.url('img/save.png')}" />
+                              <img id="btnDelete" title = '${_("Delete")}' alt = '${_("Delete")}' src = "${static.url('img/Delete-icon.png')}" />
                           </div>
                           <div id = 'add-tag'>
-                              <img id="btnAddCode" title = '${_("Add Tag")}' alt = '${_("Add Tag")}' src  = "/static/img/plus_16.png" />
+                              <img id="btnAddCode" title = '${_("Add Tag")}' alt = '${_("Add Tag")}' src  = "${static.url('img/plus_16.png')}" />
                           </div>
                      </div>
                     <p>
-                        <textarea id="course-tags"  style = "visibility:hidden;"></textarea>
+                        <textarea id="course-tags"  style = "visibility:;float:left;"></textarea>
                     </p>
                 </li>
 

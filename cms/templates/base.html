@@ -82,6 +82,7 @@
             "knockout": "js/knockout",
             "knockout-mapping": "js/knockout-mapping",
             "numeric": "js/numeric",
+            "dynatree": "js/dynatree",
 
             // externally hosted files
             "tender": "//edxedge.tenderapp.com/tender_widget",
@@ -218,6 +219,10 @@
             "coffee/src/logger": {
                 exports: "Logger",
                 deps: ["coffee/src/ajax_prefix"]
+            },
+            "dynatree": {
+                deps : [ 'jquery', 'jquery.ui' ],
+                exports : 'dynatree'
             }
         },
         // load jquery and gettext automatically
@@ -230,15 +235,12 @@
         }
     };
     </script>
-    <script type="text/javascript" src="${static.url("js/vendor/require.js")}"></script>
+    <script type="text/javascript" src="${static.url('js/vendor/require.js')}"></script>
 
     ## js templates
     <script id="system-feedback-tpl" type="text/template">
       <%static:include path="js/system-feedback.underscore" />
     </script>
-
-    ## javascript
-    <script type="text/javascript" src="${static.url('js/dynatree.js')}"></script>
 
     % if context_course:
       <script type="text/javascript">
