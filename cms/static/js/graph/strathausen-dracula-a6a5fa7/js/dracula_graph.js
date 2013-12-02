@@ -288,7 +288,13 @@ Graph.Renderer.Raphael.prototype = {
         update_hover_area(this);
     },
 
+    renameNode: function(node, name) {
+        node.shape[1].attr({text: name});
+    },
+
     drawNode: function(node) {
+//        console.log("drawing node")
+//        console.log(node)
         var point = this.translate([node.layoutPosX, node.layoutPosY]);
         node.point = point;
 
@@ -451,7 +457,7 @@ Graph.Layout.Spring.prototype = {
             var node1 = this.graph.nodes[c];
             for (var d in prev) {
                 var node2 = this.graph.nodes[prev[d]];
-                this.layoutRepulsive(node1, node2);
+                this.layoutRepulsive(node2, node1);
                 
             }
             prev.push(c);
@@ -464,8 +470,13 @@ Graph.Layout.Spring.prototype = {
         }
         
         // Move by the given force
+
+//        for (var i = this.graph.nodes.length - 1; i >= 0; i--) {
+
+//        for (var i = 0; i < this.graph.nodes.length; i++) {
         for (i in this.graph.nodes) {
             var node = this.graph.nodes[i];
+
             var xmove = this.c * node.layoutForceX;
             var ymove = this.c * node.layoutForceY;
 

@@ -1,9 +1,11 @@
+// TODO: refactor the shit out of it
 
 var redraw, g, renderer;
 
     /* visualisation of edge adding */
     var add_edge_mode = false;
     var mouse_x, mouse_y, origin_x, origin_y;
+    var new_node_x, new_node_y, origin_x, origin_y;
     var origin_node;
 
     var new_edge_line;
@@ -145,6 +147,104 @@ function generateEdgeData(disjunctions_array, source){
                     }
                  };
     return result;
+}
+
+function add_node_here(){
+
+        var new_node_name = 'Без имени';
+
+    /*
+        var location = "i4x://Org/101/vertical/temp" + Math.round(100*Math.random());
+
+        var i = location.lastIndexOf("/");
+        var node_id = location.slice(i+1);
+
+        g.addNode(node_id, { label : hideRestOfString(new_node_name), render : render} );
+        ids_arr.push(node_id);
+        edges_arr.push([]);
+        names_obj[node_id] = {
+            "name" : new_node_name,
+            "location" : location,
+            "coords_x" : 0,
+            "coords_y" : 0};
+        data_obj[node_id] = [];
+
+        renderer.drawNode(renderer.graph.nodes[node_id])
+
+        raphael_nodes[node_id].set.translate(mouse_x, mouse_y);
+
+    */
+
+        $("#node-name-input").val(new_node_name);
+        $( "#add-new-node" ).dialog({
+            modal: true,
+            width:'auto',
+            buttons: {
+                Ok: function() {
+                    new_node_name = $("#node-name-input").val();
+                    //console.log($("#node-name-input").val());
+                    $.ajax({
+                        url: "/create_item",
+                        type: "POST",
+                        headers: {
+                            'X-CSRFToken': getCookie('csrftoken')
+                        },
+                        data: {
+                            'parent_location': $(".parent-location").text(),
+                            'category': 'vertical',
+                            'display_name': new_node_name
+                        },
+                        success : function(answer){
+
+                            var location = answer["id"];
+
+                            var i = location.lastIndexOf("/");
+                            var node_id = location.slice(i+1);
+                            g.addNode(node_id, { label : hideRestOfString(new_node_name), render : render} );
+                            ids_arr.push(node_id);
+                            edges_arr.push([]);
+                            names_obj[node_id] = {
+                                "name" : new_node_name,
+                                "location" : location,
+                                "coords_x" : 0,
+                                "coords_y" : 0};
+        //                        "coords_x" : "None",
+        //                        "coords_y" : "None"};
+                            data_obj[node_id] = [];
+
+                            renderer.drawNode(renderer.graph.nodes[node_id])
+
+                            raphael_nodes[node_id].set.translate(new_node_x, new_node_y);
+                            /*
+                            renderer.enableDragingMode();
+                            renderer.isDrag = raphael_nodes[node_id];
+                            */
+
+                        }
+                    });
+                    $( this ).dialog( "close" );
+                },
+                "Отмена": function() {
+                    $( this ).dialog( "close" );
+                }
+
+            }
+        })
+
+
+}
+
+$("#canvas").dblclick(canvasDbClick);
+
+function canvasDbClick(e) {
+    if (e.target.nodeName == "svg" || e.target.nodeName == "DIV" ){
+        if (!add_edge_mode){
+            //alert("new node here!")
+            new_node_x = e.pageX - $('#canvas').offset().left - 5;
+            new_node_y = e.pageY - $('#canvas').offset().top - 5;
+            add_node_here();
+        }
+    }
 }
 
 $("#canvas").click(function (e) {
@@ -331,11 +431,47 @@ function createEdgeDeletionCallback( source_node_number, edge_number, string_id)
   }
 }
 
+function createNodeRenameCallback( node){
+  return function(){
+        $("#node-rename-input").val(names_obj[node.id]["name"]);
+
+        $( "#rename-node" ).dialog({
+              modal: true,
+              buttons: {
+                Ok: function() {
+
+                    // TODO: make a function about metadata or something
+
+                    var node_name = $("#node-rename-input").val();
+                    names_obj[node.id]["name"] = node_name;
+
+                    var unit_edit = new CMS.Views.UnitEdit({
+                      model: new CMS.Models.Module({
+                        id: names_obj[node.id]["location"]
+                      })
+                    });
+                    var metadata = $.extend({}, unit_edit.model.get('metadata'));
+
+                    metadata.display_name = node_name ;
+                    ajax_save_item(names_obj[node.id]["location"], metadata);
+
+                    renderer.renameNode(node, node_name)
+
+                    $( this ).dialog( "close" );
+                },
+                "Отмена": function() {
+                    $( this ).dialog( "close" );
+                }
+              }
+        });
+    }
+}
+
 
 
 function showNodeDetails(node){
     var S;
-    var message = names_obj[node.id]["name"];
+//    var message = names_obj[node.id]["name"];
     $(".node-data").remove();
     jQuery.each(data_obj[node.id], function(number) {
         if (data_obj[node.id][number].type != undefined){
@@ -346,9 +482,14 @@ function showNodeDetails(node){
     //                            $( "#node-details").append("<p>" + parse_type(data_obj[node.id][number].type) + " - " + data_obj[node.id][number].url +  "</p>");
         }
     });
-    $(".node-name").text(message);
-    $(".node-edit-link").attr("href", "/edit/" + names_obj[node.id]["location"]);
+    $(".node-name").text(names_obj[node.id]["name"]);
 
+    var renamer = createNodeRenameCallback(node);
+
+    $(".node-name").unbind( "click");
+    $(".node-name").bind( "click", renamer );
+
+    $(".node-edit-link").attr("href", "/edit/" + names_obj[node.id]["location"]);
 
         var node_number = ids_arr.indexOf(node.id);
         for(var i=0; i<edges_arr[node_number].length; i++) {
@@ -389,6 +530,17 @@ function showNodeDetails(node){
           modal: true,
           buttons: {
             Ok: function() {
+
+/*
+                var node_name = $("#node-name-input").val();
+        var metadata = $.extend({}, unit_edit.model.get('metadata'));
+
+        metadata.display_name = names_obj[origin_node]["name"];
+        metadata.direct_term = JSON.stringify(edges_arr[origin_node_number]);
+
+        $(".graph_string").html(JSON.stringify(edges_arr));
+        ajax_save_item(names_obj[origin_node]["location"], metadata);
+*/
                 $( this ).dialog( "close" );
             },
             "Новое ребро": function() {
@@ -483,7 +635,7 @@ document.onmousemove = function (e) {
 
                 var node_form;
                 var vertex_text;
-                color = (has_capa)? "#ffd700" : "#808080";
+                color = (has_capa)? "#ffd700" : Raphael.getColor();
 
                 if (has_video){
                     var x = 15*node_size;
@@ -678,116 +830,13 @@ var layouter;
         renderer.draw();
     };
 
-    add_node = function() {
-
-        var new_node_name = 'Новый элемент этого графа';
-
-        $("#node-name-input").val(new_node_name);
-        $( "#add-new-node" ).dialog({
-            modal: true,
-            width:'auto',
-            buttons: {
-                Ok: function() {
-                    new_node_name = $("#node-name-input").val();
-                    console.log($("#node-name-input").val());
-            $.ajax({
-                url: "/create_item",
-                type: "POST",
-                headers: {
-                    'X-CSRFToken': getCookie('csrftoken')
-                },
-                data: {
-                    'parent_location': $(".parent-location").text(),
-                    'category': 'vertical',
-                    'display_name': new_node_name
-                },
-                success : function(answer){
-
-//                    var location = jQuery.parseJSON(answer)["id"];
-                    var location = answer["id"];
-
-//                    var location = "i4x://Org/101/vertical/something" + 100*Math.random();
-                    var i = location.lastIndexOf("/");
-                    var node_id = location.slice(i+1);
-                    g.addNode(node_id, { label : hideRestOfString(new_node_name), render : render} );
-                    ids_arr.push(node_id);
-                    edges_arr.push([]);
-                    names_obj[node_id] = {
-                        "name" : new_node_name,
-                        "location" : location,
-                        "coords_x" : 0,
-                        "coords_y" : 0};
-//                        "coords_x" : "None",
-//                        "coords_y" : "None"};
-                    data_obj[node_id] = [];
-
-                    renderer.draw()
-
-//                    raphael_nodes[node_id].dx = 0;
-                    window.setTimeout(function(){
-                            raphael_nodes[node_id].set.translate(mouse_x, mouse_y);
-                            renderer.enableDragingMode();
-                            renderer.isDrag = raphael_nodes[node_id];
-                        },1000);
-
-//                    g.drawNode(g.nodes[g.nodes.length - 1]);
-
-                }
-            });
-                    $( this ).dialog( "close" );
-                }
-            }
-        })
-
-
-
-//            renderer.drawNode(g.nodes[ids_arr.length - 1]);
-
-/*        $.when(renderer.draw()).done(function(){ */
-
-
-
-//                console.log(raphael_nodes[node_id].set.getBBox().height );
-//                console.log(node_height );
-
-//                    raphael_nodes[node_id].dx = mouse_x + width;
-//                    console.log();
-//                    raphael_nodes[node_id].dx = mouse_x + $('#canvas').offset().left;
-//                    raphael_nodes[node_id].dy = mouse_y + $('#canvas').offset().top;
-
-
-//                    raphael_nodes[node_id].dy = mouse_y + $('#canvas').offset().top;
-//                    renderer.isDrag = raphael_nodes["938fbca07e994db893abc2c2ad810d68"];
-//                    raphael_nodes["938fbca07e994db893abc2c2ad810d68"].dx = mouse_x + 700;
-//                    raphael_nodes["938fbca07e994db893abc2c2ad810d68"].dy = mouse_y - 250;
-
-//        });
-
-
-
-/*
-
-        raphael_nodes["938fbca07e994db893abc2c2ad810d68"].dx = mouse_x - 50;
-
-//        $("#node_" + node_id).attr();
-
-//                    tmp = raphael_nodes[node_id];
-//                    setTimeout("tmp.dy = mouse_y - 50", 100);
-
-
-//                    raphael_nodes[node_id].dx = 300;
-//                    raphael_nodes[node_id].dy = 300;
-                    console.log(mouse_y);
-                    console.log(raphael_nodes[node_id]);
-*/
-    };
 
     hide_red_edges = function() {
 
         for(var i = 0; i < g.edges.length; i++) {
             if (g.edges[i].color == "#F00"){
                 g.edges[i].hide();
-                console.log(g.edges[i]);
+//                console.log(g.edges[i]);
             }
         }
 

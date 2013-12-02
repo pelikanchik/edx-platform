@@ -67,8 +67,13 @@
     <p class="parent-location" style="display:none">${subsection.location}</p>
 
 <div style="display:none">
+    <div id="rename-node" title="Изменить название">
+        <input id="node-rename-input" data-bind='value: value, valueUpdate: "afterkeydown"'/>
+    </div>
     <div id="node-details" title="Подробности">
+
         <p class = "node-name" >Название</p>
+
         <a class="node-edit-link" href="#">(открыть в редакторе)</a>
         <hr align="center" width="auto" size="1" color="#000000" />
         <div id="node-content">
@@ -120,7 +125,6 @@
 </div>
 
 <div id="canvas"></div>
-<button id="new_node" onclick="add_node();">New Node</button>
 <button id="random_redraw" onclick="redraw();">redraw</button>
 <button id="save" onclick="save_layout();">save</button>
 <button id="load" onclick="load_layout();">load</button>
