@@ -452,7 +452,7 @@ function createNodeRenameCallback( node){
                     });
                     var metadata = $.extend({}, unit_edit.model.get('metadata'));
 
-                    metadata.display_name = node_name ;
+                    metadata.display_name = node_name;
                     ajax_save_item(names_obj[node.id]["location"], metadata);
 
                     renderer.renameNode(node, node_name)
@@ -667,12 +667,17 @@ document.onmousemove = function (e) {
                     push(node_form).
                     push(vertex_text);
 
-                shape.items.forEach(function(item){
-                    item.node.onclick = function(){
-                        if (add_edge_mode) bindNewEdgeTo(node_form, node);
-                        if (!renderer.getDragingMode()) show_details();
-                    };
-                });
+                var renamer = createNodeRenameCallback(node);
+//                vertex_text.node.ondblclick = renamer;
+
+                node_form.node.onclick = function(){
+                    if (add_edge_mode) bindNewEdgeTo(node_form, node);
+                    if (!renderer.getDragingMode()) show_details();
+                };
+                vertex_text.node.onclick = function(){
+                    if (add_edge_mode) bindNewEdgeTo(node_form, node);
+                        else renamer();
+                };
 
                 raphael_nodes[node.id] = node_form;
 //                console.log(ellipse);
