@@ -172,8 +172,7 @@ class @Sequence
 
   godynamo: (event) =>
     event.preventDefault()
-
-    modx_full_url = @modx_url + '/' + @id + "/dynamo"
+    modx_full_url = @ajaxUrl + '/dynamo'
     $.postWithPrefix modx_full_url, (response) =>
       new_position = response.position
       Logger.log "seq_godynamo", old: @position, new: new_position, id: @id

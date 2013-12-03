@@ -445,7 +445,7 @@ def index(request, course_id, chapter=None, section=None,
            # context['content'] = section_module.runtime.render(section_module, None, 'student_view').content
 
             if not is_section_unlocked:
-                context['fragment'] = 'This subsection is not available for you'
+                context['fragment'] = Fragment(content=render_to_string( 'course_not_available.html',{'a':"a"}))
             else:
                 # remove this if works fine
                 #context['fragment'] = section_module.runtime.render(section_module, None, 'student_view').content
