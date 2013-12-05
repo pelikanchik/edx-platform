@@ -184,7 +184,7 @@ class WeightedSubsectionsGrader(CourseGrader):
             subgrade_result = subgrader.grade(grade_sheet, generate_random_scores)
            #subgrade_result = 20
             weighted_percent = subgrade_result['percent'] * weight
-            section_detail = u"{0} = {1:.1%} of a possible {2:.0%}".format(category.encode("utf-8"), weighted_percent, weight)
+            section_detail = u"{0} = {1:.1%} of a possible {2:.0%}".format(category, weighted_percent, weight)
 
             total_percent += weighted_percent
             section_breakdown += subgrade_result['section_breakdown']
@@ -290,8 +290,8 @@ class AssignmentFormatGrader(CourseGrader):
         self.show_only_average = show_only_average
         self.starting_index = starting_index
         self.hide_average = hide_average
-        self.section_type = self.section_type.encode("utf-8")
-        self.short_label = self.short_label.encode("utf-8")
+        self.section_type = self.section_type
+        self.short_label = self.short_label
     def grade(self, grade_sheet, generate_random_scores=False):
         def total_with_drops(breakdown, drop_count):
             '''calculates total score for a section while dropping lowest scores'''
@@ -324,7 +324,7 @@ class AssignmentFormatGrader(CourseGrader):
                 else:
                     earned = scores[i].earned
                     possible = scores[i].possible
-                    section_name = scores[i].section.encode("utf-8")
+                    section_name = scores[i].section
 
                 percentage = earned / float(possible)
                 summary_format = u"{section_type} {index} - {name} - {percent:.0%} ({earned:.3n}/{possible:.3n})"
