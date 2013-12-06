@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
-
+"""
+Student Views
+"""
 import datetime
 import feedparser
 import json
@@ -16,6 +18,7 @@ from django.contrib.auth import logout, authenticate, login
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import password_reset_confirm
+# from django.contrib.sessions.models import Session
 from django.core.cache import cache
 from django.core.context_processors import csrf
 from django.core.mail import send_mail
@@ -255,11 +258,16 @@ def register_user(request, extra_context=None):
     """
     This view will display the non-modal registration form
     """
-    if request.user.is_authenticated():
+    try:
+        is_demo = UserProfile.objects.get(user=request.user).is_demo
+    except:
+        is_demo = False
+    if request.user.is_authenticated() and not is_demo:
         return redirect(reverse('dashboard'))
 
     context = {
         'course_id': request.GET.get('course_id'),
+        'is_demo': is_demo,
         'enrollment_action': request.GET.get('enrollment_action')
     }
     if extra_context is not None:
@@ -297,7 +305,7 @@ def complete_course_mode_info(course_id, enrollment):
 @ensure_csrf_cookie
 def dashboard(request):
     user = request.user
-
+    profile = UserProfile.objects.get(user=user)
     # Build our (course, enrollment) list for the user, but ignore any courses that no
     # longer exist (because the course IDs have changed). Still, we don't delete those
     # enrollments, because it could have been a data push snafu.
@@ -313,7 +321,7 @@ def dashboard(request):
 
     message = ""
     if not user.is_active:
-        message = render_to_string('registration/activate_account_notice.html', {'email': user.email})
+        message = render_to_string('registration/activate_account_notice.html', {'email': user.email, 'is_demo': profile.is_demo})
 
     # Global staff can see what courses errored on their dashboard
     staff_access = False
@@ -354,6 +362,7 @@ def dashboard(request):
     context = {'course_enrollment_pairs': course_enrollment_pairs,
                'course_optouts': course_optouts,
                'message': message,
+               'is_demo': profile.is_demo,
                'external_auth_map': external_auth_map,
                'staff_access': staff_access,
                'errored_courses': errored_courses,
@@ -472,6 +481,44 @@ def try_change_enrollment(request):
                 return enrollment_response.content
         except Exception, e:
             log.exception("Exception automatically enrolling after login: {0}".format(str(e)))
+
+
+
+def demo_register(request):
+
+    if request.method != "POST":
+        raise Http404
+
+    username = "u_" + "".join(random.choice(string.ascii_letters) for x in range(6)) + "_" +  str(int(time.time()))
+    random_value = ''.join(random.choice(string.ascii_letters) for x in range(8))
+
+    post_vars = {
+        "username": username,
+        "email": username + "@pelic.ru",
+        "name":"Demo",
+        "password":random_value,
+        "is_demo":True,
+        "terms_of_service":False,
+        "honor_code":False
+    }
+
+
+
+    _do_create_account(post_vars)
+
+    user = authenticate(username=post_vars['username'], password=post_vars['password'])
+    login(request, user)
+    course_id = request.POST.get("course_id")
+
+    CourseEnrollment.enroll(user, course_id)
+
+    if course_id is None:
+
+        return HttpResponseBadRequest(_("No course ID"))
+
+    return HttpResponse()
+
+    #return redirect(reverse('courseware', args=[course_id]))
 
 
 @require_POST
@@ -657,17 +704,17 @@ def login_user(request, error=""):
 #        log.warning(u"Login failed - password for {0} is invalid".format(email))
 #        return HttpResponse(json.dumps({'success': False,'value': _(u'Введённый e-mail или пароль неверен.')}))
 
-
-    if user is not None and user.is_active:
+    #if user is not None and user.is_active:
+    if user is not None:
         try:
             # We do not log here, because we have a handler registered
             # to perform logging on successful logins.
             login(request, user)
             if request.POST.get('remember') == 'true':
-                request.session.set_expiry(604800)
+                request.session.set_expiry(60*60*24*365)
                 log.debug("Setting user session to never expire")
             else:
-                request.session.set_expiry(0)
+                request.session.set_expiry(60*60*24*365)
         except Exception as e:
             AUDIT_LOG.critical("Login failed - Could not create session. Is memcached running?")
             log.critical("Login failed - Could not create session. Is memcached running?")
@@ -817,6 +864,55 @@ def change_setting(request):
     return HttpResponse(json.dumps({'success': True,
                                     'location': up.location, }))
 
+def _do_update_demo_account(request,post_vars):
+
+    user = request.user
+    user.username = post_vars['username']
+    user.email = post_vars['email']
+    user.is_active = False
+    user.set_password(post_vars['password'])
+
+    registration = Registration()
+
+    try:
+        user.save()
+    except IntegrityError:
+        js = {'success': False}
+        # Figure out the cause of the integrity error
+        if len(User.objects.filter(username=post_vars['username'])) > 0:
+            js['value'] = _("User with username '{username}' already exists.").format(username=post_vars['username'])
+            js['field'] = 'username'
+            return HttpResponse(json.dumps(js))
+
+        if len(User.objects.filter(email=post_vars['email'])) > 0:
+            js['value'] = _("User with email '{email}' already exists.").format(email=post_vars['email'])
+            js['field'] = 'email'
+            return HttpResponse(json.dumps(js))
+
+        raise
+
+    registration.register(user)
+
+    profile = UserProfile.objects.get(user=user)
+    profile.name = post_vars['name']
+    profile.level_of_education = post_vars.get('level_of_education')
+    profile.gender = post_vars.get('gender')
+    profile.mailing_address = post_vars.get('mailing_address')
+    profile.goals = post_vars.get('goals')
+    profile.is_demo = False
+
+    try:
+        profile.year_of_birth = int(post_vars['year_of_birth'])
+    except (ValueError, KeyError):
+        # If they give us garbage, just ignore it instead
+        # of asking them to put an integer.
+        profile.year_of_birth = None
+    try:
+        profile.save()
+    except Exception:
+        log.exception("UserProfile creation failed for user {id}.".format(id=user.id))
+    return (user, profile, registration)
+
 
 def _do_create_account(post_vars):
     """
@@ -858,6 +954,7 @@ def _do_create_account(post_vars):
     profile.gender = post_vars.get('gender')
     profile.mailing_address = post_vars.get('mailing_address')
     profile.goals = post_vars.get('goals')
+    profile.is_demo = int(post_vars.get('is_demo'))
     profile.country = post_vars.get('country')
     profile.city = post_vars.get('city')
     profile.first_name = post_vars.get('first_name')
@@ -866,6 +963,12 @@ def _do_create_account(post_vars):
     profile.company_name = post_vars.get('company_name')
     profile.position = post_vars.get('position')
     profile.name = post_vars['name']
+
+    # Если аккаунт демонстрационный, то генерировать код для активации не нужно
+
+    if not profile.is_demo:
+        print profile.is_demo
+        registration.register(user)
 
     try:
         profile.year_of_birth = int(post_vars['year_of_birth'])
@@ -1012,42 +1115,50 @@ def create_account(request, post_override=None):
         return HttpResponse(json.dumps(js))
 
     # Ok, looks like everything is legit.  Create the account.
-    ret = _do_create_account(post_vars)
+    if int(post_vars['is_demo']) == 0:
+       ret = _do_create_account(post_vars)
+    else:
+       ret = _do_update_demo_account(request, post_vars)
+
+
     if isinstance(ret, HttpResponse):  # if there was an error then return that
         return ret
     (user, profile, registration) = ret
 
-    d = {'name': post_vars['name'],
-         'key': registration.activation_key,
-         }
+    # Если пользователь не демонстрационный, не слать ему письмо с кодом авторизации
+    if not profile.is_demo:
 
-    # composes activation email
-    subject = render_to_string('emails/activation_email_subject.txt', d)
-    # Email subject *must not* contain newlines
-    subject = ''.join(subject.splitlines())
-    message = render_to_string('emails/activation_email.txt', d)
+        d = {'name': post_vars['name'],
+             'key': registration.activation_key,
+             }
 
-    # don't send email if we are doing load testing or random user generation for some reason
-    if not (settings.MITX_FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING')):
-        try:
-            if settings.MITX_FEATURES.get('REROUTE_ACTIVATION_EMAIL'):
-                dest_addr = settings.MITX_FEATURES['REROUTE_ACTIVATION_EMAIL']
-                message = ("Activation for %s (%s): %s\n" % (user, user.email, profile.name) +
-                           '-' * 80 + '\n\n' + message)
-                send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [dest_addr], fail_silently=False)
-            else:
-                _res = user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
-        except:
-            log.warning('Unable to send activation email to user', exc_info=True)
-            js['value'] = _('Could not send activation e-mail.')
-            return HttpResponse(json.dumps(js))
+        # composes activation email
+        subject = render_to_string('emails/activation_email_subject.txt', d)
+        # Email subject *must not* contain newlines
+        subject = ''.join(subject.splitlines())
+        message = render_to_string('emails/activation_email.txt', d)
+
+        # don't send email if we are doing load testing or random user generation for some reason
+        if not (settings.MITX_FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING')):
+            try:
+                if settings.MITX_FEATURES.get('REROUTE_ACTIVATION_EMAIL'):
+                    dest_addr = settings.MITX_FEATURES['REROUTE_ACTIVATION_EMAIL']
+                    message = ("Activation for %s (%s): %s\n" % (user, user.email, profile.name) +
+                               '-' * 80 + '\n\n' + message)
+                    send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [dest_addr], fail_silently=False)
+                else:
+                    _res = user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
+            except:
+                log.warning('Unable to send activation email to user', exc_info=True)
+                js['value'] = _('Could not send activation e-mail.')
+                return HttpResponse(json.dumps(js))
 
     # Immediately after a user creates an account, we log them in. They are only
     # logged in until they close the browser. They can't log in again until they click
     # the activation link from the email.
     login_user = authenticate(username=post_vars['username'], password=post_vars['password'])
     login(request, login_user)
-    request.session.set_expiry(0)
+    request.session.set_expiry(60*60*24*365)
 
     # TODO: there is no error checking here to see that the user actually logged in successfully,
     # and is not yet an active user.

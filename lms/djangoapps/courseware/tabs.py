@@ -22,6 +22,7 @@ from courseware.access import has_access
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from courseware.model_data import FieldDataCache
+from student.models import UserProfile
 
 from open_ended_grading import open_ended_notifications
 
@@ -313,6 +314,9 @@ def get_course_tabs(user, course, active_page, request):
     # shouldn't) know about the details of what tabs are supported, etc.
     validate_tabs(course)
 
+    ENABLED_FOR_DEMO = ['courseware', 'course_info']
+    is_demo = UserProfile.objects.get(user=user).is_demo
+
     tabs = []
 
     if waffle.flag_is_active(request, 'merge_course_tabs'):
@@ -324,6 +328,10 @@ def get_course_tabs(user, course, active_page, request):
         # expect handlers to return lists--handles things that are turned off
         # via feature flags, and things like 'textbook' which might generate
         # multiple tabs.
+
+        if tab['type'] not in ENABLED_FOR_DEMO and (not user.is_authenticated() or is_demo):
+            break
+
         gen = VALID_TAB_TYPES[tab['type']].generator
         tabs.extend(gen(tab, user, course, active_page, request))
 

@@ -35,7 +35,7 @@ urlpatterns = ('',  # nopep8
         name='manage_user_standing'),
     url(r'^accounts/disable_account_ajax$', 'student.views.disable_account_ajax',
         name="disable_account_ajax"),
-
+    url(r'^demo_register$', 'student.views.demo_register', name="demo_register"),
     url(r'^login_ajax$', 'student.views.login_user', name="login"),
     url(r'^login_ajax/(?P<error>[^/]*)$', 'student.views.login_user'),
     url(r'^logout$', 'student.views.logout_user', name='logout'),
@@ -203,8 +203,7 @@ if settings.COURSEWARE_ENABLED:
         # url(r'^save_circuit/(?P<circuit>[^/]*)$', 'circuit.views.save_circuit'),
 
         url(r'^courses/?$', 'branding.views.courses', name="courses"),
-        url(r'^change_enrollment$',
-            'student.views.change_enrollment', name="change_enrollment"),
+        url(r'^change_enrollment$', 'student.views.change_enrollment', name="change_enrollment"),
         url(r'^change_email_settings$', 'student.views.change_email_settings', name="change_email_settings"),
 
         #About the course

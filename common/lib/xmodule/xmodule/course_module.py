@@ -207,6 +207,8 @@ class CourseFields(object):
                                   "Pass": 0.5
                               }},
                           scope=Scope.content)
+    available_for_demo = Boolean(help="Is this course available for demousers", default=False, scope=Scope.settings)
+    show_in_lms = Boolean(help="Whether to show this course in LMS", default=True, scope=Scope.settings)
     show_calculator = Boolean(help="Whether to show the calculator in this course", default=False, scope=Scope.settings)
     display_name = String(help="Display name for this module", default="Empty", display_name="Display Name", scope=Scope.settings)
     show_chat = Boolean(help="Whether to show the chat widget in this course", default=False, scope=Scope.settings)

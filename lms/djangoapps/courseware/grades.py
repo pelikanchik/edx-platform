@@ -470,6 +470,7 @@ def _progress_summary(student, request, course):
                     'url_name': section_module.url_name,
                     'scores': scores,
                     'unlock_term': section_module.unlock_term,
+                    'available_for_demo': section_module.available_for_demo,
                     'section_total': section_total,
                     'format': module_format,
                     'due': section_module.due,

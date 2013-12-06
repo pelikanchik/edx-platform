@@ -18,7 +18,7 @@ from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
 from django.db import transaction
 from markupsafe import escape
-
+from student.models import UserProfile
 from courseware import grades
 from courseware.access import has_access
 from courseware.courses import (get_courses, get_course_with_access,
@@ -113,17 +113,15 @@ def render_accordion(request, course, chapter, section, field_data_cache):
 
     courseware_summary = grades.progress_summary(student, request, course)
 
-    print("<-------------")
-    print(courseware_summary)
-    print("------------->")
-
     # grab the table of contents
     user = User.objects.prefetch_related("groups").get(id=request.user.id)
     request.user = user	# keep just one instance of User
     toc = toc_for_course(user, request, course, chapter, section, field_data_cache)
+    is_demo = UserProfile.objects.get(user=request.user).is_demo
 
     context = dict([('toc', toc),
                     ('course_id', course.id),
+                    ('is_demo', is_demo),
                     ('csrf', csrf(request)['csrf_token']),
                     ('courseware_summary',courseware_summary),
                     ('due_date_display_format', course.due_date_display_format)] + template_imports.items())
@@ -326,7 +324,14 @@ def index(request, course_id, chapter=None, section=None,
     user = User.objects.prefetch_related("groups").get(id=request.user.id)
     request.user = user	# keep just one instance of User
     course = get_course_with_access(user, course_id, 'load', depth=2)
+
+    # Если курс помечен, как непубликуемый в LMS - отправляем на главную страницу
+    if not course.show_in_lms:
+       return redirect('/')
+
+
     staff_access = has_access(user, course, 'staff')
+
     registered = registered_for_course(course, user)
     if not registered:
         # TODO (vshnayder): do course instructors need to be registered to see course?
@@ -424,6 +429,13 @@ def index(request, course_id, chapter=None, section=None,
 
 
             is_section_unlocked = grades.return_section_by_id(section_module.url_name, courseware_summary)['unlocked']
+
+
+
+            #Контент раздела закрыт для демопользователя
+            is_demo = UserProfile.objects.get(user=request.user).is_demo
+            if is_demo and not section_module.available_for_demo:
+                is_section_unlocked = False
 
             # Save where we are in the chapter
             save_child_position(chapter_module, section)
@@ -564,7 +576,7 @@ def jump_to(request, course_id, location):
     else:
         return redirect('courseware_position', course_id=course_id, chapter=chapter, section=section, position=position)
 
-
+@login_required
 @ensure_csrf_cookie
 def course_info(request, course_id):
     """
