@@ -57,7 +57,6 @@ EdgeFactory.prototype = {
         return e;
     }
 };
-
 /*
  * Graph
  */

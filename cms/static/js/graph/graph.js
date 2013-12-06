@@ -637,6 +637,7 @@ document.onmousemove = function (e) {
                 var vertex_text;
                 color = (has_capa)? "#ffd700" : Raphael.getColor();
 
+
                 if (has_video){
                     var x = 15*node_size;
                     var y = 10*node_size;
@@ -652,6 +653,23 @@ document.onmousemove = function (e) {
                     var h = node_form.getBBox().height;
                     vertex_text = r.text(0, h/2 + 10, node.label);
                 }
+
+
+/*                if (true){
+                      //Raphael.fn.hexagon = function(radius, cx, cy) {
+                      var path = ""
+                      var radius = 30*0.5*node_size;
+                      for (var i = 0; i <= 6; i++) {
+                        var a = i * 60,
+                            x = radius * Math.cos(a * Math.PI / 180),
+                            y = radius * Math.sin(a * Math.PI / 180)
+                        path += (i == 0 ? "M" : "L") + x + "," + y
+                      }
+                      path += "Z"
+                      node_form = r.path(path).attr({fill: color, stroke: color, "stroke-width": 2});
+                      vertex_text = r.text(0, radius/2 + 10, node.label);
+                }
+        */
 
                 var show_details = function(){
                     if (!add_edge_mode) showNodeDetails(node);
