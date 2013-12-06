@@ -368,6 +368,98 @@ def dashboard(request):
 
     return render_to_response('dashboard.html', context)
 
+@login_required
+@ensure_csrf_cookie
+def user_info(request):
+    user = request.user
+
+
+    user_obj = User.objects.get(email=user.email)
+    profile = UserProfile.objects.get(user=user_obj)
+    print "\n\n\n\n\n\n"
+    print "-"
+    print profile.name
+    print "-"
+    print profile.level_of_education
+    print "-"
+    print profile.gender
+    print "-"
+    print profile.mailing_address
+    print "-"
+    print profile.goals
+    print "\n\n\n\n\n\n"
+
+    # Build our (course, enrollment) list for the user, but ignore any courses that no
+    # longer exist (because the course IDs have changed). Still, we don't delete those
+    # enrollments, because it could have been a data push snafu.
+    course_enrollment_pairs = []
+    for enrollment in CourseEnrollment.enrollments_for_user(user):
+        try:
+            course_enrollment_pairs.append((course_from_id(enrollment.course_id), enrollment))
+        except ItemNotFoundError:
+            log.error("User {0} enrolled in non-existent course {1}"
+                      .format(user.username, enrollment.course_id))
+
+    course_optouts = Optout.objects.filter(user=user).values_list('course_id', flat=True)
+
+    message = ""
+    if not user.is_active:
+        message = render_to_string('registration/activate_account_notice.html', {'email': user.email})
+
+    # Global staff can see what courses errored on their dashboard
+    staff_access = False
+    errored_courses = {}
+    if has_access(user, 'global', 'staff'):
+        # Show any courses that errored on load
+        staff_access = True
+        errored_courses = modulestore().get_errored_courses()
+
+    show_courseware_links_for = frozenset(course.id for course, _enrollment in course_enrollment_pairs
+                                          if has_access(request.user, course, 'load'))
+
+    course_modes = {course.id: complete_course_mode_info(course.id, enrollment) for course, enrollment in course_enrollment_pairs}
+    cert_statuses = {course.id: cert_info(request.user, course) for course, _enrollment in course_enrollment_pairs}
+
+    # only show email settings for Mongo course and when bulk email is turned on
+    show_email_settings_for = frozenset(
+        course.id for course, _enrollment in course_enrollment_pairs if (
+            settings.MITX_FEATURES['ENABLE_INSTRUCTOR_EMAIL'] and
+            modulestore().get_modulestore_type(course.id) == MONGO_MODULESTORE_TYPE and
+            CourseAuthorization.instructor_email_enabled(course.id)
+        )
+    )
+
+    # Verification Attempts
+    verification_status, verification_msg = SoftwareSecurePhotoVerification.user_status(user)
+
+    show_refund_option_for = frozenset(course.id for course, _enrollment in course_enrollment_pairs
+                                       if _enrollment.refundable())
+
+    # get info w.r.t ExternalAuthMap
+    external_auth_map = None
+    try:
+        external_auth_map = ExternalAuthMap.objects.get(user=user)
+    except ExternalAuthMap.DoesNotExist:
+        pass
+
+    context = {'course_enrollment_pairs': course_enrollment_pairs,
+               'course_optouts': course_optouts,
+               'message': message,
+               'external_auth_map': external_auth_map,
+               'staff_access': staff_access,
+               'errored_courses': errored_courses,
+               'show_courseware_links_for': show_courseware_links_for,
+               'all_course_modes': course_modes,
+               'cert_statuses': cert_statuses,
+               'show_email_settings_for': show_email_settings_for,
+               'verification_status': verification_status,
+               'verification_msg': verification_msg,
+               'show_refund_option_for': show_refund_option_for,
+               'template': "",
+               'profile': profile,
+               }
+
+    return render_to_response('user_info.html', context)
 
 def try_change_enrollment(request):
     """

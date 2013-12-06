@@ -658,6 +658,7 @@ def course_about(request, course_id):
     registration_price = 0
     in_cart = False
     reg_then_add_to_cart_link = ""
+    """
     if (settings.MITX_FEATURES.get('ENABLE_SHOPPING_CART') and
         settings.MITX_FEATURES.get('ENABLE_PAID_COURSE_REGISTRATION')):
         registration_price = CourseMode.min_course_price_for_currency(course_id,
@@ -668,7 +669,7 @@ def course_about(request, course_id):
 
         reg_then_add_to_cart_link = "{reg_url}?course_id={course_id}&enrollment_action=add_to_cart".format(
             reg_url=reverse('register_user'), course_id=course.id)
-
+    """
     return render_to_response('courseware/course_about.html',
                               {'course': course,
                                'registered': registered,
