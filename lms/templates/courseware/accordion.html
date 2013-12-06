@@ -22,11 +22,11 @@
           ${chapter['display_name']}
         </a>
       </h3>
-
     <ul>
       % for section in chapter['sections']:
 
-            % if section['unlocked'] == True:
+
+            % if section['unlocked'] == True and (not is_demo or section['available_for_demo']):
 
           <li class="${'active' if 'active' in section and section['active'] else ''} ${'graded'  if 'graded' in section and section['graded'] else ''}">
             <a href="${reverse('courseware_section', args=[course_id, chapter['url_name'], section['url_name']])}">

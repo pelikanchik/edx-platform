@@ -122,7 +122,7 @@ def subsection_handler(request, tag=None, course_id=None, branch=None, version_g
             (field.name, field.read_from(item))
             for field
             in fields.values()
-            if field.name not in ['display_name', 'start', 'due', 'format'] and field.scope == Scope.settings
+            if field.name not in ['display_name', 'start', 'due', 'format', 'unlock_term', 'available_for_demo'] and field.scope == Scope.settings
         )
 
         sections = modulestore().get_item(course.location, depth=3).get_children()

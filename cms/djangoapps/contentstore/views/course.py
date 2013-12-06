@@ -150,7 +150,10 @@ def course_listing(request):
             ),
             course.display_org_with_default,
             course.display_number_with_default,
-            course.location.name
+            course.location.name,
+            course.available_for_demo,
+            course.show_in_lms,
+            reverse('course_advanced_settings', kwargs={'org' : course.org, 'course' : course.location.course, 'name': course.location.name})
         )
 
     return render_to_response('index.html', {

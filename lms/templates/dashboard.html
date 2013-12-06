@@ -138,13 +138,14 @@
 
 <section class="container dashboard" id="dashboard-main" aria-hidden="false">
 
-  %if message:
+  %if message and not is_demo:
     <section class="dashboard-banner">
       ${message}
     </section>
   %endif
-
-  <section class="profile-sidebar">
+% if user.is_active != 0 or is_demo:
+     % if not is_demo:
+    <section class="profile-sidebar">
     <header class="profile">
       <h1 class="user-name">${ user.username }</h1>
     </header>
@@ -175,8 +176,9 @@
 
       </ul>
     </section>
-
   </section>
+   % endif
+% endif
 
   <section class="my-courses">
     <header>

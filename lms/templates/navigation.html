@@ -23,6 +23,27 @@ except:
     course_id = None
 site_status_msg = get_site_status_msg(course_id)
 %>
+
+<style>
+
+    .need-to-register{
+        background-color:#fffcdd;
+        width: 300px;
+        left:560px;
+        position:absolute;
+        border: 1px solid #c8c8c8;
+        padding: 5px;
+        text-align:center;
+        font:normal 1em/1em Georgia, Cambria, "Times New Roman", Times, serif;
+    }
+
+    .need-to-register a{
+        font:normal 1em/1em Georgia, Cambria, "Times New Roman", Times, serif;
+    }
+
+</style>
+
+
 % if site_status_msg:
 <div class="site-status">
   <div class="inner-wrapper">
@@ -64,6 +85,14 @@ site_status_msg = get_site_status_msg(course_id)
         % endif  
       </%block>
     </ol>
+
+% if user.profile.is_demo:
+    <div class="need-to-register">
+          Для получения полного доступа необходимо пройти <a href="/register">регистрацию</a>
+    </div>
+% endif
+
+
     <ol class="user">
       <li class="primary">
         <a href="${reverse('dashboard')}" class="user-link">
@@ -75,6 +104,9 @@ site_status_msg = get_site_status_msg(course_id)
         <a href="#" class="dropdown" aria-haspopup="true" aria-expanded="false"><span class="sr">${_("More options dropdown")}</span> &#9662;</a>
         <ul class="dropdown-menu" aria-label="More Options" role="menu">
           <%block name="navigation_dropdown_menu_links" >
+         % if user.profile.is_demo:
+            <li><a href="/register"><b>Регистрация</b></a></li>
+         % endif
             <li><a href="${marketing_link('FAQ')}">${_("Help")}</a></li>
           </%block>
           <li role="presentation"><a href="${reverse('logout')}" role="menuitem">${_("Log Out")}</a></li>
