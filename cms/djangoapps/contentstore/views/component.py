@@ -61,13 +61,33 @@ def is_section_exist(section_id, sections):
 
     return False
 
+#def show_graph(request, tag=None, course_id=None, branch=None, version_guid=None, block=None):
 
-def show_graph(request, location):
 
+#def show_graph(request, location):
+def show_graph(request, tag=None, course_id=None, branch=None, version_guid=None, block=None):
+
+    log.error("GRAPH: YOUR TUPLE:")
+    log.error("!!!")
+    log.error(course_id)
+    log.error(branch)
+    log.error(version_guid)
+    log.error(block)
+    #log.error(location)
+    log.error("!!!")
+
+    locator = BlockUsageLocator(course_id=course_id, branch=branch, version_guid=version_guid, usage_id=block)
+    try:
+        old_location, course, item, lms_link = _get_item_in_course(request, locator)
+    except ItemNotFoundError:
+        return HttpResponseBadRequest()
+
+    """
     try:
         item = modulestore().get_item(location, depth=1)
     except ItemNotFoundError:
         return HttpResponseBadRequest()
+    """
 
     # make sure that location references a 'sequential', otherwise return BadRequest
     if item.location.category != 'sequential':
@@ -87,12 +107,25 @@ def subsection_handler(request, tag=None, course_id=None, branch=None, version_g
         html: return html page for editing a subsection
         json: not currently supported
     """
+    log.error("HANDLER: YOUR COURSE_ID:")
+    log.error("!!!")
+    log.error(course_id)
+    log.error(branch)
+    log.error(version_guid)
+    log.error(block)
+    log.error("!!!")
+
+    log.error("!!!IN HANDLER!!!")
     if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
         locator = BlockUsageLocator(course_id=course_id, branch=branch, version_guid=version_guid, usage_id=block)
         try:
             old_location, course, item, lms_link = _get_item_in_course(request, locator)
         except ItemNotFoundError:
             return HttpResponseBadRequest()
+        log.error("old_loc: ")
+        log.error(old_location)
+        log.error("old_item: ")
+        log.error(item)
 
         preview_link = get_lms_link_for_item(old_location, course_id=course.location.course_id, preview=True)
 
