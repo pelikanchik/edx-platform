@@ -1,13 +1,36 @@
-<!doctype html>
-<html style="overflow-y: scroll;">
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<head>
+<%inherit file="base.html" />
+<%!
+  import logging
+  from xmodule.util.date_utils import get_default_time_display, almost_same_datetime
+  from django.utils.translation import ugettext as _
+  from django.core.urlresolvers import reverse
+%>
+<%block name="title">${_("CMS Subsection")}</%block>
+<%block name="bodyclass">is-signedin course view-subsection</%block>
 
-    <script type="text/javascript" src="/static/88d5d94/js/graph/strathausen-dracula-a6a5fa7/js/raphael-min.js"></script>
-    <script type="text/javascript" src="/static/88d5d94/js/graph/strathausen-dracula-a6a5fa7/js/dracula_graffle.js"></script>
-    <script type="text/javascript" src="/static/88d5d94/js/graph/strathausen-dracula-a6a5fa7/js/jquery-1.4.2.min.js"></script>
-    <script type="text/javascript" src="/static/88d5d94/js/graph/strathausen-dracula-a6a5fa7/js/dracula_graph.js"></script>
-    <script type="text/javascript" src="/static/88d5d94/js/graph/graph.js"></script>
+
+<%namespace name="units" file="widgets/units.html" />
+<%namespace name='static' file='static_content.html'/>
+
+<%block name="content">
+
+
+    <script type="text/javascript"
+            src='${static.url("js/graph/strathausen-dracula-a6a5fa7/js/raphael-min.js")}'>
+            </script>
+
+    <script type="text/javascript"
+            src='${static.url("js/graph/strathausen-dracula-a6a5fa7/js/dracula_graffle.js")}'>
+            </script>
+    <script type="text/javascript"
+            src='${static.url("js/graph/strathausen-dracula-a6a5fa7/js/jquery-1.4.2.min.js")}'></script>
+
+    <script type="text/javascript"
+            src='${static.url("js/graph/strathausen-dracula-a6a5fa7/js/dracula_graph.js")}'></script>
+
+    <script type="text/javascript"
+            src='${static.url("js/graph/graph.js" )}'></script>
+
     <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
     <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
     <script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
@@ -15,8 +38,7 @@
             jQuery UI 1.10.3 has a bug when dragging makes dialog window jump to the bottom of screen.
             So it is advisable to use version 1.10.2 before it is fixed.
          --->
-</head>
-<body>
+
 
 <!--- Костыль: я не умею получать тип модуля, поэтому я выдираю его, используя особенности форматирования вывода -->
 <!--- Возможно, стоит добавить всем модулям нужный метод -->
@@ -52,7 +74,6 @@
 </div>
 
 <div id="canvas"></div>
-<button id="redraw" onclick="redraw();">Redraw</button>
+<button id="redraw" onclick = 'redraw();'>Redraw</button>
 
-</body>
-</html>
+</%block>
