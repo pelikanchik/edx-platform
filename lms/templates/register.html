@@ -13,7 +13,10 @@
 <%! from datetime import date %>
 <%! import calendar %>
 
-<%block name="title"><title>${_("Register for {platform_name}").format(platform_name=settings.PLATFORM_NAME)}</title></%block>
+
+
+<%block name="title"><title>${settings.PLATFORM_NAME} | Регистрация</title></%block>
+
 
 <%block name="js_extra">
   <script type="text/javascript">
@@ -85,7 +88,33 @@
           html(gettext('Processing your account information &hellip;'));
       }
     }
+
+   $('#first_name, #last_name, #middle_name').bind('keyup', function(e) {
+        var full_name = $( "#last_name").val() + " " + $( "#first_name").val() + " " + $("#middle_name").val();
+        $( "#name").val(full_name);
+
+   });
+
   </script>
+
+  <script type="text/javascript">
+        $('#company_name').change(function () {
+            var c_name = $('#company_name').val();
+            if (c_name == "ot"){
+               document.getElementById('position_text').style.display = "block";
+               document.getElementById('position').style.display = "none";
+               document.getElementById('position_text').value = "";
+            }
+            if (c_name == "as"){
+              document.getElementById('position_text').style.display = "none";
+              document.getElementById('position').style.display = "block";
+            }
+          });
+        $("#position").change(function () {
+            var pos=$('#position').val();
+            document.getElementById('position_text').value = pos;
+        });
+    </script>
 </%block>
 
 <section class="introduction">
@@ -141,6 +170,63 @@
             <input id="name" type="text" name="name" value="" placeholder="${_('example: Jane Doe')}" required aria-required="true" aria-describedby="name-tip" />
             <span class="tip tip-input" id="name-tip">${_("Needed for any certificates you may earn")}</span>
           </li>
+
+          <li class="field required text" id="field-last_name">
+            <label for="last_name">Фамилия</label>
+            <input id="last_name" type="text" name="last_name" value="" placeholder="например: Бэггинс" />
+          </li>
+
+          <li class="field required text" id="field-first_name">
+            <label for="first_name">Имя</label>
+            <input id="first_name" type="text" name="first_name" value="" placeholder="например: Фродо" />
+          </li>
+
+          <li class="field required text" id="field-middle_name">
+            <label for="middle_name">Отчество</label>
+            <input id="middle_name" type="text" name="middle_name" value="" placeholder="например: Бильбович" />
+          </li>
+
+           <li class="field required text" id="field-country">
+
+              <label for="country">Страна</label>
+              <select id="country" name="country">
+                %for code, country in UserProfile.COUNTRIES:
+                <option value="${code}"
+
+                        %if code == "RU":
+                              selected
+                        %endif
+
+                        >${country}</option>
+                %endfor
+              </select>
+
+            </li>
+
+
+            <li class="field required text" id="field-city">
+               <label for="city">Город</label>
+               <input type="text" id="city" name="city" value="" placeholder="например: Москва" />
+            </li>
+            <li class="field required text" id="field-company_name">
+               <label for="company_name">Компания</label>
+                  <select id="company_name" name="company_name">
+                    %for code, company in UserProfile.COMPANY_NAMES:
+                    <option value="${code}">${company}</option>
+                    %endfor
+                  </select>
+            </li>
+            <li class="field required text" id="field-position">
+               <label for="position">Должность</label>
+                  <select id="position" name="position">
+                    %for code, position in UserProfile.POSITION_NAMES:
+                    <option value="${code}">${position}</option>
+                    %endfor
+                  </select>
+                <input id="position_text" type="text" name="position" style="display:none" value="" placeholder="например: Эффективный менеджер"/>
+            </li>
+
+
         </ol>
 
         % else:
@@ -167,6 +253,8 @@
             <span class="tip tip-input" id="id="username-tip>${_('Will be shown in any discussions or forums you participate in')} <strong>(${_('cannot be changed later')})</strong></span>
           </li>
 
+
+
           % if ask_for_fullname:
 
           <li class="field required text" id="field-name">
@@ -176,6 +264,8 @@
           </li>
 
           % endif
+
+
 
         </ol>
 
@@ -222,8 +312,11 @@
                 <option value="${year}">${year}</option>
                 %endfor
               </select>
+
             </div>
             % endif
+
+
           </li>
         </ol>
       </div>
