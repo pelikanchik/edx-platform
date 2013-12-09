@@ -656,16 +656,25 @@ class Registration(models.Model):
 
     def register(self, user):
         # MINOR TODO: Switch to crypto-secure key
-        self.activation_key = uuid.uuid4().hex
-        self.user = user
 
-        # было: self.save().
-        # Но в таком виде не работал перевод статуса из демонстрационного в полноправного пользователя - ругался на id
-        # если всплывёт какая-нибудь ошибка - сделать разделение:
-        # self.user.save() - для перевода из демостатуса,
-        # self.save() - для регистрации нового пользователя
+        try:
+            # для перевода из демостатуса,
+            previous_registration = Registration.objects.get(user_id=user.id)
 
-        self.user.save()
+            self.activation_key = previous_registration.activation_key
+            self.user = user
+            self.user.save()
+            print "has previous registration"
+
+        except:
+            # для регистрации нового пользователя
+            self.activation_key = uuid.uuid4().hex
+            self.user = user
+            self.save()
+            print "new registration"
+
+
+
 
     def activate(self):
         self.user.is_active = True

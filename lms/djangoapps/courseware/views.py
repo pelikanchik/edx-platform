@@ -321,9 +321,19 @@ def index(request, course_id, chapter=None, section=None,
 
      - HTTPresponse
     """
+
     user = User.objects.prefetch_related("groups").get(id=request.user.id)
     request.user = user	# keep just one instance of User
-    course = get_course_with_access(user, course_id, 'load', depth=2)
+
+    # Если пользователь не активен - отправляем на главную страницу
+
+    if not user.is_active and not user.profile.is_demo:
+        return redirect('/')
+
+    try:
+        course = get_course_with_access(user, course_id, 'load', depth=2)
+    except:
+        return redirect('/')
 
     # Если курс помечен, как непубликуемый в LMS - отправляем на главную страницу
     if not course.show_in_lms:
