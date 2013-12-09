@@ -2,6 +2,8 @@
 """
 Convenience methods for working with datetime objects
 """
+from __future__ import absolute_import
+
 from datetime import timedelta
 from django.utils.translation import ugettext as _
 
