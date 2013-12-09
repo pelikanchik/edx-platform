@@ -8,6 +8,7 @@ import logging
 import os
 import re
 import requests
+import openpyxl
 
 from collections import defaultdict, OrderedDict
 from functools import partial
@@ -35,7 +36,7 @@ from bulk_email.models import CourseEmail, CourseAuthorization
 from courseware import grades
 from courseware.access import has_access
 from courseware.courses import get_course_with_access, get_cms_course_link
-from courseware.roles import CourseStaffRole, CourseInstructorRole, CourseBetaTesterRole
+from courseware.roles import CourseStaffRole, CourseInstructorRole, CourseBetaTesterRole, GlobalStaff
 from courseware.models import StudentModule
 from django_comment_common.models import (Role,
                                           FORUM_ROLE_ADMINISTRATOR,
@@ -60,6 +61,14 @@ from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 from django.utils.translation import ugettext as _u
 from lms.lib.xblock.runtime import handler_prefix
+
+from openpyxl.style import Fill, Color, Border
+from openpyxl import Workbook
+from datetime import datetime
+from courseware.model_data import FieldDataCache
+from courseware.module_render import get_module
+from HTMLParser import HTMLParser
+
 
 log = logging.getLogger(__name__)
 
@@ -142,6 +151,74 @@ def instructor_dashboard(request, course_id):
             writer.writerow(encoded_row)
         return response
 
+    def return_xlsx(fn, datatable, fp=None):
+        def set_border(ws, row_num, column_num, style):
+            for i in range(row_num):
+                for j in range(column_num):
+                    c = ws.cell(row=i, column=j)
+                    c.style.borders.top.border_style = style
+                    c.style.borders.bottom.border_style = style
+                    c.style.borders.left.border_style = style
+                    c.style.borders.right.border_style = style
+
+        Color.Correct = 'def0d8'
+        Color.Incorrect = 'f2dedf'
+        Color.Header = 'f5f59e'
+
+        if fp is None:
+            response = HttpResponse(mimetype='text/csv')
+            response['Content-Disposition'] = 'attachment; filename={0}'.format(fn)
+        else:
+            response = fp
+        wb = Workbook()
+        ws = wb.get_active_sheet()
+
+        set_border(ws, len(datatable['data']) + 1, sum(datatable['col_size']), Border.BORDER_THIN)
+        cur_column = 0
+        for i, h in enumerate(datatable['header']):
+            ws.merge_cells(start_row=0, start_column=cur_column, end_row=0, end_column=cur_column+datatable['col_size'][i] - 1)
+            c = ws.cell(row=0, column=cur_column)
+            cur_column += datatable['col_size'][i]
+            c.value = h
+            c.style.fill.fill_type = Fill.FILL_SOLID
+            c.style.fill.start_color.index = openpyxl.style.Color.Header
+
+        signs = set([u'>', u'<', u'='])
+        for i, datarow in enumerate(datatable['data'], start=1):
+            cur_column = 0
+            for j, data in enumerate(datarow):
+                if type(data) == list:
+                    for k, item in enumerate(data):
+                        c = ws.cell(row=i, column=cur_column)
+                        cur_column += 1
+                        if len(item) != 0:
+                            if item[0] in signs:
+                                c.value = '\"' + item[0] + '\"'
+                            else:
+                                c.value = item[0]
+                            c.style.fill.fill_type = Fill.FILL_SOLID
+                            if item[1] == 'correct':
+                                c.style.fill.start_color.index = openpyxl.style.Color.Correct
+                            elif item[1] == 'incorrect':
+                                c.style.fill.start_color.index = openpyxl.style.Color.Incorrect
+                        else:
+                            c.value = ' '
+                else:
+                    c = ws.cell(row=i, column=cur_column)
+                    cur_column +=1
+                    c.value = data
+
+        ws.column_dimensions["A"].width = 5
+        ws.column_dimensions["B"].width = 5
+        ws.column_dimensions["C"].width = 15
+        ws.column_dimensions["D"].width = 15
+        ws.column_dimensions["E"].width = 15
+        wb.save(response)
+        return response
+
+
+
+
     def get_module_url(urlname):
         """
         Construct full URL for a module from its urlname.
@@ -178,6 +255,68 @@ def instructor_dashboard(request, course_id):
             student = None
             msg += "<font color='red'>Couldn't find student with that email or username.  </font>"
         return msg, student
+
+
+    # returns OrderedDict(), where a key is question id and a value is None
+    # if problem type sorting or choisegroup the value will be dict of answers' ids and answers' texts
+    def get_questions_id(problem_html):
+        beg_ind = 0
+        end_ind = 0
+        question_num = problem_html.count('name=\"input_') # total questions count
+        questions_id = OrderedDict()
+        parser = HTMLParser()
+
+        for i in range(question_num):
+            beg_ind = problem_html.find('name=\"input_', beg_ind) + len('name=\"input_')
+            span_ind = problem_html.rfind('<span>', 0, beg_ind)
+            if problem_html.find('class=\"text-input-dynamath', span_ind, beg_ind) > 0:
+                end_ind = problem_html.find('_', beg_ind)
+                end_ind = problem_html.find('_', end_ind + 1)
+                q = problem_html[beg_ind:end_ind]
+                questions_id[q] = None
+
+            elif problem_html.find('class=\"sorting', span_ind, beg_ind) > 0:
+                end_ind = problem_html.find('_', beg_ind)
+                end_ind = problem_html.find('_', end_ind + 1)
+                q = problem_html[beg_ind:end_ind]
+                end_ind = problem_html.find('\"', beg_ind)
+                answer_id = problem_html[beg_ind:end_ind]
+                beg_ind = problem_html.rfind('<li>', span_ind, beg_ind) + len('<li>')
+                end_ind = problem_html.find('<section', beg_ind)
+                answer_text = parser.unescape(problem_html[beg_ind:end_ind])
+                if q in questions_id:
+                    questions_id[q][answer_id] = answer_text
+                else:
+                    questions_id[q] = {answer_id:answer_text}
+                    questions_id[q]['sorting'] = True
+                end_ind = problem_html.find('</section>', beg_ind)
+
+            elif problem_html.find('class=\"choicegroup', span_ind, beg_ind) > 0:
+                end_ind = problem_html.find('_', beg_ind)
+                end_ind = problem_html.find('_', end_ind + 1)
+                q = problem_html[beg_ind:end_ind]
+                beg_ind = problem_html.find('value=\"', end_ind) + len('value=\"')
+                end_ind = problem_html.find('\"', beg_ind)
+                choise_id = problem_html[beg_ind:end_ind]
+                beg_ind = problem_html.find('/>', end_ind) + len('/>')
+                end_ind = problem_html.find('\n', beg_ind)
+                choise_text = parser.unescape(problem_html[beg_ind:end_ind])
+                if q in questions_id:
+                    questions_id[q][choise_id] = choise_text
+                else:
+                    questions_id[q] = {choise_id:choise_text}
+                    questions_id[q]['choicegroup'] = True
+
+            else:
+                end_ind = problem_html.find('_', beg_ind)
+                end_ind = problem_html.find('_', end_ind + 1)
+                q = problem_html[beg_ind:end_ind]
+                questions_id[q] = None
+            beg_ind = end_ind
+
+        return questions_id
+
+
 
     # process actions from form POST
     action = request.POST.get('action', '')
@@ -544,109 +683,271 @@ def instructor_dashboard(request, course_id):
             datatable['title'] = 'Student state for problem %s' % problem_to_dump
             return return_csv('student_state_from_%s.csv' % problem_to_dump, datatable)
 
-    elif 'Dump of all responses to problem' in action:
+    elif 'Dump of all responses to problem' in action or 'Download XLSX of all responses to problem' in action:
         log.debug(action)
         problem_to_dump = request.POST.get('problem_to_dump', '')
 
-        if problem_to_dump[-4:] == ".xml":
-            problem_to_dump = problem_to_dump[:-4]
         try:
             (org, course_name, _) = course_id.split("/")
             module_state_key = "i4x://" + org + "/" + course_name + "/problem/" + problem_to_dump
             smdat = StudentModule.objects.filter(course_id=course_id,
                                                  module_state_key=module_state_key)
             smdat = smdat.order_by('student')
+            problem_descriptor = modulestore().get_item(module_state_key, depth=1)
             msg += "Found %d records to dump " % len(smdat)
         except Exception as err:
-            msg += "<font color='red'>Couldn't find module with that urlname.  </font>"
-            msg += "<pre>%s</pre>" % escape(err)
+            error_msg = 'Failed while getting StudentModule for the course: {0}, the state: {1}'.format(course_id, module_state_key)
+            error_msg += 'Error: {0}'.format(err)
+            log.debug(error_msg)
             smdat = []
 
         if smdat:
-            datatable = {'header': ['ID', 'Username', 'Full Name', 'E-mail',
-                                    'Tries', 'Seed', 'Student Answer']}
-            datatable['data'] = []
+            datatable = {'header': ['ID', 'Demo', 'Username', 'Full Name', 'E-mail',
+                                    'Tries', 'Seed', 'Student Answer'], 'data':[], 'col_size':[]}
+
+            model_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+                course_id,
+                request.user,
+                problem_descriptor
+            )
+            problem = get_module(request.user, request, module_state_key, model_data_cache, course_id)
+            try:
+                problem_html = problem.lcp.get_html()
+            except Exception as err:
+                problem_html = ''
+
+            datatable['col_size'] = [1] * (len(datatable['header']) - 1)
+            questions_id = get_questions_id(problem_html)
+            datatable['col_size'].append(len(questions_id))
+
             for i in smdat:
                 data = json.loads(i.state)
-                answers = ''
+                if i.student.profile.is_demo:
+                    datarow = [i.student.id, int(i.student.profile.is_demo), "", i.student.profile.name, ""]
+                else:
+                    datarow = [i.student.id, int(i.student.profile.is_demo), i.student.username, i.student.profile.name, i.student.email]
                 try:
+                    datarow.append(data['attempts'])
+                #student didnt answer the question
+                except KeyError:
+                    datarow.append(0)
+                try:
+                    datarow.append(data['seed'])
+                except KeyError:
+                    datarow.append('')
+                try: #trying to get sudent's answers if there are
                     answers = {}
                     for j in data['student_answers'].keys():
                         found = j.find('_dynamath')
-                        if found != -1:
-                            answers[j[:found]] = str(data['student_answers'][j].encode('utf-8'))
+                        if found > 0:
+                            tmp = j.find('_')
+                            key = j[:j.find('_', tmp + 1)]
+                            if 'Dump of all responses to problem' in action:
+                                correctness = data['correct_map'][j[:found]]['correctness']
+                                answers[key] = {j[:found]:[data['student_answers'][j].encode('utf-8'), correctness]}
+                                answers['dynamath'] = True
                         else:
-                            if j not in answers:
-                                answers[j] = str(data['student_answers'][j].encode('utf-8'))
-                    answers_str = ''
-                    for key in answers.keys():
-                        answers_str += answers[key] + ', '
-                    datarow = [i.student.id, i.student.username, i.student.profile.name, i.student.email]
-                    datarow += [data['attempts'], data['seed'], answers_str[:-2]]
-                except KeyError:
-                    continue
-                datatable['data'].append(datarow)
-            datatable['title'] = 'Student state for problem %s' % problem_to_dump
+                            tmp = j.find('_')
+                            key = j[:j.find('_', tmp + 1)]
+                            if key not in answers:
+                                if data['student_answers'][j] == '':
+                                    answers[key] = {j:[]}
+                                else:
+                                    correctness = data['correct_map'][j]['correctness']
+                                    answers[key] = {j:[data['student_answers'][j], correctness]}
+                            elif j not in answers[key]:
+                                answers[key][j] = [data['student_answers'][j], correctness]
 
-    elif "Dump of section results" in action:
+                    answers = OrderedDict(sorted(answers.items(), key=lambda t: t[0]))
+                    answers_list = []
+
+                    for q in questions_id.keys():
+                        if q in answers:
+                            if questions_id[q] != None:
+                                if 'sorting' in questions_id[q]:
+                                    sorted_asnwers = {}
+                                    for item in answers[q].items():
+                                        sorted_asnwers[int(item[1][0])] = questions_id[q][item[0]]
+                                    sorted_asnwers = OrderedDict(sorted(sorted_asnwers.items(), key=lambda t: t[0]))
+                                    answers_str = ''
+                                    for value in sorted_asnwers.values():
+                                        answers_str += value + ' | '
+                                    answers_list.append([answers_str[:-3], answers[q].values()[0][1]])
+                                elif 'choicegroup' in questions_id[q]:
+                                    for value in answers[q].values():
+                                        answers_str = ''
+                                        if type(value[0]) == list:
+                                            for choise in value[0]:
+                                                answers_str += questions_id[q][choise] + ' | '
+                                            answers_list.append([answers_str[:-3], value[1]])
+                                        else:
+                                            answers_list.append([questions_id[q][value[0]], value[1]])
+                            else:
+                                for value in answers[q].values():
+                                    answers_list.append(value)
+                        else:
+                            answers_list.append([])
+                    datarow.append(answers_list)
+
+                except KeyError: #student didnt answer the question
+                    datarow.append([[]] * len(questions_id))
+
+                datatable['data'].append(datarow)
+            problem_name = problem_descriptor.display_name_with_default.encode('utf-8')
+            datatable['title'] = 'Student state for problem {0} ({1})'.format(problem_name, problem_to_dump)
+            datatable['data'] = sorted(datatable['data'], key=lambda row: row[1])
+
+
+            if 'Download XLSX of all responses to problem' in action:
+                t = datetime.now()
+                file_name = '{0}{1}{2}_{3}_{4}_{5}.xlsx'.format(t.year, t.month, t.day, t.hour, t.minute, problem_name)
+                return return_xlsx(file_name, datatable)
+
+    elif "Dump of section results" in action or 'Download XLSX of all responses to section' in action:
         log.debug(action)
         section_to_dump = request.POST.get('section_to_dump', '')
         (org, course_name, _) = course_id.split("/")
         location = "i4x://" + org + "/" + course_name + "/sequential/" + section_to_dump
         try:
-            item = modulestore().get_item(location, depth=1)
+            section = modulestore().get_item(location, depth=1)
         except (ItemNotFoundError, InvalidLocationError):
             return HttpResponseBadRequest()
         units = [
             modulestore().get_item(component.location.url(), depth=1)
             for component
-            in item.get_children()
+            in section.get_children()
         ]
+
         problems_urls = []
         for unit in units:
             for component in unit.get_children():
                 if component.category == 'problem':
                     problems_urls.append(component.location.url())
 
-        datatable = {'header': ['ID', 'Username', 'Full Name', 'E-mail']}
+        datatable = {'header': ['ID', 'Demo', 'Username', 'Full Name', 'E-mail'], 'data':[], 'col_size':[]}
         datatable['header'] += ["Task %d" % num for num in range(1, len(problems_urls) + 1)]
+        datatable['col_size'] = [1] * len(datatable['header'])
+
         enrolled_students = User.objects.filter(
             courseenrollment__course_id=course_id,
             courseenrollment__is_active=1,
         ).prefetch_related("groups").order_by('username')
+        try:
+            enrolled_students = User.objects.filter(
+                courseenrollment__course_id=course_id,
+                courseenrollment__is_active=1,
+            ).prefetch_related("groups").order_by('username')
+        except Exception as err:
+            error_msg = 'Failed while getting enrolled students for the course: {0}'.format(course_id)
+            error_msg += 'Error: {0}'.format(err)
+            log.debug(error_msg)
+
         msg += "Found %d records to dump " % len(enrolled_students)
-        datarow = []
+        problems_html = {}
+        questions_id_for_problem = {}
+        for problem_url in problems_urls:
+            try:
+                problem_descriptor = modulestore().get_item(problem_url, depth=1)
+            except Exception as err:
+                log.debug(err)
+            model_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+                course_id,
+                request.user,
+                problem_descriptor
+            )
+            problem = get_module(request.user, request, problem_url, model_data_cache, course_id)
+
+            try:
+                problems_html[problem_url] = problem.lcp.get_html()
+            except Exception as err:
+                problems_html[problem_url] = ''
+
+            questions_id_for_problem[problem_url] = get_questions_id(problems_html[problem_url])
+            datatable['col_size'].append(len(questions_id_for_problem[problem_url]))
+
         for student in enrolled_students:
-            datasubrow = [student.id, student.username, student.profile.name, student.email]
-            for problem in problems_urls:
+
+            if student.profile.is_demo:
+                datarow = [student.id, int(student.profile.is_demo), "", student.profile.name, ""]
+            else:
+                datarow = [student.id, int(student.profile.is_demo), student.username, student.profile.name, student.email]
+            for problem_url in problems_urls:
                 try:
                     smdat = StudentModule.objects.get(student=student, 
                                                       course_id=course_id,
-                                                      module_state_key=problem)
+                                                      module_state_key=problem_url)
                 except Exception as err:
-                    smdat = None
+                    smdat = []
                 if smdat:
                     data = json.loads(smdat.state)
-                    try:
+                    try: #trying to get sudent's answers if there are
                         answers = {}
                         for j in data['student_answers'].keys():
                             found = j.find('_dynamath')
-                            if found != -1:
-                                answers[j[:found]] = str(data['student_answers'][j].encode('utf-8'))
+                            if found > 0:
+                                tmp = j.find('_')
+                                key = j[:j.find('_', tmp + 1)]
+                                if 'Dump of section results' in action:
+                                    correctness = data['correct_map'][j[:found]]['correctness']
+                                    answers[key] = {j[:found]:[data['student_answers'][j].encode('utf-8'), correctness]}
                             else:
-                                if j not in answers:
-                                    answers[j] = str(data['student_answers'][j].encode('utf-8'))
-                        answers_str = ''
-                        for key in answers.keys():
-                            answers_str += answers[key] + ', '
-                        datasubrow.append(answers_str[:-2])
-                    except KeyError:
-                        datasubrow.append('')
+                                tmp = j.find('_')
+                                key = j[:j.find('_', tmp + 1)]
+                                if key not in answers:
+                                    if data['student_answers'][j] == '':
+                                        answers[key] = {j:[]}
+                                    else:
+                                        correctness = data['correct_map'][j]['correctness']
+                                        answers[key] = {j:[data['student_answers'][j], correctness]}
+                                elif j not in answers[key]:
+                                    answers[key][j] = [data['student_answers'][j], correctness]
+
+                        answers = OrderedDict(sorted(answers.items(), key=lambda t: t[0]))
+
+                        questions_id = questions_id_for_problem[problem_url]
+                        cur_html = problems_html[problem_url]
+                        answers_list = []
+                        for q in questions_id.keys():
+                            if q in answers:
+                                if questions_id[q] != None:
+                                    if 'sorting' in questions_id[q]:
+                                        sorted_asnwers = {}
+                                        for item in answers[q].items():
+                                            sorted_asnwers[int(item[1][0])] = questions_id[q][item[0]]
+                                        sorted_asnwers = OrderedDict(sorted(sorted_asnwers.items(), key=lambda t: t[0]))
+                                        answers_str = ''
+                                        for value in sorted_asnwers.values():
+                                            answers_str += value + ' | '
+                                        answers_list.append([answers_str[:-3], answers[q].values()[0][1]])
+                                    elif 'choicegroup' in questions_id[q]:
+                                        for value in answers[q].values():
+                                            answers_str = ''
+                                            if type(value[0]) == list:
+                                                for choise in value[0]:
+                                                    answers_str += questions_id[q][choise] + ' | '
+                                                answers_list.append([answers_str[:-3], value[1]])
+                                            else:
+                                                answers_list.append([questions_id[q][value[0]], value[1]])
+                                else:
+                                    for value in answers[q].values():
+                                        answers_list.append(value)
+
+                            else:
+                                answers_list.append([])
+                        datarow.append(answers_list)
+                    except KeyError: #student didnt answer the question
+                        datarow.append([[]] * len(questions_id_for_problem[problem_url]))
                 else:
-                    datasubrow.append('')
-            datarow.append(datasubrow)
-        datatable['data'] = datarow
-        datatable['title'] = 'Students state for section %s' % section_to_dump                          
+                    datarow.append([[]] * len(questions_id_for_problem[problem_url]))
+            datatable['data'].append(datarow)
+        section_name = section.display_name_with_default.encode('utf-8')
+        datatable['title'] = 'Students state for section {0} ({1})'.format(section_name, section_to_dump)
+        datatable['data'] = sorted(datatable['data'], key=lambda row: row[1])
+
+        if 'Download XLSX of all responses to section' in action:
+            t = datetime.now()
+            file_name = '{0}{1}{2}_{3}_{4}_{5}.xlsx'.format(t.year, t.month, t.day, t.hour, t.minute, section_name)
+            return return_xlsx(file_name, datatable)
             
     elif 'Download CSV of all student anonymized IDs' in action:
         students = User.objects.filter(
@@ -919,6 +1220,8 @@ def instructor_dashboard(request, course_id):
     #----------------------------------------
     # context for rendering
 
+    sections = course.get_children()
+
     context = {
         'course': course,
         'staff_access': True,
@@ -945,7 +1248,8 @@ def instructor_dashboard(request, course_id):
         'cohorts_ajax_url': reverse('cohorts', kwargs={'course_id': course_id}),
 
         'analytics_results': analytics_results,
-        'disable_buttons': disable_buttons
+        'disable_buttons': disable_buttons,
+        'sections' : sections
     }
 
     if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BETA_DASHBOARD'):
@@ -1212,7 +1516,7 @@ def get_student_grade_summary_data(request, course, course_id, get_grades=True, 
         courseenrollment__is_active=1,
     ).prefetch_related("groups").order_by('username')
 
-    header = ['ID', 'Username', 'Full Name', 'edX email', 'External email']
+    header = ['ID', 'Demo','Username', 'Full Name', 'edX email', 'External email']
     assignments = []
     if get_grades and enrolled_students.count() > 0:
         # just to construct the header
@@ -1228,7 +1532,10 @@ def get_student_grade_summary_data(request, course, course_id, get_grades=True, 
     data = []
 
     for student in enrolled_students:
-        datarow = [student.id, student.username, student.profile.name, student.email]
+        if student.profile.is_demo:
+            datarow = [student.id, int(student.profile.is_demo), "", student.profile.name, ""]
+        else:
+            datarow = [student.id, int(student.profile.is_demo), student.username, student.profile.name, student.email]
         try:
             datarow.append(student.externalauthmap.external_email)
         except:  # ExternalAuthMap.DoesNotExist
@@ -1247,6 +1554,7 @@ def get_student_grade_summary_data(request, course, course_id, get_grades=True, 
 
         data.append(datarow)
     datatable['data'] = data
+    datatable['data'] = sorted(datatable['data'], key=lambda row: row[1])
     return datatable
 
 #-----------------------------------------------------------------------------
