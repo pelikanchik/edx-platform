@@ -29,7 +29,7 @@ site_status_msg = get_site_status_msg(course_id)
     .need-to-register{
         background-color:#fffcdd;
         width: 300px;
-        left:560px;
+        left:45%;
         position:absolute;
         border: 1px solid #c8c8c8;
         padding: 5px;
@@ -103,7 +103,7 @@ site_status_msg = get_site_status_msg(course_id)
       <li class="primary">
         <a href="${reverse('user_info')}" class="user-link">
           <span class="avatar"></span>
-          <span class="sr">${_("Dashboard for:")} </span> ${user.username}
+          <span class="sr">${_("Dashboard for:")} </span> ${user.profile.name}
         </a>
       </li>
       <li class="primary">
