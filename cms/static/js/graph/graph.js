@@ -489,7 +489,23 @@ function showNodeDetails(node){
     $(".node-name").unbind( "click");
     $(".node-name").bind( "click", renamer );
 
-    $(".node-edit-link").attr("href", "/edit/" + names_obj[node.id]["location"]);
+    $(".node-edit-link").
+        attr("href", "/vertex/edit/" + names_obj[node.id]["location"]).
+        fancybox({
+            width         : '60%',
+            height        : '80%',
+            autoScale     : false,
+            autoSize      : false,
+            autoDimensions: false,
+            fitToView     : false,
+            type          : 'iframe',
+    //            hideOnOverlayClick:false,
+    //            hideOnContentClick:false,
+            closeClick: false,
+            helpers     : {
+                overlay : {closeClick: false} // prevents closing when clicking OUTSIDE fancybox
+            }
+        })
 
         var node_number = ids_arr.indexOf(node.id);
         for(var i=0; i<edges_arr[node_number].length; i++) {
@@ -639,7 +655,8 @@ document.onmousemove = function (e) {
 
                 var node_form;
                 var vertex_text;
-                color = (has_capa)? "#ffd700" : Raphael.getColor();
+                color = (has_capa)? "#ffd700" : "#080808";
+                //color = (has_capa)? "#ffd700" : Raphael.getColor();
 
 
                 if (has_video){

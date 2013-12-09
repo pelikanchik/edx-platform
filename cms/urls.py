@@ -19,6 +19,9 @@ urlpatterns = ('',  # nopep8
     # graph
     url(r'^graph/subsection/(?P<location>.*?)$', 'contentstore.views.show_graph', name='show_graph'),
 
+    # a lite edit: for vertices in graph
+    url(r'^vertex/edit/(?P<location>.*?)$', 'contentstore.views.edit_unit_lite', name='edit_unit_lite'),
+
     url(r'^preview_component/(?P<location>.*?)$', 'contentstore.views.preview_component', name='preview_component'),
     url(r'^save_item$', 'contentstore.views.save_item', name='save_item'),
     url(r'^delete_item$', 'contentstore.views.delete_item', name='delete_item'),

@@ -508,6 +508,27 @@ p, ul, ol, dl {
   width: 70%;
 }
 
+.edit-lite {
+  .main-wrapper {
+    margin: 0 0 0 0px;
+  }
+
+  .inner-wrapper {
+    @include clearfix();
+    position: relative;
+    max-width: 1280px;
+
+    > article {
+      clear: both;
+    }
+  }
+
+  .main-column {
+    width: 100%;
+  }
+}
+
+
 .sidebar {
   float: right;
   width: 28%;

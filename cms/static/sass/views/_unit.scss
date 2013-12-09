@@ -7,6 +7,13 @@ body.course.unit {
     margin-top: ($baseline*2);
   }
 
+  .edit-lite {
+    .main-wrapper {
+      margin-top: 0;
+    }
+  }
+
+
   //Problem Selector tab menu requirements
   .js .tabs .tab {
    display: none;
