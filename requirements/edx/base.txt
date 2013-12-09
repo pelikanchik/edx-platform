@@ -70,6 +70,7 @@ South==0.7.6
 sympy==0.7.1
 xmltodict==0.4.1
 django-ratelimit-backend==0.6
+openpyxl
 
 # Used for debugging
 ipython==0.13.1
