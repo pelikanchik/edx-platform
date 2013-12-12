@@ -2,10 +2,11 @@ from datetime import datetime
 import pytz
 import logging
 import smtplib
+import unicodecsv
 
 from model_utils.managers import InheritanceManager
 from collections import namedtuple
-from boto.exception import BotoServerError  # this is a super-class of SESError and catches connection errors
+from boto.exception import BotoServerError # this is a super-class of SESError and catches connection errors
 
 from django.dispatch import receiver
 from django.db import models
@@ -40,17 +41,17 @@ ORDER_STATUSES = (
 )
 
 # we need a tuple to represent the primary key of various OrderItem subclasses
-OrderItemSubclassPK = namedtuple('OrderItemSubclassPK', ['cls', 'pk'])  # pylint: disable=C0103
+OrderItemSubclassPK = namedtuple('OrderItemSubclassPK', ['cls', 'pk']) # pylint: disable=C0103
 
 
 class Order(models.Model):
     """
-    This is the model for an order.  Before purchase, an Order and its related OrderItems are used
-    as the shopping cart.
-    FOR ANY USER, THERE SHOULD ONLY EVER BE ZERO OR ONE ORDER WITH STATUS='cart'.
-    """
+This is the model for an order. Before purchase, an Order and its related OrderItems are used
+as the shopping cart.
+FOR ANY USER, THERE SHOULD ONLY EVER BE ZERO OR ONE ORDER WITH STATUS='cart'.
+"""
     user = models.ForeignKey(User, db_index=True)
-    currency = models.CharField(default="usd", max_length=8)  # lower case ISO currency codes
+    currency = models.CharField(default="usd", max_length=8) # lower case ISO currency codes
     status = models.CharField(max_length=32, default='cart', choices=ORDER_STATUSES)
     purchase_time = models.DateTimeField(null=True, blank=True)
     # Now we store data needed to generate a reasonable receipt
@@ -63,7 +64,7 @@ class Order(models.Model):
     bill_to_state = models.CharField(max_length=8, blank=True)
     bill_to_postalcode = models.CharField(max_length=16, blank=True)
     bill_to_country = models.CharField(max_length=64, blank=True)
-    bill_to_ccnum = models.CharField(max_length=8, blank=True)  # last 4 digits
+    bill_to_ccnum = models.CharField(max_length=8, blank=True) # last 4 digits
     bill_to_cardtype = models.CharField(max_length=32, blank=True)
     # a JSON dump of the CC processor response, for completeness
     processor_reply_dump = models.TextField(blank=True)
@@ -71,8 +72,8 @@ class Order(models.Model):
     @classmethod
     def get_cart_for_user(cls, user):
         """
-        Always use this to preserve the property that at most 1 order per user has status = 'cart'
-        """
+Always use this to preserve the property that at most 1 order per user has status = 'cart'
+"""
         # find the newest element in the db
         try:
             cart_order = cls.objects.filter(user=user, status='cart').order_by('-id')[:1].get()
@@ -84,9 +85,9 @@ class Order(models.Model):
     @classmethod
     def user_cart_has_items(cls, user):
         """
-        Returns true if the user (anonymous user ok) has
-        a cart with items in it.  (Which means it should be displayed.
-        """
+Returns true if the user (anonymous user ok) has
+a cart with items in it. (Which means it should be displayed.
+"""
         if not user.is_authenticated():
             return False
         cart = cls.get_cart_for_user(user)
@@ -95,42 +96,42 @@ class Order(models.Model):
     @property
     def total_cost(self):
         """
-        Return the total cost of the cart.  If the order has been purchased, returns total of
-        all purchased and not refunded items.
-        """
-        return sum(i.line_cost for i in self.orderitem_set.filter(status=self.status))  # pylint: disable=E1101
+Return the total cost of the cart. If the order has been purchased, returns total of
+all purchased and not refunded items.
+"""
+        return sum(i.line_cost for i in self.orderitem_set.filter(status=self.status)) # pylint: disable=E1101
 
     def has_items(self):
         """
-        Does the cart have any items in it?
-        """
-        return self.orderitem_set.exists()  # pylint: disable=E1101
+Does the cart have any items in it?
+"""
+        return self.orderitem_set.exists() # pylint: disable=E1101
 
     def clear(self):
         """
-        Clear out all the items in the cart
-        """
+Clear out all the items in the cart
+"""
         self.orderitem_set.all().delete()
 
     def purchase(self, first='', last='', street1='', street2='', city='', state='', postalcode='',
                  country='', ccnum='', cardtype='', processor_reply_dump=''):
         """
-        Call to mark this order as purchased.  Iterates through its OrderItems and calls
-        their purchased_callback
+Call to mark this order as purchased. Iterates through its OrderItems and calls
+their purchased_callback
 
-        `first` - first name of person billed (e.g. John)
-        `last` - last name of person billed (e.g. Smith)
-        `street1` - first line of a street address of the billing address (e.g. 11 Cambridge Center)
-        `street2` - second line of a street address of the billing address (e.g. Suite 101)
-        `city` - city of the billing address (e.g. Cambridge)
-        `state` - code of the state, province, or territory of the billing address (e.g. MA)
-        `postalcode` - postal code of the billing address (e.g. 02142)
-        `country` - country code of the billing address (e.g. US)
-        `ccnum` - last 4 digits of the credit card number of the credit card billed (e.g. 1111)
-        `cardtype` - 3-digit code representing the card type used (e.g. 001)
-        `processor_reply_dump` - all the parameters returned by the processor
+`first` - first name of person billed (e.g. John)
+`last` - last name of person billed (e.g. Smith)
+`street1` - first line of a street address of the billing address (e.g. 11 Cambridge Center)
+`street2` - second line of a street address of the billing address (e.g. Suite 101)
+`city` - city of the billing address (e.g. Cambridge)
+`state` - code of the state, province, or territory of the billing address (e.g. MA)
+`postalcode` - postal code of the billing address (e.g. 02142)
+`country` - country code of the billing address (e.g. US)
+`ccnum` - last 4 digits of the credit card number of the credit card billed (e.g. 1111)
+`cardtype` - 3-digit code representing the card type used (e.g. 001)
+`processor_reply_dump` - all the parameters returned by the processor
 
-        """
+"""
         if self.status == 'purchased':
             return
         self.status = 'purchased'
@@ -166,19 +167,19 @@ class Order(models.Model):
         })
         try:
             send_mail(subject, message,
-                      settings.DEFAULT_FROM_EMAIL, [self.user.email])  # pylint: disable=E1101
-        except (smtplib.SMTPException, BotoServerError):  # sadly need to handle diff. mail backends individually
-            log.error('Failed sending confirmation e-mail for order %d', self.id)  # pylint: disable=E1101
+                      settings.DEFAULT_FROM_EMAIL, [self.user.email]) # pylint: disable=E1101
+        except (smtplib.SMTPException, BotoServerError): # sadly need to handle diff. mail backends individually
+            log.error('Failed sending confirmation e-mail for order %d', self.id) # pylint: disable=E1101
 
     def generate_receipt_instructions(self):
         """
-        Call to generate specific instructions for each item in the order.  This gets displayed on the receipt
-        page, typically.  Instructions are something like "visit your dashboard to see your new courses".
-        This will return two things in a pair.  The first will be a dict with keys=OrderItemSubclassPK corresponding
-        to an OrderItem and values=a set of html instructions they generate.  The second will be a set of de-duped
-        html instructions
-        """
-        instruction_set = set([])  # heh. not ia32 or alpha or sparc
+Call to generate specific instructions for each item in the order. This gets displayed on the receipt
+page, typically. Instructions are something like "visit your dashboard to see your new courses".
+This will return two things in a pair. The first will be a dict with keys=OrderItemSubclassPK corresponding
+to an OrderItem and values=a set of html instructions they generate. The second will be a set of de-duped
+html instructions
+"""
+        instruction_set = set([]) # heh. not ia32 or alpha or sparc
         instruction_dict = {}
         order_items = OrderItem.objects.filter(order=self).select_subclasses()
         for item in order_items:
@@ -190,12 +191,12 @@ class Order(models.Model):
 
 class OrderItem(models.Model):
     """
-    This is the basic interface for order items.
-    Order items are line items that fill up the shopping carts and orders.
+This is the basic interface for order items.
+Order items are line items that fill up the shopping carts and orders.
 
-    Each implementation of OrderItem should provide its own purchased_callback as
-    a method.
-    """
+Each implementation of OrderItem should provide its own purchased_callback as
+a method.
+"""
     objects = InheritanceManager()
     order = models.ForeignKey(Order, db_index=True)
     # this is denormalized, but convenient for SQL queries for reports, etc. user should always be = order.user
@@ -205,8 +206,10 @@ class OrderItem(models.Model):
     qty = models.IntegerField(default=1)
     unit_cost = models.DecimalField(default=0.0, decimal_places=2, max_digits=30)
     line_desc = models.CharField(default="Misc. Item", max_length=1024)
-    currency = models.CharField(default="usd", max_length=8)  # lower case ISO currency codes
+    currency = models.CharField(default="usd", max_length=8) # lower case ISO currency codes
     fulfilled_time = models.DateTimeField(null=True)
+    # general purpose field, not user-visible. Used for reporting
+    report_comments = models.TextField(default="")
 
     @property
     def line_cost(self):
@@ -216,11 +219,11 @@ class OrderItem(models.Model):
     @classmethod
     def add_to_order(cls, order, *args, **kwargs):
         """
-        A suggested convenience function for subclasses.
+A suggested convenience function for subclasses.
 
-        NOTE: This does not add anything to the cart. That is left up to the
-        subclasses to implement for themselves
-        """
+NOTE: This does not add anything to the cart. That is left up to the
+subclasses to implement for themselves
+"""
         # this is a validation step to verify that the currency of the item we
         # are adding is the same as the currency of the order we are adding it
         # to
@@ -231,9 +234,9 @@ class OrderItem(models.Model):
     @transaction.commit_on_success
     def purchase_item(self):
         """
-        This is basically a wrapper around purchased_callback that handles
-        modifying the OrderItem itself
-        """
+This is basically a wrapper around purchased_callback that handles
+modifying the OrderItem itself
+"""
         self.purchased_callback()
         self.status = 'purchased'
         self.fulfilled_time = datetime.now(pytz.utc)
@@ -241,64 +244,124 @@ class OrderItem(models.Model):
 
     def purchased_callback(self):
         """
-        This is called on each inventory item in the shopping cart when the
-        purchase goes through.
-        """
+This is called on each inventory item in the shopping cart when the
+purchase goes through.
+"""
         raise NotImplementedError
 
     def generate_receipt_instructions(self):
         """
-        This is called on each item in a purchased order to generate receipt instructions.
-        This should return a list of `ReceiptInstruction`s in HTML string
-        Default implementation is to return an empty set
-        """
+This is called on each item in a purchased order to generate receipt instructions.
+This should return a list of `ReceiptInstruction`s in HTML string
+Default implementation is to return an empty set
+"""
         return self.pk_with_subclass, set([])
+
+    @classmethod
+    def purchased_items_btw_dates(cls, start_date, end_date):
+        """
+Returns a QuerySet of the purchased items between start_date and end_date inclusive.
+"""
+        return cls.objects.filter(
+            status="purchased",
+            fulfilled_time__gte=start_date,
+            fulfilled_time__lt=end_date,
+        )
+
+    @classmethod
+    def csv_purchase_report_btw_dates(cls, filelike, start_date, end_date):
+        """
+Outputs a CSV report into "filelike" (a file-like python object, such as an actual file, an HttpRequest,
+or sys.stdout) of purchased items between start_date and end_date inclusive.
+Opening and closing filelike (if applicable) should be taken care of by the caller
+"""
+        items = cls.purchased_items_btw_dates(start_date, end_date).order_by("fulfilled_time")
+
+        writer = unicodecsv.writer(filelike, encoding="utf-8")
+        writer.writerow(OrderItem.csv_report_header_row())
+
+        for item in items:
+            writer.writerow(item.csv_report_row)
+
+    @classmethod
+    def csv_report_header_row(cls):
+        """
+Returns the "header" row for a csv report of purchases
+"""
+        return [
+            "Purchase Time",
+            "Order ID",
+            "Status",
+            "Quantity",
+            "Unit Cost",
+            "Total Cost",
+            "Currency",
+            "Description",
+            "Comments"
+        ]
+
+    @property
+    def csv_report_row(self):
+        """
+Returns an array which can be fed into csv.writer to write out one csv row
+"""
+        return [
+            self.fulfilled_time,
+            self.order_id, # pylint: disable=no-member
+            self.status,
+            self.qty,
+            self.unit_cost,
+            self.line_cost,
+            self.currency,
+            self.line_desc,
+            self.report_comments,
+        ]
 
     @property
     def pk_with_subclass(self):
         """
-        Returns a named tuple that annotates the pk of this instance with its class, to fully represent
-        a pk of a subclass (inclusive) of OrderItem
-        """
+Returns a named tuple that annotates the pk of this instance with its class, to fully represent
+a pk of a subclass (inclusive) of OrderItem
+"""
         return OrderItemSubclassPK(type(self), self.pk)
 
     @property
     def single_item_receipt_template(self):
         """
-        The template that should be used when there's only one item in the order
-        """
+The template that should be used when there's only one item in the order
+"""
         return 'shoppingcart/receipt.html'
 
     @property
     def single_item_receipt_context(self):
         """
-        Extra variables needed to render the template specified in
-        `single_item_receipt_template`
-        """
+Extra variables needed to render the template specified in
+`single_item_receipt_template`
+"""
         return {}
 
     @property
     def additional_instruction_text(self):
         """
-        Individual instructions for this order item.
+Individual instructions for this order item.
 
-        Currently, only used for e-mails.
-        """
+Currently, only used for e-mails.
+"""
         return ''
 
 
 class PaidCourseRegistration(OrderItem):
     """
-    This is an inventory item for paying for a course registration
-    """
+This is an inventory item for paying for a course registration
+"""
     course_id = models.CharField(max_length=128, db_index=True)
     mode = models.SlugField(default=CourseMode.DEFAULT_MODE_SLUG)
 
     @classmethod
     def contained_in_order(cls, order, course_id):
         """
-        Is the course defined by course_id contained in the order?
-        """
+Is the course defined by course_id contained in the order?
+"""
         return course_id in [item.paidcourseregistration.course_id
                              for item in order.orderitem_set.all().select_subclasses("paidcourseregistration")]
 
@@ -306,14 +369,14 @@ class PaidCourseRegistration(OrderItem):
     @transaction.commit_on_success
     def add_to_order(cls, order, course_id, mode_slug=CourseMode.DEFAULT_MODE_SLUG, cost=None, currency=None):
         """
-        A standardized way to create these objects, with sensible defaults filled in.
-        Will update the cost if called on an order that already carries the course.
+A standardized way to create these objects, with sensible defaults filled in.
+Will update the cost if called on an order that already carries the course.
 
-        Returns the order item
-        """
+Returns the order item
+"""
         # First a bunch of sanity checks
         try:
-            course = course_from_id(course_id)  # actually fetch the course to make sure it exists, use this to
+            course = course_from_id(course_id) # actually fetch the course to make sure it exists, use this to
                                                 # throw errors if it doesn't
         except ItemNotFoundError:
             log.error("User {} tried to add non-existent course {} to cart id {}"
@@ -345,13 +408,13 @@ class PaidCourseRegistration(OrderItem):
 
         item, created = cls.objects.get_or_create(order=order, user=order.user, course_id=course_id)
         item.status = order.status
-
         item.mode = course_mode.slug
         item.qty = 1
         item.unit_cost = cost
         item.line_desc = 'Registration for Course: {0}'.format(course.display_name_with_default)
         item.currency = currency
         order.currency = currency
+        item.report_comments = item.csv_report_comments
         order.save()
         item.save()
         log.info("User {} added course registration {} to cart: order {}"
@@ -360,11 +423,11 @@ class PaidCourseRegistration(OrderItem):
 
     def purchased_callback(self):
         """
-        When purchased, this should enroll the user in the course.  We are assuming that
-        course settings for enrollment date are configured such that only if the (user.email, course_id) pair is found
-        in CourseEnrollmentAllowed will the user be allowed to enroll.  Otherwise requiring payment
-        would in fact be quite silly since there's a clear back door.
-        """
+When purchased, this should enroll the user in the course. We are assuming that
+course settings for enrollment date are configured such that only if the (user.email, course_id) pair is found
+in CourseEnrollmentAllowed will the user be allowed to enroll. Otherwise requiring payment
+would in fact be quite silly since there's a clear back door.
+"""
         try:
             course_loc = CourseDescriptor.id_to_location(self.course_id)
             course_exists = modulestore().has_item(self.course_id, course_loc)
@@ -379,36 +442,61 @@ class PaidCourseRegistration(OrderItem):
         CourseEnrollment.enroll(user=self.user, course_id=self.course_id, mode=self.mode)
 
         log.info("Enrolled {0} in paid course {1}, paid ${2}"
-                 .format(self.user.email, self.course_id, self.line_cost))  # pylint: disable=E1101
+                 .format(self.user.email, self.course_id, self.line_cost)) # pylint: disable=E1101
 
     def generate_receipt_instructions(self):
         """
-        Generates instructions when the user has purchased a PaidCourseRegistration.
-        Basically tells the user to visit the dashboard to see their new classes
-        """
+Generates instructions when the user has purchased a PaidCourseRegistration.
+Basically tells the user to visit the dashboard to see their new classes
+"""
         notification = (_('Please visit your <a href="{dashboard_link}">dashboard</a> to see your new enrollments.')
                         .format(dashboard_link=reverse('dashboard')))
 
         return self.pk_with_subclass, set([notification])
 
+    @property
+    def csv_report_comments(self):
+        """
+Tries to fetch an annotation associated with the course_id from the database. If not found, returns u"".
+Otherwise returns the annotation
+"""
+        try:
+            return PaidCourseRegistrationAnnotation.objects.get(course_id=self.course_id).annotation
+        except PaidCourseRegistrationAnnotation.DoesNotExist:
+            return u""
+
+
+class PaidCourseRegistrationAnnotation(models.Model):
+    """
+A model that maps course_id to an additional annotation. This is specifically needed because when Stanford
+generates report for the paid courses, each report item must contain the payment account associated with a course.
+And unfortunately we didn't have the concept of a "SKU" or stock item where we could keep this association,
+so this is to retrofit it.
+"""
+    course_id = models.CharField(unique=True, max_length=128, db_index=True)
+    annotation = models.TextField(null=True)
+
+    def __unicode__(self):
+        return u"{} : {}".format(self.course_id, self.annotation)
+
 
 class CertificateItem(OrderItem):
     """
-    This is an inventory item for purchasing certificates
-    """
+This is an inventory item for purchasing certificates
+"""
     course_id = models.CharField(max_length=128, db_index=True)
     course_enrollment = models.ForeignKey(CourseEnrollment)
     mode = models.SlugField()
 
-    @receiver(unenroll_done)
+    @receiver(unenroll_done, sender=CourseEnrollment)
     def refund_cert_callback(sender, course_enrollment=None, **kwargs):
         """
-        When a CourseEnrollment object calls its unenroll method, this function checks to see if that unenrollment
-        occurred in a verified certificate that was within the refund deadline.  If so, it actually performs the
-        refund.
+When a CourseEnrollment object calls its unenroll method, this function checks to see if that unenrollment
+occurred in a verified certificate that was within the refund deadline. If so, it actually performs the
+refund.
 
-        Returns the refunded certificate on a successful refund; else, it returns nothing.
-        """
+Returns the refunded certificate on a successful refund; else, it returns nothing.
+"""
 
         # Only refund verified cert unenrollments that are within bounds of the expiration date
         if not course_enrollment.refundable():
@@ -418,12 +506,10 @@ class CertificateItem(OrderItem):
         try:
             target_cert = target_certs[0]
         except IndexError:
-            log.error("Matching CertificateItem not found while trying to refund.  User %s, Course %s", course_enrollment.user, course_enrollment.course_id)
+            log.error("Matching CertificateItem not found while trying to refund. User %s, Course %s", course_enrollment.user, course_enrollment.course_id)
             return
         target_cert.status = 'refunded'
         target_cert.save()
-        target_cert.order.status = 'refunded'
-        target_cert.order.save()
 
         order_number = target_cert.order_id
         # send billing an email so they can handle refunding
@@ -449,24 +535,27 @@ class CertificateItem(OrderItem):
     @transaction.commit_on_success
     def add_to_order(cls, order, course_id, cost, mode, currency='usd'):
         """
-        Add a CertificateItem to an order
+Add a CertificateItem to an order
 
-        Returns the CertificateItem object after saving
+Returns the CertificateItem object after saving
 
-        `order` - an order that this item should be added to, generally the cart order
-        `course_id` - the course that we would like to purchase as a CertificateItem
-        `cost` - the amount the user will be paying for this CertificateItem
-        `mode` - the course mode that this certificate is going to be issued for
+`order` - an order that this item should be added to, generally the cart order
+`course_id` - the course that we would like to purchase as a CertificateItem
+`cost` - the amount the user will be paying for this CertificateItem
+`mode` - the course mode that this certificate is going to be issued for
 
-        This item also creates a new enrollment if none exists for this user and this course.
+This item also creates a new enrollment if none exists for this user and this course.
 
-        Example Usage:
-            cart = Order.get_cart_for_user(user)
-            CertificateItem.add_to_order(cart, 'edX/Test101/2013_Fall', 30, 'verified')
+Example Usage:
+cart = Order.get_cart_for_user(user)
+CertificateItem.add_to_order(cart, 'edX/Test101/2013_Fall', 30, 'verified')
 
-        """
+"""
         super(CertificateItem, cls).add_to_order(order, course_id, cost, currency=currency)
-        course_enrollment = CourseEnrollment.get_or_create_enrollment(order.user, course_id)
+        try:
+            course_enrollment = CourseEnrollment.objects.get(user=order.user, course_id=course_id)
+        except ObjectDoesNotExist:
+            course_enrollment = CourseEnrollment.create_enrollment(order.user, course_id, mode=mode)
 
         # do some validation on the enrollment mode
         valid_modes = CourseMode.modes_for_course_dict(course_id)
@@ -495,8 +584,8 @@ class CertificateItem(OrderItem):
 
     def purchased_callback(self):
         """
-        When purchase goes through, activate and update the course enrollment for the correct mode
-        """
+When purchase goes through, activate and update the course enrollment for the correct mode
+"""
         try:
             verification_attempt = SoftwareSecurePhotoVerification.active_for_user(self.course_enrollment.user)
             verification_attempt.submit()
@@ -505,7 +594,8 @@ class CertificateItem(OrderItem):
                 "Could not submit verification attempt for enrollment {}".format(self.course_enrollment)
             )
 
-        self.course_enrollment.change_mode(self.mode)
+        self.course_enrollment.mode = self.mode
+        self.course_enrollment.save()
         self.course_enrollment.activate()
 
     @property

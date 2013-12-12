@@ -49,7 +49,6 @@ def marketing_link(name):
         log.warning("Cannot find corresponding link for name: {name}".format(name=name))
         return '#'
 
-
 def marketing_link_context_processor(request):
     """
     A django context processor to give templates access to marketing URLs
