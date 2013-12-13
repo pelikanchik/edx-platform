@@ -33,6 +33,11 @@ site_status_msg = get_site_status_msg(course_id)
 % endif
 </%block>
 
+  <script type="text/javascript">
+        $(function(){
+            $(".cta.cta-register").attr("redirect",window.location.href);
+          });
+    </script>
 
 % if course:
   <header class="global slim" aria-label="${_('Global Navigation')}">

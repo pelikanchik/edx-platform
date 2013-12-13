@@ -69,10 +69,14 @@ CONTENTSTORE = {
 }
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': ENV_ROOT / "db" / "mitx.db",
-    }
+        "default": {
+            "ENGINE": "django.db.backends.mysql",
+            "HOST": "localhost",
+            "NAME": "edxapp",
+            "PASSWORD": "",
+            "PORT": "3306",
+            "USER": "root"
+        }
 }
 
 LMS_BASE = "localhost:8000"

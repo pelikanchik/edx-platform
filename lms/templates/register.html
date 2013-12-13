@@ -172,23 +172,23 @@
           </li>
 
           <li class="field required text" id="field-last_name">
-            <label for="last_name">Фамилия</label>
+            <label for="last_name">${_('Lat Name')}</label>
             <input id="last_name" type="text" name="last_name" value="" placeholder="например: Бэггинс" />
           </li>
 
           <li class="field required text" id="field-first_name">
-            <label for="first_name">Имя</label>
+            <label for="first_name">${_('First Name')}</label>
             <input id="first_name" type="text" name="first_name" value="" placeholder="например: Фродо" />
           </li>
 
           <li class="field required text" id="field-middle_name">
-            <label for="middle_name">Отчество</label>
+            <label for="middle_name">${_('Middle Name')}</label>
             <input id="middle_name" type="text" name="middle_name" value="" placeholder="например: Бильбович" />
           </li>
 
            <li class="field required text" id="field-country">
 
-              <label for="country">Страна</label>
+              <label for="country">${_('Country')}</label>
               <select id="country" name="country">
                 %for code, country in UserProfile.COUNTRIES:
                 <option value="${code}"
@@ -205,11 +205,11 @@
 
 
             <li class="field required text" id="field-city">
-               <label for="city">Город</label>
+               <label for="city">${_('City')}</label>
                <input type="text" id="city" name="city" value="" placeholder="например: Москва" />
             </li>
             <li class="field required text" id="field-company_name">
-               <label for="company_name">Компания</label>
+               <label for="company_name">${_('Company')}</label>
                   <select id="company_name" name="company_name">
                     %for code, company in UserProfile.COMPANY_NAMES:
                     <option value="${code}">${company}</option>
@@ -217,8 +217,9 @@
                   </select>
             </li>
             <li class="field required text" id="field-position">
-               <label for="position">Должность</label>
+               <label for="position">${_('Position')}</label>
                   <select id="position" name="position">
+                    <option value="">--</option>
                     %for code, position in UserProfile.POSITION_NAMES:
                     <option value="${code}">${position}</option>
                     %endfor

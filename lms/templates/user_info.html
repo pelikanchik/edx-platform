@@ -1,0 +1,482 @@
+<%! from django.utils.translation import ugettext as _ %>
+
+<%!
+  from django.core.urlresolvers import reverse
+%>
+<%inherit file="main.html" />
+
+<%namespace name='static' file='static_content.html'/>
+
+<%block name="title"><title>${_("Dashboard")}</title></%block>
+<%block name="bodyclass">view-dashboard is-authenticated</%block>
+
+<%block name="js_extra">
+  <script type="text/javascript">
+  (function() {
+
+    $('.message.is-expandable .wrapper-tip').bind('click', toggleExpandMessage);
+
+    function toggleExpandMessage(e) {
+        (e).preventDefault();
+
+        $(this).closest('.message.is-expandable').toggleClass('is-expanded');
+    }
+
+    $(".email-settings").click(function(event) {
+      $("#email_settings_course_id").val( $(event.target).data("course-id") );
+      $("#email_settings_course_number").text( $(event.target).data("course-number") );
+      if($(event.target).data("optout") == "False") {
+        $("#receive_emails").prop('checked', true);
+      }
+    });
+
+    $(".unenroll").click(function(event) {
+      $("#unenroll_course_id").val( $(event.target).data("course-id") );
+      $("#unenroll_course_number").text( $(event.target).data("course-number") );
+    });
+
+    $('#unenroll_form').on('ajax:complete', function(event, xhr) {
+      if(xhr.status == 200) {
+        location.href = "${reverse('dashboard')}";
+      } else if (xhr.status == 403) {
+        location.href = "${reverse('signin_user')}?course_id=" +
+          $("#unenroll_course_id").val() + "&enrollment_action=unenroll";
+      } else {
+        $('#unenroll_error').html(
+          xhr.responseText ? xhr.responseText : "${_('An error occurred. Please try again later.')}"
+        ).stop().css("display", "block");
+      }
+    });
+
+    $('#pwd_reset_button').click(function() {
+      $.post('${reverse("password_reset")}',
+             {"email"  : $('#id_email').val()},
+             function(data){
+               $("#password_reset_complete_link").click();
+             });
+    });
+
+    $("#change_email_form").submit(function(){
+      var new_email = $('#new_email_field').val();
+      var new_password = $('#new_email_password').val();
+
+      $.post('${reverse("change_email")}',
+               {"new_email" : new_email, "password" : new_password},
+               function(data) {
+                 if (data.success) {
+                   $("#change_email_title").html("${_('Please verify your new email')}");
+                   $("#change_email_form").html("<p>${_(('You\'ll receive a confirmation in your in-box.'
+                                                    ' Please click the link in the email to confirm'
+                                                    ' the email change.'))}</p>");
+                 } else {
+                   $("#change_email_error").html(data.error).stop().css("display", "block");
+                 }
+               });
+      return false;
+    });
+
+    $("#change_name_form").submit(function(){
+      var new_name = $('#new_name_field').val();
+      var rationale = $('#name_rationale_field').val();
+
+      $.post('${reverse("change_name")}',
+             {"new_name":new_name, "rationale":rationale},
+             function(data) {
+               if(data.success) {
+                 location.reload();
+               } else {
+                 $("#change_name_error").html(data.error).stop().css("display", "block");
+               }
+             });
+       return false;
+    });
+
+    $("#email_settings_form").submit(function(){
+      $.ajax({
+        type: "POST",
+        url: '${reverse("change_email_settings")}',
+        data: $(this).serializeArray(),
+        success: function(data) {
+          if(data.success) {
+            location.href = "${reverse('dashboard')}";
+          }
+        },
+        error: function(xhr, textStatus, error) {
+          if (xhr.status == 403) {
+            location.href = "${reverse('signin_user')}";
+          }
+        }
+      });
+      return false;
+    });
+  })(this);
+
+  $(function(){
+    accessible_modal(".edit-name", "#apply_name_change .close-modal", "#apply_name_change", "#dashboard-main");
+
+    accessible_modal(".edit-email", "#change_email .close-modal", "#change_email", "#dashboard-main");
+
+    accessible_modal("#pwd_reset_button", "#password_reset_complete .close-modal", "#password_reset_complete", "#dashboard-main");
+
+
+    $(".email-settings").each(function(index){
+      $(this).attr("id", "unenroll-" + index);
+      // a bit of a hack, but gets the unique selector for the modal trigger
+      var trigger = "#" + $(this).attr("id");
+      accessible_modal(trigger, "#email-settings-modal .close-modal", "#email-settings-modal", "#dashboard-main");
+    });
+
+    $(".unenroll").each(function(index){
+      $(this).attr("id", "email-settings-" + index);
+      // a bit of a hack, but gets the unique selector for the modal trigger
+      var trigger = "#" + $(this).attr("id");
+      accessible_modal(trigger, "#unenroll-modal .close-modal", "#unenroll-modal", "#dashboard-main");
+    });
+  });
+  </script>
+  <script type="text/javascript">
+    (function() {
+      toggleSubmitButton(true);
+
+      $('#register-form').on('submit', function() {
+        toggleSubmitButton(false);
+      });
+
+      $('#register-form').on('ajax:error', function() {
+        toggleSubmitButton(true);
+      });
+
+      $('#register-form').on('ajax:success', function(event, json, xhr) {
+        if(json.success) {
+          if(json.redirect_url){
+            location.href=json.redirect_url;
+          }
+          else {
+            location.href="${reverse('dashboard')}";
+          }
+       } else {
+         toggleSubmitButton(true);
+         $('.status.message.submission-error').addClass('is-shown').focus();
+         $('.status.message.submission-error .message-copy').html(json.value).stop().css("display", "block");
+         $(".field-error").removeClass('field-error');
+         $("[data-field='"+json.field+"']").addClass('field-error')
+       }
+      });
+    })(this);
+
+    function toggleSubmitButton(enable) {
+      var $submitButton = $('form .form-actions #submit');
+
+      if(enable) {
+        $submitButton.
+          removeClass('is-disabled').
+          removeProp('disabled').
+          html("${_('Edit My {platform_name} Account').format(platform_name=settings.PLATFORM_NAME)}");
+      }
+      else {
+        $submitButton.
+          addClass('is-disabled').
+          prop('disabled', true).
+          html(gettext('Processing your account information &hellip;'));
+      }
+    }
+
+        $('#company_name').change(function () {
+            var c_name = $('#company_name').val();
+            if (c_name == "ot"){
+               document.getElementById('position_text').style.display = "block";
+               document.getElementById('position').style.display = "none";
+            }
+            if (c_name == "as"){
+              document.getElementById('position_text').style.display = "none";
+              document.getElementById('position').style.display = "block";
+            }
+          });
+        $("#position").change(function () {
+            var pos=$('#position').val();
+            document.getElementById('position_text').value = pos;
+        });
+    </script>
+
+</%block>
+
+<section class="container dashboard" id="dashboard-main" aria-hidden="false">
+
+  %if message:
+    <section class="dashboard-banner">
+      ${message}
+    </section>
+  %endif
+
+  <section class="my-courses">
+    <form role="form" id="register-form" method="post" data-remote="true" action="/edit_account" novalidate>
+    <header>
+      <h2>${_("User Info")}</h2>
+    </header>
+    <section class="user-info">
+      <ul style="list-style-type:none">
+        <li class="info--username">
+            <p>
+          <span class="title"><div class="icon name-icon"></div>${_("Full Name")} </span>
+            </p>
+          <span class="data">${ user.profile.name | h }</span>
+        </li>
+        <li class="info--email">
+            <p>
+          <span class="title"><div class="icon email-icon"></div>${_("Email")} </span>
+                </p>
+          <span class="data">${ user.email | h }</span>
+        </li>
+        <%include file='dashboard/_dashboard_status_verification.html' />
+
+
+           <li class="field required text" id="field-country">
+               <p>
+              <label for="country">${_('Country')}</label>
+                   </p>
+              <select id="country" name="country">
+                %for code, country in profile.COUNTRIES:
+                <option value="${code}"
+
+                        %if code == profile.country:
+                              selected
+                        %endif
+
+                        >${country}</option>
+                %endfor
+              </select>
+
+            </li>
+
+
+            <li class="field required text" id="field-city">
+                <p>
+               <label for="city">${_('City')}</label>
+                    </p>
+               <input type="text" id="city" name="city" value="${profile.city}" />
+            </li>
+            <li class="field required text" id="field-company_name">
+                <p>
+               <label for="company_name">${_('Company')}</label>
+                    </p>
+                  <select id="company_name" name="company_name">
+                    %for code, company in profile.COMPANY_NAMES:
+                    <option value="${code}"
+                        %if code == profile.company_name:
+                              selected
+                        %endif
+                            >${company}</option>
+                    %endfor
+                  </select>
+
+            </li>
+            <li class="field required text" id="field-position">
+                <p>
+               <label for="position">${_('Position')}</label>
+                    </p>
+
+                  <select id="position" name="position"
+                       %if profile.company_name == "ot":
+                        style="display:none"
+                       %endif
+                          >
+                    <option value="">--</option>
+                    %for code, position in profile.POSITION_NAMES:
+                    <option value="${code}"
+                        %if code == profile.position:
+                              selected
+                        %endif
+                            >${position}</option>
+                    %endfor
+                  </select>
+                <input id="position_text" type="text" name="position"
+                       %if profile.company_name == "as":
+                        style="display:none"
+                       %endif
+                       value="${profile.position}"/>
+            </li>
+          % if 'level_of_education' in settings.REGISTRATION_OPTIONAL_FIELDS:
+          <li class="field-group">
+            <div class="field select" id="field-education-level">
+                <p>
+              <label for="education-level">${_("Highest Level of Education Completed")}</label>
+                </p>
+              <select id="education-level" name="level_of_education">
+                <option value="">--</option>
+                %for code, ed_level in profile.LEVEL_OF_EDUCATION_CHOICES:
+                <option value="${code}"
+                        %if code == profile.level_of_education:
+                              selected
+                        %endif
+                        >${ed_level}</option>
+                %endfor
+              </select>
+            </div>
+          </li>
+          % endif
+          % if 'gender' in settings.REGISTRATION_OPTIONAL_FIELDS:
+          <li class="field-group">
+            <div class="field select" id="field-gender">
+                <p>
+              <label for="gender">${_("Gender")}</label>
+                    </p>
+              <select id="gender" name="gender">
+                <option value="">--</option>
+                %for code, gender in profile.GENDER_CHOICES:
+                <option value="${code}"
+                        %if code == profile.gender:
+                              selected
+                        %endif
+                        >${gender}</option>
+                %endfor
+              </select>
+            </div>
+          </li>
+          % endif
+          % if 'year_of_birth' in settings.REGISTRATION_OPTIONAL_FIELDS:
+          <li class="field-group">
+            <div class="field select" id="field-yob">
+                <p>
+              <label for="yob">${_("Year of Birth")}</label>
+                    </p>
+              <select id="yob" name="year_of_birth">
+                <option value="">--</option>
+                %for year in profile.VALID_YEARS:
+                <option value="${year}"
+                        %if year == profile.year_of_birth:
+                              selected
+                        %endif
+                        >${year}</option>
+                %endfor
+              </select>
+
+            </div>
+            % endif
+
+
+          </li>
+      </ul>
+    </section>
+      <div class="form-actions">
+        <button name="submit" type="submit" id="submit" class="action action-primary action-update"><span class="orn-plus">+</span>${_('Edit My Account')}</button>
+      </div>
+    </form>
+  </section>
+</section>
+
+<section id="email-settings-modal" class="modal" aria-hidden="true">
+  <div class="inner-wrapper" role="dialog" aria-labelledby="email-settings-title">
+    <button class="close-modal">&#10005; <span class="sr">${_('Close Modal')}</span></button>
+
+    <header>
+      <h2 id="email-settings-title">${_('Email Settings for {course_number}').format(course_number='<span id="email_settings_course_number"></span>')}<span class="sr">, ${_("modal open")}</span></h2>
+      <hr/>
+    </header>
+
+    <form id="email_settings_form" method="post">
+      <input name="course_id" id="email_settings_course_id" type="hidden" />
+      <label>${_("Receive course emails")} <input type="checkbox" id="receive_emails" name="receive_emails" /></label>
+      <div class="submit">
+        <input type="submit" id="submit" value="${_('Save Settings')}" />
+      </div>
+    </form>
+  </div>
+</section>
+
+
+
+<section id="password_reset_complete" class="modal" aria-hidden="true">
+  <div class="inner-wrapper" role="dialog" aria-labelledby="password-reset-email">
+    <button class="close-modal">&#10005; <span class="sr">${_('Close Modal')}</span></button>
+
+    <header>
+      <h2 id="password-reset-email">${_('Password Reset Email Sent')}<span class="sr">, ${_("modal open")}</span></h2>
+      <hr/>
+    </header>
+    <div>
+      <form> <!-- Here for styling reasons -->
+        <section>
+          <p>${_('An email has been sent to {email}. Follow the link in the email to change your password.').format(email=user.email)}</p>
+        </section>
+      </form>
+    </div>
+  </div>
+</section>
+
+<section id="change_email" class="modal" aria-hidden="true">
+  <div class="inner-wrapper" role="dialog" aria-labelledby="change_email_title">
+    <button class="close-modal">&#10005; <span class="sr">${_('Close Modal')}</span></button>
+
+    <header>
+      <h2><span id="change_email_title">${_("Change Email")}</span><span class="sr">, ${_("modal open")}</span></h2>
+      <hr/>
+    </header>
+    <div id="change_email_body">
+      <form id="change_email_form">
+        <div id="change_email_error" class="modal-form-error"> </div>
+        <fieldset>
+          <div class="input-group">
+            <label>${_('Please enter your new email address:')}</label>
+            <input id="new_email_field" type="email" value="" />
+            <label>${_('Please confirm your password:')}</label>
+            <input id="new_email_password" value="" type="password" />
+          </div>
+          <section>
+            <p>${_('We will send a confirmation to both {email} and your new email as part of the process.').format(email=user.email)}</p>
+          </section>
+          <div class="submit">
+            <input type="submit" id="submit_email_change" value="${_('Change Email')}"/>
+          </div>
+        </fieldset>
+      </form>
+    </div>
+  </div>
+</section>
+
+<section id="apply_name_change" class="modal" aria-hidden="true">
+  <div class="inner-wrapper" role="dialog" aria-labelledby="change-name-title">
+    <button class="close-modal">&#10005; <span class="sr">${_('Close Modal')}</span></button>
+
+    <header>
+      <h2 id="change-name-title">${_("Change your name")}<span class="sr">, ${_("modal open")}</span></h2>
+      <hr/>
+    </header>
+    <div id="change_name_body">
+      <form id="change_name_form">
+        <div id="change_name_error" class="modal-form-error"> </div>
+        <p>${_("To uphold the credibility of {platform} certificates, all name changes will be logged and recorded.").format(platform=settings.PLATFORM_NAME)}</p>
+        <br/>
+        <fieldset>
+          <div class="input-group">
+            <label>${_("Enter your desired full name, as it will appear on the {platform} certificates:").format(platform=settings.PLATFORM_NAME)}</label>
+            <input id="new_name_field" value="" type="text" />
+            <label>${_("Reason for name change:")}</label>
+            <textarea id="name_rationale_field" value=""></textarea>
+          </div>
+          <div class="submit">
+            <input type="submit" id="submit" value="${_('Change My Name')}">
+          </div>
+        </fieldset>
+      </form>
+    </div>
+  </div>
+</section>
+
+<section id="unenroll-modal" class="modal unenroll-modal" aria-hidden="true">
+  <div class="inner-wrapper" role="alertdialog" aria-labelledy="unenrollment-modal-title">
+    <button class="close-modal">&#10005; <span class="sr">${_('Close Modal')}</span></button>
+    <header>
+      <h2 id="unenrollment-modal-title">${_('<span id="track-info"></span> {course_number}?  <span id="refund-info"></span>').format(course_number='<span id="unenroll_course_number"></span>')}<span class="sr">, ${_("modal open")}</span></h2>
+      refund
+      <hr/>
+    </header>
+    <div id="unenroll_error" class="modal-form-error"></div>
+    <form id="unenroll_form" method="post" data-remote="true" action="${reverse('change_enrollment')}">
+      <input name="course_id" id="unenroll_course_id" type="hidden" />
+      <input name="enrollment_action" type="hidden" value="unenroll" />
+      <div class="submit">
+        <input name="submit" type="submit" value="${_('Unregister')}" />
+      </div>
+    </form>
+  </div>
+</section>
