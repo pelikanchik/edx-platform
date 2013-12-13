@@ -23,10 +23,20 @@
         </a>
       </h3>
     <ul>
+
       % for section in chapter['sections']:
+        <%
+           # check locks
+           for cw_chapter in courseware_summary:
+             for cw_section in cw_chapter['sections']:
+                if section['url_name'] == cw_section['url_name']:
+                   if cw_section['unlocked'] == True:
+                       unlocked = True
+                   else:
+                       unlocked = False
+        %>
 
-
-            % if section['unlocked'] == True and (not is_demo or section['available_for_demo']):
+          % if unlocked == True and (not is_demo or section['available_for_demo']):
 
           <li class="${'active' if 'active' in section and section['active'] else ''} ${'graded'  if 'graded' in section and section['graded'] else ''}">
             <a href="${reverse('courseware_section', args=[course_id, chapter['url_name'], section['url_name']])}">
@@ -41,12 +51,12 @@
               <p class="subtitle">${section['format']} ${due_date}</p>
             </a>
           </li>
-            % endif
+         % endif
       % endfor
     </ul>
   </div>
 </%def>
 
-% for chapter in courseware_summary:
+% for chapter in toc:
     ${make_chapter(chapter)}
 % endfor
