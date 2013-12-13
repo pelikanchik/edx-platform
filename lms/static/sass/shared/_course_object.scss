@@ -32,14 +32,12 @@
 
     .course {
       background: $body-bg;
-      border: 1px solid $border-color-1;
-      border-radius: 2px;
-      @include box-sizing(border-box);
+      border-radius: 5px;
       box-shadow: 0 1px 10px 0 rgba(0,0,0, 0.15), inset 0 0 0 1px rgba(255,255,255, 0.9);
       margin-bottom: 30px;
       position: relative;
       width: 100%;
-      @include transition(all 0.15s linear 0s);
+      @include transition(all 0.25s linear 0s);
 
       .status {
         background: $link-color;
@@ -87,66 +85,46 @@
       }
 
       .meta-info {
-        background: $dark-trans-bg;
+        background: url('../pelican/pelican_course-parent-main-label-background.png');
         bottom: 6px;
-        border: 1px solid rgba(0,0,0, 0.5);
-        @include border-right-radius(2px);
-        box-shadow: 0 1px 5px 0 rgba(0,0,0, 0.15);
         @include clearfix;
         position: absolute;
-        right: -4px;
-        @include transition(all 0.15s linear 0s);
+        left: -16px;
+        width: 272px;
+        height: 55px;
+        @include transition(all 0.25s linear 0s);
 
         p {
-          color: rgb(255,255,255);
-          font-style: italic;
           line-height: 1.2em;
-          padding: 4px 12px 5px;
+          padding: 20px 20px 0 35px;
         }
       }
 
       .inner-wrapper {
-        border: 1px solid $border-color-4;
         height: 100%;
-        height: 200px;
+        height: 350px;
         overflow: hidden;
         position: relative;
       }
 
-      header.course-preview {
+        header.course-preview {
         left: 0px;
-        position: absolute;
         top: 0px;
         width: 100%;
-        z-index: 3;
 
-        // > a {
-          @include background-image(linear-gradient(-90deg, rgba(255,255,255, 1), rgba(255,255,255, 0.85)));
-          box-shadow: inset 0 -1px 0 0 rgba(255,255,255, 0.2);
-          border-bottom: 1px solid rgba(150,150,150, 0.7);
-          display: block;
-          height: 50px;
+          height: 100px;
 
           &:hover {
-            @include background-image(linear-gradient(-90deg, rgba(255,255,255, 1), rgba(255,255,255, 0.8)));
-            text-decoration: none;
-
-            .info-link {
               color: $link-color;
-              opacity: 1.0;
-            }
-
-            h2 {
-              color: $link-color;
-            }
           }
 
           hgroup {
-            left: 0px;
-            padding: 0px 10px;
-            position: absolute;
-            right: 60px;
-            top: 0px;
+            height: 100px;
+            padding: 35px;
+            text-align: center;
+            margin: 0 auto;
+            color: $base-font-color;
+            vertical-align: center;
 
             h2 {
               color: $base-font-color;
@@ -192,19 +170,18 @@
       // }
 
       .info {
-        background: $content-wrapper-bg;
+        background: $body-bg;
         height: 220px + 130px;
-        left: 0px;
-        position: absolute;
-        top: 0px;
-        @include transition(all 0.15s linear 0s);
+        @include transition(all 0.25s linear 0s);
         width: 100%;
         overflow: hidden;
 
         .cover-image {
-          height: 200px;
+          height: 220px;
           overflow: hidden;
-          width: 100%;
+          width: 330px;
+          margin: 0 auto;
+          border-radius:5px;
 
           img {
             display: block;
@@ -214,20 +191,39 @@
         }
 
         .desc {
+          opacity: 0;
           @include box-sizing(border-box);
-          height: 120px;
+          @include transition(all 0.25s linear 0s);
+          background: rgba(100,100,100, 0.6);
+          height: 220px;
+          width: 330px;
+          border-radius:5px;
           overflow: hidden;
-          padding: 10px 10px 12px 10px;
           position: relative;
-          width: 100%;
+          margin: 0 auto;
+          top:-220px;
+          ul{
+            padding: 0;
+            margin: 0;
+            margin-top: 20px;
 
-          section {
-            color: $base-font-color;
-            font: normal 1em/1.6em $serif;
-            margin: 0px;
-            height: 100%;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            list-style: none;
+            li.start-date {
+              background: url(../pelican/pelican_clocks.png) 20px no-repeat;
+              padding: 10px;
+            }
+            li{
+              height: 50px;
+              border-bottom: 1px solid #fff;
+              div{
+                margin-left: 65px;
+                color: #fff;
+                width: 235px;
+                height: 50px;
+                padding: 10px;
+              }
+
+            }
           }
         }
 
@@ -245,6 +241,7 @@
 
             &:hover, &:focus {
               color: $link-color;
+              font-decoration:none;
             }
           }
 
@@ -256,16 +253,14 @@
       }
 
       &:hover, &:focus {
-        background: $course-profile-bg;
-        border-color: $border-color-1;
-        box-shadow: 0 1px 16px 0 rgba($shadow-color, 0.4);
+        box-shadow: 0 1px 16px 0 #ff5500;
 
         .info {
-          top: -150px;
         }
-
+        .desc{
+          opacity: 1;
+        }
         .meta-info {
-          opacity: 0;
         }
       }
     }

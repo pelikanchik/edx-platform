@@ -92,7 +92,6 @@ site_status_msg = get_site_status_msg(course_id)
     </div>
 % endif
 
-
     <ol class="user">
       <li class="primary">
         <a href="${reverse('dashboard')}" class="user-link">
@@ -123,44 +122,19 @@ site_status_msg = get_site_status_msg(course_id)
         </ol>
       % endif
     % else:
-    <ol class="left nav-global">
-      <%block name="navigation_global_links">
-        % if settings.MITX_FEATURES.get('ENABLE_MKTG_SITE'):
-          <li class="nav-global-01">
-            <a href="${marketing_link('HOW_IT_WORKS')}">${_("How it Works")}</a>
-          </li>
-          <li class="nav-global-02">
-            <a href="${marketing_link('COURSES')}">${_("Courses")}</a>
-          </li>
-          <li class="nav-global-03">
-            <a href="${marketing_link('SCHOOLS')}">${_("Schools")}</a>
-          </li>
-        % endif
-      </%block>
-      % if not settings.MITX_FEATURES['DISABLE_LOGIN_BUTTON']:
-          % if course and settings.MITX_FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
-          <li class="nav-global-04">
-            <a class="cta cta-register" href="${reverse('course-specific-register', args=[course.id])}">${_("Register Now")}</a>
-          </li>
-          % else:
-          <li class="nav-global-04">
-            <a class="cta cta-register" href="/register">${_("Register Now")}</a>
-          </li>
-          % endif
-      % endif
-    </ol>
 
+    <div class = "account-panel">
+    <div class="triangle"></div>
     <ol class="right nav-courseware">
-    <li class="nav-courseware-01">
-      % if not settings.MITX_FEATURES['DISABLE_LOGIN_BUTTON']:
-          % if course and settings.MITX_FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
-          <a class="cta cta-login" href="${reverse('course-specific-login', args=[course.id])}${login_query()}">${_("Log in")}</a>
-          % else:
-          <a class="cta cta-login" href="/login${login_query()}">${_("Log in")}</a>
-          % endif
-      % endif
+    <li class="auth">
+
+          <div class="icon"></div><a class="cta cta-login" href="/login${login_query()}">${_("Log in")}</a>
+    </li>
+    <li class="reg">
+          <div class="icon"></div><a class="cta cta-login" href="/register">${_("Register Now")}</a>
     </li>
     </ol>
+    </div>
     % endif
   </nav>
 </header>

@@ -6,14 +6,15 @@
 <%namespace name='static' file='static_content.html'/>
 
 <section class="home">
- <header>
+  <div class="wood-separator"></div>
+  <header>
     <div class="outer-wrapper">
       <div class="title">
         <hgroup>
           % if self.stanford_theme_enabled():
-            <h1>${_("Free courses from <strong>{university_name}</strong>").format(university_name="Stanford")}</h1>
+##            <h1>${_("Free courses from <strong>{university_name}</strong>").format(university_name="Stanford")}</h1>
           % else:
-            <h1>${_("The Future of Online Education")}</h1>
+##            <h1>${_("The Future of Online Education")}</h1>
           % endif
           <h2>${_("For anyone, anywhere, anytime")}</h2>
         </hgroup>
@@ -42,7 +43,7 @@
           </section>
         % endif
       </div>
-
+      <div class = "pelican-main"></div>
 ##        <a href="#video-modal" class="media" rel="leanModal">
 ##          <div class="hero">
 ##            <div class="play-intro"></div>
@@ -51,8 +52,7 @@
 
     </div>
   </header>
-
-
+  <div class="wood-separator"></div>
   <section class="container">
     <section class="highlighted-courses">
       <h2>${_('Explore free courses from {span_start}{platform_name}{span_end} universities').format(platform_name="edX", span_start='<span class="edx">', span_end='</span>')}</h2>

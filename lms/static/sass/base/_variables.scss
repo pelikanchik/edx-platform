@@ -241,13 +241,15 @@ $dashboard-profile-color: rgb(252,252,252);
 $dot-color: $light-gray;
 
 // MISC: course assets
-$content-wrapper-bg: $white;
+//$content-wrapper-bg: $white;
+$content-wrapper-bg: url(../pelican/pelican_background.png);
+
 $course-bg-color: #d6d6d6;
 $course-bg-image: url(../images/bg-texture.png);
 $account-content-wrapper-bg: shade($body-bg, 2%);
 $course-profile-bg: rgb(245,245,245);
 $course-header-bg: rgba(255,255,255, 0.93);
-
+$course-bubble-bg:url(../pelican/pelican_bubble.png);
 // MISC: borders
 $border-color-1: rgb(190,190,190);
 $border-color-2: rgb(200,200,200);
@@ -286,8 +288,11 @@ $footer_margin: ($baseline/4) 0 ($baseline*1.5) 0;
 // ====================
 
 // IMAGES: backgrounds
-$homepage-bg-image: '../images/homepage-bg.jpg';
-
+$homepage-bg-image: '../pelican/pelican_desk.png';
+$wood-border-bg-image: url(../pelican/pelican_wood-border.png);
+$pelican-main-image: url(../pelican/pelican_pelican-main.png);
+$pelican-reg-bg-image: url(../pelican/pelican_register-background.png);
+$pelican-triangle-image: url(../pelican/pelican_auth-triangle.png);
 $login-banner-image: url(../images/bg-banner-account.png);
 $register-banner-image: url(../images/bg-banner-account.png);
 

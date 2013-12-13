@@ -45,6 +45,9 @@ def get_logo_url(domain=None):
     Return the url for the branded logo image to be used
     """
     university = get_university(domain)
+    return '{static_url}pelican/pelican_pelican-logo.png'.format(
+            static_url=settings.STATIC_URL
+        )
 
     if university is None:
         return '{static_url}images/header-logo.png'.format(

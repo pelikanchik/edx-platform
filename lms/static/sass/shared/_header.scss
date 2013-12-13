@@ -1,8 +1,7 @@
 header.global {
-  border-bottom: 1px solid $m-gray;
   box-shadow: 0 1px 5px 0 rgba(0,0,0, 0.1);
   background: $header-bg;
-  height: 76px;
+  height: 85px;
   position: relative;
   width: 100%;
   z-index: 10;
@@ -276,24 +275,66 @@ header.global {
 
     }
   }
+  div.account-panel{
 
-  .nav-courseware {
+    .triangle{
+       background: $pelican-triangle-image no-repeat;
+       height: 12px;
+       width: 12px;
+       float: left;
+       position: relative;
+       left: -12px;
+    }
     float: right;
-    margin-top: ($baseline/4);
-    list-style: none;
+    position: absolute;
+    right: 100px;
+    top: 73px;
 
-    li {
-      display: inline-block;
+    .nav-courseware {
+      list-style: none;
+      position: relative;
+      z-index: 11;
+      background: #fff;
+      box-shadow: 0 3px 5px 0 rgba(0,0,0, 0.6);
 
-      .cta {
-        @extend %m-btn-primary;
+
+      li {
+        display: block;
+        padding: 14px;
+        a{
+           padding: 9px 0px;
+           color:#666;
+        }
+        .icon{
+          float: left;
+          height: 35px;
+          width: 48px;
+          position: relative;
+          top: -8px;
+        }
+      }
+      li.reg {
+        a{
+            background: $pelican-reg-bg-image no-repeat;
+        }
+        .icon{
+          background: url('../pelican/pelican_register-icon.png') no-repeat;
+
+        }
+      }
+      li.auth {
+        .icon{
+          background: url('../pelican/pelican_entry-icon.png') no-repeat;
+        }
+      }
+
+      // logged in
+      &.authenticated {
+
       }
     }
 
-    // logged in
-    &.authenticated {
 
-    }
   }
 }
 
