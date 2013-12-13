@@ -60,7 +60,12 @@
             location.href=json.redirect_url;
           }
           else {
-            location.href="${reverse('dashboard')}";
+              var to_redir = window.location.href;
+              if (to_redir.indexOf("?next=") > -1){
+                  var redir =  (to_redir.split("?next="))[1];
+                  location.href = redir;
+              }
+            //location.href="${reverse('dashboard')}";
           }
        } else {
          toggleSubmitButton(true);
@@ -172,7 +177,7 @@
           </li>
 
           <li class="field required text" id="field-last_name">
-            <label for="last_name">${_('Lat Name')}</label>
+            <label for="last_name">${_('Last Name')}</label>
             <input id="last_name" type="text" name="last_name" value="" placeholder="например: Бэггинс" />
           </li>
 

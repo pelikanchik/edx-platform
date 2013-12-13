@@ -35,8 +35,9 @@ site_status_msg = get_site_status_msg(course_id)
 
   <script type="text/javascript">
         $(function(){
-            $(".cta.cta-register").attr("redirect",window.location.href);
-          });
+            $(".cta.cta-register").attr("href","/register?next=" + window.location.href);
+            $(".cta.cta-login").attr("href","/login?next=" + window.location.href);
+        });
     </script>
 
 % if course:

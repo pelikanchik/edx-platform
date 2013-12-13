@@ -56,6 +56,8 @@
           }  else if(json.redirect_url){
             location.href=json.redirect_url;
           } else {
+            var redirect = $(".cta.cta-login").attr("register");
+            alert(redirect);
             location.href="${reverse('dashboard')}";
           }
         } else if(json.hasOwnProperty('redirect')) {
