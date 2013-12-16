@@ -391,7 +391,7 @@ def get_default_tabs(user, course, active_page, request):
     tabs.extend(_wiki({'name': 'Wiki', 'type': 'wiki'}, user, course, active_page, request))
 
     if user.is_authenticated() and not course.hide_progress_tab:
-        tabs.extend(_progress({'name': 'Progress'}, user, course, active_page, request))
+        tabs.extend(_progress({'name': 'Scores'}, user, course, active_page, request))
 
     if has_access(user, course, 'staff'):
         link = reverse('instructor_dashboard', args=[course.id])
