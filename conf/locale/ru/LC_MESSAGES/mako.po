@@ -5397,13 +5397,13 @@ msgstr "Автоматически вносить в список"
 msgid ""
 "If auto enroll is <em>checked</em>, students who have not yet registered for"
 " edX will be automatically enrolled."
-msgstr "Если автоматическое внесение в список отмечено <em>checked</em>, студенты, которые еще не зарегистрировались на edX, будут автоматически внесены в список."
+msgstr "Если автоматическое внесение в список отмечено <em>checked</em>, студенты, которые еще не зарегистрировались, будут автоматически внесены в список."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html:41
 msgid ""
 "If auto enroll is left <em>unchecked</em>, students who have not yet "
 "registered for edX will not be enrolled, but will be allowed to enroll."
-msgstr "Если автоматическое внесение в список остается не отмеченным <em>unchecked</em>, студенты, еще не зарегистрировавшиеся на edX, не будут внесены в список, но им будет разрешено внести себя в список."
+msgstr "Если автоматическое внесение в список остается не отмеченным <em>unchecked</em>, студенты, еще не зарегистрировавшиеся, не будут внесены в список, но им будет разрешено внести себя в список."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html:49
 msgid "Administration List Management"
@@ -6497,7 +6497,7 @@ msgstr "Проверьте Ваше имя"
 msgid ""
 "Make sure your full name on your edX account ({full_name}) matches your ID. "
 "We will also use this as the name on your certificate."
-msgstr "Убедитесь, что Ваше полное имя в аккаунте edX ({full_name}) совпадает с Вашим документом."
+msgstr "Убедитесь, что ваше полное имя в аккаунте ({full_name}) совпадает с вашим документом."
 
 #: lms/templates/verify_student/photo_verification.html:353
 msgid "Edit your name"
@@ -6527,17 +6527,17 @@ msgstr "Регистрация для {}"
 
 #: lms/templates/verify_student/show_requirements.html:13
 msgid "You need to activate your edX account before proceeding"
-msgstr "Вам необходимо активировать Ваш аккаунт edX, прежде чем продолжить"
+msgstr "Вам необходимо активировать Ваш аккаунт, прежде чем продолжить"
 
 #: lms/templates/verify_student/show_requirements.html:15
 msgid ""
 "Please check your email for further instructions on activating your new "
 "account."
-msgstr "Пожалуйста, проверьте Вашу электронную почту для получения дальнейших инструкций по активации Вашего нового аккаунта."
+msgstr "Пожалуйста, проверьте Вашу электронную почту для получения дальнейших инструкций по активации вашего нового аккаунта."
 
 #: lms/templates/verify_student/show_requirements.html:74
 msgid "What You Will Need to Register"
-msgstr "Что Вам потребуется для регистрации"
+msgstr "Что вам потребуется для регистрации"
 
 #: lms/templates/verify_student/show_requirements.html:77
 msgid ""
@@ -6556,7 +6556,7 @@ msgstr "Проверьте Вашу электронную почту"
 msgid ""
 "you need an active edX account before registering - check your email for "
 "instructions"
-msgstr "Вам нужен активный аккаунт edX, прежде чем зарегистрироваться - проверьте электронную почту для указаний"
+msgstr "Вам нужен активный аккаунт, прежде чем зарегистрироваться - проверьте электронную почту для указаний"
 
 #: lms/templates/verify_student/show_requirements.html:98
 msgid "Identification"
