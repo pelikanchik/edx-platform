@@ -373,7 +373,7 @@ msgstr "При связи с сервисом оценок произошла о
 msgid ""
 "Error occurred while contacting the grading service.  Please notify your edX"
 " point of contact."
-msgstr "При связи с сервисом оценок произошла ошибка. Пожалуйста, сообщите вашему контактному лицу в edX."
+msgstr "При связи с сервисом оценок произошла ошибка. Пожалуйста, сообщите вашему контактному лицу."
 
 #: lms/djangoapps/open_ended_grading/utils.py:103
 msgid "for course {0} and student {1}."
@@ -720,7 +720,9 @@ msgstr "\n              В нашем %(start_link)sразделе помощи%
 msgid ""
 "You're receiving this e-mail because you requested a password reset for your"
 " user account at edx.org."
-msgstr "Вы получили это письмо, потому что сбросили пароль на вашем аккаунте на edx.org."
+msgstr "Вы получили это письмо, потому что сбросили пароль на вашем аккаунте на pelic.ru"
+# Prestigio
+# msgstr "Вы получили это письмо, потому что сбросили пароль на вашем аккаунте на edu.prestigio.ru"
 
 #: lms/templates/registration/password_reset_email.html:4
 msgid "Please go to the following page and choose a new password:"
@@ -732,7 +734,9 @@ msgstr "Спасибо за использование нашего сайта!"
 
 #: lms/templates/registration/password_reset_email.html:13
 msgid "The edX Team"
-msgstr "Команда edX"
+msgstr "Команда Pelic.Ru"
+# Prestigio
+# msgstr "Команда Prestigio"
 
 #: lms/templates/wiki/article.html:31
 msgid "Last modified:"
@@ -942,7 +946,7 @@ msgstr "[Название Статьи](wiki:НазваниеСтатьи)"
 #. Translators: Do not translate "edX"
 #: lms/templates/wiki/includes/cheatsheet.html:21
 msgid "edX Additions:"
-msgstr "edX дополнения:"
+msgstr "дополнения:"
 
 #: lms/templates/wiki/includes/cheatsheet.html:31
 msgid "Useful examples:"
@@ -959,7 +963,7 @@ msgstr "[Википедия](http://wikipedia.org)"
 
 #: lms/templates/wiki/includes/cheatsheet.html:38
 msgid "[edX Wiki](wiki:/edx/)"
-msgstr "[edX Wiki](wiki:/edx/)"
+msgstr "[Wiki](wiki:/edx/)"
 
 #: lms/templates/wiki/includes/cheatsheet.html:41
 msgid "Huge Header"
