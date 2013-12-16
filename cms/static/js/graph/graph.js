@@ -492,7 +492,7 @@ function showNodeDetails(node){
     $(".node-edit-link").
         attr("href", "/vertex/edit/" + names_obj[node.id]["location"]).
         fancybox({
-            width         : '60%',
+            width         : '75%',
             height        : '80%',
             autoScale     : false,
             autoSize      : false,

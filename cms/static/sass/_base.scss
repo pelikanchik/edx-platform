@@ -512,7 +512,12 @@ p, ul, ol, dl {
   .main-wrapper {
     margin: 0 0 0 0px;
   }
-
+  p.unit-name-input{
+    max-width: 600px;
+  }
+  select{
+    max-width: 200px;
+  }
   .inner-wrapper {
     @include clearfix();
     position: relative;

@@ -42,7 +42,7 @@
 <div class = "edit-lite">
   <div class="main-wrapper edit-state-${unit_state}" data-id="${unit_location}">
 
-      <div class="main-column-lite">
+      <div class="main-column-lite" >
         <article class="unit-body window">
           <p class="unit-name-input"><label>Название элемента:</label><input type="text" value="${unit.display_name_with_default | h}" class="unit-display-name-input" /></p>
           <label>Условие для перенаправления:</label>
@@ -52,7 +52,7 @@
             <script type='text/javascript' src='/static/js/knockout-mapping.js'></script>
             <script type='text/javascript' src='/static/js/numeric.js'></script>
 
-            <div id='termConstructor' class = 'termConstructor' style = "width: 100%;">
+            <div id='termConstructor' class = 'termConstructor'  style="width: 100%">
                     <table class='termEditor' style = "width: 100%;">
 
                         <tbody data-bind="foreach: disjunctions">
