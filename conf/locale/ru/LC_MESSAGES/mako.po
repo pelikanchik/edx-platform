@@ -2927,11 +2927,11 @@ msgstr "Ваш адрес электронной почты"
 
 #: lms/templates/forgot_password_modal.html:23 lms/templates/login.html:131
 msgid "This is the e-mail address you used to register with {platform}"
-msgstr "Это адрес e-mail, с помощью которого вы зарегистрировались"
+msgstr "Это e-mail, с помощью которого вы зарегистрировались"
 
 #: lms/templates/forgot_password_modal.html:29
 msgid "Reset My Password"
-msgstr "Сбросить мой пароль"
+msgstr "Сбросить пароль"
 
 #: lms/templates/forgot_password_modal.html:47
 msgid "Email is incorrect."
@@ -3015,15 +3015,11 @@ msgstr "Бесплатные курсы от <strong>{university_name}</strong>"
 
 #: lms/templates/index.html:16
 msgid "The Future of Online Education"
-msgstr "Будущее онлайн-образования"
-# Prestigio
-# msgstr "Prestigio"
+msgstr "Prestigio"
 
 #: lms/templates/index.html:18
 msgid "For anyone, anywhere, anytime"
-msgstr "Кто угодно, где угодно, когда угодно"
-# Prestigio
-# msgstr "Внутренняя образовательная платформа"
+msgstr "Внутренняя образовательная платформа"
 
 #: lms/templates/index.html:30
 msgid "Stay up to date with all {platform_name} has to offer!"
@@ -3070,11 +3066,11 @@ msgstr "Посмотреть курсы"
 
 #: lms/templates/login.html:98
 msgid "Please log in"
-msgstr "Пожалуйста, войдите в систему"
+msgstr ""
 
 #: lms/templates/login.html:99
 msgid "to access your account and courses"
-msgstr "чтобы получить доступ к своему аккаунту и курсам"
+msgstr ""
 
 #: lms/templates/login.html:110
 msgid "We're Sorry, {platform_name} accounts are unavailable currently"
@@ -3436,7 +3432,7 @@ msgstr "Дополнительная личная информация"
 
 #: lms/templates/register.html:190
 msgid "Highest Level of Education Completed"
-msgstr "Уровень вашего образования"
+msgstr "Уровень образования"
 
 #: lms/templates/register.html:200 lms/templates/signup_modal.html:71
 msgid "Gender"
@@ -3887,6 +3883,10 @@ msgstr "например 08540"
 #: lms/templates/test_center_register.html:238
 msgid "Country Code"
 msgstr "Код страны"
+
+#: lms/templates/test_center_register.html:238
+msgid "Country"
+msgstr "Страна"
 
 #: lms/templates/test_center_register.html:239
 msgid "e.g. USA"
