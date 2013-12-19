@@ -3,6 +3,8 @@
  * original position is visible
  * and stick to the browser window otherwise
  */
+// проверка, включен ли динамический граф
+if ($('.check-all').length != 0){
 
 $(document).ready(function () {
 
@@ -104,5 +106,6 @@ $(window).scroll(function(){
 
 });
 
-});
+})
 
+}

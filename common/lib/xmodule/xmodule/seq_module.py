@@ -210,6 +210,7 @@ class SequenceModule(SequenceFields, XModule):
 
         params = {'items': contents,
                   'element_id': self.location.html_id(),
+                  'course_id': self.course_id,
                   'item_id': self.id,
                   'position': self.position,
                   'tag': self.location.category,

@@ -57,7 +57,10 @@ require(["domReady!", "jquery", "js/models/module_info", "coffee/src/views/unit"
       <div class="main-column">
         <article class="unit-body window">
           <p class="unit-name-input"><label>${_("Display Name:")}</label><input type="text" value="${unit.display_name_with_default | h}" class="unit-display-name-input" /></p>
-          <label>${_("Direct Term:")}</label>
+
+
+          % if context_course.has_dynamic_graph:
+          <label>${_("Direct Term")}</label>
 
 
             <div id='termConstructor' class = 'termConstructor' style = "width: 100%;">
@@ -311,6 +314,7 @@ require(["domReady!", "jquery", "js/models/module_info", "coffee/src/views/unit"
         </script>
 
 
+          % endif
 
 
             <ol class="components">
