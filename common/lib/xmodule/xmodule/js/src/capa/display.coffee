@@ -350,14 +350,14 @@ class @Problem
           @el.find('.problem > div').each (index, element) =>
             MathJax.Hub.Queue ["Typeset", MathJax.Hub, element]
 
-        @$('.show-label').text 'Hide Answer(s)'
+        @$('.show-label').text gettext('Hide Answer(s)')
         @el.addClass 'showed'
         @updateProgress response
     else
       @$('[id^=answer_], [id^=solution_]').text ''
       @$('[correct_answer]').attr correct_answer: null
       @el.removeClass 'showed'
-      @$('.show-label').text 'Show Answer(s)'
+      @$('.show-label').text(gettext('Show Answer(s)'))
 
       @el.find(".capa_inputtype").each (index, inputtype) =>
         display = @inputtypeDisplays[$(inputtype).attr('id')]

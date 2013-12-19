@@ -55,7 +55,12 @@ This def will enumerate through a passed in subsection and list all of the units
         </a>
   </li>
 </ol>
-            <a href="#" class="show-graph-item"> Graph </a>
+    ## Пока не показываем граф - работает неважно
+    % if context_course.has_dynamic_graph and None:
+    <a href="#" class="show-graph-item"> Graph </a>
+    % endif
+
+
 </%def>
 
 

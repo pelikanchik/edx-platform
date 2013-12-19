@@ -323,7 +323,7 @@ describe 'Problem', ->
 
       it 'toggle the show answer button', ->
         @problem.show()
-        expect($('.show .show-label')).toHaveText 'Show Answer(s)'
+        expect($('.show .show-label')).toHaveText gettext('Show Answer(s)')
 
       it 'remove the showed class from element', ->
         @problem.show()
