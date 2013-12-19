@@ -6906,7 +6906,7 @@ msgstr "Если вы не запрашивали смену пароля - пр
 msgid "Enter email with accepted domain."
 msgstr "Введите e-mail с доверенным доменом"
 
-msgid "Domain should be."
+msgid "Domain should be {0}."
 msgstr "Домен e-mail должен быть {0}."
 
 
