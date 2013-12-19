@@ -3376,7 +3376,7 @@ msgstr "Я согласен с {link_start}Условиями предостав
 
 #: lms/templates/register-shib.html:175 lms/templates/register.html:264
 msgid "I agree to the {link_start}Honor Code{link_end}"
-msgstr "I согласен с {link_start}кодексом чести{link_end}"
+msgstr "Я согласен с {link_start}кодексом чести{link_end}"
 
 #: lms/templates/register-shib.html:189
 #: lms/templates/combinedopenended/openended/open_ended.html:34
@@ -6898,6 +6898,54 @@ msgstr "Если вы не запрашивали подтверждения р�
 
 msgid "If you didn't request this change, you can disregard this email - we have not yet reset your password."
 msgstr "Если вы не запрашивали смену пароля - проигнорируйте это сообщение. Ваш пароль ещё не изменен."
+
+
+msgid "Username is too short"
+msgstr "Имя пользователя не должно быть короче 2 символов"
+
+msgid "Your full name is too short"
+msgstr "Ваше полное имя не должно быть короче 2 символов"
+
+msgid "Your name is too short"
+msgstr "Ваше имя не должно быть короче 2 символов"
+
+msgid "Your last name is too short"
+msgstr "Ваша фамилия не должно быть короче 2 символов"
+
+msgid "Your second name is too short"
+msgstr "Ваше отчество не должно быть короче 2 символов"
+
+msgid "Your city is too short"
+msgstr "Название вашего города не должно быть короче 2 символов"
+
+msgid "Your company is too short"
+msgstr "Название вашей организации не должно быть короче 2 символов"
+
+msgid "Your position is too short"
+msgstr "Название вашей должности не должно быть короче 2 символов"
+
+msgid "Your password is incorrect"
+msgstr "Пароль некорректный"
+
+msgid "You need to enter a valid email"
+msgstr "Вам нужно ввести корректный e-mail"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 #accepted domaints

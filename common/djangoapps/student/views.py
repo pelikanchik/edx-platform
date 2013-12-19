@@ -81,6 +81,8 @@ AUDIT_LOG = logging.getLogger("audit")
 
 Article = namedtuple('Article', 'title url author image deck publication publish_date')
 
+if settings.ACCEPTED_DOMAINS_ENABLE:
+    ACCEPTED_DOMAINS = ['asbis.ru']
 
 def csrf_token(context):
     """A csrf token that can be included in a form."""
@@ -1024,6 +1026,15 @@ def create_account(request, post_override=None):
     JSON call to create new edX account.
     Used by form in signup_modal.html, which is included into navigation.html
     """
+
+    if settings.ACCEPTED_DOMAINS_ENABLE:
+        def validate_domain(email, accepted_domains):
+            domain = email[email.find('@') + 1:]
+            if domain not in accepted_domains:
+                raise ValidationError(_('Enter email with accepted domain.'), code='invalid')
+
+
+
     js = {'success': False}
 
     post_vars = post_override if post_override else request.POST
@@ -1084,19 +1095,19 @@ def create_account(request, post_override=None):
 
     for a in required_post_vars:
         if len(post_vars[a]) < 2:
-            error_str = {'username': u'Имя пользователя не должно быть короче 2 символов.',
-                         'email': u'E-mail введён неверно.',
-                         'name': u'Ваше полное имя не должно быть короче 2 символов.',
-                         'first_name': u'Ваше имя не должно быть короче 2 символов.',
-                         'last_name': u'Ваша фамилия не должна быть короче 2 символов.',
-                         'middle_name': u'Ваше отчество не должно быть короче 2 символов.',
-                         'city': u'Название вашего города не должно быть короче 2 символов.',
-                         'company_name': u'Название вашей организации не должно быть короче 2 символов.',
-                         'position': u'Название вашей должности не должно быть короче 2 символов',
-                         'password': u'Некорректный пароль',
-                         'terms_of_service': u'Необходимо согласиться с правилами пользования',
-                         'honor_code': u'Для регистрации вы должны согласиться с honor code.'}
-            js['value'] = error_str[a]
+            error_str = {'username': 'Username is too short',
+                         'email': 'Valid e-mail is required',
+                         'name': 'Your full name is too short',
+                         'first_name': 'Your name is too short',
+                         'last_name': 'Your last name is too short',
+                         'middle_name': 'Your second name is too short',
+                         'city': 'Your city name is too short',
+                         'company_name': 'Your company name is too short',
+                         'position': 'Your position is too short',
+                         'password': 'Your password is incorrect',
+                         'terms_of_service': 'You must accept the terms of service',
+                         'honor_code': 'To enroll, you must follow the honor code'}
+            js['value'] = _(error_str[a])
             js['field'] = a
             return HttpResponse(json.dumps(js))
 
@@ -1107,7 +1118,18 @@ def create_account(request, post_override=None):
         js['field'] = 'email'
         return HttpResponse(json.dumps(js))
 
+
+    if settings.ACCEPTED_DOMAINS_ENABLE:
+        try:
+            validate_domain(post_vars['email'], ACCEPTED_DOMAINS)
+        except ValidationError:
+            accepted_domains = ' или '.join(domain for domain in ACCEPTED_DOMAINS)
+            js['value'] = _("Domain should be {0}.".format(accepted_domains)).format(field=a)
+            js['field'] = 'email'
+            return HttpResponse(json.dumps(js))
+
     try:
+
         validate_slug(post_vars['username'])
     except ValidationError:
         js['value'] = _("Username should only consist of A-Z and 0-9, with no spaces.").format(field=a)
@@ -1519,7 +1541,7 @@ def reactivation_email_for_user(user):
         _res = user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
     except:
         log.warning(u'Не удалось отправить письмо реактивации', exc_info=True)
-        return HttpResponse(json.dumps({'success': False, 'error': _(u'Невозможно отправить письмо')}))
+        return HttpResponse(json.dumps({'success': False, 'error': _('Unable to send reactivation email')}))
 
 
     return HttpResponse(json.dumps({'success': True}))
@@ -1536,18 +1558,18 @@ def change_email_request(request):
     user = request.user
 
     if not user.check_password(request.POST['password']):
-        return HttpResponse(json.dumps({'success': False, 'error': _(u'Неверный пароль')}))
+        return HttpResponse(json.dumps({'success': False, 'error': _("Your password is incorrect")}))
 
     new_email = request.POST['new_email']
     try:
         validate_email(new_email)
     except ValidationError:
-        return HttpResponse(json.dumps({'success': False,'error': _(u'Необходимо ввести корректный e-mail.')}))
+        return HttpResponse(json.dumps({'success': False,'error': _('You need to enter a valid email')}))
 
 
     if User.objects.filter(email=new_email).count() != 0:
         ## CRITICAL TODO: Handle case sensitivity for e-mails
-        return HttpResponse(json.dumps({'success': False, 'error': _(u'Пользователь с таким адресом электронной почты уже существует.')}))
+        return HttpResponse(json.dumps({'success': False, 'error': _("An account with the Email '{email}' already exists.")}))
 
 
     pec_list = PendingEmailChange.objects.filter(user=request.user)
@@ -1563,7 +1585,7 @@ def change_email_request(request):
 
     if pec.new_email == user.email:
         pec.delete()
-        return HttpResponse(json.dumps({'success': False,'error': _(u'Старый e-mail такой же, как и новый.')}))
+        return HttpResponse(json.dumps({'success': False,'error': _('Old email is the same as the new email.')}))
 
 
     d = {'key': pec.activation_key,
@@ -1653,7 +1675,7 @@ def change_name_request(request):
     pnc.new_name = request.POST['new_name']
     pnc.rationale = request.POST['rationale']
     if len(pnc.new_name) < 2:
-        return HttpResponse(json.dumps({'success': False, 'error': _(u'Необходимо ввести имя')}))
+        return HttpResponse(json.dumps({'success': False, 'error': _('Name required')}))
 
     pnc.save()
 
@@ -1689,7 +1711,7 @@ def reject_name_change(request):
     try:
         pnc = PendingNameChange.objects.get(id=int(request.POST['id']))
     except PendingNameChange.DoesNotExist:
-        return HttpResponse(json.dumps({'success': False, 'error': _(u'Неверный ID')}))
+        return HttpResponse(json.dumps({'success': False, 'error': _('Invalid ID')}))
 
     pnc.delete()
     return HttpResponse(json.dumps({'success': True}))
@@ -1699,7 +1721,7 @@ def accept_name_change_by_id(id):
     try:
         pnc = PendingNameChange.objects.get(id=id)
     except PendingNameChange.DoesNotExist:
-        return HttpResponse(json.dumps({'success': False, 'error': _(u'Неверный ID')}))
+        return HttpResponse(json.dumps({'success': False, 'error': _('Invalid ID')}))
 
     u = pnc.user
     up = UserProfile.objects.get(user=u)

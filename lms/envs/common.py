@@ -48,7 +48,6 @@ DISCUSSION_SETTINGS = {
     'MAX_COMMENT_DEPTH': 2,
 }
 
-
 # Features
 MITX_FEATURES = {
     'SAMPLE': False,
@@ -201,6 +200,8 @@ MITX_FEATURES = {
     # only edX superusers can perform the downloads)
     'ALLOW_COURSE_STAFF_GRADE_DOWNLOADS': False,
 }
+
+ACCEPTED_DOMAINS_ENABLE = False
 
 # Used for A/B testing
 DEFAULT_GROUPS = []
