@@ -6877,9 +6877,53 @@ msgstr "изменить настройки курса"
 
 msgid "without registration"
 msgstr "без регистрации"
-#django partial.po
 
 
+#reg messages
+
+
+msgid "Thank you for signing up for {platform_name}! To activate "
+"your account, please copy and paste this address into your web "
+"browser's address bar:"
+msgstr "Спасибо за регистрацию! Чтобы активировать вашу учётную запись, пожалуйста, скопируйте следующую ссылку в адресную строку вашего браузера:"
+
+msgid "Your account for {platform_name}"
+msgstr "Ваш аккаунт на {platform_name}"
+
+msgid "If you didn't request this, you don't need to do anything; you won't "
+      "receive any more email from us. Please do not reply to this e-mail; "
+      "if you require assistance, check the help section of the "
+      "{platform_name} web site."
+msgstr "Если вы не запрашивали подтверждения регистрации - проигнорируйте письмо, вы больше не получите сообщений от нас. На это письмо отвечать не нужно."
+
+msgid "If you didn't request this change, you can disregard this email - we have not yet reset your password."
+msgstr "Если вы не запрашивали смену пароля - проигнорируйте это сообщение. Ваш пароль ещё не изменен."
+
+
+#accepted domaints
+
+
+msgid "Enter email with accepted domain."
+msgstr "Введите e-mail с доверенным доменом"
+
+msgid "Domain should be."
+msgstr "Домен e-mail должен быть {0}."
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#django_partial.po
 
 
 #: cms/djangoapps/contentstore/utils.py:22
@@ -7592,10 +7636,11 @@ msgid "Thanks for using our site!"
 msgstr "Спасибо за использование нашего сайта!"
 
 #: lms/templates/registration/password_reset_email.html:13
-msgid "The edX Team"
-msgstr "Команда Pelic.Ru"
+#msgid "The edX Team"
+#msgstr "Команда Pelic.Ru"
 # Prestigio
-# msgstr "Команда Prestigio"
+msgid "The edX Team"
+msgstr "Команда Prestigio"
 
 #: lms/templates/wiki/article.html:31
 msgid "Last modified:"
