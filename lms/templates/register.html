@@ -170,11 +170,6 @@
             <input id="username" type="text" name="username" value="" placeholder="${_('example: JaneDoe')}" required aria-required="true" aria-describedby="username-tip"/>
             <span class="tip tip-input" id="username-tip">${_('Will be shown in any discussions or forums you participate in')} <strong>(${_('cannot be changed later')})</strong></span>
           </li>
-          <li class="field required text" id="field-name">
-            <label for="name">${_('Full Name')}</label>
-            <input id="name" type="text" name="name" value="" placeholder="${_('example: Jane Doe')}" required aria-required="true" aria-describedby="name-tip" />
-            <span class="tip tip-input" id="name-tip">${_("Needed for any certificates you may earn")}</span>
-          </li>
 
           <li class="field required text" id="field-last_name">
             <label for="last_name">${_('Last Name')}</label>
@@ -189,6 +184,12 @@
           <li class="field required text" id="field-middle_name">
             <label for="middle_name">${_('Middle Name')}</label>
             <input id="middle_name" type="text" name="middle_name" value="" placeholder="например: Бильбович" />
+          </li>
+
+          <li class="field required text" id="field-name">
+            <label for="name">${_('Full Name')}</label>
+            <input id="name" type="text" name="name" value="" placeholder="${_('example: Jane Doe')}" required aria-required="true" aria-describedby="name-tip" />
+            <span class="tip tip-input" id="name-tip">${_("Needed for any certificates you may earn")}</span>
           </li>
 
            <li class="field required text" id="field-country">
