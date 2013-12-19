@@ -3298,6 +3298,10 @@ msgstr "Сбросить"
 msgid "Show Answer(s)"
 msgstr "Показать ответ"
 
+#alexg
+msgid "Hide Answer(s)"
+msgstr "Скрыть ответ"
+
 #: lms/templates/problem.html:27
 msgid "(for question(s) above - adjacent to each field)"
 msgstr "(для вопроса сверху - примыкают к каждому полю)"
@@ -6835,8 +6839,44 @@ msgstr "Демо-вход"
 
 
 
+msgid "Course Shows"
+msgstr "Курс отображается"
 
+msgid "Course Hidden"
+msgstr "Курс не отображается"
 
+msgid "Registration not required"
+msgstr "Без регистрации"
+
+msgid "Registration required"
+msgstr "Необходима регистрация"
+
+msgid "Dynamic"
+msgstr "Динамический"
+
+msgid "Linear"
+msgstr "Линейный"
+
+msgid "Direct Term"
+msgstr "Условие перенаправления"
+
+msgid "Unlock Term"
+msgstr "Условие разблокировки"
+
+msgid "available"
+msgstr "доступен"
+
+msgid "not available"
+msgstr "не доступен"
+
+msgid "Course availability without registration"
+msgstr "Доступность курса без регистрации"
+
+msgid "change course settings"
+msgstr "изменить настройки курса"
+
+msgid "without registration"
+msgstr "без регистрации"
 #django partial.po
 
 
@@ -7088,7 +7128,7 @@ msgstr "Неверный ID"
 
 #: common/lib/xmodule/xmodule/capa_module.py:356
 msgid "Check"
-msgstr "Проверка"
+msgstr "Проверить"
 
 #: common/lib/xmodule/xmodule/capa_module.py:357
 msgid "Final Check"
