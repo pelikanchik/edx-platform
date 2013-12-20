@@ -26,17 +26,17 @@ __all__ = ['checklists_handler']
 @require_http_methods(("GET", "POST", "PUT"))
 @login_required
 @ensure_csrf_cookie
-def checklists_handler(request, tag=None, course_id=None, branch=None, version_guid=None, block=None, checklist_index=None):
+def checklists_handler(request, tag=None, package_id=None, branch=None, version_guid=None, block=None, checklist_index=None):
     """
-The restful handler for checklists.
+    The restful handler for checklists.
 
-GET
-html: return html page for all checklists
-json: return json representing all checklists. checklist_index is not supported for GET at this time.
-POST or PUT
-json: updates the checked state for items within a particular checklist. checklist_index is required.
-"""
-    location = BlockUsageLocator(course_id=course_id, branch=branch, version_guid=version_guid, usage_id=block)
+    GET
+        html: return html page for all checklists
+        json: return json representing all checklists. checklist_index is not supported for GET at this time.
+    POST or PUT
+        json: updates the checked state for items within a particular checklist. checklist_index is required.
+    """
+    location = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
     if not has_access(request.user, location):
         raise PermissionDenied()
 
@@ -96,11 +96,11 @@ json: updates the checked state for items within a particular checklist. checkli
 
 def expand_all_action_urls(course_module):
     """
-Gets the checklists out of the course module and expands their action urls.
+    Gets the checklists out of the course module and expands their action urls.
 
-Returns a copy of the checklists with modified urls, without modifying the persisted version
-of the checklists.
-"""
+    Returns a copy of the checklists with modified urls, without modifying the persisted version
+    of the checklists.
+    """
     expanded_checklists = []
     for checklist in course_module.checklists:
         expanded_checklists.append(expand_checklist_action_url(course_module, checklist))
@@ -109,10 +109,10 @@ of the checklists.
 
 def expand_checklist_action_url(course_module, checklist):
     """
-Expands the action URLs for a given checklist and returns the modified version.
+    Expands the action URLs for a given checklist and returns the modified version.
 
-The method does a copy of the input checklist and does not modify the input argument.
-"""
+    The method does a copy of the input checklist and does not modify the input argument.
+    """
     expanded_checklist = copy.deepcopy(checklist)
 
     urlconf_map = {

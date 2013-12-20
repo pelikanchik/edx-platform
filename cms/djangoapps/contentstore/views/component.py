@@ -78,16 +78,16 @@ def show_graph(request, location):
 
 @require_http_methods(["GET"])
 @login_required
-def subsection_handler(request, tag=None, course_id=None, branch=None, version_guid=None, block=None):
+def subsection_handler(request, tag=None, package_id=None, branch=None, version_guid=None, block=None):
     """
-The restful handler for subsection-specific requests.
+    The restful handler for subsection-specific requests.
 
-GET
-html: return html page for editing a subsection
-json: not currently supported
-"""
+    GET
+        html: return html page for editing a subsection
+        json: not currently supported
+    """
     if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
-        locator = BlockUsageLocator(course_id=course_id, branch=branch, version_guid=version_guid, usage_id=block)
+        locator = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
         try:
             old_location, course, item, lms_link = _get_item_in_course(request, locator)
         except ItemNotFoundError:
@@ -158,8 +158,8 @@ json: not currently supported
 
 def _load_mixed_class(category):
     """
-Load an XBlock by category name, and apply all defined mixins
-"""
+    Load an XBlock by category name, and apply all defined mixins
+    """
     component_class = XModuleDescriptor.load_class(category)
     mixologist = Mixologist(settings.XBLOCK_MIXINS)
     return mixologist.mix(component_class)
@@ -167,16 +167,16 @@ Load an XBlock by category name, and apply all defined mixins
 
 @require_http_methods(["GET"])
 @login_required
-def unit_handler(request, tag=None, course_id=None, branch=None, version_guid=None, block=None):
+def unit_handler(request, tag=None, package_id=None, branch=None, version_guid=None, block=None):
     """
-The restful handler for unit-specific requests.
+    The restful handler for unit-specific requests.
 
-GET
-html: return html page for editing a unit
-json: not currently supported
-"""
+    GET
+        html: return html page for editing a unit
+        json: not currently supported
+    """
     if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
-        locator = BlockUsageLocator(course_id=course_id, branch=branch, version_guid=version_guid, usage_id=block)
+        locator = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
         try:
             old_location, course, item, lms_link = _get_item_in_course(request, locator)
         except ItemNotFoundError:
@@ -195,8 +195,8 @@ json: not currently supported
             component_templates[category].append((
                 display_name,
                 category,
-                False, # No defaults have markdown (hardcoded current default)
-                None # no boilerplate for overrides
+                False,  # No defaults have markdown (hardcoded current default)
+                None  # no boilerplate for overrides
             ))
             # add boilerplates
             if hasattr(component_class, 'templates'):
@@ -231,7 +231,7 @@ json: not currently supported
                                 component_class.display_name.default or category,
                                 category,
                                 False,
-                                None # don't override default data
+                                None  # don't override default data
                             )
                         )
                     except PluginMissingError:
@@ -321,11 +321,11 @@ json: not currently supported
 @login_required
 def _get_item_in_course(request, locator):
     """
-Helper method for getting the old location, containing course,
-item, and lms_link for a given locator.
+    Helper method for getting the old location, containing course,
+    item, and lms_link for a given locator.
 
-Verifies that the caller has permission to access this item.
-"""
+    Verifies that the caller has permission to access this item.
+    """
     if not has_access(request.user, locator):
         raise PermissionDenied()
 

@@ -30,8 +30,8 @@ __all__ = ['request_course_creator', 'course_team_handler']
 @login_required
 def request_course_creator(request):
     """
-User has requested course creation access.
-"""
+    User has requested course creation access.
+    """
     user_requested_access(request.user)
     return JsonResponse({"Status": "OK"})
 
@@ -40,25 +40,25 @@ User has requested course creation access.
 @login_required
 @ensure_csrf_cookie
 @require_http_methods(("GET", "POST", "PUT", "DELETE"))
-def course_team_handler(request, tag=None, course_id=None, branch=None, version_guid=None, block=None, email=None):
+def course_team_handler(request, tag=None, package_id=None, branch=None, version_guid=None, block=None, email=None):
     """
-The restful handler for course team users.
+    The restful handler for course team users.
 
-GET
-html: return html page for managing course team
-json: return json representation of a particular course team member (email is required).
-POST or PUT
-json: modify the permissions for a particular course team member (email is required, as well as role in the payload).
-DELETE:
-json: remove a particular course team member from the course team (email is required).
-"""
-    location = BlockUsageLocator(course_id=course_id, branch=branch, version_guid=version_guid, usage_id=block)
+    GET
+        html: return html page for managing course team
+        json: return json representation of a particular course team member (email is required).
+    POST or PUT
+        json: modify the permissions for a particular course team member (email is required, as well as role in the payload).
+    DELETE:
+        json: remove a particular course team member from the course team (email is required).
+    """
+    location = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
     if not has_access(request.user, location):
         raise PermissionDenied()
 
     if 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json'):
         return _course_team_user(request, location, email)
-    elif request.method == 'GET': # assume html
+    elif request.method == 'GET':  # assume html
         return _manage_users(request, location)
     else:
         return HttpResponseNotFound()
@@ -66,8 +66,8 @@ json: remove a particular course team member from the course team (email is requ
 
 def _manage_users(request, locator):
     """
-This view will return all CMS users who are editors for the specified course
-"""
+    This view will return all CMS users who are editors for the specified course
+    """
     old_location = loc_mapper().translate_locator_to_location(locator)
 
     # check that logged in user has permissions to this item
@@ -90,8 +90,8 @@ This view will return all CMS users who are editors for the specified course
 @expect_json
 def _course_team_user(request, locator, email):
     """
-Handle the add, remove, promote, demote requests ensuring the requester has authority
-"""
+    Handle the add, remove, promote, demote requests ensuring the requester has authority
+    """
     # check that logged in user has permissions to this item
     if has_access(request.user, locator, role=INSTRUCTOR_ROLE_NAME):
         # instructors have full permissions

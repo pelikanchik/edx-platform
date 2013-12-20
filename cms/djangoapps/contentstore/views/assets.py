@@ -34,24 +34,24 @@ __all__ = ['assets_handler']
 
 @login_required
 @ensure_csrf_cookie
-def assets_handler(request, tag=None, course_id=None, branch=None, version_guid=None, block=None, asset_id=None):
+def assets_handler(request, tag=None, package_id=None, branch=None, version_guid=None, block=None, asset_id=None):
     """
-The restful handler for assets.
-It allows retrieval of all the assets (as an HTML page), as well as uploading new assets,
-deleting assets, and changing the "locked" state of an asset.
+    The restful handler for assets.
+    It allows retrieval of all the assets (as an HTML page), as well as uploading new assets,
+    deleting assets, and changing the "locked" state of an asset.
 
-GET
-html: return html page of all course assets (note though that a range of assets can be requested using start
-and max query parameters)
-json: not currently supported
-POST
-json: create (or update?) an asset. The only updating that can be done is changing the lock state.
-PUT
-json: update the locked state of an asset
-DELETE
-json: delete an asset
-"""
-    location = BlockUsageLocator(course_id=course_id, branch=branch, version_guid=version_guid, usage_id=block)
+    GET
+        html: return html page of all course assets (note though that a range of assets can be requested using start
+        and max query parameters)
+        json: not currently supported
+    POST
+        json: create (or update?) an asset. The only updating that can be done is changing the lock state.
+    PUT
+        json: update the locked state of an asset
+    DELETE
+        json: delete an asset
+    """
+    location = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
     if not has_access(request.user, location):
         raise PermissionDenied()
 
@@ -60,7 +60,7 @@ json: delete an asset
             raise NotImplementedError('coming soon')
         else:
             return _update_asset(request, location, asset_id)
-    elif request.method == 'GET': # assume html
+    elif request.method == 'GET':  # assume html
         return _asset_index(request, location)
     else:
         return HttpResponseNotFound()
@@ -68,10 +68,10 @@ json: delete an asset
 
 def _asset_index(request, location):
     """
-Display an editable asset library.
+    Display an editable asset library.
 
-Supports start (0-based index into the list of assets) and max query parameters.
-"""
+    Supports start (0-based index into the list of assets) and max query parameters.
+    """
     old_location = loc_mapper().translate_locator_to_location(location)
 
     course_module = modulestore().get_item(old_location)
@@ -113,9 +113,9 @@ Supports start (0-based index into the list of assets) and max query parameters.
 @login_required
 def _upload_asset(request, location):
     '''
-This method allows for POST uploading of files into the course asset
-library, which will be supported by GridFS in MongoDB.
-'''
+    This method allows for POST uploading of files into the course asset
+    library, which will be supported by GridFS in MongoDB.
+    '''
     old_location = loc_mapper().translate_locator_to_location(location)
 
     # Does the course actually exist?!? Get anything from it to prove its
@@ -180,11 +180,11 @@ library, which will be supported by GridFS in MongoDB.
 @ensure_csrf_cookie
 def _update_asset(request, location, asset_id):
     """
-restful CRUD operations for a course asset.
-Currently only DELETE, POST, and PUT methods are implemented.
+    restful CRUD operations for a course asset.
+    Currently only DELETE, POST, and PUT methods are implemented.
 
-asset_id: the URL of the asset (used by Backbone as the id)
-"""
+    asset_id: the URL of the asset (used by Backbone as the id)
+    """
     def get_asset_location(asset_id):
         """ Helper method to get the location (and verify it is valid). """
         try:
@@ -241,8 +241,8 @@ asset_id: the URL of the asset (used by Backbone as the id)
 
 def _get_asset_json(display_name, date, location, thumbnail_location, locked):
     """
-Helper method for formatting the asset information to send to client.
-"""
+    Helper method for formatting the asset information to send to client.
+    """
     asset_url = StaticContent.get_url_path_from_location(location)
     return {
         'display_name': display_name,

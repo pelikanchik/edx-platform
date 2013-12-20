@@ -47,39 +47,39 @@ CREATE_IF_NOT_FOUND = ['course_info']
 @require_http_methods(("DELETE", "GET", "PUT", "POST"))
 @login_required
 @expect_json
-def xblock_handler(request, tag=None, course_id=None, branch=None, version_guid=None, block=None):
+def xblock_handler(request, tag=None, package_id=None, branch=None, version_guid=None, block=None):
     """
-The restful handler for xblock requests.
+    The restful handler for xblock requests.
 
-DELETE
-json: delete this xblock instance from the course. Supports query parameters "recurse" to delete
-all children and "all_versions" to delete from all (mongo) versions.
-GET
-json: returns representation of the xblock (locator id, data, and metadata).
-if ?fields=graderType, it returns the graderType for the unit instead of the above.
-html: returns HTML for rendering the xblock (which includes both the "preview" view and the "editor" view)
-PUT or POST
-json: if xblock locator is specified, update the xblock instance. The json payload can contain
-these fields, all optional:
-:data: the new value for the data.
-:children: the locator ids of children for this xblock.
-:metadata: new values for the metadata fields. Any whose values are None will be deleted not set
-to None! Absent ones will be left alone.
-:nullout: which metadata fields to set to None
-:graderType: change how this unit is graded
-:publish: can be one of three values, 'make_public, 'make_private', or 'create_draft'
-The JSON representation on the updated xblock (minus children) is returned.
+    DELETE
+        json: delete this xblock instance from the course. Supports query parameters "recurse" to delete
+        all children and "all_versions" to delete from all (mongo) versions.
+    GET
+        json: returns representation of the xblock (locator id, data, and metadata).
+              if ?fields=graderType, it returns the graderType for the unit instead of the above.
+        html: returns HTML for rendering the xblock (which includes both the "preview" view and the "editor" view)
+    PUT or POST
+        json: if xblock locator is specified, update the xblock instance. The json payload can contain
+              these fields, all optional:
+                :data: the new value for the data.
+                :children: the locator ids of children for this xblock.
+                :metadata: new values for the metadata fields. Any whose values are None will be deleted not set
+                       to None! Absent ones will be left alone.
+                :nullout: which metadata fields to set to None
+                :graderType: change how this unit is graded
+                :publish: can be one of three values, 'make_public, 'make_private', or 'create_draft'
+              The JSON representation on the updated xblock (minus children) is returned.
 
-if xblock locator is not specified, create a new xblock instance. The json playload can contain
-these fields:
-:parent_locator: parent for new xblock, required
-:category: type of xblock, required
-:display_name: name for new xblock, optional
-:boilerplate: template name for populating fields, optional
-The locator (and old-style id) for the created xblock (minus children) is returned.
-"""
-    if course_id is not None:
-        locator = BlockUsageLocator(course_id=course_id, branch=branch, version_guid=version_guid, usage_id=block)
+              if xblock locator is not specified, create a new xblock instance. The json playload can contain
+              these fields:
+                :parent_locator: parent for new xblock, required
+                :category: type of xblock, required
+                :display_name: name for new xblock, optional
+                :boilerplate: template name for populating fields, optional
+              The locator (and old-style id) for the created xblock (minus children) is returned.
+    """
+    if package_id is not None:
+        locator = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
         if not has_access(request.user, locator):
             raise PermissionDenied()
         old_location = loc_mapper().translate_locator_to_location(locator)
@@ -104,7 +104,7 @@ The locator (and old-style id) for the created xblock (minus children) is return
                 # catch exceptions indiscriminately, since after this point they escape the
                 # dungeon and surface as uneditable, unsaveable, and undeletable
                 # component-goblins.
-                except Exception as exc: # pylint: disable=W0703
+                except Exception as exc:                          # pylint: disable=W0703
                     log.debug("Unable to render studio_view for %r", component, exc_info=True)
                     content = render_to_string('html_error.html', {'message': str(exc)})
 
@@ -117,7 +117,7 @@ The locator (and old-style id) for the created xblock (minus children) is return
             delete_all_versions = str_to_bool(request.REQUEST.get('all_versions', 'False'))
 
             return _delete_item_at_location(old_location, delete_children, delete_all_versions)
-        else: # Since we have a course_id, we are updating an existing xblock.
+        else:  # Since we have a package_id, we are updating an existing xblock.
             return _save_item(
                 request,
                 locator,
@@ -133,7 +133,7 @@ The locator (and old-style id) for the created xblock (minus children) is return
         return _create_item(request)
     else:
         return HttpResponseBadRequest(
-            "Only instance creation is supported without a course_id.",
+            "Only instance creation is supported without a package_id.",
             content_type="text/plain"
         )
 
@@ -141,12 +141,12 @@ The locator (and old-style id) for the created xblock (minus children) is return
 def _save_item(request, usage_loc, item_location, data=None, children=None, metadata=None, nullout=None,
                grader_type=None, publish=None):
     """
-Saves xblock w/ its fields. Has special processing for grader_type, publish, and nullout and Nones in metadata.
-nullout means to truly set the field to None whereas nones in metadata mean to unset them (so they revert
-to default).
+    Saves xblock w/ its fields. Has special processing for grader_type, publish, and nullout and Nones in metadata.
+    nullout means to truly set the field to None whereas nones in metadata mean to unset them (so they revert
+    to default).
 
-The item_location is still the old-style location whereas usage_loc is a BlockUsageLocator
-"""
+    The item_location is still the old-style location whereas usage_loc is a BlockUsageLocator
+    """
     store = get_modulestore(item_location)
 
     try:
@@ -287,10 +287,10 @@ def _create_item(request):
 
 def _delete_item_at_location(item_location, delete_children=False, delete_all_versions=False):
     """
-Deletes the item at with the given Location.
+    Deletes the item at with the given Location.
 
-It is assumed that course permissions have already been checked.
-"""
+    It is assumed that course permissions have already been checked.
+    """
     store = get_modulestore(item_location)
 
     item = store.get_item(item_location)
@@ -319,18 +319,18 @@ It is assumed that course permissions have already been checked.
 # pylint: disable=W0613
 @login_required
 @require_http_methods(("GET", "DELETE"))
-def orphan_handler(request, tag=None, course_id=None, branch=None, version_guid=None, block=None):
+def orphan_handler(request, tag=None, package_id=None, branch=None, version_guid=None, block=None):
     """
-View for handling orphan related requests. GET gets all of the current orphans.
-DELETE removes all orphans (requires is_staff access)
+    View for handling orphan related requests. GET gets all of the current orphans.
+    DELETE removes all orphans (requires is_staff access)
 
-An orphan is a block whose category is not in the DETACHED_CATEGORY list, is not the root, and is not reachable
-from the root via children
+    An orphan is a block whose category is not in the DETACHED_CATEGORY list, is not the root, and is not reachable
+    from the root via children
 
-:param request:
-:param course_id: Locator syntax course_id
-"""
-    location = BlockUsageLocator(course_id=course_id, branch=branch, version_guid=version_guid, usage_id=block)
+    :param request:
+    :param package_id: Locator syntax package_id
+    """
+    location = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
     # DHM: when split becomes back-end, move or conditionalize this conversion
     old_location = loc_mapper().translate_locator_to_location(location)
     if request.method == 'GET':
@@ -350,9 +350,9 @@ from the root via children
 
 def _get_module_info(usage_loc, rewrite_static_links=True):
     """
-metadata, data, id representation of a leaf module fetcher.
-:param usage_loc: A BlockUsageLocator
-"""
+    metadata, data, id representation of a leaf module fetcher.
+    :param usage_loc: A BlockUsageLocator
+    """
     old_location = loc_mapper().translate_locator_to_location(usage_loc)
     store = get_modulestore(old_location)
     try:

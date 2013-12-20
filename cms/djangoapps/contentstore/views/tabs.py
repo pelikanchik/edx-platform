@@ -25,12 +25,12 @@ __all__ = ['tabs_handler']
 
 def initialize_course_tabs(course):
     """
-set up the default tabs
-I've added this because when we add static tabs, the LMS either expects a None for the tabs list or
-at least a list populated with the minimal times
-@TODO: I don't like the fact that the presentation tier is away of these data related constraints, let's find a better
-place for this. Also rather than using a simple list of dictionaries a nice class model would be helpful here
-"""
+    set up the default tabs
+    I've added this because when we add static tabs, the LMS either expects a None for the tabs list or
+    at least a list populated with the minimal times
+    @TODO: I don't like the fact that the presentation tier is away of these data related constraints, let's find a better
+    place for this. Also rather than using a simple list of dictionaries a nice class model would be helpful here
+    """
 
     # This logic is repeated in xmodule/modulestore/tests/factories.py
     # so if you change anything here, you need to also change it there.
@@ -48,21 +48,21 @@ place for this. Also rather than using a simple list of dictionaries a nice clas
 @login_required
 @ensure_csrf_cookie
 @require_http_methods(("GET", "POST", "PUT"))
-def tabs_handler(request, tag=None, course_id=None, branch=None, version_guid=None, block=None):
+def tabs_handler(request, tag=None, package_id=None, branch=None, version_guid=None, block=None):
     """
-The restful handler for static tabs.
+    The restful handler for static tabs.
 
-GET
-html: return page for editing static tabs
-json: not supported
-PUT or POST
-json: update the tab order. It is expected that the request body contains a JSON-encoded dict with entry "tabs".
-The value for "tabs" is an array of tab locators, indicating the desired order of the tabs.
+    GET
+        html: return page for editing static tabs
+        json: not supported
+    PUT or POST
+        json: update the tab order. It is expected that the request body contains a JSON-encoded dict with entry "tabs".
+        The value for "tabs" is an array of tab locators, indicating the desired order of the tabs.
 
-Creating a tab, deleting a tab, or changing its contents is not supported through this method.
-Instead use the general xblock URL (see item.xblock_handler).
-"""
-    locator = BlockUsageLocator(course_id=course_id, branch=branch, version_guid=version_guid, usage_id=block)
+    Creating a tab, deleting a tab, or changing its contents is not supported through this method.
+    Instead use the general xblock URL (see item.xblock_handler).
+    """
+    locator = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
     if not has_access(request.user, locator):
         raise PermissionDenied()
 
@@ -76,7 +76,7 @@ Instead use the general xblock URL (see item.xblock_handler).
         else:
             if 'tabs' in request.json:
                 def get_location_for_tab(tab):
-                    """ Returns the location (old-style) for a tab. """
+                    """  Returns the location (old-style) for a tab. """
                     return loc_mapper().translate_locator_to_location(BlockUsageLocator(tab))
 
                 tabs = request.json['tabs']
@@ -122,7 +122,7 @@ Instead use the general xblock URL (see item.xblock_handler).
                 return JsonResponse()
             else:
                 raise NotImplementedError('Creating or changing tab content is not supported.')
-    elif request.method == 'GET': # assume html
+    elif request.method == 'GET':  # assume html
         # see tabs have been uninitialized (e.g. supporting courses created before tab support in studio)
         if course_item.tabs is None or len(course_item.tabs) == 0:
             initialize_course_tabs(course_item)
@@ -184,3 +184,4 @@ def primitive_insert(course, num, tab_type, name):
     tabs = course.tabs
     tabs.insert(num, new_tab)
     modulestore('direct').update_metadata(course.location, own_metadata(course))
+
