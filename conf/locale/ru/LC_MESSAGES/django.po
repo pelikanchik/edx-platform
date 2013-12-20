@@ -6915,7 +6915,7 @@ msgstr "Ваша фамилия не должно быть короче 2 сим
 msgid "Your second name is too short"
 msgstr "Ваше отчество не должно быть короче 2 символов"
 
-msgid "Your city is too short"
+msgid "Your city name is too short"
 msgstr "Название вашего города не должно быть короче 2 символов"
 
 msgid "Your company is too short"
@@ -6930,15 +6930,8 @@ msgstr "Пароль некорректный"
 msgid "You need to enter a valid email"
 msgstr "Вам нужно ввести корректный e-mail"
 
-
-
-
-
-
-
-
-
-
+msgid "Position"
+msgstr "Должность"
 
 
 
@@ -6955,7 +6948,7 @@ msgid "Enter email with accepted domain."
 msgstr "Введите e-mail с доверенным доменом"
 
 msgid "Domain should be {0}."
-msgstr "Домен e-mail должен быть {0}."
+msgstr "Домен должен быть {0}."
 
 
 

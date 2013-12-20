@@ -1124,7 +1124,7 @@ def create_account(request, post_override=None):
             validate_domain(post_vars['email'], ACCEPTED_DOMAINS)
         except ValidationError:
             accepted_domains = ' или '.join(domain for domain in ACCEPTED_DOMAINS)
-            js['value'] = _("Domain should be {0}.".format(accepted_domains)).format(field=a)
+            js['value'] = _("Domain should be {0}.").format(accepted_domains).format(field=a)
             js['field'] = 'email'
             return HttpResponse(json.dumps(js))
 
