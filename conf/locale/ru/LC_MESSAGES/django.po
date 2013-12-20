@@ -2,7 +2,7 @@
 # This English source file is machine-generated. Do not check it into github
 # Copyright (C) 2013 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
+#
 # Translators:
 # asandler <setcursorpos@gmail.com>, 2013
 # Tenrius <tenrius@gmail.com>, 2013
@@ -7664,7 +7664,7 @@ msgstr "\n              В нашем %(start_link)sразделе помощи%
 msgid ""
 "You're receiving this e-mail because you requested a password reset for your"
 " user account at edx.org."
-msgstr "Вы получили это письмо, потому что сбросили пароль на вашем аккаунте на pelic.ru"
+msgstr "Вы получили это письмо, потому что сбросили пароль от вашего аккаунта"
 # Prestigio
 # msgstr "Вы получили это письмо, потому что сбросили пароль на вашем аккаунте на edu.prestigio.ru"
 
