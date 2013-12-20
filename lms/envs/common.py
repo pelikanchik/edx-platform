@@ -199,9 +199,9 @@ MITX_FEATURES = {
     # Give course staff unrestricted access to grade downloads (if set to False,
     # only edX superusers can perform the downloads)
     'ALLOW_COURSE_STAFF_GRADE_DOWNLOADS': False,
+    'ACCEPTED_DOMAINS_ENABLE': False
 }
 
-ACCEPTED_DOMAINS_ENABLE = False
 
 # Used for A/B testing
 DEFAULT_GROUPS = []

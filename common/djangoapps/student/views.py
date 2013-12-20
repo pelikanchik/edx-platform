@@ -81,7 +81,7 @@ AUDIT_LOG = logging.getLogger("audit")
 
 Article = namedtuple('Article', 'title url author image deck publication publish_date')
 
-if settings.ACCEPTED_DOMAINS_ENABLE:
+if settings.MITX_FEATURES.get('ACCEPTED_DOMAINS_ENABLE'):
     ACCEPTED_DOMAINS = ['asbis.ru']
 
 def csrf_token(context):
@@ -1027,7 +1027,7 @@ def create_account(request, post_override=None):
     Used by form in signup_modal.html, which is included into navigation.html
     """
 
-    if settings.ACCEPTED_DOMAINS_ENABLE:
+    if settings.MITX_FEATURES.get('ACCEPTED_DOMAINS_ENABLE'):
         def validate_domain(email, accepted_domains):
             domain = email[email.find('@') + 1:]
             if domain not in accepted_domains:
@@ -1119,7 +1119,7 @@ def create_account(request, post_override=None):
         return HttpResponse(json.dumps(js))
 
 
-    if settings.ACCEPTED_DOMAINS_ENABLE:
+    if settings.MITX_FEATURES.get('ACCEPTED_DOMAINS_ENABLE'):
         try:
             validate_domain(post_vars['email'], ACCEPTED_DOMAINS)
         except ValidationError:
