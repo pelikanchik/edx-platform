@@ -6953,10 +6953,26 @@ msgstr "Домен должен быть {0}."
 
 
 
+#enroll messages
 
 
+msgid "Dear {full_name}"
+msgstr "Здравствуйте, {full_name}"
 
+msgid "You have been enrolled in {course_name} at {site_name} by a member "
+	"of the course staff. The course should now appear on your {site_name} "
+	"dashboard."
+msgstr "Вы были зарегистрированы на курс {course_name} на {site_name} администратором. Курс теперь доступен в вашем кабинете."
 
+msgid "To start accessing course materials, please visit {course_url}"
+msgstr "Чтобы приступить к занятиям, перейдите на страницу: {course_url}"
+
+msgid "This email was automatically sent from {site_name} to "
+	"{full_name}"
+msgstr "Письмо было сгенерировано автоматически на сайте {site_name}"
+
+msgid "You have been enrolled in {course_name}"
+msgstr "Регистрация на курс {course_name}"
 
 
 
