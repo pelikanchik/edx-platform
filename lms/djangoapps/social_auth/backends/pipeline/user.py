@@ -2,6 +2,7 @@ from uuid import uuid4
 
 from social_auth.utils import setting, module_member
 from social_auth.models import UserSocialAuth
+from student.models import UserProfile
 
 
 slugify = module_member(setting('SOCIAL_AUTH_SLUGIFY_FUNCTION',
@@ -67,6 +68,19 @@ def create_user(backend, details, response, uid, username, user=None, *args,
         'is_new': True
     }
 
+def create_profile(user, details, *args, **kwargs):
+    try:
+        profile = UserProfile.objects.get(user=user)
+    except UserProfile.DoesNotExist:
+        try:
+            profile = UserProfile(user=user)
+            if details.get('fullname') is None:
+                profile.name = user.username
+            else:
+                profile.name = details.get('fullname')
+            profile.save()
+        except Exception as err:
+            print(err)
 
 def _ignore_field(name, is_new=False):
     return name in ('username', 'id', 'pk') or \
