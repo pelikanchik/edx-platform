@@ -6974,7 +6974,11 @@ msgstr "Письмо было сгенерировано автоматичес�
 msgid "You have been enrolled in {course_name}"
 msgstr "Регистрация на курс {course_name}"
 
+#User Info
 
+
+msgid "User Info"
+msgstr "Данные пользователя"
 
 
 

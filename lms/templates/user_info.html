@@ -11,6 +11,17 @@
 <%block name="bodyclass">view-dashboard is-authenticated</%block>
 
 <%block name="js_extra">
+
+  <style>
+
+      input[disabled]{
+          background: #eee;
+          color: #999!important;
+      }
+      ul{
+          padding:0;
+      }
+  </style>
   <script type="text/javascript">
   (function() {
 
@@ -171,13 +182,13 @@
         $submitButton.
           removeClass('is-disabled').
           removeProp('disabled').
-          html("${_('Edit My {platform_name} Account').format(platform_name=settings.PLATFORM_NAME)}");
+          html("${_('Save').format(platform_name=settings.PLATFORM_NAME)}");
       }
       else {
         $submitButton.
           addClass('is-disabled').
           prop('disabled', true).
-          html(gettext('Processing your account information &hellip;'));
+          html(gettext('Saving&hellip;'));
       }
     }
 
@@ -200,7 +211,7 @@
 
 </%block>
 
-<section class="container dashboard" id="dashboard-main" aria-hidden="false">
+<section class="container dashboard register" id="dashboard-main" aria-hidden="false">
 
   %if message:
     <section class="dashboard-banner">
@@ -215,17 +226,19 @@
     </header>
     <section class="user-info">
       <ul style="list-style-type:none">
-        <li class="info--username">
+        <li class="field text">
             <p>
-          <span class="title"><div class="icon name-icon"></div>${_("Full Name")} </span>
+               <label for="fullname">${_('Full Name')}</label>
             </p>
-          <span class="data">${ user.profile.name | h }</span>
+             <input type="text" id="fullname" name="fullname" disabled value="${ user.profile.name | h }" />
         </li>
-        <li class="info--email">
+        <li class="field text">
             <p>
-          <span class="title"><div class="icon email-icon"></div>${_("Email")} </span>
+               <label for="email">${_('E-Mail')}</label>
                 </p>
-          <span class="data">${ user.email | h }</span>
+
+
+             <input type="text" id="email" name="email" disabled value="${ user.email | h }" />
         </li>
         <%include file='dashboard/_dashboard_status_verification.html' />
 
@@ -358,7 +371,7 @@
       </ul>
     </section>
       <div class="form-actions">
-        <button name="submit" type="submit" id="submit" class="action action-primary action-update"><span class="orn-plus">+</span>${_('Edit My Account')}</button>
+        <button name="submit" type="submit" id="submit" class="action action-primary action-update"><span class="orn-plus">+</span>${_('Save')}</button>
       </div>
     </form>
   </section>
