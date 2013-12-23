@@ -3124,7 +3124,7 @@ msgstr "Теперь вы можете начать изучать курсы, �
 
 #: lms/templates/login.html:179
 msgid "Not Enrolled?"
-msgstr "Еще не участвуете в курсах?"
+msgstr "Не зарегистрированы?"
 
 #: lms/templates/login.html:180
 msgid "Sign up for {platform_name} today!"
@@ -3400,7 +3400,7 @@ msgid "Register for {platform_name}"
 msgstr "Регистрация"
 
 #: lms/templates/register.html:79
-msgid "Create my {platform_name} Account"
+msgid "Create My {platform_name} Account"
 msgstr "Создать учётную запись"
 
 #: lms/templates/register.html:94
