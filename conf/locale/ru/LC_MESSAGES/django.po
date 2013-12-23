@@ -517,8 +517,8 @@ msgid "Welcome"
 msgstr "Добро пожаловать"
 
 #: cms/templates/howitworks.html:17
-msgid "Welcome to"
-msgstr "Добро пожаловать в"
+msgid "Welcome to Studio"
+msgstr "Добро пожаловать в Студию"
 
 #: cms/templates/howitworks.html:18
 msgid ""
