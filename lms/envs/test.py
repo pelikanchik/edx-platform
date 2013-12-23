@@ -101,9 +101,9 @@ MODULESTORE = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': TEST_ROOT / 'db' / 'mitx.db'
+        'NAME': TEST_ROOT / "db" / "test_mitx_%s.db" % seed(),
+        'TEST_NAME': TEST_ROOT / "db" / "test_mitx_%s.db" % seed(),
     },
-
 }
 
 CACHES = {

@@ -42,7 +42,10 @@ def course_db_for(course_id):
     db_name = CLASSES_TO_DBS[course_id]
     return {
                'default': {
-                    'ENGINE': 'django.db.backends.sqlite3',
-                    'NAME': path_for_db(db_name)
+                    'ENGINE': 'django.db.backends.mysql',
+                    'NAME': 'pelican',
+                    'PASSWORD' : '',
+                    'USER' : 'root',
+                    'HOST' : 'localhost',
                 }
             }

@@ -64,10 +64,12 @@ CONTENTSTORE = {
 # which they can flush without messing up your dev db
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': TEST_ROOT / "db" / "test_mitx_%s.db" % seed(),
-        'TEST_NAME': TEST_ROOT / "db" / "test_mitx_%s.db" % seed(),
-    }
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'pelican',
+        'PASSWORD' : '',
+        'USER' : 'root',
+        'HOST' : 'localhost',
+    },
 }
 
 # Set up XQueue information so that the lms will send
