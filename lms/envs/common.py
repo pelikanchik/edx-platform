@@ -446,28 +446,22 @@ HTTPS = 'on'
 ROOT_URLCONF = 'lms.urls'
 IGNORABLE_404_ENDS = ('favicon.ico')
 
-# Email
-#<<<<<<< HEAD
-#EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-#DEFAULT_FROM_EMAIL = 'registration@edx.org'
-#DEFAULT_FEEDBACK_EMAIL = 'feedback@edx.org'
-#SERVER_EMAIL = 'devops@edx.org'
-#TECH_SUPPORT_EMAIL = 'technical@edx.org'
-#CONTACT_EMAIL = 'info@edx.org'
-#BUGS_EMAIL = 'bugs@edx.org'
-#ADMINS = ()
-#=======
-EMAIL_BACKEND = 'django_ses.SESBackend'
-DEFAULT_FROM_EMAIL = 'registration@pelic.ru'
-DEFAULT_FEEDBACK_EMAIL = 'feedback@pelic.ru'
-SERVER_EMAIL = 'devops@pelic.ru'
-TECH_SUPPORT_EMAIL = 'technical@pelic.ru'
-CONTACT_EMAIL = 'info@pelic.ru'
-BUGS_EMAIL = 'bugs@pelic.ru'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+DEFAULT_FROM_EMAIL = 'support.prestigio@yandex.ru'
+DEFAULT_FEEDBACK_EMAIL = 'support.prestigio@yandex.ru'
+SERVER_EMAIL = 'support.prestigio@yandex.ru'
+TECH_SUPPORT_EMAIL = 'support.prestigio@yandex.ru'
+CONTACT_EMAIL = 'support.prestigio@yandex.ru'
+BUGS_EMAIL = 'support.prestigio@yandex.ru'
 ADMINS = (
-    ('edX Admins', 'admin@pelic.ru'),
+    ('Prestigio Admins', 'support.prestigio@yandex.ru'),
 )
-#>>>>>>> 4f9bf342df105f2a5f00372194e6f7a65dac6f8b
+EMAIL_HOST = 'smtp.yandex.ru'
+EMAIL_HOST_USER = 'support.prestigio@yandex.ru'
+EMAIL_HOST_PASSWORD = '***'
+EMAIL_PORT = '25'
+EMAIL_USE_TLS = 'True'
+
 MANAGERS = ADMINS
 
 # Static content
