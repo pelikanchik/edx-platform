@@ -215,6 +215,9 @@ msgstr "Загрузить новый PDF “<%= name %>”"
 msgid "Saving"
 msgstr "Сохранение"
 
+msgid "Save"
+msgstr "Сохранить"
+
 #: cms/static/js/views/import.js:141
 msgid "There was an error with the upload"
 msgstr "Ошибка загрузки"

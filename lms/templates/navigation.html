@@ -88,7 +88,7 @@ site_status_msg = get_site_status_msg(course_id)
 
 % if user.profile.is_demo:
     <div class="need-to-register">
-          Для получения полного доступа необходимо пройти <a href="/register">регистрацию</a>
+          ${_("You need")} <a href="/register">${_("to register")}</a>
     </div>
 % endif
 
@@ -97,7 +97,7 @@ site_status_msg = get_site_status_msg(course_id)
       <li class="primary">
         <a href="${reverse('dashboard')}" class="user-link">
           <span class="avatar"></span>
-          <span class="sr">${_("Dashboard for:")} </span> ${user.username}
+          <span class="sr">${_("Dashboard for:")} </span> ${user.profile.name}
         </a>
       </li>
       <li class="primary">

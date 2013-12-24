@@ -6889,13 +6889,26 @@ msgstr "не доступен"
 msgid "Course availability without registration"
 msgstr "Доступность курса без регистрации"
 
+msgid "Subsection availability without registration"
+msgstr "Доступность подраздела без регистрации"
+
 msgid "change course settings"
 msgstr "изменить настройки курса"
 
 msgid "without registration"
 msgstr "без регистрации"
 
+msgid "Subject"
+msgstr "Предмет"
 
+msgid "The name of the subject"
+msgstr "Название дисциплины"
+
+msgid "You need"
+msgstr "Для получения полного доступа необходимо пройти"
+
+msgid "to register"
+msgstr "регистрацию"
 #reg messages
 
 

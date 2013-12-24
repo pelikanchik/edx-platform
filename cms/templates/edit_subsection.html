@@ -26,7 +26,7 @@
         </div>
 
          <div class="subsection-name-input">
-         <label>${_("Course availability without registration")}</label>
+         <label>${_("Subsection availability without registration")}</label>
              <select id = "available-for-demo" data-metadata-name="available_for_demo">
                   <option value="0"
                           % if not subsection.available_for_demo:
@@ -44,7 +44,7 @@
               </select>
 
               <% ctx_loc = context_course.location %>
-               <p style = "font-size:10px">(${_("Course")} <b>
+               <p style = "font-size:10px">(${_("Subsection")} <b>
                           % if context_course.available_for_demo:
                              ${_("available")}
                           % else:
@@ -122,8 +122,11 @@
                     <img class = "add" style="width:20px; margin: 3px;" src = '${static.url("img/plus_32.png")}' data-bind='click: addDisjunction' />
                 </div>
                 </div>
-                <p style = "text-align: center;"><input type = "button" class = "save-subsection-button" value='${_("Save term")}'/></p>
 
+        % endif
+                <p style = "text-align: center;"><input type = "button" class = "save-subsection-button" value='${_("Save")}'/></p>
+
+        % if context_course.has_dynamic_graph:
                 <input disabled data-bind='value: term_string' style="font-size: 10px; display:none;" class="subsection-display-name-input" data-metadata-name="unlock_term">
 
         <script>

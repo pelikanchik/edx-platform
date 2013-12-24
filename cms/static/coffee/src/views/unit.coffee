@@ -253,7 +253,7 @@ define ["jquery", "jquery.ui", "gettext", "backbone",
     saveTerm: =>
       # Saving a term
 
-      $('.save-term').val("Saving...")
+      $('.save-term').val(gettext('Saving&hellip;'))
       $('.save-term').addClass("save-term-active")
 
       metadata = $.extend({}, @model.get('metadata'))
@@ -261,7 +261,7 @@ define ["jquery", "jquery.ui", "gettext", "backbone",
       metadata.direct_term = $('.unit-direct-term-input').val()
       @model.save(metadata: metadata)
 
-      setTimeout('$(".save-term").val("Save"); $(".save-term").removeClass("save-term-active");', 500)
+      setTimeout('$(".save-term").val(gettext("Save")); $(".save-term").removeClass("save-term-active");', 500)
       # Update term
       $('.unit-location .editing .unit-term').html(metadata.direct_term)
       analytics.track "Edited Unit Term",
