@@ -4447,11 +4447,11 @@ msgstr "Студенческий интерфейс"
 
 #: lms/templates/courseware/courses.html:20
 msgid "Explore free courses from {university_name}."
-msgstr "Выберите нужный курс"
+msgstr "Выберите курс"
 
 #: lms/templates/courseware/courses.html:22
 msgid "Explore free courses from leading universities."
-msgstr "Выберите нужный курс"
+msgstr "Выберите курс"
 
 #: lms/templates/courseware/courseware-error.html:6
 msgid "Courseware"
@@ -6917,10 +6917,10 @@ msgid "If you didn't request this change, you can disregard this email - we have
 msgstr "Если вы не запрашивали смену пароля - проигнорируйте это сообщение. Ваш пароль ещё не изменен."
 
 
-msgid "Username is too short"
+msgid "Username must be minimum of two characters long"
 msgstr "Имя пользователя не должно быть короче 2 символов"
 
-msgid "Your full name is too short"
+msgid "Your legal name must be a minimum of two characters long."
 msgstr "Ваше полное имя не должно быть короче 2 символов"
 
 msgid "Your name is too short"
@@ -6941,10 +6941,10 @@ msgstr "Название вашей организации не должно б�
 msgid "Your position is too short"
 msgstr "Название вашей должности не должно быть короче 2 символов"
 
-msgid "Your password is incorrect"
+msgid "A valid password is required."
 msgstr "Пароль некорректный"
 
-msgid "You need to enter a valid email"
+msgid "A properly formatted e-mail is required."
 msgstr "Вам нужно ввести корректный e-mail"
 
 msgid "Position"
