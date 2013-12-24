@@ -3030,11 +3030,11 @@ msgstr "Бесплатные курсы от <strong>{university_name}</strong>"
 
 #: lms/templates/index.html:16
 msgid "The Future of Online Education"
-msgstr "ASBIS"
+msgstr "Заочная школа"
 
 #: lms/templates/index.html:18
 msgid "For anyone, anywhere, anytime"
-msgstr "Внутренняя образовательная платформа"
+msgstr "образовательная платформа"
 
 #: lms/templates/index.html:30
 msgid "Stay up to date with all {platform_name} has to offer!"
@@ -7751,7 +7751,7 @@ msgstr "Спасибо за использование нашего сайта!"
 #msgstr "Команда Pelic.Ru"
 # Prestigio
 msgid "The edX Team"
-msgstr "Команда ASBIS"
+msgstr "Команда Pelic.Ru"
 
 #: lms/templates/wiki/article.html:31
 msgid "Last modified:"
