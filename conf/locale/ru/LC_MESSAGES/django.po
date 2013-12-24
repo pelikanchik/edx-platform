@@ -2667,7 +2667,7 @@ msgstr "Судя по всему, вы пока не зарегистриров�
 
 #: lms/templates/dashboard.html:170
 msgid "Find courses now!"
-msgstr "Найти курсы прямо сейчас!"
+msgstr "Найти курсы"
 
 #: lms/templates/dashboard.html:173
 msgid "Looks like you haven't been enrolled in any courses yet."
@@ -3356,7 +3356,7 @@ msgstr "Введите логин пользователя:"
 #: lms/templates/register-shib.html:122 lms/templates/register.html:135
 #: lms/templates/register.html:165
 msgid "example: JaneDoe"
-msgstr "образец: JaneDoe"
+msgstr "пример: JaneDoe"
 
 #: lms/templates/register-shib.html:123 lms/templates/register.html:136
 #: lms/templates/register.html:166
@@ -3366,7 +3366,7 @@ msgstr "Будет отображаться в любых дискуссиях, 
 #: lms/templates/register-shib.html:130 lms/templates/register.html:127
 #: lms/templates/register.html:158
 msgid "example: username@domain.com"
-msgstr "образец: username@domain.com"
+msgstr "пример: username@domain.com"
 
 #: lms/templates/register-shib.html:150 lms/templates/register.html:239
 msgid "Account Acknowledgements"
@@ -3422,7 +3422,7 @@ msgstr "нельзя будет изменить позже"
 #: lms/templates/register.html:140
 #: lms/templates/verify_student/face_upload.html:310
 msgid "example: Jane Doe"
-msgstr "образец: Jane Doe"
+msgstr "пример: Jane Doe"
 
 #: lms/templates/register.html:141 lms/templates/register.html:174
 msgid "Needed for any certificates you may earn"
@@ -3537,7 +3537,7 @@ msgstr "Следующее"
 
 #: lms/templates/signup_modal.html:14
 msgid "Sign Up for {span_start}{platform_name}{span_end}"
-msgstr "Зарегистрироваться"
+msgstr "Регистрация"
 
 #: lms/templates/signup_modal.html:25 lms/templates/signup_modal.html:44
 msgid "E-mail *"
@@ -6951,7 +6951,7 @@ msgid "Enter email with accepted domain."
 msgstr "Введите e-mail с доверенным доменом"
 
 msgid "Domain should be {0}."
-msgstr "Домен должен быть {0}."
+msgstr "Домен электронной почты должен быть {0}."
 
 
 
