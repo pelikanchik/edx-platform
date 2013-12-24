@@ -278,15 +278,14 @@ msgstr "Ваши изменения не вступят в силу, пока в
 
 #: cms/static/js/views/settings/advanced.js:105
 msgid "Your policy changes have been saved."
-msgstr "Ваши политические изменения были сохранены."
+msgstr "Ваши изменения были сохранены."
 
 #: cms/static/js/views/settings/advanced.js:106
 msgid ""
 "Please note that validation of your policy key and value pairs is not "
 "currently in place yet. If you are having difficulties, please review your "
 "policy pairs."
-msgstr "Пожалуйста, обратите внимание, что проверки пар ключей и значений в настоящее время еще нет. Если у вас возникли трудности, пожалуйста, пересмотрите политику пар."
-
+msgstr "Обратите внимание, что проверки пар ключей и значений в настоящее время нет."
 #: cms/static/js/views/settings/main.js:256
 msgid "Upload your course image."
 msgstr "Загрузить образ курса."
@@ -443,7 +442,7 @@ msgstr "Показать"
 
 #: lms/static/admin/js/collapse.js:15 lms/static/admin/js/collapse.min.js:1
 msgid "Hide"
-msgstr "Спрятать"
+msgstr "Скрыть"
 
 #: lms/static/admin/js/dateparse.js:33
 msgid "Sunday Monday Tuesday Wednesday Thursday Friday Saturday"
@@ -490,3 +489,46 @@ msgstr "Вчера"
 #: lms/static/admin/js/admin/DateTimeShortcuts.js:199
 msgid "Tomorrow"
 msgstr "Завтра"
+
+
+
+#: lms/templates/problem.html:27
+msgid "Show Answer(s)"
+msgstr "Показать ответ"
+
+#alexg
+msgid "Hide Answer(s)"
+msgstr "Скрыть ответ"
+
+msgid "Wait..."
+msgstr "Ждите..."
+
+msgid "Check"
+msgstr "Проверить"
+
+msgid "Check all"
+msgstr "Проверить всё"
+
+msgid "Forward"
+msgstr "Дальше"
+
+msgid "Yes"
+msgstr "Да"
+
+msgid "No"
+msgstr "Нет"
+
+msgid "Value"
+msgstr "Значение"
+
+msgid "Key"
+msgstr "Ключ"
+
+msgid "Has Dynamic Graph"
+msgstr "Используется ли динамический граф"
+
+msgid "Available for demousers"
+msgstr "Доступность без регистрации"
+
+msgid "Show In LMS"
+msgstr "Отображать курс в публичной части"

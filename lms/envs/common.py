@@ -36,7 +36,7 @@ from xmodule.x_module import XModuleMixin
 
 ################################### FEATURES ###################################
 # The display name of the platform to be used in templates/emails/etc.
-PLATFORM_NAME = "Prestigio"
+PLATFORM_NAME = "ASBIS"
 CC_MERCHANT_NAME = PLATFORM_NAME
 
 COURSEWARE_ENABLED = True
@@ -454,7 +454,7 @@ TECH_SUPPORT_EMAIL = 'support.prestigio@yandex.ru'
 CONTACT_EMAIL = 'support.prestigio@yandex.ru'
 BUGS_EMAIL = 'support.prestigio@yandex.ru'
 ADMINS = (
-    ('Prestigio Admins', 'support.prestigio@yandex.ru'),
+    ('ASBIS Admins', 'support.prestigio@yandex.ru'),
 )
 EMAIL_HOST = 'smtp.yandex.ru'
 EMAIL_HOST_USER = 'support.prestigio@yandex.ru'
@@ -539,7 +539,7 @@ ZENDESK_USER = None
 ZENDESK_API_KEY = None
 
 ##### shoppingcart Payment #####
-PAYMENT_SUPPORT_EMAIL = 'payment@example.com'
+PAYMENT_SUPPORT_EMAIL = 'support.prestigio@yandex.ru'
 ##### Using cybersource by default #####
 CC_PROCESSOR = {
     'CyberSource': {
@@ -879,7 +879,7 @@ CELERYD_HIJACK_ROOT_LOGGER = False
 
 # Suffix used to construct 'from' email address for bulk emails.
 # A course-specific identifier is prepended.
-BULK_EMAIL_DEFAULT_FROM_EMAIL = 'no-reply@example.com'
+BULK_EMAIL_DEFAULT_FROM_EMAIL = 'support.prestigio@yandex.ru'
 
 # Parameters for breaking down course enrollment into subtasks.
 BULK_EMAIL_EMAILS_PER_TASK = 100
