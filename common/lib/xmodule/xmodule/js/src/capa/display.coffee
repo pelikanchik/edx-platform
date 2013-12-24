@@ -286,9 +286,9 @@ class @Problem
     Logger.log 'problem_check', @answers
 
     if( responsesBeingProcessedCount == 0)
-      $('.check-all').html('Wait...').addClass('check-all-disabled')
+      $('.check-all').html(gettext('Wait...')).addClass('check-all-disabled')
 
-    $("#" + @element_id + " .check").val('Wait...').prop('disabled', true);
+    $("#" + @element_id + " .check").val(gettext('Wait...')).prop('disabled', true);
     responsesBeingProcessedCount++;
 
 
@@ -306,10 +306,10 @@ class @Problem
             @el.removeClass 'showed'
         else
           @gentle_alert response.success
-      $("#" + @element_id + " .check").val('Check').prop('disabled', false)
+      $("#" + @element_id + " .check").val(gettext('Check')).prop('disabled', false)
       responsesBeingProcessedCount--
       if( responsesBeingProcessedCount == 0)
-        $('.check-all').html('Check all').removeClass('check-all-disabled');
+        $('.check-all').html(gettext('Check all')).removeClass('check-all-disabled');
 
       Logger.log 'problem_graded', [@answers, response.contents], @id
 

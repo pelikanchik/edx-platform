@@ -36,7 +36,7 @@ from xmodule.x_module import XModuleMixin
 
 ################################### FEATURES ###################################
 # The display name of the platform to be used in templates/emails/etc.
-PLATFORM_NAME = "lutiX"
+PLATFORM_NAME = "Pelican"
 CC_MERCHANT_NAME = PLATFORM_NAME
 
 COURSEWARE_ENABLED = True
@@ -440,33 +440,30 @@ CMS_BASE = 'localhost:8001'
 
 # Site info
 SITE_ID = 1
-SITE_NAME = "edx.org"
-HTTPS = 'on'
+SITE_NAME = "pelic.ru"
+HTTPS = 'off'
 ROOT_URLCONF = 'lms.urls'
 IGNORABLE_404_ENDS = ('favicon.ico')
 
-# Email
-#<<<<<<< HEAD
-#EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-#DEFAULT_FROM_EMAIL = 'registration@edx.org'
-#DEFAULT_FEEDBACK_EMAIL = 'feedback@edx.org'
-#SERVER_EMAIL = 'devops@edx.org'
-#TECH_SUPPORT_EMAIL = 'technical@edx.org'
-#CONTACT_EMAIL = 'info@edx.org'
-#BUGS_EMAIL = 'bugs@edx.org'
-#ADMINS = ()
-#=======
-EMAIL_BACKEND = 'django_ses.SESBackend'
-DEFAULT_FROM_EMAIL = 'registration@pelic.ru'
-DEFAULT_FEEDBACK_EMAIL = 'feedback@pelic.ru'
-SERVER_EMAIL = 'devops@pelic.ru'
-TECH_SUPPORT_EMAIL = 'technical@pelic.ru'
-CONTACT_EMAIL = 'info@pelic.ru'
-BUGS_EMAIL = 'bugs@pelic.ru'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
+DEFAULT_FROM_EMAIL = 'team@pelic.ru'
+DEFAULT_FEEDBACK_EMAIL = 'team@pelic.ru'
+SERVER_EMAIL = 'team@pelic.ru'
+TECH_SUPPORT_EMAIL = 'team@pelic.ru'
+CONTACT_EMAIL = 'team@pelic.ru'
+BUGS_EMAIL = 'team@pelic.ru'
+
+EMAIL_HOST = 'smtp.yandex.ru'
+EMAIL_HOST_USER = 'team@pelic.ru'
+EMAIL_HOST_PASSWORD = 'ruhuseda'
+EMAIL_PORT = '25'
+EMAIL_USE_TLS = 'True'
+
 ADMINS = (
-    ('edX Admins', 'admin@pelic.ru'),
+    ('Prestigio Admins', 'support.prestigio@yandex.ru'),
 )
-#>>>>>>> 4f9bf342df105f2a5f00372194e6f7a65dac6f8b
+
 MANAGERS = ADMINS
 
 # Static content
@@ -544,7 +541,7 @@ ZENDESK_USER = None
 ZENDESK_API_KEY = None
 
 ##### shoppingcart Payment #####
-PAYMENT_SUPPORT_EMAIL = 'payment@example.com'
+PAYMENT_SUPPORT_EMAIL = 'team@pelic.ru'
 ##### Using cybersource by default #####
 CC_PROCESSOR = {
     'CyberSource': {
@@ -884,7 +881,7 @@ CELERYD_HIJACK_ROOT_LOGGER = False
 
 # Suffix used to construct 'from' email address for bulk emails.
 # A course-specific identifier is prepended.
-BULK_EMAIL_DEFAULT_FROM_EMAIL = 'no-reply@example.com'
+BULK_EMAIL_DEFAULT_FROM_EMAIL = 'team@pelic.ru'
 
 # Parameters for breaking down course enrollment into subtasks.
 BULK_EMAIL_EMAILS_PER_TASK = 100
