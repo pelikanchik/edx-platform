@@ -32,17 +32,20 @@ from courseware.courses import course_image_url, get_course_about_section
               <p>${get_course_about_section(course, 'short_description')}</p>
             </div>
             <div class="bottom">
+            % if course.subject != "Empty" and course.subject:
               % if stanford_theme_enabled():
-                <span class="university">${get_course_about_section(course, 'university')}</span>
+                <span class="university">${course.subject | h}</span>
               % else:
-                <a href="#" class="university">${get_course_about_section(course, 'university')}</a>
+                <a href="#" class="university">${course.subject | h}</a>
               % endif
-              <span class="start-date">${course.start_date_text}</span>
+            % endif
             </div>
           </section>
         </div>
+        % if course.subject != "Empty" and course.subject:
         <div class="meta-info">
-          <p class="university">${get_course_about_section(course, 'university')}</p>
+          <p class="university">${course.subject | h}</p>
         </div>
+        % endif
       </a>
     </article>
