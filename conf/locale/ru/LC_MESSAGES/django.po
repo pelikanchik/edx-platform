@@ -6974,10 +6974,8 @@ msgstr "Должность"
 msgid "Enter email with accepted domain."
 msgstr "Введите e-mail с доверенным доменом"
 
-msgid "Domain should be {0}."
-msgstr "Домен электронной почты должен быть {0}."
-
-
+msgid "Email has incorrect domain"
+msgstr "Домен электронной почты некорректный"
 
 
 #enroll messages
