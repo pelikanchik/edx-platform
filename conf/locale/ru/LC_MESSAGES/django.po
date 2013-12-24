@@ -7285,6 +7285,12 @@ msgstr "Неверный ID"
 msgid "Check"
 msgstr "Проверить"
 
+msgid "Check all"
+msgstr "Проверить"
+
+msgid "Forward"
+msgstr "Дальше"
+
 #: common/lib/xmodule/xmodule/capa_module.py:357
 msgid "Final Check"
 msgstr "Заключительная проверка"

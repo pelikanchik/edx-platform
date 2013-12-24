@@ -507,7 +507,7 @@ msgid "Check"
 msgstr "Проверить"
 
 msgid "Check all"
-msgstr "Проверить всё"
+msgstr "Проверить"
 
 msgid "Forward"
 msgstr "Дальше"

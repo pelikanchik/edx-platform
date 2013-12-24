@@ -152,6 +152,7 @@ def instructor_dashboard(request, course_id):
         return response
 
     def return_xlsx(fn, datatable, fp=None):
+        fn = re.sub(' +', '-', fn)
         def set_border(ws, row_num, column_num, style):
             for i in range(row_num):
                 for j in range(column_num):
@@ -250,7 +251,7 @@ def instructor_dashboard(request, course_id):
                 student = User.objects.get(email=unique_student_identifier)
             else:
                 student = User.objects.get(username=unique_student_identifier)
-            msg += "Found a single student.  "
+            msg += _u("Found a single student.  ")
         except User.DoesNotExist:
             student = None
             msg += "<font color='red'>Couldn't find student with that email or username.  </font>"
@@ -335,7 +336,7 @@ def instructor_dashboard(request, course_id):
                 msg += "<pre>{0}</pre></p>".format(escape(os.popen(cmd).read()))
                 track.views.server_track(request, "git-pull", {"directory": data_dir}, page="idashboard")
 
-        if 'Reload course' in action:
+        if _u('Reload course') in action:
             log.debug('reloading {0} ({1})'.format(course_id, course))
             try:
                 data_dir = course.data_dir
@@ -350,45 +351,45 @@ def instructor_dashboard(request, course_id):
             except Exception as err:
                 msg += '<br/><p>Error: {0}</p>'.format(escape(err))
 
-    if action == 'Dump list of enrolled students' or action == 'List enrolled students':
+    if action == _u('Dump list of enrolled students' or action == 'List enrolled students'):
         log.debug(action)
         datatable = get_student_grade_summary_data(request, course, course_id, get_grades=False, use_offline=use_offline)
         datatable['title'] = 'List of students enrolled in {0}'.format(course_id)
         track.views.server_track(request, "list-students", {}, page="idashboard")
 
-    elif 'Dump Grades' in action:
+    elif _u('Dump Grades') in action:
         log.debug(action)
         datatable = get_student_grade_summary_data(request, course, course_id, get_grades=True, use_offline=use_offline)
         datatable['title'] = 'Summary Grades of students enrolled in {0}'.format(course_id)
         track.views.server_track(request, "dump-grades", {}, page="idashboard")
 
-    elif 'Dump all RAW grades' in action:
+    elif _u('Dump all RAW grades') in action:
         log.debug(action)
         datatable = get_student_grade_summary_data(request, course, course_id, get_grades=True,
                                                    get_raw_scores=True, use_offline=use_offline)
         datatable['title'] = 'Raw Grades of students enrolled in {0}'.format(course_id)
         track.views.server_track(request, "dump-grades-raw", {}, page="idashboard")
 
-    elif 'Download CSV of all student grades' in action:
+    elif _u('Download CSV of all student grades for this course') in action:
         track.views.server_track(request, "dump-grades-csv", {}, page="idashboard")
         return return_csv('grades_{0}.csv'.format(course_id),
                           get_student_grade_summary_data(request, course, course_id, use_offline=use_offline))
 
-    elif 'Download CSV of all RAW grades' in action:
+    elif _u('Download CSV of all RAW grades') in action:
         track.views.server_track(request, "dump-grades-csv-raw", {}, page="idashboard")
         return return_csv('grades_{0}_raw.csv'.format(course_id),
                           get_student_grade_summary_data(request, course, course_id, get_raw_scores=True, use_offline=use_offline))
 
-    elif 'Download CSV of answer distributions' in action:
+    elif _u('Download CSV of answer distributions') in action:
         track.views.server_track(request, "dump-answer-dist-csv", {}, page="idashboard")
         return return_csv('answer_dist_{0}.csv'.format(course_id), get_answers_distribution(request, course_id))
 
-    elif 'Dump description of graded assignments configuration' in action:
+    elif _u('Dump description of graded assignments configuration') in action:
         # what is "graded assignments configuration"?
         track.views.server_track(request, "dump-graded-assignments-config", {}, page="idashboard")
         msg += dump_grading_context(course)
 
-    elif "Rescore ALL students' problem submissions" in action:
+    elif _u("Rescore ALL student problem submissions") in action:
         problem_urlname = request.POST.get('problem_for_all_students', '')
         problem_url = get_module_url(problem_urlname)
         try:
@@ -403,7 +404,7 @@ def instructor_dashboard(request, course_id):
             log.error("Encountered exception from rescore: {0}".format(err))
             msg += '<font color="red">Failed to create a background task for rescoring "{0}": {1}.</font>'.format(problem_url, err.message)
 
-    elif "Reset ALL students' attempts" in action:
+    elif _u("Reset ALL student attempts") in action:
         problem_urlname = request.POST.get('problem_for_all_students', '')
         problem_url = get_module_url(problem_urlname)
         try:
@@ -419,7 +420,7 @@ def instructor_dashboard(request, course_id):
             log.error("Encountered exception from reset: {0}".format(err))
             msg += '<font color="red">Failed to create a background task for resetting "{0}": {1}.</font>'.format(problem_url, err.message)
 
-    elif "Show Background Task History for Student" in action:
+    elif _u("Show Background Task History for Student") in action:
         # put this before the non-student case, since the use of "in" will cause this to be missed
         unique_student_identifier = request.POST.get('unique_student_identifier', '')
         message, student = get_student_from_identifier(unique_student_identifier)
@@ -431,15 +432,15 @@ def instructor_dashboard(request, course_id):
             message, datatable = get_background_task_table(course_id, problem_url, student)
             msg += message
 
-    elif "Show Background Task History" in action:
+    elif _u("Show Background Task History") in action:
         problem_urlname = request.POST.get('problem_for_all_students', '')
         problem_url = get_module_url(problem_urlname)
         message, datatable = get_background_task_table(course_id, problem_url)
         msg += message
 
-    elif ("Reset student's attempts" in action or
-          "Delete student state for module" in action or
-          "Rescore student's problem submission" in action):
+    elif (_u("Reset student attempts") in action or
+          _u("Delete student state for module") in action or
+          _u("Rescore student problem submission") in action):
         # get the form data
         unique_student_identifier = request.POST.get(
             'unique_student_identifier', ''
@@ -467,7 +468,7 @@ def instructor_dashboard(request, course_id):
                 log.debug(error_msg)
 
         if student_module is not None:
-            if "Delete student state for module" in action:
+            if _u("Delete student state for module") in action:
                 # delete the state
                 try:
                     student_module.delete()
@@ -489,7 +490,7 @@ def instructor_dashboard(request, course_id):
                     )
                     msg += "<font color='red'>" + error_msg + "({0}) ".format(err) + "</font>"
                     log.exception(error_msg)
-            elif "Reset student's attempts" in action:
+            elif _u("Reset student attempts") in action:
                 # modify the problem's state
                 try:
                     # load the state json
@@ -531,7 +532,7 @@ def instructor_dashboard(request, course_id):
                     )
                     )
 
-    elif "Get link to student's progress page" in action:
+    elif _u("Get link to student progress page") in action:
         unique_student_identifier = request.POST.get('unique_student_identifier', '')
         # try to uniquely id student by email address or username
         message, student = get_student_from_identifier(unique_student_identifier)
@@ -544,11 +545,11 @@ def instructor_dashboard(request, course_id):
     #----------------------------------------
     # export grades to remote gradebook
 
-    elif action == 'List assignments available in remote gradebook':
+    elif action == _u('List assignments available in remote gradebook'):
         msg2, datatable = _do_remote_gradebook(request.user, course, 'get-assignments')
         msg += msg2
 
-    elif action == 'List assignments available for this course':
+    elif action == _u('List assignments available for this course'):
         log.debug(action)
         allgrades = get_student_grade_summary_data(request, course, course_id, get_grades=True, use_offline=use_offline)
 
@@ -559,7 +560,7 @@ def instructor_dashboard(request, course_id):
 
         msg += 'assignments=<pre>%s</pre>' % assignments
 
-    elif action == 'List enrolled students matching remote gradebook':
+    elif action == _u('List enrolled students matching remote gradebook'):
         stud_data = get_student_grade_summary_data(request, course, course_id, get_grades=False, use_offline=use_offline)
         msg2, rg_stud_data = _do_remote_gradebook(request.user, course, 'get-membership')
         datatable = {'header': ['Student  email', 'Match?']}
@@ -570,8 +571,8 @@ def instructor_dashboard(request, course_id):
         datatable['data'] = [[x.email, domatch(x)] for x in stud_data['students']]
         datatable['title'] = action
 
-    elif action in ['Display grades for assignment', 'Export grades for assignment to remote gradebook',
-                    'Export CSV file of grades for assignment']:
+    elif action in [_u('Display grades for assignment'), _u('Export grades for assignment to remote gradebook'),
+                    _u('Export CSV file of grades for assignment')]:
 
         log.debug(action)
         datatable = {}
@@ -595,11 +596,11 @@ def instructor_dashboard(request, course_id):
 
                 datatable['title'] = 'Grades for assignment "%s"' % aname
 
-                if 'Export CSV' in action:
+                if _u('Export CSV') in action:
                     # generate and return CSV file
                     return return_csv('grades %s.csv' % aname, datatable)
 
-                elif 'remote gradebook' in action:
+                elif _u('remote gradebook') in action:
                     file_pointer = StringIO()
                     return_csv('', datatable, file_pointer=file_pointer)
                     file_pointer.seek(0)
@@ -610,32 +611,32 @@ def instructor_dashboard(request, course_id):
     #----------------------------------------
     # Admin
 
-    elif 'List course staff' in action:
+    elif _u('List course staff') in action:
         role = CourseStaffRole(course.location)
         datatable = _role_members_table(role, "List of Staff", course_id)
         track.views.server_track(request, "list-staff", {}, page="idashboard")
 
-    elif 'List course instructors' in action and GlobalStaff().has_user(request.user):
+    elif _u('List course instructors') in action and GlobalStaff().has_user(request.user):
         role = CourseInstructorRole(course.location)
         datatable = _role_members_table(role, "List of Instructors", course_id)
         track.views.server_track(request, "list-instructors", {}, page="idashboard")
 
-    elif action == 'Add course staff':
+    elif action == _u('Add course staff'):
         uname = request.POST['staffuser']
         role = CourseStaffRole(course.location)
         msg += add_user_to_role(request, uname, role, 'staff', 'staff')
 
-    elif action == 'Add instructor' and request.user.is_staff:
+    elif action == _u('Add instructor') and request.user.is_staff:
         uname = request.POST['instructor']
         role = CourseInstructorRole(course.location)
         msg += add_user_to_role(request, uname, role, 'instructor', 'instructor')
 
-    elif action == 'Remove course staff':
+    elif action == _u('Remove course staff'):
         uname = request.POST['staffuser']
         role = CourseStaffRole(course.location)
         msg += remove_user_from_role(request, uname, role, 'staff', 'staff')
 
-    elif action == 'Remove instructor' and request.user.is_staff:
+    elif action == _u('Remove instructor') and request.user.is_staff:
         uname = request.POST['instructor']
         role = CourseInstructorRole(course.location)
         msg += remove_user_from_role(request, uname, role, 'instructor', 'instructor')
@@ -643,7 +644,7 @@ def instructor_dashboard(request, course_id):
     #----------------------------------------
     # DataDump
 
-    elif 'Download CSV of all student profile data' in action:
+    elif _u('Download CSV of all student profile data') in action:
         enrolled_students = User.objects.filter(
             courseenrollment__course_id=course_id,
             courseenrollment__is_active=1,
@@ -660,7 +661,7 @@ def instructor_dashboard(request, course_id):
         datatable['title'] = 'Student profile data for course %s' % course_id
         return return_csv('profiledata_%s.csv' % course_id, datatable)
 
-    elif 'Download CSV of all responses to problem' in action:
+    elif _u('Download CSV of all responses to problem') in action:
         problem_to_dump = request.POST.get('problem_to_dump', '')
 
         if problem_to_dump[-4:] == ".xml":
@@ -683,7 +684,7 @@ def instructor_dashboard(request, course_id):
             datatable['title'] = 'Student state for problem %s' % problem_to_dump
             return return_csv('student_state_from_%s.csv' % problem_to_dump, datatable)
 
-    elif 'Dump of all responses to problem' in action or 'Download XLSX of all responses to problem' in action:
+    elif _u('Dump of all responses to problem') in action or _u('Download XLSX of all responses to problem') in action:
         log.debug(action)
         problem_to_dump = request.POST.get('problem_to_dump', '')
 
@@ -798,12 +799,12 @@ def instructor_dashboard(request, course_id):
             datatable['data'] = sorted(datatable['data'], key=lambda row: row[1])
 
 
-            if 'Download XLSX of all responses to problem' in action:
+            if _u('Download XLSX of all responses to problem') in action:
                 t = datetime.now()
                 file_name = '{0}{1}{2}_{3}_{4}_{5}.xlsx'.format(t.year, t.month, t.day, t.hour, t.minute, problem_name)
                 return return_xlsx(file_name, datatable)
 
-    elif "Dump of section results" in action or 'Download XLSX of all responses to section' in action:
+    elif _u("Dump of section results") in action or _u('Download XLSX of all responses to section') in action:
         log.debug(action)
         section_to_dump = request.POST.get('section_to_dump', '')
         (org, course_name, _) = course_id.split("/")
@@ -887,7 +888,7 @@ def instructor_dashboard(request, course_id):
                             if found > 0:
                                 tmp = j.find('_')
                                 key = j[:j.find('_', tmp + 1)]
-                                if 'Dump of section results' in action:
+                                if _u('Dump of section results') in action:
                                     correctness = data['correct_map'][j[:found]]['correctness']
                                     answers[key] = {j[:found]:[data['student_answers'][j].encode('utf-8'), correctness]}
                             else:
@@ -944,12 +945,12 @@ def instructor_dashboard(request, course_id):
         datatable['title'] = 'Students state for section {0} ({1})'.format(section_name, section_to_dump)
         datatable['data'] = sorted(datatable['data'], key=lambda row: row[1])
 
-        if 'Download XLSX of all responses to section' in action:
+        if _u('Download XLSX of all responses to section') in action:
             t = datetime.now()
             file_name = '{0}{1}{2}_{3}_{4}_{5}.xlsx'.format(t.year, t.month, t.day, t.hour, t.minute, section_name)
             return return_xlsx(file_name, datatable)
             
-    elif 'Download CSV of all student anonymized IDs' in action:
+    elif _u('Download CSV of all student anonymized IDs') in action:
         students = User.objects.filter(
             courseenrollment__course_id=course_id,
         ).order_by('id')
@@ -961,12 +962,12 @@ def instructor_dashboard(request, course_id):
     #----------------------------------------
     # Group management
 
-    elif 'List beta testers' in action:
+    elif _u('List beta testers') in action:
         role = CourseBetaTesterRole(course.location)
         datatable = _role_members_table(role, "List of Beta Testers", course_id)
         track.views.server_track(request, "list-beta-testers", {}, page="idashboard")
 
-    elif action == 'Add beta testers':
+    elif action == _u('Add beta testers'):
         users = request.POST['betausers']
         log.debug("users: {0!r}".format(users))
         role = CourseBetaTesterRole(course.location)
@@ -974,7 +975,7 @@ def instructor_dashboard(request, course_id):
             msg += "<p>{0}</p>".format(
                 add_user_to_role(request, username_or_email, role, 'beta testers', 'beta-tester'))
 
-    elif action == 'Remove beta testers':
+    elif action == _u('Remove beta testers'):
         users = request.POST['betausers']
         role = CourseBetaTesterRole(course.location)
         for username_or_email in split_by_comma_and_whitespace(users):
@@ -984,50 +985,50 @@ def instructor_dashboard(request, course_id):
     #----------------------------------------
     # forum administration
 
-    elif action == 'List course forum admins':
+    elif action == _u('List course forum admins'):
         rolename = FORUM_ROLE_ADMINISTRATOR
         datatable = {}
         msg += _list_course_forum_members(course_id, rolename, datatable)
         track.views.server_track(request, "list-forum-admins", {"course": course_id}, page="idashboard")
 
-    elif action == 'Remove forum admin':
+    elif action == _u('Remove forum admin'):
         uname = request.POST['forumadmin']
         msg += _update_forum_role_membership(uname, course, FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_REMOVE)
         track.views.server_track(request, "remove-forum-admin", {"username": uname, "course": course_id}, page="idashboard")
 
-    elif action == 'Add forum admin':
+    elif action == _u('Add forum admin'):
         uname = request.POST['forumadmin']
         msg += _update_forum_role_membership(uname, course, FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_ADD)
         track.views.server_track(request, "add-forum-admin", {"username": uname, "course": course_id}, page="idashboard")
 
-    elif action == 'List course forum moderators':
+    elif action == _u('List course forum moderators'):
         rolename = FORUM_ROLE_MODERATOR
         datatable = {}
         msg += _list_course_forum_members(course_id, rolename, datatable)
         track.views.server_track(request, "list-forum-mods", {"course": course_id}, page="idashboard")
 
-    elif action == 'Remove forum moderator':
+    elif action == _u('Remove forum moderator'):
         uname = request.POST['forummoderator']
         msg += _update_forum_role_membership(uname, course, FORUM_ROLE_MODERATOR, FORUM_ROLE_REMOVE)
         track.views.server_track(request, "remove-forum-mod", {"username": uname, "course": course_id}, page="idashboard")
 
-    elif action == 'Add forum moderator':
+    elif action == _u('Add forum moderator'):
         uname = request.POST['forummoderator']
         msg += _update_forum_role_membership(uname, course, FORUM_ROLE_MODERATOR, FORUM_ROLE_ADD)
         track.views.server_track(request, "add-forum-mod", {"username": uname, "course": course_id}, page="idashboard")
 
-    elif action == 'List course forum community TAs':
+    elif action == _u('List course forum community TAs'):
         rolename = FORUM_ROLE_COMMUNITY_TA
         datatable = {}
         msg += _list_course_forum_members(course_id, rolename, datatable)
         track.views.server_track(request, "list-forum-community-TAs", {"course": course_id}, page="idashboard")
 
-    elif action == 'Remove forum community TA':
+    elif action == _u('Remove forum community TA'):
         uname = request.POST['forummoderator']
         msg += _update_forum_role_membership(uname, course, FORUM_ROLE_COMMUNITY_TA, FORUM_ROLE_REMOVE)
         track.views.server_track(request, "remove-forum-community-TA", {"username": uname, "course": course_id}, page="idashboard")
 
-    elif action == 'Add forum community TA':
+    elif action == _u('Add forum community TA'):
         uname = request.POST['forummoderator']
         msg += _update_forum_role_membership(uname, course, FORUM_ROLE_COMMUNITY_TA, FORUM_ROLE_ADD)
         track.views.server_track(request, "add-forum-community-TA", {"username": uname, "course": course_id}, page="idashboard")
@@ -1035,13 +1036,13 @@ def instructor_dashboard(request, course_id):
     #----------------------------------------
     # enrollment
 
-    elif action == 'List students who may enroll but may not have yet signed up':
+    elif action == _u('List students who may enroll but may not have yet signed up'):
         ceaset = CourseEnrollmentAllowed.objects.filter(course_id=course_id)
         datatable = {'header': ['StudentEmail']}
         datatable['data'] = [[x.email] for x in ceaset]
         datatable['title'] = action
 
-    elif action == 'Enroll multiple students':
+    elif action == _u('Enroll multiple students'):
 
         is_shib_course = uses_shib(course)
         students = request.POST.get('multiple_students', '')
@@ -1050,27 +1051,27 @@ def instructor_dashboard(request, course_id):
         ret = _do_enroll_students(course, course_id, students, auto_enroll=auto_enroll, email_students=email_students, is_shib_course=is_shib_course)
         datatable = ret['datatable']
 
-    elif action == 'Unenroll multiple students':
+    elif action == _u('Unenroll multiple students'):
 
         students = request.POST.get('multiple_students', '')
         email_students = bool(request.POST.get('email_students'))
         ret = _do_unenroll_students(course_id, students, email_students=email_students)
         datatable = ret['datatable']
 
-    elif action == 'List sections available in remote gradebook':
+    elif action == _u('List sections available in remote gradebook'):
 
         msg2, datatable = _do_remote_gradebook(request.user, course, 'get-sections')
         msg += msg2
 
-    elif action in ['List students in section in remote gradebook',
-                    'Overload enrollment list using remote gradebook',
-                    'Merge enrollment list with remote gradebook']:
+    elif action in [_u('List students in section in remote gradebook'),
+                    _u('Overload enrollment list using remote gradebook'),
+                    _u('Merge enrollment list with remote gradebook')]:
 
         section = request.POST.get('gradebook_section', '')
         msg2, datatable = _do_remote_gradebook(request.user, course, 'get-membership', dict(section=section))
         msg += msg2
 
-        if not 'List' in action:
+        if not _u('List') in action:
             students = ','.join([x['email'] for x in datatable['retdata']])
             overload = 'Overload' in action
             ret = _do_enroll_students(course, course_id, students, overload=overload)
@@ -1079,7 +1080,7 @@ def instructor_dashboard(request, course_id):
     #----------------------------------------
     # email
 
-    elif action == 'Send email':
+    elif action == _u('Send email'):
         email_to_option = request.POST.get("to_option")
         email_subject = request.POST.get("subject")
         html_message = request.POST.get("message")
@@ -1106,18 +1107,18 @@ def instructor_dashboard(request, course_id):
             else:
                 email_msg = '<div class="msg msg-confirm"><p class="copy">Your email was successfully queued for sending.</p></div>'
 
-    elif "Show Background Email Task History" in action:
+    elif _u("Show Background Email Task History") in action:
         message, datatable = get_background_task_table(course_id, task_type='bulk_course_email')
         msg += message
 
-    elif "Show Background Email Task History" in action:
+    elif _u("Show Background Email Task History") in action:
         message, datatable = get_background_task_table(course_id, task_type='bulk_course_email')
         msg += message
 
     #----------------------------------------
     # psychometrics
 
-    elif action == 'Generate Histogram and IRT Plot':
+    elif action == _u('Generate Histogram and IRT Plot'):
         problem = request.POST['Problem']
         nmsg, plots = psychoanalyze.generate_plots_for_problem(problem)
         msg += nmsg
@@ -1525,7 +1526,7 @@ def get_student_grade_summary_data(request, course, course_id, get_grades=True, 
         if get_raw_scores:
             assignments += [score.section for score in gradeset['raw_scores']]
         else:
-            assignments += [x['label'] for x in gradeset['section_breakdown']]
+            assignments += [x['label'].encode('utf-8') for x in gradeset['section_breakdown']]
     header += assignments
 
     datatable = {'header': header, 'assignments': assignments, 'students': enrolled_students}
