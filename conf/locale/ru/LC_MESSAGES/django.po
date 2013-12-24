@@ -7012,6 +7012,10 @@ msgid "Jump to"
 msgstr "Перейти в"
 
 
+msgid "Course preferences"
+msgstr "Настройки курса"
+
+
 
 msgid "if all of theese terms are done:"
 msgstr "если все следующие условия выполнены:"
