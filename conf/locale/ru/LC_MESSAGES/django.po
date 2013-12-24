@@ -916,7 +916,7 @@ msgstr "Номер курса"
 
 #: cms/templates/index.html:112
 msgid "e.g. CS101"
-msgstr "например, CS101"
+msgstr "Например: CS101"
 
 #: cms/templates/index.html:113
 msgid "The unique number that identifies your course within your organization"
@@ -928,7 +928,7 @@ msgstr "Период проведения курса"
 
 #: cms/templates/index.html:119
 msgid "e.g. 2013_Spring"
-msgstr "например, 2013_Весна"
+msgstr "Например: 2013_Весна"
 
 #: cms/templates/index.html:120
 msgid "The term in which your course will run"
@@ -6963,12 +6963,11 @@ msgstr "Вам нужно ввести корректный e-mail"
 msgid "Position"
 msgstr "Должность"
 
+msgid "e.g. UniversityX or OrganizationX"
+msgstr "Например: MSU"
 
-
-
-
-
-
+msgid 'e.g. 2014_T1'
+msgstr 'Например: winter2014'
 
 
 #accepted domaints
