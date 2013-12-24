@@ -6966,9 +6966,11 @@ msgstr "Должность"
 msgid "e.g. UniversityX or OrganizationX"
 msgstr "Например: MSU"
 
-msgid 'e.g. 2014_T1'
-msgstr 'Например: winter2014'
+msgid "e.g. 2014_T1"
+msgstr "Например: winter2014"
 
+msgid "e.g. Mathematics"
+msgstr "Например: Математика"
 
 #accepted domaints
 
