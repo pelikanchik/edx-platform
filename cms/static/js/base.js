@@ -257,7 +257,7 @@ function createNewUnit(e) {
     $.postJSON(ModuleUtils.getUpdateUrl(), {
         'parent_locator': parent,
         'category': category,
-        'display_name': 'New Unit'
+        'display_name': gettext('New Unit')
     },
 
     function(data) {
