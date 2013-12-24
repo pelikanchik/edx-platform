@@ -532,3 +532,7 @@ msgstr "Доступность без регистрации"
 
 msgid "Show In LMS"
 msgstr "Отображать курс в публичной части"
+
+
+msgid "Processing your account information &hellip;"
+msgstr "Отправка формы..."

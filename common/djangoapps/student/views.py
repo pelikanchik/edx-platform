@@ -964,7 +964,7 @@ def create_account(request, post_override=None):
                          'password': 'A valid password is required.',
                          'terms_of_service': 'Accepting Terms of Service is required.',
                          'honor_code': 'Agreeing to the Honor Code is required.'}
-            js['value'] = error_str[a]
+            js['value'] = _(error_str[a])
             js['field'] = a
             return HttpResponse(json.dumps(js))
 

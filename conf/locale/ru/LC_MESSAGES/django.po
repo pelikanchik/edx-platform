@@ -6917,7 +6917,7 @@ msgid "If you didn't request this change, you can disregard this email - we have
 msgstr "Если вы не запрашивали смену пароля - проигнорируйте это сообщение. Ваш пароль ещё не изменен."
 
 
-msgid "Username must be minimum of two characters long"
+msgid "Username must be minimum of two characters long."
 msgstr "Имя пользователя не должно быть короче 2 символов"
 
 msgid "Your legal name must be a minimum of two characters long."
