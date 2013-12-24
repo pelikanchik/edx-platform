@@ -82,7 +82,7 @@ AUDIT_LOG = logging.getLogger("audit")
 Article = namedtuple('Article', 'title url author image deck publication publish_date')
 
 if settings.MITX_FEATURES.get('ACCEPTED_DOMAINS_ENABLE'):
-    ACCEPTED_DOMAINS = ['asbis.ru']
+    ACCEPTED_DOMAINS = ['asbis.ba', 'asbis.bg', 'asbis.by', 'asbis.com.cy', 'asbis.cz', 'asbis.de', 'asbis.ee', 'asbis.es', 'asbis.eu', 'asbis.hr', 'asbis.com.hr', 'asbis.hu', 'asbis.ie', 'asbis.it', 'asbis.lt', 'asbis.lv', 'asbis.nl', 'asbis.pl', 'asbis.pt', 'asbis.ro', 'asbis.rs', 'asbis.ru', 'asbis.si', 'asbis.sk', 'asbis.com.tr', 'asbis.ua', 'asbis.com.ua', 'asbis.co.uk', 'asbis.com', 'prestigio.at', 'prestigio.ba', 'prestigio.be', 'prestigio.bg', 'prestigio.by', 'prestigio.ch', 'prestigio.com.cy', 'prestigio.cz', 'prestigio.de', 'prestigio.dk', 'prestigio.ee', 'prestigio.es', 'prestigio.com.es', 'prestigio.eu', 'prestigio.fr', 'prestigio.gr', 'prestigio.hr', 'prestigio.com.hr', 'prestigio.hu', 'prestigio.it', 'prestigio.li', 'prestigio.lt', 'prestigio.lv', 'prestigio.md', 'prestigio.nl', 'prestigio.pl', 'prestigio.com.pl', 'prestigio.pt', 'prestigio.com.pt', 'prestigio.ro', 'prestigio.rs', 'prestigio.ru', 'prestigio.se', 'prestigio.si', 'prestigio.sk', 'prestigio.com.tr', 'prestigio.ua', 'prestigio.com.ua', 'prestigio.co.uk', 'prestigio.uk.com', 'prestigio.com', 'canyon-tech.com.tw', 'canyon.com', 'canyon.com.tw', 'asbis.com.tw', 'canyon.at', 'canyon.be', 'canyon.bg', 'canyon.by', 'canyon.ch', 'canyon.cz', 'canyon.de', 'canyon.ee', 'canyon.eu', 'canyon.fi', 'canyon.fr', 'canyon.gr', 'canyon.hr', 'canyon.com.hr', 'canyon.hu', 'canyon.ie', 'canyon.it', 'canyon.li', 'canyon.lt', 'canyon.me', 'canyon.nl', 'canyon.no', 'canyon.pl', 'canyon.com.pl', 'canyon.rs', 'canyon.ru', 'canyon.se', 'canyon.sk', 'canyon.ua', 'canyon.com.ua', 'canyon.co.uk', 'canyon.org.uk', 'canyon.uk.com', 'asbis-eg.com', 'asbisme.ae', 'it-max.by', 'easacompany.ru', 'itaka-dc.ru', 'asbis.co.za', 'asbis.kz', 'prestigio.kz', 'canyon.kz', 'megatrend.ba', 'asbis.biz']
 
 def csrf_token(context):
     """A csrf token that can be included in a form."""
@@ -1123,8 +1123,7 @@ def create_account(request, post_override=None):
         try:
             validate_domain(post_vars['email'], ACCEPTED_DOMAINS)
         except ValidationError:
-            accepted_domains = ' или '.join(domain for domain in ACCEPTED_DOMAINS)
-            js['value'] = _("Domain should be {0}.").format(accepted_domains).format(field=a)
+            js['value'] = _("Email has incorrect domain").format(field=a)
             js['field'] = 'email'
             return HttpResponse(json.dumps(js))
 
