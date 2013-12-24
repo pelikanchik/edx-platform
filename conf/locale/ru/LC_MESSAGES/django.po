@@ -542,7 +542,7 @@ msgid ""
 "The backbone of your course is how it is organized. Studio offers an "
 "<strong>Outline</strong> editor, providing a simple hierarchy and easy drag "
 "and drop to help you and your students stay organized."
-msgstr "Главное в вашем курсе — это его структура. Studio предлагает <strong>редактор структуры</strong> с удобным интерфейсом, позволяющим перетаскивать элементы. Это облегчит жизнь вам и вашим студентам."
+msgstr "Главное в вашем курсе — это его структура. Studio предлагает <strong>редактор структуры</strong> с удобным интерфейсом, позволяющим перетаскивать элементы. Это облегчит жизнь вам и вашим студентам."
 
 #: cms/templates/howitworks.html:47
 msgid "Simple Organization For Content"
@@ -1101,7 +1101,7 @@ msgid ""
 "Please check your Junk or Spam folders in case our email isn't in your "
 "INBOX. Still can't find the verification email? Request help via the link "
 "below."
-msgstr "Пожалуйста, проверьте папку «Спам», если нашего письма нет в папке «Входящие». Всё ещё не получается найти письмо? Можете обратиться за помощью по ссылке внизу."
+msgstr "Пожалуйста, проверьте папку «Спам», если нашего письма нет в папке «Входящие». Всё ещё не получается найти письмо? Можете обратиться за помощью по ссылке внизу."
 
 #: cms/templates/login.html:6 cms/templates/widgets/header.html:159
 msgid "Sign In"
@@ -1858,6 +1858,8 @@ msgstr "Поиск и устранение неисправностей"
 msgid "Study Groups"
 msgstr "Учебные группы"
 
+
+
 #: cms/templates/settings_discussions_faculty.html:377
 #: cms/templates/settings_discussions_faculty.html:389
 #: cms/templates/settings_discussions_faculty.html:400
@@ -2013,7 +2015,7 @@ msgid ""
 "knowledge is required, but for some of the more advanced features, a "
 "technical background would be helpful. As always, we are here to help, so "
 "don't hesitate to dive right in."
-msgstr "Студия — программное обеспечение, разработанное для использования практически любым человеком, знакомым с основными системами управления контентом (Wordpress, Moodle и др.).  Знание программирования не требуется, но для некоторых расширенных функций технические знания могут быть полезны. Не стесняйтесь пробовать, если что-то не получится — вам смогут помочь."
+msgstr "Студия — программное обеспечение, разработанное для использования практически любым человеком, знакомым с основными системами управления контентом (Wordpress, Moodle и др.).  Знание программирования не требуется, но для некоторых расширенных функций технические знания могут быть полезны. Не стесняйтесь пробовать, если что-то не получится — вам смогут помочь."
 
 #: cms/templates/signup.html:91
 msgid "I've never authored a course online before. Is there help?"
@@ -2904,7 +2906,7 @@ msgid ""
 "all ages anywhere in the world, wherever there is Internet access. "
 "{platform_name}'s free online MOOCs are interactive and subjects include "
 "computer science, public health, and artificial intelligence."
-msgstr "{platform_name} — некоммерческая платформа, созданная благодаря партнёрству {Harvard} и {MIT}. Её задача заключается в предоставлении доступа к лучшему высшему образованию имеющим доступ в Интернет студентам всех возрастов по всему миру. Бесплатные онлайн курсы {platform_name} интерактивны и охватывают ряд предметов, включая computer science, здравоохранение и искусственный интеллект."
+msgstr "{platform_name} — некоммерческая платформа, созданная благодаря партнёрству {Harvard} и {MIT}. Её задача заключается в предоставлении доступа к лучшему высшему образованию имеющим доступ в Интернет студентам всех возрастов по всему миру. Бесплатные онлайн курсы {platform_name} интерактивны и охватывают ряд предметов, включая computer science, здравоохранение и искусственный интеллект."
 
 #: lms/templates/footer.html:77
 msgid "&copy; 2013 {platform_name}, some rights reserved."
@@ -3498,7 +3500,7 @@ msgid ""
 "Registering with {platform_name} gives you access to all of our current and "
 "future free courses. Not ready to take a course just yet? Registering puts "
 "you on our mailing list - we will update you as courses are added."
-msgstr "Регистрация даёт вам доступ ко всем уже созданным и будущим курсам. Пока не готовы участвовать в курсе? Зарегистрируйтесь и подпишитесь вас на нашу рассылку — мы сообщим вам о добавлении новых курсов."
+msgstr "Регистрация даёт вам доступ ко всем уже созданным и будущим курсам. Пока не готовы участвовать в курсе? Зарегистрируйтесь и подпишитесь вас на нашу рассылку — мы сообщим вам о добавлении новых курсов."
 
 #: lms/templates/register.html:311
 msgid "Next Steps"
@@ -5789,6 +5791,7 @@ msgstr "Продолжить"
 msgid "Ready to grade!"
 msgstr "Готов оценивать!"
 
+
 #: lms/templates/peer_grading/peer_grading_problem.html:91
 msgid ""
 "You have finished learning to grade, which means that you are now ready to "
@@ -7027,16 +7030,6 @@ msgstr "Результат (абсолютный)"
 
 msgid "Score (relative, %)"
 msgstr "Результат (относительный, %)"
-
-
-msgid "e.g. Mathematics or Physics"
-msgstr "Например, Математика или Физика"
-
-msgid "Subject"
-msgstr "Предмет"
-
-msgid "The name of the subject"
-msgstr "Название дисциплины"
 
 
 
