@@ -8,6 +8,7 @@ html, body {
   font-size: 1em;
   font-style: normal;
   line-height: 1em;
+  height: 100%;
   //-webkit-font-smoothing: antialiased;
 }
 
@@ -98,11 +99,18 @@ a:focus {
    **/
 }
 
+.page-wrapper {
+
+  height: auto;
+  min-height: 100%;
+  background:$course-bg-image;
+
+}
 .content-wrapper {
+  padding-bottom: 104px!important;
   width: flex-grid(12);
   margin: 0 auto;
   background: $content-wrapper-bg;
-  padding-bottom: ($baseline*2);
 }
 
 .container {

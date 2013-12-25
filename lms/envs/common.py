@@ -75,7 +75,7 @@ MITX_FEATURES = {
                                         # set to None to do no university selection
 
     'ENABLE_TEXTBOOK': True,
-    'ENABLE_DISCUSSION_SERVICE': True,
+    'ENABLE_DISCUSSION_SERVICE': False,
     # discussion home panel, which includes a subscription on/off setting for discussion digest emails.
     # this should remain off in production until digest notifications are online.
     'ENABLE_DISCUSSION_HOME_PANEL': False,

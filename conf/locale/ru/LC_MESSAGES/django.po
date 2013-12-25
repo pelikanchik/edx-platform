@@ -7011,6 +7011,9 @@ msgstr "Регистрация на курс {course_name}"
 msgid "Course Team Roles"
 msgstr "Роли"
 
+msgid "User Info"
+msgstr "Персональные данные"
+
 
 msgid "Course team members, or staff, are course co-authors. They have full writing and editing privileges on all course content."
 msgstr "Команда курса - это соавторы курса. У них есть полные права по внесению и изменению информации на весь контент курса"
