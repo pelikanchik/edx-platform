@@ -66,6 +66,7 @@
 </head>
 
 <body class="<%block name='bodyclass'/>">
+<div class = "page-wrapper">
   <a class="nav-skip" href="#content">${_("Skip to this view's content")}</a>
 
   <%include file="mathjax_accessible.html" />
@@ -80,7 +81,7 @@
     ${self.body()}
     <%block name="bodyextra"/>
   </section>
-
+</div>
 % if theme_enabled():
   <%include file="theme-footer.html" />
 % elif not suppress_toplevel_navigation:
