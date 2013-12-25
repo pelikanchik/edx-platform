@@ -6,7 +6,9 @@ class @Problem
     @el = $(element).find('.problems-wrapper')
     @id = @el.data('problem-id')
     @element_id = @el.attr('id')
+    @el_show = @el.attr('show_answers_button')
     @url = @el.data('url')
+    @index_show = 0
     @render()
 
   $: (selector) ->

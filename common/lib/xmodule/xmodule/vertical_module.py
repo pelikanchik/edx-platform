@@ -34,8 +34,10 @@ class VerticalModule(VerticalFields, XModule):
             contents.append({
                 'id': child.id,
                 'content': rendered_child.content,
+                'father': self.id,                
                 'direct_term': self.direct_term,
-                'progress_detail': Progress.to_js_detail_str(self.get_progress())
+                'progress_detail': Progress.to_js_detail_str(self.get_progress()),
+                'type': child.get_icon_class()                
             })
 
         fragment.add_content(self.system.render_template('vert_module.html', {

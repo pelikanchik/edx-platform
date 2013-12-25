@@ -40,7 +40,7 @@ log = logging.getLogger(__name__)
 class VideoFields(object):
     """Fields for `VideoModule` and `VideoDescriptor`."""
     display_name = String(
-#<<<<<<< HEAD
+
         display_name="Display Name", help="Display name for this module.",
         default="Video",
         scope=Scope.settings
@@ -61,7 +61,7 @@ class VideoFields(object):
     youtube_id_1_0 = String(
         help="This is the Youtube ID reference for the normal speed video.",
         display_name="Youtube ID",
-        scope=Scope.settings,
+            scope=Scope.settings,
         default="OEoXaMPEzfM"
     )
     youtube_id_0_75 = String(
@@ -95,7 +95,12 @@ class VideoFields(object):
         default=datetime.timedelta(seconds=0)
     )
     #front-end code of video player checks logical validity of (start_time, end_time) pair.
-
+    problem_after_video = Boolean(
+        help=u"Показать задание по завершении видео.", 
+        display_name=u"Задачка после видео", 
+        scope=Scope.settings,
+        default=True
+    )
     source = String(
         help="The external URL to download the video. This appears as a link beneath the video.",
         display_name="Download Video",
@@ -119,30 +124,6 @@ class VideoFields(object):
         scope=Scope.settings,
         default=""
     )
-#=======
-#        display_name=u"Отображаемое имя",
-#        help=u"Это имя появляется в горизонтальной навигации наверху страницы.",
-#        scope=Scope.settings,
-#        # it'd be nice to have a useful default but it screws up other things; so,
-#        # use display_name_with_default for those
-#        default=u"Видео"
-#    )
-#    data = String(
-#        help=u"XML-данные",
-#        default='',
-#        scope=Scope.content
-#    )
-#    position = Integer(help=u"Текущая позиция в видео", scope=Scope.user_state, default=0)
-#    show_captions = Boolean(help=u"Управляет, показываются ли по умолчанию заголовки.", display_name=u"Показывать заголовки", scope=Scope.settings, default=True)
-#    youtube_id_1_0 = String(help=u"YouTube ID для видео нормальной скорости.", display_name=u"Обычная скорость", scope=Scope.settings, default="OEoXaMPEzfM")
-#    youtube_id_0_75 = String(help=u"Youtube ID для видео скорости 0.75x.", display_name=u"Скорость: .75x", scope=Scope.settings, default="")
-#    youtube_id_1_25 = String(help=u"Youtube ID для видео скорости 1.25x", display_name=u"Скорость: 1.25x", scope=Scope.settings, default="")
-#    youtube_id_1_5 = String(help=u"Youtube ID для видео скорости 1.5x", display_name=u"Скорость: 1.5x", scope=Scope.settings, default="")
-#    start_time = Float(help=u"Время запуска видео", display_name=u"Время начала", scope=Scope.settings, default=0.0)
-#    end_time = Float(help=u"Время, когда показ видео закончится", display_name=u"Время окончания", scope=Scope.settings, default=0.0)
-#    source = String(help=u"Внешняя ссылка на видеофайл.", display_name=u"Скачать видео", scope=Scope.settings, default="")
-#    track = String(help=u"Внешняя ссылка на субтитры.", display_name=u"Скачать субтитры", scope=Scope.settings, default="")
-#>>>>>>> 4f9bf342df105f2a5f00372194e6f7a65dac6f8b
 
 
 class VideoModule(VideoFields, XModule):
@@ -187,6 +168,7 @@ class VideoModule(VideoFields, XModule):
         raise Http404()
 
     def get_html(self):
+        problem_id = None
         caption_asset_path = "/static/subs/"
 
         get_ext = lambda filename: filename.rpartition('.')[-1]
@@ -200,7 +182,11 @@ class VideoModule(VideoFields, XModule):
             yt_test_url = 'https://gdata.youtube.com/feeds/api/videos/'
 
         return self.system.render_template('video.html', {
-            'youtube_streams': _create_youtube_string(self),
+            'youtube_id_0_75': self.youtube_id_0_75,
+            'youtube_id_1_0': self.youtube_id_1_0,
+            'youtube_id_1_25': self.youtube_id_1_25,
+            'youtube_id_1_5': self.youtube_id_1_5,
+            'problem_id': problem_id,            
             'id': self.location.html_id(),
             'sub': self.sub,
             'sources': sources,
@@ -239,14 +225,13 @@ class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor
 
     def __init__(self, *args, **kwargs):
         super(VideoDescriptor, self).__init__(*args, **kwargs)
-#<<<<<<< HEAD
         # For backwards compatibility -- if we've got XML data, parse
         # it out and set the metadata fields
         if self.data:
             field_data = self._parse_video_xml(self.data)
             self._field_data.set_many(self, field_data)
             del self.data
-#=======
+
         # If we don't have a `youtube_id_1_0`, this is an XML course
         # and we parse out the fields.
 #        if self.data and 'youtube_id_1_0' not in self._model_data:
@@ -255,14 +240,6 @@ class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor
     @property
     def get_class(self):
         return "VideoDescriptor"
-#
-#    @property
-#    def non_editable_metadata_fields(self):
-#        non_editable_fields = super(MetadataOnlyEditingDescriptor, self).non_editable_metadata_fields
-#        non_editable_fields.extend([VideoModule.start_time,
-#                                    VideoModule.end_time])
-#        return non_editable_fields
-#>>>>>>> 4f9bf342df105f2a5f00372194e6f7a65dac6f8b
 
     @classmethod
     def from_xml(cls, xml_data, system, org=None, course=None):

@@ -8,6 +8,7 @@
     id="video_${id}"
     class="video"
 
+    data-problem-id="${problem_id}"
     data-streams="${youtube_streams}"
 
     ${'data-sub="{}"'.format(sub) if sub else ''}
@@ -90,6 +91,8 @@
         <li></li>
       </ol>
     </div>
+  </div>
+%endif
 
     <a class="nav-skip sr" id="after-transcript_${id}" href="#before-transcript_${id}">${_('Go back to start of transcript.')}</a>
 

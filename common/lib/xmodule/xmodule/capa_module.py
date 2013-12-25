@@ -163,6 +163,11 @@ class CapaFields(object):
             {"display_name": "Per Student", "value": "per_student"}
         ]
     )
+    show_problem_after_video = Boolean(
+        help=u"Показать это задание по завершению просмотра видео",
+        scope=Scope.settings,
+        default=False
+    )
     data = String(help="XML data for the problem", scope=Scope.content, default="<problem></problem>")
     correct_map = Dict(help="Dictionary with the correctness of current student answers",
                        scope=Scope.user_state, default={})
@@ -584,6 +589,7 @@ class CapaModule(CapaFields, XModule):
                    'attempts_used': self.attempts,
                    'attempts_allowed': self.max_attempts,
                    'delay_answers': self.showbuttonanswer,
+                   'after_video': self.show_problem_after_video,
                    'check_answer': self.checkanswer,
                    'progress': self.get_progress(),
                    'progress_detail': Progress.to_js_detail_str(self.get_progress())
