@@ -25,25 +25,16 @@ define ["jquery", "jquery.ui", "gettext", "backbone",
         model: @model
       )
 
-    @nameView = new CMS.Views.UnitEdit.NameEdit(
-      el: @$('.unit-name-input')
-      model: @model
-    )
-    @termView = new CMS.Views.UnitEdit.TermEdit(
-      el: @$('.unit-term-input')
-      model: @model
-    )
-    @randomView = new CMS.Views.UnitEdit.RandomEdit(
-      el: @$('.unit-random-problem')
-      model: @model
-    )
-      @nameView = new UnitEditView.NameEdit(
+      @nameView = new CMS.Views.UnitEdit.NameEdit(
         el: @$('.unit-name-input')
         model: @model
       )
-
-      @termView = new UnitEditView.TermEdit(
+      @termView = new CMS.Views.UnitEdit.TermEdit(
         el: @$('.unit-term-input')
+        model: @model
+      )
+      @randomView = new CMS.Views.UnitEdit.RandomEdit(
+        el: @$('.unit-random-problem')
         model: @model
       )
 
