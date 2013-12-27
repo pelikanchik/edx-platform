@@ -71,7 +71,7 @@
 
                 %if section.get('due') is not None:
                   <%
-                      formatted_string = get_time_display(section['due'], course.due_date_display_format)
+                      formatted_string = get_time_display(section['due'], "%d.%m.%Y, %H:%M")
                       due_date = '' if len(formatted_string)==0 else _('due {date}'.format(date=formatted_string))
                   %>
                   <em>
