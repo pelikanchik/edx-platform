@@ -7024,6 +7024,14 @@ msgstr "Граф"
 msgid "Jump to"
 msgstr "Перейти в"
 
+msgid "Male"
+msgstr "Мужской"
+
+msgid "Female"
+msgstr "Женский"
+
+msgid "Other"
+msgstr "Иное"
 
 msgid "Course preferences"
 msgstr "Настройки курса"
