@@ -1,9 +1,10 @@
  html {
    overflow-y: scroll;
+   background-image: $course-bg-image;
+   background-color: $course-bg-color;
  }
 
 html, body {
-  background: $body-bg;
   font-family: $sans-serif;
   font-size: 1em;
   font-style: normal;
