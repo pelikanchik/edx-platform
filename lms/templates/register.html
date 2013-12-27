@@ -258,7 +258,7 @@
 
             <div class="field required checkbox" id="field-tos">
               <input id="tos-yes" type="checkbox" name="terms_of_service" value="true" required aria-required="true" />
-              <label for="tos-yes">${_('I agree to the {link_start}Terms of Service{link_end}').format(
+              <label for="tos-yes">${_('I will respect staff and other students').format(
                 link_start='<a href="{url}" class="new-vp">'.format(url=marketing_link('TOS')),
                 link_end='</a>')}</label>
             </div>
@@ -274,7 +274,7 @@
                 else:
                   honor_code_path = marketing_link('HONOR')
               %>
-              <label for="honorcode-yes">${_('I agree to the {link_start}Honor Code{link_end}').format(
+              <label for="honorcode-yes">${_('I will resolve tasks by myself').format(
                 link_start='<a href="{url}" class="new-vp">'.format(url=honor_code_path),
                 link_end='</a>')}</label>
             </div>
@@ -337,15 +337,15 @@
       % endif
     </div>
 
-    % if settings.MKTG_URL_LINK_MAP.get('FAQ'):
-      <div class="cta cta-help">
-        <h3>${_("Need Help?")}</h3>
-        <p>${_("Need help in registering with {platform_name}?").format(platform_name=settings.PLATFORM_NAME)}
-          <a href="${marketing_link('FAQ')}">
-              ${_("View our FAQs for answers to commonly asked questions.")}
-          </a>
-          ${_("Once registered, most questions can be answered in the course specific discussion forums or through the FAQs.")}</p>
-      </div>
-    % endif
+   ## % if settings.MKTG_URL_LINK_MAP.get('FAQ'):
+   ##   <div class="cta cta-help">
+   ##     <h3>${_("Need Help?")}</h3>
+   ##     <p>${_("Need help in registering with {platform_name}?").format(platform_name=settings.PLATFORM_NAME)}
+   ##       <a href="${marketing_link('FAQ')}">
+   ##           ${_("View our FAQs for answers to commonly asked questions.")}
+   ##       </a>
+   ##       ${_("Once registered, most questions can be answered in the course specific discussion forums or through the FAQs.")}</p>
+   ##   </div>
+   ## % endif
   </aside>
 </section>

@@ -930,7 +930,8 @@ def create_account(request, post_override=None):
             return HttpResponse(json.dumps(js))
 
     if post_vars.get('honor_code', 'false') != u'true':
-        js['value'] = _("To enroll, you must follow the honor code.").format(field=a)
+        #js['value'] = _("To enroll, you must follow the honor code.").format(field=a)
+        js['value'] = _("You must accept the terms of service.").format(field=a)
         js['field'] = 'honor_code'
         return HttpResponse(json.dumps(js))
 
