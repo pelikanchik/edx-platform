@@ -60,7 +60,6 @@
 
           <section class="video-controls">
               <div class="slider" title="Video position"></div>
-              <button class="return-to-video" id="return_to_video_${id}" style="display: none">Вернуться к видео</button>
               <div>
                   <ul class="vcr">
                       <li><a class="video_control" href="#" title="${_('Play')}" role="button" aria-disabled="false"></a></li>
@@ -85,6 +84,7 @@
 
                       <a href="#" class="hide-subtitles" title="${_('Turn off captions')}" role="button" aria-disabled="false">${_('Turn off captions')}</a>
                   </div>
+                  <button class="return-to-video" id="return_to_video_${id}" style="display: none; float: right;">${_('Return to Video')}</button>
               </div>
           </section>
           <a class="nav-skip sr" id="before-transcript_${id}" href="#after-transcript_${id}">${_('Skip to end of transcript.')}</a>

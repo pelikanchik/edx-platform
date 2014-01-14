@@ -563,7 +563,6 @@ class CapaModule(CapaFields, XModule):
 
         Adds check, reset, save buttons as necessary based on the problem config and state.
         """
-        print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
         try:
             html = self.lcp.get_html()
 

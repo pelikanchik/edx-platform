@@ -655,7 +655,6 @@ function (HTML5Video, Resizer) {
             }
         }
 
-            console.log(time);
             var duration;
 
             duration = this.videoPlayer.duration();
@@ -676,7 +675,6 @@ function (HTML5Video, Resizer) {
                 {
                   var return_to_video = document.getElementsByClassName("return-to-video");
                   return_to_video[0].style.display = 'block';
-                  console.log(this.id);
                   var iframe = document.getElementById(this.id);
                   iframe.style.display = 'none';
                   var frame_problem = document.getElementById("frame_problem");
@@ -721,15 +719,12 @@ function (HTML5Video, Resizer) {
 
         try {
             var jsonchik = $("#vert-0").data('problem_time');
-            console.log(jsonchik);
             var jsoncheg = jsonchik.replace(/'/g,'"').replace(/: u"/g,': "');
             var obj_id_time = JSON.parse(jsoncheg);
-            console.log(obj_id_time);
             var problems_count = 0;
             var obj_id_time_length = obj_id_time.length;
             for (var _i=0; _i < obj_id_time_length; _i++) {
                 var elem = obj_id_time[_i];
-                console.log(elem.time);
                 if (elem.time != 'video') {
                     var hours = elem.time.substr(0,2);
                     var minutes = elem.time.substr(3,2);

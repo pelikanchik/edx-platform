@@ -106,8 +106,6 @@ define ["jquery", "jquery.ui", "gettext", "backbone",
         $(event.currentTarget).data()
       )
 
-      console.log("ololo")
-
       analytics.track "Added a Component",
         course: course_location_analytics
         unit_id: unit_location_analytics
