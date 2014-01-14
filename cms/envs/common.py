@@ -230,9 +230,9 @@ STATICFILES_DIRS = [
 
 # Locale/Internationalization
 TIME_ZONE = 'Europe/Moscow'   # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
-LANGUAGE_CODE = 'ru'  # http://www.i18nguy.com/unicode/language-identifiers.html
+LANGUAGE_CODE = 'en'  # http://www.i18nguy.com/unicode/language-identifiers.html
 USE_I18N = True
-LANGUAGES = (('ru', 'Russian'), )
+LANGUAGES = (('en', 'English'), )
 
 ## We want i18n to be turned off in production, at least until we have full localizations.
 ## Thus we want the Django translation engine to be disabled. Otherwise even without

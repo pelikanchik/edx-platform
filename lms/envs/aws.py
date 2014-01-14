@@ -202,9 +202,9 @@ TIME_ZONE = ENV_TOKENS.get('TIME_ZONE', TIME_ZONE)
 #LANGUAGE_CODE = ENV_TOKENS.get('LANGUAGE_CODE', LANGUAGE_CODE)
 #USE_I18N = ENV_TOKENS.get('USE_I18N', USE_I18N)
 
-LANGUAGE_CODE = 'ru' # http://www.i18nguy.com/unicode/language-identifiers.html
+LANGUAGE_CODE = 'en' # http://www.i18nguy.com/unicode/language-identifiers.html
 USE_I18N = True
-LANGUAGES = (('ru', 'Russian'), )
+LANGUAGES = (('en', 'English'), )
 
 # Additional installed apps
 for app in ENV_TOKENS.get('ADDL_INSTALLED_APPS', []):
