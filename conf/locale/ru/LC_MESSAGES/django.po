@@ -3393,6 +3393,9 @@ msgstr "Я согласен с {link_start}Условиями предостав
 msgid "I agree to the {link_start}Honor Code{link_end}"
 msgstr "Я согласен с {link_start}кодексом чести{link_end}"
 
+
+
+
 #: lms/templates/register-shib.html:189
 #: lms/templates/combinedopenended/openended/open_ended.html:34
 #: lms/templates/combinedopenended/selfassessment/self_assessment_prompt.html:23
@@ -7011,6 +7014,9 @@ msgstr "Регистрация на курс {course_name}"
 msgid "Course Team Roles"
 msgstr "Роли"
 
+msgid "User Info"
+msgstr "Персональные данные"
+
 
 msgid "Course team members, or staff, are course co-authors. They have full writing and editing privileges on all course content."
 msgstr "Команда курса - это соавторы курса. У них есть полные права по внесению и изменению информации на весь контент курса"
@@ -7028,6 +7034,14 @@ msgstr "Граф"
 msgid "Jump to"
 msgstr "Перейти в"
 
+msgid "Male"
+msgstr "Мужской"
+
+msgid "Female"
+msgstr "Женский"
+
+msgid "Other"
+msgstr "Иное"
 
 msgid "Course preferences"
 msgstr "Настройки курса"
@@ -7046,6 +7060,13 @@ msgid "Score (relative, %)"
 msgstr "Результат (относительный, %)"
 
 
+#alexger - for Pelic
+msgid "I will respect staff and other students"
+msgstr "Я буду уважительно относиться к создателям и участникам курсов"
+
+#alexger - for Pelic
+msgid "I will resolve tasks by myself"
+msgstr "Я приложу все усилия, чтобы выполнять задания курсов вдумчиво, внимательно и самостоятельно"
 
 
 #django_partial.po
@@ -7238,9 +7259,10 @@ msgstr "Ошибка (401 {field}). Напишите нам."
 msgid "To enroll, you must follow the honor code."
 msgstr "Чтобы зарегистрироваться, вы должны следовать Кодексу Чести."
 
+#alexger - for Pelic
 #: common/djangoapps/student/views.py:724
 msgid "You must accept the terms of service."
-msgstr "Вы должны принять условия предоставления услуг."
+msgstr "Вы должны принять правила пользования"
 
 #: common/djangoapps/student/views.py:753
 msgid "Valid e-mail is required."
@@ -7770,6 +7792,8 @@ msgstr "Спасибо за использование нашего сайта!"
 #msgid "The edX Team"
 #msgstr "Команда Pelic.Ru"
 # Prestigio
+
+#alexger - for Pelic
 msgid "The edX Team"
 msgstr "Команда Pelic.Ru"
 
