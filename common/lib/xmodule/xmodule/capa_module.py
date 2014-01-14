@@ -184,14 +184,14 @@ class CapaFields(object):
         scope=Scope.settings
     )
     problem_now = Boolean(
-        display_name=u"Задание сразу/после видео",
-        help=u"True - показать задание сразу. False - задание будет показано после видео.",
+        display_name="Show problem commonly or into video",
+        help="True - commonly. False - into video.",
         scope=Scope.settings,
         default=True
     )
     problem_time = String(
-        display_name=u"Время показа видео",
-        help=u"Укажите момент показа задачи в виде HH:MM:SS",
+        display_name="Time in video when student will see the problem",
+        help="Set time in HH:MM:SS format",
         scope=Scope.settings,
         default=None
     )

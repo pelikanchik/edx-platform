@@ -23,8 +23,8 @@ class VerticalFields(object):
         default='[]'
     )
     random_problem_count = Integer(
-        display_name="Количество отображаемых задач",
-        help="Ученику будет показано несколько случайных задач из юнита. Это число определяет количество показываемых задач.",
+        display_name="Count of problems to show",
+        help="Students will see k random problems from n. Value -1 for showing all problems",
         scope=Scope.settings,
         default=-1
     )

@@ -205,7 +205,7 @@ define ["backbone", "jquery", "underscore", "gettext", "xblock/runtime.v1",
         time_part = parseInt(elem)
         time = time*60+time_part
       if time == 0
-        alert "Видео ещё не проигрывается, пожалуйста, нажмите кнопку Play"
+        alert "Video wasn't loaded yet. Please, press Play button"
       else
         time = time-1
         seconds = time%60

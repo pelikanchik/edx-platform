@@ -52,7 +52,7 @@ var AdvancedView = ValidatingView.extend({
         var oldValue = $(select).val();
         $(select).change(function(){
 
-            var message = gettext("Ваши изменения не вступят в силу пока вы их не сохраните.");
+            var message = gettext("You have to save your changes for applying.");
 
             self.model.set($(select).attr("rel"),$(select).val())
             self.showNotificationBar(message,

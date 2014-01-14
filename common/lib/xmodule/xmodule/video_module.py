@@ -99,12 +99,6 @@ class VideoFields(object):
         default=datetime.timedelta(seconds=0)
     )
     #front-end code of video player checks logical validity of (start_time, end_time) pair.
-    problem_after_video = Boolean(
-        help=u"Показать задание по завершении видео.",
-        display_name=u"Задачка после видео",
-        scope=Scope.settings,
-        default=True
-    )
     source = String(
         help="The external URL to download the video. This appears as a link beneath the video.",
         display_name="Download Video",
