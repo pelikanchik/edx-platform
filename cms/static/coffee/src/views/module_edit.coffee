@@ -174,6 +174,8 @@ define ["backbone", "jquery", "underscore", "gettext", "xblock/runtime.v1",
       if time > 0
         if cur_time_str == duration_time_str
           time = time-1
+      if time == 0
+        time = 1
       seconds = time%60
       minutes = ((time-seconds)/60)%60
       hours = (time-minutes*60-seconds)/3600
