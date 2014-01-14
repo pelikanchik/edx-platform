@@ -5,7 +5,7 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponseBadRequest
 from django.contrib.auth.decorators import login_required
-from mitxmako.shortcuts import render_to_response, render_to_string
+from edxmako.shortcuts import render_to_response, render_to_string
 
 from xmodule_modifiers import replace_static_urls, wrap_xblock
 from xmodule.error_module import ErrorDescriptor
@@ -33,11 +33,11 @@ log = logging.getLogger(__name__)
 
 def handler_prefix(block, handler='', suffix=''):
     """
-    Return a url prefix for XBlock handler_url. The full handler_url
-    should be '{prefix}/{handler}/{suffix}?{query}'.
+Return a url prefix for XBlock handler_url. The full handler_url
+should be '{prefix}/{handler}/{suffix}?{query}'.
 
-    Trailing `/`s are removed from the returned url.
-    """
+Trailing `/`s are removed from the returned url.
+"""
     return reverse('preview_handler', kwargs={
         'usage_id': quote_slashes(str(block.scope_ids.usage_id)),
         'handler': handler,
@@ -48,12 +48,12 @@ def handler_prefix(block, handler='', suffix=''):
 @login_required
 def preview_handler(request, usage_id, handler, suffix=''):
     """
-    Dispatch an AJAX action to an xblock
+Dispatch an AJAX action to an xblock
 
-    usage_id: The usage-id of the block to dispatch to, passed through `quote_slashes`
-    handler: The handler to execute
-    suffix: The remainder of the url to be passed to the handler
-    """
+usage_id: The usage-id of the block to dispatch to, passed through `quote_slashes`
+handler: The handler to execute
+suffix: The remainder of the url to be passed to the handler
+"""
 
     location = unquote_slashes(usage_id)
 
@@ -84,22 +84,22 @@ def preview_handler(request, usage_id, handler, suffix=''):
     return webob_to_django_response(resp)
 
 
-class PreviewModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
+class PreviewModuleSystem(ModuleSystem): # pylint: disable=abstract-method
     """
-    An XModule ModuleSystem for use in Studio previews
-    """
-    def handler_url(self, block, handler_name, suffix='', query=''):
+An XModule ModuleSystem for use in Studio previews
+"""
+    def handler_url(self, block, handler_name, suffix='', query='', thirdparty=False):
         return handler_prefix(block, handler_name, suffix) + '?' + query
 
 
 def _preview_module_system(request, descriptor):
     """
-    Returns a ModuleSystem for the specified descriptor that is specialized for
-    rendering module previews.
+Returns a ModuleSystem for the specified descriptor that is specialized for
+rendering module previews.
 
-    request: The active django request
-    descriptor: An XModuleDescriptor
-    """
+request: The active django request
+descriptor: An XModuleDescriptor
+"""
 
     course_id = get_course_for_item(descriptor.location).location.course_id
 
@@ -137,27 +137,28 @@ def _preview_module_system(request, descriptor):
 
 def _load_preview_module(request, descriptor):
     """
-    Return a preview XModule instantiated from the supplied descriptor.
+Return a preview XModule instantiated from the supplied descriptor.
 
-    request: The active django request
-    descriptor: An XModuleDescriptor
-    """
+request: The active django request
+descriptor: An XModuleDescriptor
+"""
     student_data = DbModel(SessionKeyValueStore(request))
     descriptor.bind_for_student(
         _preview_module_system(request, descriptor),
-        LmsFieldData(descriptor._field_data, student_data),  # pylint: disable=protected-access
+        LmsFieldData(descriptor._field_data, student_data), # pylint: disable=protected-access
     )
     return descriptor
 
 
 def get_preview_html(request, descriptor):
     """
-    Returns the HTML returned by the XModule's student_view,
-    specified by the descriptor and idx.
-    """
+Returns the HTML returned by the XModule's student_view,
+specified by the descriptor and idx.
+"""
     module = _load_preview_module(request, descriptor)
     try:
         content = module.render("student_view").content
-    except Exception as exc:                          # pylint: disable=W0703
+    except Exception as exc: # pylint: disable=W0703
+        log.debug("Unable to render student_view for %r", module, exc_info=True)
         content = render_to_string('html_error.html', {'message': str(exc)})
     return content

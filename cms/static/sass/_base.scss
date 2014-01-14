@@ -493,7 +493,6 @@ a.show-graph-item{
   .visibility-toggle,
   .insert-button
   .insert-to-end-button {
-  .visibility-toggle {
     float: left;
     margin-right: 13px;
     color: #a4aab7;
@@ -913,4 +912,4 @@ body.hide-wip {
         background-color: #007Fc6;
         background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.3));
 }
-}
+

@@ -6,9 +6,7 @@ class @Problem
     @el = $(element).find('.problems-wrapper')
     @id = @el.data('problem-id')
     @element_id = @el.attr('id')
-    @el_show = @el.attr('show_answers_button')
     @url = @el.data('url')
-    @index_show = 0
     @render()
 
   $: (selector) ->
@@ -30,8 +28,6 @@ class @Problem
     @$('section.action input.reset').click @reset
     @$('section.action button.show').click @show
     @$('section.action input.save').click @save
-
-    @$('section.action input.return').click @return_video
 
     @$(".advice-for-problem").each ->
       showDelay = 1000 * parseInt($(this).attr("rel"))
@@ -204,7 +200,7 @@ class @Problem
       $('.check').click()
 
 
-###
+  ###
 # 'check_fd' uses FormData to allow file submissions in the 'problem_check' dispatch,
 # in addition to simple querystring-based answers
 #
@@ -443,7 +439,7 @@ class @Problem
       id = ($element.attr('id').match /^inputtype_(.*)$/)[1]
       $element.find('input').on 'change', ->
         $status = $("#status_#{id}")
-        if $status[0]  # We found a status icon.
+        if $status[0] # We found a status icon.
           $status.removeClass().addClass "unanswered"
           $status.empty().css 'display', 'inline-block'
         else

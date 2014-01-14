@@ -563,7 +563,7 @@ class CapaModule(CapaFields, XModule):
 
         Adds check, reset, save buttons as necessary based on the problem config and state.
         """
-
+        print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
         try:
             html = self.lcp.get_html()
 
@@ -603,6 +603,7 @@ class CapaModule(CapaFields, XModule):
                    'weight': self.weight,
                    'id': self.id
                    }
+
         context = {'problem': content,
                    'id': self.id,
                    'check_button': check_button,
@@ -611,13 +612,9 @@ class CapaModule(CapaFields, XModule):
                    'answer_available': self.answer_available(),
                    'attempts_used': self.attempts,
                    'attempts_allowed': self.max_attempts,
-                   'delay_answers': self.showbuttonanswer,
                    'problem_now': self.problem_now,
                    'problem_time': problem_time_to_show,
                    'return_to_video_button': show_return_to_video_button,
-                   'check_answer': self.checkanswer,
-                   'progress': self.get_progress(),
-                   'progress_detail': Progress.to_js_detail_str(self.get_progress())
                    }
 
         html = self.system.render_template('problem.html', context)

@@ -49,10 +49,10 @@ log = logging.getLogger(__name__)
 
 def common_exceptions_400(func):
     """
-    Catches common exceptions and renders matching 400 errors.
-    (decorator without arguments)
-    """
-    def wrapped(request, *args, **kwargs):  # pylint: disable=C0111
+Catches common exceptions and renders matching 400 errors.
+(decorator without arguments)
+"""
+    def wrapped(request, *args, **kwargs): # pylint: disable=C0111
         use_json = (request.is_ajax() or
                     request.META.get("HTTP_ACCEPT", "").startswith("application/json"))
         try:
@@ -74,20 +74,20 @@ def common_exceptions_400(func):
 
 def require_query_params(*args, **kwargs):
     """
-    Checks for required paremters or renders a 400 error.
-    (decorator with arguments)
+Checks for required paremters or renders a 400 error.
+(decorator with arguments)
 
-    `args` is a *list of required GET parameter names.
-    `kwargs` is a **dict of required GET parameter names
-        to string explanations of the parameter
-    """
+`args` is a *list of required GET parameter names.
+`kwargs` is a **dict of required GET parameter names
+to string explanations of the parameter
+"""
     required_params = []
     required_params += [(arg, None) for arg in args]
     required_params += [(key, kwargs[key]) for key in kwargs]
     # required_params = e.g. [('action', 'enroll or unenroll'), ['emails', None]]
 
-    def decorator(func):  # pylint: disable=C0111
-        def wrapped(*args, **kwargs):  # pylint: disable=C0111
+    def decorator(func): # pylint: disable=C0111
+        def wrapped(*args, **kwargs): # pylint: disable=C0111
             request = args[0]
 
             error_response_data = {
@@ -112,19 +112,19 @@ def require_query_params(*args, **kwargs):
 
 def require_post_params(*args, **kwargs):
     """
-    Checks for required parameters or renders a 400 error.
-    (decorator with arguments)
+Checks for required parameters or renders a 400 error.
+(decorator with arguments)
 
-    Functions like 'require_query_params', but checks for
-    POST parameters rather than GET parameters.
-    """
+Functions like 'require_query_params', but checks for
+POST parameters rather than GET parameters.
+"""
     required_params = []
     required_params += [(arg, None) for arg in args]
     required_params += [(key, kwargs[key]) for key in kwargs]
     # required_params = e.g. [('action', 'enroll or unenroll'), ['emails', None]]
 
-    def decorator(func):  # pylint: disable=C0111
-        def wrapped(*args, **kwargs):  # pylint: disable=C0111
+    def decorator(func): # pylint: disable=C0111
+        def wrapped(*args, **kwargs): # pylint: disable=C0111
             request = args[0]
 
             error_response_data = {
@@ -149,22 +149,22 @@ def require_post_params(*args, **kwargs):
 
 def require_level(level):
     """
-    Decorator with argument that requires an access level of the requesting
-    user. If the requirement is not satisfied, returns an
-    HttpResponseForbidden (403).
+Decorator with argument that requires an access level of the requesting
+user. If the requirement is not satisfied, returns an
+HttpResponseForbidden (403).
 
-    Assumes that request is in args[0].
-    Assumes that course_id is in kwargs['course_id'].
+Assumes that request is in args[0].
+Assumes that course_id is in kwargs['course_id'].
 
-    `level` is in ['instructor', 'staff']
-    if `level` is 'staff', instructors will also be allowed, even
-        if they are not in the staff group.
-    """
+`level` is in ['instructor', 'staff']
+if `level` is 'staff', instructors will also be allowed, even
+if they are not in the staff group.
+"""
     if level not in ['instructor', 'staff']:
         raise ValueError("unrecognized level '{}'".format(level))
 
-    def decorator(func):  # pylint: disable=C0111
-        def wrapped(*args, **kwargs):  # pylint: disable=C0111
+    def decorator(func): # pylint: disable=C0111
+        def wrapped(*args, **kwargs): # pylint: disable=C0111
             request = args[0]
             course = get_course_by_id(kwargs['course_id'])
 
@@ -182,41 +182,41 @@ def require_level(level):
 @require_query_params(action="enroll or unenroll", emails="stringified list of emails")
 def students_update_enrollment(request, course_id):
     """
-    Enroll or unenroll students by email.
-    Requires staff access.
+Enroll or unenroll students by email.
+Requires staff access.
 
-    Query Parameters:
-    - action in ['enroll', 'unenroll']
-    - emails is string containing a list of emails separated by anything split_input_list can handle.
-    - auto_enroll is a boolean (defaults to false)
-        If auto_enroll is false, students will be allowed to enroll.
-        If auto_enroll is true, students will be enrolled as soon as they register.
-    - email_students is a boolean (defaults to false)
-        If email_students is true, students will be sent email notification
-        If email_students is false, students will not be sent email notification
+Query Parameters:
+- action in ['enroll', 'unenroll']
+- emails is string containing a list of emails separated by anything split_input_list can handle.
+- auto_enroll is a boolean (defaults to false)
+If auto_enroll is false, students will be allowed to enroll.
+If auto_enroll is true, students will be enrolled as soon as they register.
+- email_students is a boolean (defaults to false)
+If email_students is true, students will be sent email notification
+If email_students is false, students will not be sent email notification
 
-    Returns an analog to this JSON structure: {
-        "action": "enroll",
-        "auto_enroll": false,
-        "results": [
-            {
-                "email": "testemail@test.org",
-                "before": {
-                    "enrollment": false,
-                    "auto_enroll": false,
-                    "user": true,
-                    "allowed": false
-                },
-                "after": {
-                    "enrollment": true,
-                    "auto_enroll": false,
-                    "user": true,
-                    "allowed": false
-                }
-            }
-        ]
-    }
-    """
+Returns an analog to this JSON structure: {
+"action": "enroll",
+"auto_enroll": false,
+"results": [
+{
+"email": "testemail@test.org",
+"before": {
+"enrollment": false,
+"auto_enroll": false,
+"user": true,
+"allowed": false
+},
+"after": {
+"enrollment": true,
+"auto_enroll": false,
+"user": true,
+"allowed": false
+}
+}
+]
+}
+"""
 
     action = request.GET.get('action')
     emails_raw = request.GET.get('emails')
@@ -246,7 +246,7 @@ def students_update_enrollment(request, course_id):
             })
         # catch and log any exceptions
         # so that one error doesn't cause a 500.
-        except Exception as exc:  # pylint: disable=W0703
+        except Exception as exc: # pylint: disable=W0703
             log.exception("Error while #{}ing student")
             log.exception(exc)
             results.append({
@@ -273,16 +273,16 @@ def students_update_enrollment(request, course_id):
 )
 def modify_access(request, course_id):
     """
-    Modify staff/instructor access of other user.
-    Requires instructor access.
+Modify staff/instructor access of other user.
+Requires instructor access.
 
-    NOTE: instructors cannot remove their own instructor access.
+NOTE: instructors cannot remove their own instructor access.
 
-    Query parameters:
-    email is the target users email
-    rolename is one of ['instructor', 'staff', 'beta']
-    action is one of ['allow', 'revoke']
-    """
+Query parameters:
+email is the target users email
+rolename is one of ['instructor', 'staff', 'beta']
+action is one of ['allow', 'revoke']
+"""
     course = get_course_with_access(
         request.user, course_id, 'instructor', depth=None
     )
@@ -326,23 +326,23 @@ def modify_access(request, course_id):
 @require_query_params(rolename="'instructor', 'staff', or 'beta'")
 def list_course_role_members(request, course_id):
     """
-    List instructors and staff.
-    Requires instructor access.
+List instructors and staff.
+Requires instructor access.
 
-    rolename is one of ['instructor', 'staff', 'beta']
+rolename is one of ['instructor', 'staff', 'beta']
 
-    Returns JSON of the form {
-        "course_id": "some/course/id",
-        "staff": [
-            {
-                "username": "staff1",
-                "email": "staff1@example.org",
-                "first_name": "Joe",
-                "last_name": "Shmoe",
-            }
-        ]
-    }
-    """
+Returns JSON of the form {
+"course_id": "some/course/id",
+"staff": [
+{
+"username": "staff1",
+"email": "staff1@example.org",
+"first_name": "Joe",
+"last_name": "Shmoe",
+}
+]
+}
+"""
     course = get_course_with_access(
         request.user, course_id, 'instructor', depth=None
     )
@@ -375,8 +375,8 @@ def list_course_role_members(request, course_id):
 @require_level('staff')
 def get_grading_config(request, course_id):
     """
-    Respond with json which contains a html formatted grade summary.
-    """
+Respond with json which contains a html formatted grade summary.
+"""
     course = get_course_with_access(
         request.user, course_id, 'staff', depth=None
     )
@@ -392,15 +392,15 @@ def get_grading_config(request, course_id):
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
-def get_students_features(request, course_id, csv=False):  # pylint: disable=W0613, W0621
+def get_students_features(request, course_id, csv=False): # pylint: disable=W0613, W0621
     """
-    Respond with json which contains a summary of all enrolled students profile information.
+Respond with json which contains a summary of all enrolled students profile information.
 
-    Responds with JSON
-        {"students": [{-student-info-}, ...]}
+Responds with JSON
+{"students": [{-student-info-}, ...]}
 
-    TO DO accept requests for different attribute sets.
-    """
+TO DO accept requests for different attribute sets.
+"""
     available_features = analytics.basic.AVAILABLE_FEATURES
     query_features = ['username', 'name', 'email', 'language', 'location', 'year_of_birth', 'gender',
                       'level_of_education', 'mailing_address', 'goals']
@@ -424,10 +424,10 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=W06
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
-def get_anon_ids(request, course_id):  # pylint: disable=W0613
+def get_anon_ids(request, course_id): # pylint: disable=W0613
     """
-    Respond with 2-column CSV output of user-id, anonymized-user-id
-    """
+Respond with 2-column CSV output of user-id, anonymized-user-id
+"""
     # TODO: the User.objects query and CSV generation here could be
     # centralized into analytics. Currently analytics has similar functionality
     # but not quite what's needed.
@@ -458,13 +458,13 @@ def get_anon_ids(request, course_id):  # pylint: disable=W0613
 @require_level('staff')
 def get_distribution(request, course_id):
     """
-    Respond with json of the distribution of students over selected features which have choices.
+Respond with json of the distribution of students over selected features which have choices.
 
-    Ask for a feature through the `feature` query parameter.
-    If no `feature` is supplied, will return response with an
-        empty response['feature_results'] object.
-    A list of available will be available in the response['available_features']
-    """
+Ask for a feature through the `feature` query parameter.
+If no `feature` is supplied, will return response with an
+empty response['feature_results'] object.
+A list of available will be available in the response['available_features']
+"""
     feature = request.GET.get('feature')
     # alternate notations of None
     if feature in (None, 'null', ''):
@@ -511,14 +511,14 @@ def get_distribution(request, course_id):
 )
 def get_student_progress_url(request, course_id):
     """
-    Get the progress url of a student.
-    Limited to staff access.
+Get the progress url of a student.
+Limited to staff access.
 
-    Takes query paremeter unique_student_identifier and if the student exists
-    returns e.g. {
-        'progress_url': '/../...'
-    }
-    """
+Takes query paremeter unique_student_identifier and if the student exists
+returns e.g. {
+'progress_url': '/../...'
+}
+"""
     user = get_student_from_identifier(request.GET.get('unique_student_identifier'))
 
     progress_url = reverse('student_progress', kwargs={'course_id': course_id, 'student_id': user.id})
@@ -540,21 +540,21 @@ def get_student_progress_url(request, course_id):
 def reset_student_attempts(request, course_id):
     """
 
-    Resets a students attempts counter or starts a task to reset all students
-    attempts counters. Optionally deletes student state for a problem. Limited
-    to staff access. Some sub-methods limited to instructor access.
+Resets a students attempts counter or starts a task to reset all students
+attempts counters. Optionally deletes student state for a problem. Limited
+to staff access. Some sub-methods limited to instructor access.
 
-    Takes some of the following query paremeters
-        - problem_to_reset is a urlname of a problem
-        - unique_student_identifier is an email or username
-        - all_students is a boolean
-            requires instructor access
-            mutually exclusive with delete_module
-            mutually exclusive with delete_module
-        - delete_module is a boolean
-            requires instructor access
-            mutually exclusive with all_students
-    """
+Takes some of the following query paremeters
+- problem_to_reset is a urlname of a problem
+- unique_student_identifier is an email or username
+- all_students is a boolean
+requires instructor access
+mutually exclusive with delete_module
+mutually exclusive with delete_module
+- delete_module is a boolean
+requires instructor access
+mutually exclusive with all_students
+"""
     course = get_course_with_access(
         request.user, course_id, 'staff', depth=None
     )
@@ -610,16 +610,16 @@ def reset_student_attempts(request, course_id):
 @common_exceptions_400
 def rescore_problem(request, course_id):
     """
-    Starts a background process a students attempts counter. Optionally deletes student state for a problem.
-    Limited to instructor access.
+Starts a background process a students attempts counter. Optionally deletes student state for a problem.
+Limited to instructor access.
 
-    Takes either of the following query paremeters
-        - problem_to_reset is a urlname of a problem
-        - unique_student_identifier is an email or username
-        - all_students is a boolean
+Takes either of the following query paremeters
+- problem_to_reset is a urlname of a problem
+- unique_student_identifier is an email or username
+- all_students is a boolean
 
-    all_students and unique_student_identifier cannot both be present.
-    """
+all_students and unique_student_identifier cannot both be present.
+"""
     problem_to_reset = strip_if_string(request.GET.get('problem_to_reset'))
     student_identifier = request.GET.get('unique_student_identifier', None)
     student = None
@@ -656,16 +656,16 @@ def rescore_problem(request, course_id):
 
 def extract_task_features(task):
     """
-    Convert task to dict for json rendering.
-    Expects tasks have the following features:
-    * task_type (str, type of task)
-    * task_input (dict, input(s) to the task)
-    * task_id (str, celery id of the task)
-    * requester (str, username who submitted the task)
-    * task_state (str, state of task eg PROGRESS, COMPLETED)
-    * created (datetime, when the task was completed)
-    * task_output (optional)
-    """
+Convert task to dict for json rendering.
+Expects tasks have the following features:
+* task_type (str, type of task)
+* task_input (dict, input(s) to the task)
+* task_id (str, celery id of the task)
+* requester (str, username who submitted the task)
+* task_state (str, state of task eg PROGRESS, COMPLETED)
+* created (datetime, when the task was completed)
+* task_output (optional)
+"""
     # Pull out information from the task
     features = ['task_type', 'task_input', 'task_id', 'requester', 'task_state']
     task_feature_dict = {feature: str(getattr(task, feature)) for feature in features}
@@ -696,10 +696,10 @@ def extract_task_features(task):
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
-def list_background_email_tasks(request, course_id):  # pylint: disable=unused-argument
+def list_background_email_tasks(request, course_id): # pylint: disable=unused-argument
     """
-    List background email tasks.
-    """
+List background email tasks.
+"""
     task_type = 'bulk_course_email'
     # Specifying for the history of a single task type
     tasks = instructor_task.api.get_instructor_task_history(course_id, task_type=task_type)
@@ -715,14 +715,14 @@ def list_background_email_tasks(request, course_id):  # pylint: disable=unused-a
 @require_level('staff')
 def list_instructor_tasks(request, course_id):
     """
-    List instructor tasks.
+List instructor tasks.
 
-    Takes optional query paremeters.
-        - With no arguments, lists running tasks.
-        - `problem_urlname` lists task history for problem
-        - `problem_urlname` and `unique_student_identifier` lists task
-            history for problem AND student (intersection)
-    """
+Takes optional query paremeters.
+- With no arguments, lists running tasks.
+- `problem_urlname` lists task history for problem
+- `problem_urlname` and `unique_student_identifier` lists task
+history for problem AND student (intersection)
+"""
     problem_urlname = strip_if_string(request.GET.get('problem_urlname', False))
     student = request.GET.get('unique_student_identifier', None)
     if student is not None:
@@ -756,8 +756,8 @@ def list_instructor_tasks(request, course_id):
 @require_level('staff')
 def list_grade_downloads(_request, course_id):
     """
-    List grade CSV files that are available for download for this course.
-    """
+List grade CSV files that are available for download for this course.
+"""
     grades_store = GradesStore.from_config()
 
     response_payload = {
@@ -774,8 +774,8 @@ def list_grade_downloads(_request, course_id):
 @require_level('staff')
 def calculate_grades_csv(request, course_id):
     """
-    AlreadyRunningError is raised if the course's grades are already being updated.
-    """
+AlreadyRunningError is raised if the course's grades are already being updated.
+"""
     try:
         instructor_task.api.submit_calculate_grades_csv(request, course_id)
         success_status = _("Your grade report is being generated! You can view the status of the generation task in the 'Pending Instructor Tasks' section.")
@@ -793,15 +793,15 @@ def calculate_grades_csv(request, course_id):
 @require_query_params('rolename')
 def list_forum_members(request, course_id):
     """
-    Lists forum members of a certain rolename.
-    Limited to staff access.
+Lists forum members of a certain rolename.
+Limited to staff access.
 
-    The requesting user must be at least staff.
-    Staff forum admins can access all roles EXCEPT for FORUM_ROLE_ADMINISTRATOR
-        which is limited to instructors.
+The requesting user must be at least staff.
+Staff forum admins can access all roles EXCEPT for FORUM_ROLE_ADMINISTRATOR
+which is limited to instructors.
 
-    Takes query parameter `rolename`.
-    """
+Takes query parameter `rolename`.
+"""
     course = get_course_by_id(course_id)
     has_instructor_access = has_access(request.user, course, 'instructor')
     has_forum_admin = has_forum_access(
@@ -852,25 +852,25 @@ def list_forum_members(request, course_id):
 @require_post_params(send_to="sending to whom", subject="subject line", message="message text")
 def send_email(request, course_id):
     """
-    Send an email to self, staff, or everyone involved in a course.
-    Query Parameters:
-    - 'send_to' specifies what group the email should be sent to
-       Options are defined by the CourseEmail model in
-       lms/djangoapps/bulk_email/models.py
-    - 'subject' specifies email's subject
-    - 'message' specifies email's content
-    """
+Send an email to self, staff, or everyone involved in a course.
+Query Parameters:
+- 'send_to' specifies what group the email should be sent to
+Options are defined by the CourseEmail model in
+lms/djangoapps/bulk_email/models.py
+- 'subject' specifies email's subject
+- 'message' specifies email's content
+"""
     send_to = request.POST.get("send_to")
     subject = request.POST.get("subject")
     message = request.POST.get("message")
 
-    # Create the CourseEmail object.  This is saved immediately, so that
+    # Create the CourseEmail object. This is saved immediately, so that
     # any transaction that has been pending up to this point will also be
     # committed.
     email = CourseEmail.create(course_id, request.user, send_to, subject, message)
 
     # Submit the task, so that the correct InstructorTask object gets created (for monitoring purposes)
-    instructor_task.api.submit_bulk_course_email(request, course_id, email.id)  # pylint: disable=E1101
+    instructor_task.api.submit_bulk_course_email(request, course_id, email.id) # pylint: disable=E1101
 
     response_payload = {'course_id': course_id}
     return JsonResponse(response_payload)
@@ -887,18 +887,18 @@ def send_email(request, course_id):
 @common_exceptions_400
 def update_forum_role_membership(request, course_id):
     """
-    Modify user's forum role.
+Modify user's forum role.
 
-    The requesting user must be at least staff.
-    Staff forum admins can access all roles EXCEPT for FORUM_ROLE_ADMINISTRATOR
-        which is limited to instructors.
-    No one can revoke an instructors FORUM_ROLE_ADMINISTRATOR status.
+The requesting user must be at least staff.
+Staff forum admins can access all roles EXCEPT for FORUM_ROLE_ADMINISTRATOR
+which is limited to instructors.
+No one can revoke an instructors FORUM_ROLE_ADMINISTRATOR status.
 
-    Query parameters:
-    - `email` is the target users email
-    - `rolename` is one of [FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA]
-    - `action` is one of ['allow', 'revoke']
-    """
+Query parameters:
+- `email` is the target users email
+- `rolename` is one of [FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA]
+- `action` is one of ['allow', 'revoke']
+"""
     course = get_course_by_id(course_id)
     has_instructor_access = has_access(request.user, course, 'instructor')
     has_forum_admin = has_forum_access(
@@ -949,10 +949,10 @@ def update_forum_role_membership(request, course_id):
 @common_exceptions_400
 def proxy_legacy_analytics(request, course_id):
     """
-    Proxies to the analytics cron job server.
+Proxies to the analytics cron job server.
 
-    `aname` is a query parameter specifying which analytic to query.
-    """
+`aname` is a query parameter specifying which analytic to query.
+"""
     analytics_name = request.GET.get('aname')
 
     # abort if misconfigured
@@ -968,7 +968,7 @@ def proxy_legacy_analytics(request, course_id):
 
     try:
         res = requests.get(url)
-    except Exception:  # pylint: disable=broad-except
+    except Exception: # pylint: disable=broad-except
         log.exception("Error requesting from analytics server at %s", url)
         return HttpResponse("Error requesting from analytics server.", status=500)
 
@@ -993,15 +993,15 @@ def proxy_legacy_analytics(request, course_id):
 
 def _split_input_list(str_list):
     """
-    Separate out individual student email from the comma, or space separated string.
+Separate out individual student email from the comma, or space separated string.
 
-    e.g.
-    in: "Lorem@ipsum.dolor, sit@amet.consectetur\nadipiscing@elit.Aenean\r convallis@at.lacus\r, ut@lacinia.Sed"
-    out: ['Lorem@ipsum.dolor', 'sit@amet.consectetur', 'adipiscing@elit.Aenean', 'convallis@at.lacus', 'ut@lacinia.Sed']
+e.g.
+in: "Lorem@ipsum.dolor, sit@amet.consectetur\nadipiscing@elit.Aenean\r convallis@at.lacus\r, ut@lacinia.Sed"
+out: ['Lorem@ipsum.dolor', 'sit@amet.consectetur', 'adipiscing@elit.Aenean', 'convallis@at.lacus', 'ut@lacinia.Sed']
 
-    `str_list` is a string coming from an input text area
-    returns a list of separated values
-    """
+`str_list` is a string coming from an input text area
+returns a list of separated values
+"""
 
     new_list = re.split(r'[\n\r\s,]', str_list)
     new_list = [s.strip() for s in new_list]
@@ -1012,13 +1012,13 @@ def _split_input_list(str_list):
 
 def _msk_from_problem_urlname(course_id, urlname):
     """
-    Convert a 'problem urlname' (name that instructor's input into dashboard)
-    to a module state key (db field)
-    """
+Convert a 'problem urlname' (name that instructor's input into dashboard)
+to a module state key (db field)
+"""
     if urlname.endswith(".xml"):
         urlname = urlname[:-4]
 
-    # Combined open ended problems also have state that can be deleted.  However,
+    # Combined open ended problems also have state that can be deleted. However,
     # appending "problem" will only allow capa problems to be reset.
     # Get around this for combinedopenended problems.
     if "combinedopenended" not in urlname:
@@ -1027,3 +1027,4 @@ def _msk_from_problem_urlname(course_id, urlname):
     (org, course_name, __) = course_id.split("/")
     module_state_key = "i4x://" + org + "/" + course_name + "/" + urlname
     return module_state_key
+

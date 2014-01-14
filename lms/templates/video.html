@@ -51,10 +51,13 @@
           <span tabindex="0" class="spinner" aria-hidden="false" aria-label="${_('Loading video player')}"></span>
           <div class="video-player-pre"></div>
           <section class="video-player">
+              <section class="xmodule_display xmodule_CapaModule" data-type="Problem" id="frame_problem" style="display: none"></section>
+              <div id="temp_index_problem" style="display: none"></div>
               <div id="${id}"></div>
               <h3 class="hidden">${_('ERROR: No playable video sources found!')}</h3>
           </section>
           <div class="video-player-post"></div>
+
           <section class="video-controls">
               <div class="slider" title="Video position"></div>
               <button class="return-to-video" id="return_to_video_${id}" style="display: none">Вернуться к видео</button>
@@ -85,15 +88,6 @@
               </div>
           </section>
           <a class="nav-skip sr" id="before-transcript_${id}" href="#after-transcript_${id}">${_('Skip to end of transcript.')}</a>
-        <section class="video-player" id="video_player_yt"  style="display: block">
-          <section class="xmodule_display xmodule_CapaModule" data-type="Problem" id="frame_problem" style="display: none"></section>
-          <div id="temp_index_problem" style="display: none"></div>
-          <div id="${id}"></div>
-        </section>
-        <section class="video-controls">
-          <button class="return-to-video" id="return_to_video_${id}" style="display: none">Вернуться к видео</button>
-          <button class="answer-problem" id="answer_problem" style="display: none">Проверить</button>
-        </section>
       </article>
 
       <ol id="transcript-captions" class="subtitles" tabindex="0" title="${_('Captions')}" role="group" aria-label="${_('Activating an item in this group will spool the video to the corresponding time point. To skip transcript, go to previous item.')}">

@@ -197,7 +197,7 @@ ROOT_URLCONF = 'cms.urls'
 IGNORABLE_404_ENDS = ('favicon.ico')
 
 # Email
-#<<<<<<< HEAD
+
 #EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 #DEFAULT_FROM_EMAIL = 'registration@edx.org'
 #DEFAULT_FEEDBACK_EMAIL = 'feedback@edx.org'
@@ -211,7 +211,7 @@ SERVER_EMAIL = 'devops@pelic.ru'
 ADMINS = (
     ('lutiX Admins', 'admin@pelic.ru'),
 )
-#>>>>>>> 4f9bf342df105f2a5f00372194e6f7a65dac6f8b
+
 MANAGERS = ADMINS
 
 # Static content

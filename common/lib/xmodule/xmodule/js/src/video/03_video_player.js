@@ -653,15 +653,13 @@ function (HTML5Video, Resizer) {
                 this.videoPlayer.startTime = 0;
                 this.videoPlayer.endTime = null;
             }
+        }
+
             console.log(time);
             var duration;
-    
+
             duration = this.videoPlayer.duration();
-    
-            this.trigger('videoProgressSlider.updatePlayTime', {'time': time, 'duration': duration});
-            this.trigger('videoControl.updateVcrVidTime', {'time': time, 'duration': duration});
-            this.trigger('videoCaption.updatePlayTime', time);
-    
+
             var int_time = parseInt(time);
             var _problems_time = this.videoPlayer.getProblemsTime();
             var l_t= _problems_time.length;
@@ -678,23 +676,26 @@ function (HTML5Video, Resizer) {
                 {
                   var return_to_video = document.getElementsByClassName("return-to-video");
                   return_to_video[0].style.display = 'block';
-                  //console.log(this.id);
+                  console.log(this.id);
                   var iframe = document.getElementById(this.id);
-                  iframe.style.height = '0%';
+                  iframe.style.display = 'none';
                   var frame_problem = document.getElementById("frame_problem");
+                  frame_problem.style.overflow = 'auto';
                   frame_problem.style.display = 'block';
+                  frame_problem.style.height = iframe.style.height;
                   var slider = document.getElementsByClassName("slider");
                   slider[0].style.display = 'none';
-                  var underslider = document.getElementsByClassName("underslider");
-                  underslider[0].style.display = 'none';
+                  var secondary = document.getElementsByClassName("secondary-controls");
+                  secondary[0].style.display = 'none';
+                  var vcr = document.getElementsByClassName("vcr");
+                  vcr[0].style.display = 'none';
                   $("#temp_index_problem").html(r);
                   var problem_id = $("#vert-" + r).data('id').replace(/:\/\//,'-').replace(/\//g,'-');
                   $("#frame_problem").attr({'data-old-id': problem_id});
                   $("#problem_" + problem_id).appendTo("#frame_problem");
                 }
               }
-            }            
-        }
+            }
 
         this.trigger(
             'videoProgressSlider.updatePlayTime',
@@ -713,6 +714,40 @@ function (HTML5Video, Resizer) {
         );
 
         this.trigger('videoCaption.updatePlayTime', time);
+    }
+
+    function getProblemsTime(){
+        var problems_time = [];
+
+        try {
+            var jsonchik = $("#vert-0").data('problem_time');
+            console.log(jsonchik);
+            var jsoncheg = jsonchik.replace(/'/g,'"').replace(/: u"/g,': "');
+            var obj_id_time = JSON.parse(jsoncheg);
+            console.log(obj_id_time);
+            var problems_count = 0;
+            var obj_id_time_length = obj_id_time.length;
+            for (var _i=0; _i < obj_id_time_length; _i++) {
+                var elem = obj_id_time[_i];
+                console.log(elem.time);
+                if (elem.time != 'video') {
+                    var hours = elem.time.substr(0,2);
+                    var minutes = elem.time.substr(3,2);
+                    var seconds = elem.time.substr(6,2);
+                    var int_hours = parseInt(hours);
+                    var int_minutes = parseInt(minutes);
+                    var int_seconds = parseInt(seconds);
+                    var time_to_show = int_hours*3600 + int_minutes*60 + int_seconds;
+                    problems_time[problems_count] = time_to_show;
+                    problems_count++;
+                }
+            }
+        }
+        catch (error){
+            console.log("You're in CMS")
+            }
+
+        return problems_time;
     }
 
     function isPlaying() {

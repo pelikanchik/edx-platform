@@ -174,11 +174,13 @@ function () {
       var frame_problem = document.getElementById("frame_problem");
       frame_problem.style.display = 'none';
       var iframe = document.getElementById(this.id);
-      iframe.style.height = '100%';
+      iframe.style.display  = 'block';
       var slider = document.getElementsByClassName("slider");
       slider[0].style.display = 'block';
-      var underslider = document.getElementsByClassName("underslider");
-      underslider[0].style.display = 'block';
+      var secondary = document.getElementsByClassName("secondary-controls");
+      secondary[0].style.display = 'block';
+      var vcr = document.getElementsByClassName("vcr");
+      vcr[0].style.display = 'block';
       var return_to_video = document.getElementsByClassName("return-to-video");
       return_to_video[0].style.display = 'none';
       var r = $("#temp_index_problem").html();

@@ -106,10 +106,16 @@ def xblock_handler(request, tag=None, course_id=None, branch=None, version_guid=
                 # component-goblins.
                 except Exception as exc:                          # pylint: disable=W0703
                     content = render_to_string('html_error.html', {'message': str(exc)})
-
+                mod_class = component.__class__.__name__
+                current_module_class = 'other'
+                if "CapaDescriptor" in mod_class:
+                    current_module_class = 'problem'
+                if "VideoDescriptor" in mod_class:
+                    current_module_class = 'video'
                 return render_to_response('component.html', {
                     'preview': get_preview_html(request, component),
-                    'editor': content
+                    'editor': content,
+                    'module_class': current_module_class,
                 })
         elif request.method == 'DELETE':
             delete_children = str_to_bool(request.REQUEST.get('recurse', 'False'))

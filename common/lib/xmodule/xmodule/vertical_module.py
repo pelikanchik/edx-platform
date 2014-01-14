@@ -29,6 +29,7 @@ class VerticalFields(object):
         default=-1
     )
 
+
 class VerticalModule(VerticalFields, XModule):
     ''' Layout module for laying out submodules vertically.'''
 
@@ -50,15 +51,14 @@ class VerticalModule(VerticalFields, XModule):
                 'type': child.get_icon_class(),
                 'show_now': 'true' if child.get_icon_class() == 'video' or child.problem_now else 'false',
                 'problem_time': child.problem_time if child.get_icon_class() == 'problem' else
-                [{"id": child2.id  if child2.get_icon_class() == 'problem' else "video",
-                  "time": child2.problem_time if child2.get_icon_class() == 'problem' else "video",
+                [{"id": child2.id if child2.get_icon_class() == 'problem' else "video",
+                  "time": child2.problem_time if child2.get_icon_class() == 'problem' and child2.problem_time is not None else "video",
                   } for child2 in self.get_display_items()]
             })
             if self.random_problem_count == -1:
                 contents = all_contents
             else:
                 contents = random.sample(all_contents, self.random_problem_count)
-            
 
         fragment.add_content(self.system.render_template('vert_module.html', {
             'items': contents

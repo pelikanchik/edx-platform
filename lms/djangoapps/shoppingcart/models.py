@@ -392,6 +392,20 @@ class PaidCourseRegistration(OrderItem):
         return self.pk_with_subclass, set([notification])
 
 
+class PaidCourseRegistrationAnnotation(models.Model):
+    """
+A model that maps course_id to an additional annotation. This is specifically needed because when Stanford
+generates report for the paid courses, each report item must contain the payment account associated with a course.
+And unfortunately we didn't have the concept of a "SKU" or stock item where we could keep this association,
+so this is to retrofit it.
+"""
+    course_id = models.CharField(unique=True, max_length=128, db_index=True)
+    annotation = models.TextField(null=True)
+
+    def __unicode__(self):
+        return u"{} : {}".format(self.course_id, self.annotation)
+
+
 class CertificateItem(OrderItem):
     """
     This is an inventory item for purchasing certificates

@@ -7,17 +7,18 @@ define ["backbone", "jquery", "underscore", "gettext", "xblock/runtime.v1",
     className: 'component'
     editorMode: 'editor-mode'
 
-  events:
-    "click .component-editor .cancel-button": 'clickCancelButton'
-    "click .component-editor .save-button": 'clickSaveButton'
-    "click .component-actions .edit-button": 'clickEditButton'
-    "click .component-actions .insert-button": 'clickInsertButton'
-    "click .component-actions .insert-to-end-button": 'clickInsertToEndButton'
-    "click .component-actions .delete-button": 'onDelete'
-    "click .mode a": 'clickModeButton'
+    events:
+      "click .component-editor .cancel-button": 'clickCancelButton'
+      "click .component-editor .save-button": 'clickSaveButton'
+      "click .component-actions .edit-button": 'clickEditButton'
+      "click .component-actions .insert-button": 'clickInsertButton'
+      "click .component-actions .insert-to-end-button": 'clickInsertToEndButton'
+      "click .component-actions .delete-button": 'onDelete'
+      "click .mode a": 'clickModeButton'
 
     initialize: ->
       @onDelete = @options.onDelete
+      @createItemStatus = 0
       @render()
 
     $component_editor: => @$el.find('.component-editor')
@@ -58,7 +59,7 @@ define ["backbone", "jquery", "underscore", "gettext", "xblock/runtime.v1",
         # build up an object to pass back to the server on the subsequent POST.
         # Note that these values will always be sent back on POST, even if they did not actually change.
         _metadata = {}
-        _metadata[$(el).data("metadata-name")] = el.value for el in $('[data-metadata-name]',  @$component_editor())
+        _metadata[$(el).data("metadata-name")] = el.value for el in $('[data-metadata-name]', @$component_editor())
         return _metadata
 
     changedMetadata: ->
@@ -66,6 +67,7 @@ define ["backbone", "jquery", "underscore", "gettext", "xblock/runtime.v1",
 
     createItem: (parent, payload) ->
       payload.parent_locator = parent
+      @createItemStatus = 1
       $.postJSON(
           @model.urlRoot
           payload
@@ -73,12 +75,19 @@ define ["backbone", "jquery", "underscore", "gettext", "xblock/runtime.v1",
               @model.set(id: data.locator)
               @$el.data('locator', data.locator)
               @render()
+      )
 
     render: ->
       if @model.id
         @$el.load(@model.url(), =>
           @loadDisplay()
           @delegateEvents()
+          if @createItemStatus == 1
+            @createItemStatus = 0
+            @$el.addClass('editing')
+            ModalUtils.showModalCover(true)
+            @$component_editor().slideDown(150)
+            @loadEdit()
         )
 
     clickSaveButton: (event) =>
@@ -114,13 +123,42 @@ define ["backbone", "jquery", "underscore", "gettext", "xblock/runtime.v1",
       @$component_editor().slideDown(150)
       @loadEdit()
 
-    clickInsertButton: (event) ->
+    clickModeButton: (event) ->
       event.preventDefault()
-      @$el.addClass('editing')
-      $modalCover.show().addClass('is-fixed')
-      @$component_editor().slideDown(150)
-      @loadEdit()
-  
+      if not @hasDataEditor()
+        return
+      @selectMode(event.currentTarget.parentElement.id)
+
+    hasDataEditor: =>
+      return @$el.find('.wrapper-comp-editor').length > 0
+
+    selectMode: (mode) =>
+      dataEditor = @$el.find('.wrapper-comp-editor')
+      settingsEditor = @$el.find('.wrapper-comp-settings')
+      editorModeButton = @$el.find('#editor-mode').find("a")
+      settingsModeButton = @$el.find('#settings-mode').find("a")
+
+      if mode == @editorMode
+        # Because of CodeMirror editor, cannot hide the data editor when it is first loaded. Therefore
+        # we have to use a class of is-inactive instead of is-active.
+        dataEditor.removeClass('is-inactive')
+        editorModeButton.addClass('is-set')
+        settingsEditor.removeClass('is-active')
+        settingsModeButton.removeClass('is-set')
+      else
+        dataEditor.addClass('is-inactive')
+        editorModeButton.removeClass('is-set')
+        settingsEditor.addClass('is-active')
+        settingsModeButton.addClass('is-set')
+
+    hideDataEditor: =>
+      editorModeButtonParent = @$el.find('#editor-mode')
+      editorModeButtonParent.addClass('inactive-mode')
+      editorModeButtonParent.removeClass('active-mode')
+      @$el.find('.wrapper-comp-settings').addClass('is-active')
+      @$el.find('#settings-mode').find("a").addClass('is-set')
+
+
     clickInsertButton: (event) ->
       event.preventDefault()
       vidtime = @$el.find('.vidtime')
@@ -153,9 +191,11 @@ define ["backbone", "jquery", "underscore", "gettext", "xblock/runtime.v1",
       if hours_str.length == 1
         hours_str = "0" + hours_str
       time_format = hours_str + ":" + minutes_str + ":" + seconds_str
-      console.log(time_format)
+      console.log time_format
       new_component = document.getElementsByClassName('multiple-templates')
+      console.log new_component
       for elem in new_component
+        console.log elem
         if elem.getAttribute('data-type') == 'problem'
         #if elem.data.type == 'problem'
           elem.click()
@@ -200,37 +240,3 @@ define ["backbone", "jquery", "underscore", "gettext", "xblock/runtime.v1",
             elem.setAttribute 'time', time_format
             elem.setAttribute 'show_now', 'False'
 
-    clickModeButton: (event) ->
-      event.preventDefault()
-      if not @hasDataEditor()
-        return
-      @selectMode(event.currentTarget.parentElement.id)
-
-    hasDataEditor: =>
-      return @$el.find('.wrapper-comp-editor').length > 0
-
-    selectMode: (mode) =>
-      dataEditor = @$el.find('.wrapper-comp-editor')
-      settingsEditor = @$el.find('.wrapper-comp-settings')
-      editorModeButton =  @$el.find('#editor-mode').find("a")
-      settingsModeButton = @$el.find('#settings-mode').find("a")
-
-      if mode == @editorMode
-        # Because of CodeMirror editor, cannot hide the data editor when it is first loaded. Therefore
-        # we have to use a class of is-inactive instead of is-active.
-        dataEditor.removeClass('is-inactive')
-        editorModeButton.addClass('is-set')
-        settingsEditor.removeClass('is-active')
-        settingsModeButton.removeClass('is-set')
-      else
-        dataEditor.addClass('is-inactive')
-        editorModeButton.removeClass('is-set')
-        settingsEditor.addClass('is-active')
-        settingsModeButton.addClass('is-set')
-
-    hideDataEditor: =>
-      editorModeButtonParent =  @$el.find('#editor-mode')
-      editorModeButtonParent.addClass('inactive-mode')
-      editorModeButtonParent.removeClass('active-mode')
-      @$el.find('.wrapper-comp-settings').addClass('is-active')
-      @$el.find('#settings-mode').find("a").addClass('is-set')
