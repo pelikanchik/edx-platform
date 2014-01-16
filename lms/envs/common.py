@@ -36,7 +36,7 @@ from xmodule.x_module import XModuleMixin
 
 ################################### FEATURES ###################################
 # The display name of the platform to be used in templates/emails/etc.
-PLATFORM_NAME = "ASBIS"
+PLATFORM_NAME = "Prestigio"
 CC_MERCHANT_NAME = PLATFORM_NAME
 
 COURSEWARE_ENABLED = True
@@ -454,7 +454,7 @@ TECH_SUPPORT_EMAIL = 'support.prestigio@yandex.ru'
 CONTACT_EMAIL = 'support.prestigio@yandex.ru'
 BUGS_EMAIL = 'support.prestigio@yandex.ru'
 ADMINS = (
-    ('ASBIS Admins', 'support.prestigio@yandex.ru'),
+    ('Prestigio Admins', 'support.prestigio@yandex.ru'),
 )
 EMAIL_HOST = 'smtp.yandex.ru'
 EMAIL_HOST_USER = 'support.prestigio@yandex.ru'

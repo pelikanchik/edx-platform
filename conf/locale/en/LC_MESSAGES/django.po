@@ -658,7 +658,7 @@ msgid ""
 " user account at edx.org."
 msgstr ""
 "You're receiving this e-mail because you requested a password reset for your"
-" user account at edx.org."
+" user account."
 
 #: lms/templates/registration/password_reset_email.html:4
 msgid "Please go to the following page and choose a new password:"
@@ -670,7 +670,7 @@ msgstr "Thanks for using our site!"
 
 #: lms/templates/registration/password_reset_email.html:13
 msgid "The edX Team"
-msgstr "The edX Team"
+msgstr "Prestigio Team"
 
 #: lms/templates/wiki/article.html:31
 msgid "Last modified:"
@@ -4123,21 +4123,19 @@ msgstr "Free courses from <strong>{university_name}</strong>"
 
 #: lms/templates/index.html:16
 msgid "The Future of Online Education"
-msgstr "The Future of Online Education"
+msgstr "Prestigio"
 
 #: lms/templates/index.html:18
 msgid "For anyone, anywhere, anytime"
-msgstr "For anyone, anywhere, anytime"
+msgstr "Internal education"
 
 #: lms/templates/index.html:30
 msgid "Stay up to date with all {platform_name} has to offer!"
 msgstr "Stay up to date with all {platform_name} has to offer!"
 
 #: lms/templates/index.html:59
-msgid ""
-"Explore free courses from {span_start}{platform_name}{span_end} universities"
-msgstr ""
-"Explore free courses from {span_start}{platform_name}{span_end} universities"
+msgid "Explore free courses from {span_start}{platform_name}{span_end} universities"
+msgstr "Our courses"
 
 #: lms/templates/invalid_email_key.html:8
 msgid "Invalid email change key"
@@ -4165,11 +4163,11 @@ msgstr "The keys are valid for a limited amount of time. Has the key expired?"
 
 #: lms/templates/login.html:10
 msgid "Log into your {platform_name} Account"
-msgstr "Log into your {platform_name} Account"
+msgstr "Log into your Account"
 
 #: lms/templates/login.html:71
 msgid "Log into My {platform_name} Account"
-msgstr "Log into My {platform_name} Account"
+msgstr "Log into My Account"
 
 #: lms/templates/login.html:71 lms/templates/login_modal.html:26
 msgid "Access My Courses"
@@ -4181,7 +4179,7 @@ msgstr "PLEASE LOG IN to access your account and courses"
 
 #: lms/templates/login.html:95
 msgid "We're Sorry, {platform_name} accounts are unavailable currently"
-msgstr "We're Sorry, {platform_name} accounts are unavailable currently"
+msgstr "We're Sorry, accounts are unavailable currently"
 
 #: lms/templates/login.html:100
 msgid "The following errors occured while logging you in:"
@@ -4237,11 +4235,11 @@ msgstr "Not Enrolled?"
 
 #: lms/templates/login.html:165
 msgid "Sign up for {platform_name} today!"
-msgstr "Sign up for {platform_name} today!"
+msgstr "Sign up today!"
 
 #: lms/templates/login.html:170
 msgid "Looking for help in logging in or with your {platform_name} account?"
-msgstr "Looking for help in logging in or with your {platform_name} account?"
+msgstr "Looking for help in logging in or with your account?"
 
 #: lms/templates/login.html:172
 msgid "View our help section for answers to commonly asked questions."
@@ -4417,21 +4415,21 @@ msgstr "Return To %s"
 
 #: lms/templates/register.html:16
 msgid "Register for {platform_name}"
-msgstr "Register for {platform_name}"
+msgstr "Register"
 
 #: lms/templates/register.html:74
-msgid "Create my {platform_name} Account"
-msgstr "Create my {platform_name} Account"
+msgid "Create My {platform_name} Account"
+msgstr "Create my Account"
 
 #: lms/templates/register.html:88
 msgid "Welcome! Register below to create your {platform_name} account"
-msgstr "Welcome! Register below to create your {platform_name} account"
+msgstr "Welcome! Register below to create your account"
 
 #: lms/templates/register.html:98
 msgid ""
 "We're sorry, {platform_name} enrollment is not available in your region"
 msgstr ""
-"We're sorry, {platform_name} enrollment is not available in your region"
+"We're sorry, enrollment is not available in your region"
 
 #: lms/templates/register.html:103
 msgid "The following errors occured while processing your registration:"
@@ -4542,7 +4540,7 @@ msgstr "Click here to log in."
 
 #: lms/templates/register.html:298
 msgid "Welcome to {platform_name}"
-msgstr "Welcome to {platform_name}"
+msgstr "Welcome"
 
 #: lms/templates/register.html:299
 msgid ""
@@ -4550,7 +4548,7 @@ msgid ""
 "future free courses. Not ready to take a course just yet? Registering puts "
 "you on our mailing list - we will update you as courses are added."
 msgstr ""
-"Registering with {platform_name} gives you access to all of our current and "
+"Registering with gives you access to all of our current and "
 "future free courses. Not ready to take a course just yet? Registering puts "
 "you on our mailing list - we will update you as courses are added."
 
@@ -5552,11 +5550,11 @@ msgstr "Staff view"
 
 #: lms/templates/courseware/courses.html:20
 msgid "Explore free courses from {university_name}."
-msgstr "Explore free courses from {university_name}."
+msgstr "Our courses"
 
 #: lms/templates/courseware/courses.html:22
 msgid "Explore free courses from leading universities."
-msgstr "Explore free courses from leading universities."
+msgstr "Our courses"
 
 #: lms/templates/courseware/courseware-error.html:6
 msgid "Courseware"
