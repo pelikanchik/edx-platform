@@ -670,7 +670,7 @@ msgstr "Thanks for using our site!"
 
 #: lms/templates/registration/password_reset_email.html:13
 msgid "The edX Team"
-msgstr "ASBIS Team"
+msgstr "Prestigio Team"
 
 #: lms/templates/wiki/article.html:31
 msgid "Last modified:"
@@ -4123,7 +4123,7 @@ msgstr "Free courses from <strong>{university_name}</strong>"
 
 #: lms/templates/index.html:16
 msgid "The Future of Online Education"
-msgstr "ASBIS"
+msgstr "Prestigio"
 
 #: lms/templates/index.html:18
 msgid "For anyone, anywhere, anytime"
