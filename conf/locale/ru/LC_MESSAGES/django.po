@@ -5898,7 +5898,7 @@ msgstr "Пароль сброшен успешно"
 msgid ""
 "We've e-mailed you instructions for setting your password to the e-mail "
 "address you submitted. You should be receiving it shortly."
-msgstr "Мы отправили на e-mail, который вы указали, инструкции по обновлению пароля. вы скоро их получите."
+msgstr "Мы отправили на e-mail, который вы указали, инструкции по обновлению пароля. Вы скоро их получите."
 
 #: lms/templates/shoppingcart/error.html:6
 msgid "Payment Error"
