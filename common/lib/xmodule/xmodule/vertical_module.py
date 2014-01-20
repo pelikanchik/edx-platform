@@ -42,6 +42,15 @@ class VerticalModule(VerticalFields, XModule):
             rendered_child = child.render('student_view', context)
             fragment.add_frag_resources(rendered_child)
 
+            show_now = 'true'
+
+            try:
+                problem_now = child.problem_now
+                if not problem_now:
+                    show_now = 'false'
+            except AttributeError:
+                pass
+
             all_contents.append({
                 'id': child.id,
                 'content': rendered_child.content,
@@ -49,7 +58,7 @@ class VerticalModule(VerticalFields, XModule):
                 'direct_term': self.direct_term,
                 'progress_detail': Progress.to_js_detail_str(self.get_progress()),
                 'type': child.get_icon_class(),
-                'show_now': 'true' if child.get_icon_class() == 'video' or child.problem_now else 'false',
+                'show_now': show_now,
                 'problem_time': child.problem_time if child.get_icon_class() == 'problem' else
                 [{"id": child2.id if child2.get_icon_class() == 'problem' else "video",
                   "time": child2.problem_time if child2.get_icon_class() == 'problem' and child2.problem_time is not None else "video",

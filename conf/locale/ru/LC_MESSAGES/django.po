@@ -7069,6 +7069,17 @@ msgid "I will resolve tasks by myself"
 msgstr "Я приложу все усилия, чтобы выполнять задания курсов вдумчиво, внимательно и самостоятельно"
 
 
+#martynov backshots
+
+msgid "Return to Video"
+msgstr "Вернуться к видео"
+
+msgid "Insert problem rightnow"
+msgstr "Вставить задачу прямо сейчас"
+
+msgid "Insert problem at the end of video"
+msgstr "Вставить задачу в конец"
+
 #django_partial.po
 
 
