@@ -830,6 +830,8 @@ function goto( mode)
                     <td class="td_correct">${i[0]}</td>
                   %elif i[1] == 'incorrect':
                     <td class="td_incorrect">${i[0]}</td>
+                  %else:
+                    <td class="td_empty">${i[0]}</td>
                   %endif
                 %else:
                   <td class="td_empty"> </td>

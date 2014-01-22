@@ -165,9 +165,10 @@ def instructor_dashboard(request, course_id):
         Color.Correct = 'def0d8'
         Color.Incorrect = 'f2dedf'
         Color.Header = 'f5f59e'
+        Color.Default = 'ffffff'
 
         if fp is None:
-            response = HttpResponse(mimetype='text/csv')
+            response = HttpResponse(mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
             response['Content-Disposition'] = 'attachment; filename={0}'.format(fn)
         else:
             response = fp
@@ -202,6 +203,8 @@ def instructor_dashboard(request, course_id):
                                 c.style.fill.start_color.index = openpyxl.style.Color.Correct
                             elif item[1] == 'incorrect':
                                 c.style.fill.start_color.index = openpyxl.style.Color.Incorrect
+                            else:
+                                c.style.fill.start_color.index = openpyxl.style.Color.Default
                         else:
                             c.value = ' '
                 else:
@@ -266,7 +269,7 @@ def instructor_dashboard(request, course_id):
         question_num = problem_html.count('name=\"input_') # total questions count
         questions_id = OrderedDict()
         parser = HTMLParser()
-
+        
         for i in range(question_num):
             beg_ind = problem_html.find('name=\"input_', beg_ind) + len('name=\"input_')
             span_ind = problem_html.rfind('<span>', 0, beg_ind)
@@ -826,8 +829,8 @@ def instructor_dashboard(request, course_id):
                     problems_urls.append(component.location.url())
 
         datatable = {'header': ['ID', 'Demo', 'Username', 'Full Name', 'E-mail'], 'data':[], 'col_size':[]}
-        datatable['header'] += ["Task %d" % num for num in range(1, len(problems_urls) + 1)]
         datatable['col_size'] = [1] * len(datatable['header'])
+        datatable['header'] += ["Task %d" % num for num in range(1, len(problems_urls) + 1)]
 
         enrolled_students = User.objects.filter(
             courseenrollment__course_id=course_id,
