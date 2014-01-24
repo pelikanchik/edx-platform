@@ -13,6 +13,7 @@ define ["backbone", "jquery", "underscore", "gettext", "xblock/runtime.v1",
       "click .component-actions .edit-button": 'clickEditButton'
       "click .component-actions .insert-button": 'clickInsertButton'
       "click .component-actions .insert-to-end-button": 'clickInsertToEndButton'
+      "click .component-actions .snapshot": 'clickSnapshot'
       "click .component-actions .delete-button": 'onDelete'
       "click .mode a": 'clickModeButton'
 
@@ -231,3 +232,6 @@ define ["backbone", "jquery", "underscore", "gettext", "xblock/runtime.v1",
             elem.setAttribute 'time', time_format
             elem.setAttribute 'show_now', 'False'
 
+    clickSnapshot: (event) ->
+      event.preventDefault()
+      alert "Hello!"
