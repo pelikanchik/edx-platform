@@ -9,7 +9,7 @@ from django.core.exceptions import PermissionDenied
 from django_future.csrf import ensure_csrf_cookie
 from django.conf import settings
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from mitxmako.shortcuts import render_to_response
+from edxmako.shortcuts import render_to_response
 
 from xmodule.modulestore.django import modulestore
 from xmodule.util.date_utils import get_default_time_display
@@ -30,7 +30,6 @@ from xblock.runtime import Mixologist
 
 __all__ = ['OPEN_ENDED_COMPONENT_TYPES',
            'ADVANCED_COMPONENT_POLICY_KEY',
-           'show_graph',
            'subsection_handler',
            'unit_handler'
            ]
@@ -122,28 +121,8 @@ json: not currently supported
             (field.name, field.read_from(item))
             for field
             in fields.values()
-            if field.name not in ['display_name', 'start', 'due', 'format', 'unlock_term', 'available_for_demo'] and field.scope == Scope.settings
+            if field.name not in ['display_name', 'start', 'due', 'format'] and field.scope == Scope.settings
         )
-
-        sections = modulestore().get_item(course.location, depth=3).get_children()
-
-        #for section in sections:
-        # print section.display_name_with_default
-        # subsections = section.get_children()
-        # for subsection in subsections:
-        # print subsection.display_name_with_default
-
-        #item.unlock_term = '{"disjunctions":[]}'
-        term = json.loads(item.unlock_term)
-
-
-        # updating if term has links to already not existed sections
-        for disjunction in term["disjunctions"]:
-            for conjunction in disjunction["conjunctions"]:
-                if not is_section_exist(conjunction["source_section_id"], sections):
-                    disjunction["conjunctions"].remove(conjunction)
-
-        item.unlock_term = json.dumps(term)
 
         can_view_live = False
         subsection_units = item.get_children()
@@ -170,17 +149,17 @@ json: not currently supported
                 'locator': locator,
                 'policy_metadata': policy_metadata,
                 'subsection_units': subsection_units,
-                'sections': sections,
                 'can_view_live': can_view_live
             }
         )
     else:
         return HttpResponseBadRequest("Only supports html requests")
 
+
 def _load_mixed_class(category):
     """
-    Load an XBlock by category name, and apply all defined mixins
-    """
+Load an XBlock by category name, and apply all defined mixins
+"""
     component_class = XModuleDescriptor.load_class(category)
     mixologist = Mixologist(settings.XBLOCK_MIXINS)
     return mixologist.mix(component_class)
@@ -190,12 +169,12 @@ def _load_mixed_class(category):
 @login_required
 def unit_handler(request, tag=None, course_id=None, branch=None, version_guid=None, block=None):
     """
-    The restful handler for unit-specific requests.
+The restful handler for unit-specific requests.
 
-    GET
-        html: return html page for editing a unit
-        json: not currently supported
-    """
+GET
+html: return html page for editing a unit
+json: not currently supported
+"""
     if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
         locator = BlockUsageLocator(course_id=course_id, branch=branch, version_guid=version_guid, usage_id=block)
         try:
@@ -216,8 +195,8 @@ def unit_handler(request, tag=None, course_id=None, branch=None, version_guid=No
             component_templates[category].append((
                 display_name,
                 category,
-                False,  # No defaults have markdown (hardcoded current default)
-                None  # no boilerplate for overrides
+                False, # No defaults have markdown (hardcoded current default)
+                None # no boilerplate for overrides
             ))
             # add boilerplates
             if hasattr(component_class, 'templates'):
@@ -252,7 +231,7 @@ def unit_handler(request, tag=None, course_id=None, branch=None, version_guid=No
                                 component_class.display_name.default or category,
                                 category,
                                 False,
-                                None  # don't override default data
+                                None # don't override default data
                             )
                         )
                     except PluginMissingError:
@@ -269,13 +248,9 @@ def unit_handler(request, tag=None, course_id=None, branch=None, version_guid=No
             )
 
         components = [
-            [
-                # TODO: old location needed for video transcripts.
-                component.location.url(),
-                loc_mapper().translate_location(
-                    course.location.course_id, component.location, False, True
-                )
-            ]
+            loc_mapper().translate_location(
+                course.location.course_id, component.location, False, True
+            )
             for component
             in item.get_children()
         ]
@@ -302,7 +277,7 @@ def unit_handler(request, tag=None, course_id=None, branch=None, version_guid=No
                 break
             index = index + 1
 
-        preview_lms_base = settings.MITX_FEATURES.get('PREVIEW_LMS_BASE')
+        preview_lms_base = settings.FEATURES.get('PREVIEW_LMS_BASE')
 
         preview_lms_link = (
             '//{preview_lms_base}/courses/{org}/{course}/'
@@ -319,7 +294,6 @@ def unit_handler(request, tag=None, course_id=None, branch=None, version_guid=No
         )
 
         return render_to_response('unit.html', {
-            'length': len(components),
             'context_course': course,
             'unit': item,
             'unit_locator': locator,
@@ -344,15 +318,14 @@ def unit_handler(request, tag=None, course_id=None, branch=None, version_guid=No
         return HttpResponseBadRequest("Only supports html requests")
 
 
-
 @login_required
 def _get_item_in_course(request, locator):
     """
-    Helper method for getting the old location, containing course,
-    item, and lms_link for a given locator.
+Helper method for getting the old location, containing course,
+item, and lms_link for a given locator.
 
-    Verifies that the caller has permission to access this item.
-    """
+Verifies that the caller has permission to access this item.
+"""
     if not has_access(request.user, locator):
         raise PermissionDenied()
 

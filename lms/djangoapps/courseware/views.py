@@ -13,7 +13,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect
-from mitxmako.shortcuts import render_to_response, render_to_string
+from edxmako.shortcuts import render_to_response, render_to_string
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
 from django.db import transaction
@@ -40,7 +40,9 @@ from xmodule.modulestore.search import path_to_location
 from xmodule.course_module import CourseDescriptor
 import shoppingcart
 
-log = logging.getLogger("mitx.courseware")
+from microsite_configuration.middleware import MicrositeConfiguration
+
+log = logging.getLogger("edx.courseware")
 
 template_imports = {'urllib': urllib}
 
@@ -91,28 +93,6 @@ def render_accordion(request, course, chapter, section, field_data_cache):
     Returns the html string
     """
 
-    staff_access = has_access(request.user, course, 'staff')
-
-    # NOTE: To make sure impersonation by instructor works, use
-    # student instead of request.user in the rest of the function.
-
-    # The pre-fetching of groups is done to make auth checks not require an
-    # additional DB lookup (this kills the Progress page in particular).
-    course_id = course.id
-    student_id = None
-    if student_id is None or student_id == request.user.id:
-        # always allowed to see your own profile
-        student = request.user
-    else:
-        # Requesting access to a different student's profile
-        if not staff_access:
-            raise Http404
-        student = User.objects.get(id=int(student_id))
- 
-    student = User.objects.prefetch_related("groups").get(id=student.id)
-
-    courseware_summary = grades.progress_summary(student, request, course)
-
     # grab the table of contents
     user = User.objects.prefetch_related("groups").get(id=request.user.id)
     request.user = user	# keep just one instance of User
@@ -123,7 +103,6 @@ def render_accordion(request, course, chapter, section, field_data_cache):
                     ('course_id', course.id),
                     ('is_demo', is_demo),
                     ('csrf', csrf(request)['csrf_token']),
-                    ('courseware_summary',courseware_summary),
                     ('due_date_display_format', course.due_date_display_format)] + template_imports.items())
     return render_to_string('courseware/accordion.html', context)
 
@@ -199,71 +178,6 @@ def save_child_position(seq_module, child_name):
     seq_module.save()
 
 
-def check_for_active_timelimit_module(request, course_id, course):
-    """
-    Looks for a timing module for the given user and course that is currently active.
-    If found, returns a context dict with timer-related values to enable display of time remaining.
-    """
-    context = {}
-
-    # TODO (cpennington): Once we can query the course structure, replace this with such a query
-    timelimit_student_modules = StudentModule.objects.filter(student=request.user, course_id=course_id, module_type='timelimit')
-    if timelimit_student_modules:
-        for timelimit_student_module in timelimit_student_modules:
-            # get the corresponding section_descriptor for the given StudentModel entry:
-            module_state_key = timelimit_student_module.module_state_key
-            timelimit_descriptor = modulestore().get_instance(course_id, Location(module_state_key))
-            timelimit_module_cache = FieldDataCache.cache_for_descriptor_descendents(course.id, request.user,
-                                                                                     timelimit_descriptor, depth=None)
-            timelimit_module = get_module_for_descriptor(request.user, request, timelimit_descriptor,
-                                                         timelimit_module_cache, course.id, position=None)
-            if timelimit_module is not None and timelimit_module.category == 'timelimit' and \
-                    timelimit_module.has_begun and not timelimit_module.has_ended:
-                location = timelimit_module.location
-                # determine where to go when the timer expires:
-                if timelimit_descriptor.time_expired_redirect_url is None:
-                    raise Http404("no time_expired_redirect_url specified at this location: {} ".format(timelimit_module.location))
-                context['time_expired_redirect_url'] = timelimit_descriptor.time_expired_redirect_url
-                # Fetch the remaining time relative to the end time as stored in the module when it was started.
-                # This value should be in milliseconds.
-                remaining_time = timelimit_module.get_remaining_time_in_ms()
-                context['timer_expiration_duration'] = remaining_time
-                context['suppress_toplevel_navigation'] = timelimit_descriptor.suppress_toplevel_navigation
-                return_url = reverse('jump_to', kwargs={'course_id': course_id, 'location': location})
-                context['timer_navigation_return_url'] = return_url
-    return context
-
-
-def update_timelimit_module(user, course_id, field_data_cache, timelimit_descriptor, timelimit_module):
-    """
-    Updates the state of the provided timing module, starting it if it hasn't begun.
-    Returns dict with timer-related values to enable display of time remaining.
-    Returns 'timer_expiration_duration' in dict if timer is still active, and not if timer has expired.
-    """
-    context = {}
-    # determine where to go when the exam ends:
-    if timelimit_descriptor.time_expired_redirect_url is None:
-        raise Http404("No time_expired_redirect_url specified at this location: {} ".format(timelimit_module.location))
-    context['time_expired_redirect_url'] = timelimit_descriptor.time_expired_redirect_url
-
-    if not timelimit_module.has_ended:
-        if not timelimit_module.has_begun:
-            # user has not started the exam, so start it now.
-            if timelimit_descriptor.duration is None:
-                raise Http404("No duration specified at this location: {} ".format(timelimit_module.location))
-            # The user may have an accommodation that has been granted to them.
-            # This accommodation information should already be stored in the module's state.
-            timelimit_module.begin(timelimit_descriptor.duration)
-
-        # the exam has been started, either because the student is returning to the
-        # exam page, or because they have just visited it.  Fetch the remaining time relative to the
-        # end time as stored in the module when it was started.
-        context['timer_expiration_duration'] = timelimit_module.get_remaining_time_in_ms()
-        # also use the timed module to determine whether top-level navigation is visible:
-        context['suppress_toplevel_navigation'] = timelimit_descriptor.suppress_toplevel_navigation
-    return context
-
-
 def chat_settings(course, user):
     """
     Returns a dict containing the settings required to connect to a
@@ -321,7 +235,6 @@ def index(request, course_id, chapter=None, section=None,
 
      - HTTPresponse
     """
-
     user = User.objects.prefetch_related("groups").get(id=request.user.id)
     request.user = user	# keep just one instance of User
 
@@ -362,7 +275,7 @@ def index(request, course_id, chapter=None, section=None,
 
         if chapter is None:
             return redirect_to_course_position(course_module)
-        print(field_data_cache);
+
         context = {
             'csrf': csrf(request)['csrf_token'],
             'accordion': render_accordion(request, course, chapter, section, field_data_cache),
@@ -372,12 +285,12 @@ def index(request, course_id, chapter=None, section=None,
             'fragment': Fragment(),
             'staff_access': staff_access,
             'masquerade': masq,
-            'xqa_server': settings.MITX_FEATURES.get('USE_XQA_SERVER', 'http://xqa:server@content-qa.mitx.mit.edu/xqa')
+            'xqa_server': settings.FEATURES.get('USE_XQA_SERVER', 'http://xqa:server@content-qa.mitx.mit.edu/xqa')
             }
 
         # Only show the chat if it's enabled by the course and in the
         # settings.
-        show_chat = course.show_chat and settings.MITX_FEATURES['ENABLE_CHAT']
+        show_chat = course.show_chat and settings.FEATURES['ENABLE_CHAT']
         if show_chat:
             context['chat'] = chat_settings(course, user)
             # If we couldn't load the chat settings, then don't show
@@ -403,7 +316,6 @@ def index(request, course_id, chapter=None, section=None,
 
         if section is not None:
             section_descriptor = chapter_descriptor.get_child_by(lambda m: m.url_name == section)
-
             if section_descriptor is None:
                 # Specifically asked-for section doesn't exist
                 if masq=='student':  # if staff is masquerading as student be kinder, don't 404
@@ -449,35 +361,11 @@ def index(request, course_id, chapter=None, section=None,
 
             # Save where we are in the chapter
             save_child_position(chapter_module, section)
-
-            # check here if this section *is* a timed module.
-            if section_module.category == 'timelimit':
-                timer_context = update_timelimit_module(user, course_id, section_field_data_cache,
-                                                        section_descriptor, section_module)
-                if 'timer_expiration_duration' in timer_context:
-                    context.update(timer_context)
-                else:
-                    # if there is no expiration defined, then we know the timer has expired:
-                    return HttpResponseRedirect(timer_context['time_expired_redirect_url'])
-            else:
-                # check here if this page is within a course that has an active timed module running.  If so, then
-                # add in the appropriate timer information to the rendering context:
-                context.update(check_for_active_timelimit_module(request, course_id, course))
-
-           # context['content'] = section_module.runtime.render(section_module, None, 'student_view').content
-
-            if not is_section_unlocked:
-                context['fragment'] = Fragment(content=render_to_string( 'course_not_available.html',{'a':"a"}))
-            else:
-                # remove this if works fine
-                #context['fragment'] = section_module.runtime.render(section_module, None, 'student_view').content
-                #context['content'] = section_module.get_html()
-                context['fragment'] = section_module.render('student_view')
+            context['fragment'] = section_module.render('student_view')
 
         else:
             # section is none, so display a message
             prev_section = get_current_child(chapter_module)
-
             if prev_section is None:
                 # Something went wrong -- perhaps this chapter has no sections visible to the user
                 raise Http404
@@ -536,7 +424,7 @@ def jump_to_id(request, course_id, module_id):
     course_location = CourseDescriptor.id_to_location(course_id)
 
     items = modulestore().get_items(
-        ['i4x', course_location.org, course_location.course, None, module_id],
+        Location('i4x', course_location.org, course_location.course, None, module_id),
         course_id=course_id
     )
 
@@ -586,7 +474,7 @@ def jump_to(request, course_id, location):
     else:
         return redirect('courseware_position', course_id=course_id, chapter=chapter, section=section, position=position)
 
-@login_required
+
 @ensure_csrf_cookie
 def course_info(request, course_id):
     """
@@ -662,7 +550,11 @@ def registered_for_course(course, user):
 @ensure_csrf_cookie
 @cache_if_anonymous
 def course_about(request, course_id):
-    if settings.MITX_FEATURES.get('ENABLE_MKTG_SITE', False):
+
+    if MicrositeConfiguration.get_microsite_configuration_value(
+        'ENABLE_MKTG_SITE',
+        settings.FEATURES.get('ENABLE_MKTG_SITE', False)
+    ):
         raise Http404
 
     course = get_course_with_access(request.user, course_id, 'see_exists')
@@ -674,14 +566,14 @@ def course_about(request, course_id):
         course_target = reverse('about_course', args=[course.id])
 
     show_courseware_link = (has_access(request.user, course, 'load') or
-                            settings.MITX_FEATURES.get('ENABLE_LMS_MIGRATION'))
+                            settings.FEATURES.get('ENABLE_LMS_MIGRATION'))
 
     # Note: this is a flow for payment for course registration, not the Verified Certificate flow.
     registration_price = 0
     in_cart = False
     reg_then_add_to_cart_link = ""
-    if (settings.MITX_FEATURES.get('ENABLE_SHOPPING_CART') and
-        settings.MITX_FEATURES.get('ENABLE_PAID_COURSE_REGISTRATION')):
+    if (settings.FEATURES.get('ENABLE_SHOPPING_CART') and
+        settings.FEATURES.get('ENABLE_PAID_COURSE_REGISTRATION')):
         registration_price = CourseMode.min_course_price_for_currency(course_id,
                                                                       settings.PAID_COURSE_REGISTRATION_CURRENCY[0])
         if request.user.is_authenticated():
@@ -727,7 +619,7 @@ def mktg_course_about(request, course_id):
     allow_registration = has_access(request.user, course, 'enroll')
 
     show_courseware_link = (has_access(request.user, course, 'load') or
-                            settings.MITX_FEATURES.get('ENABLE_LMS_MIGRATION'))
+                            settings.FEATURES.get('ENABLE_LMS_MIGRATION'))
     course_modes = CourseMode.modes_for_course(course.id)
 
     return render_to_response(

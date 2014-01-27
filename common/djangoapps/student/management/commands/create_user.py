@@ -4,8 +4,10 @@ from student.models import CourseEnrollment, Registration
 from student.views import _do_create_account
 from django.contrib.auth.models import User
 
+from track.management.tracked_command import TrackedCommand
 
-class Command(BaseCommand):
+
+class Command(TrackedCommand):
     help = """
     This command creates and registers a user in a given course
     as "audit", "verified" or "honor".
@@ -44,12 +46,12 @@ class Command(BaseCommand):
                     default=None,
                     help='Email for user'),
         make_option('-c', '--course',
-                    metavar='COURSE_ID',
+                    metavar='course_id',
                     dest='course',
                     default=None,
                     help='course to enroll the user in (optional)'),
         make_option('-s', '--staff',
-                    metavar='COURSE_ID',
+                    metavar='course_id',
                     dest='staff',
                     default=False,
                     action='store_true',

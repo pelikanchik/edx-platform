@@ -21,7 +21,7 @@ from django.http import HttpResponseNotFound
 from django.views.decorators.http import require_http_methods, require_GET
 from django.utils.translation import ugettext as _
 
-from mitxmako.shortcuts import render_to_response
+from edxmako.shortcuts import render_to_response
 from auth.authz import create_all_course_groups
 
 from xmodule.modulestore.xml_importer import import_from_xml
@@ -52,14 +52,14 @@ CONTENT_RE = re.compile(r"(?P<start>\d{1,11})-(?P<stop>\d{1,11})/(?P<end>\d{1,11
 @require_http_methods(("GET", "POST", "PUT"))
 def import_handler(request, tag=None, course_id=None, branch=None, version_guid=None, block=None):
     """
-    The restful handler for importing a course.
+The restful handler for importing a course.
 
-    GET
-        html: return html page for import page
-        json: not supported
-    POST or PUT
-        json: import a course via the .tar.gz file specified in request.FILES
-    """
+GET
+html: return html page for import page
+json: not supported
+POST or PUT
+json: import a course via the .tar.gz file specified in request.FILES
+"""
     location = BlockUsageLocator(course_id=course_id, branch=branch, version_guid=version_guid, usage_id=block)
     if not has_access(request.user, location):
         raise PermissionDenied()
@@ -94,7 +94,7 @@ def import_handler(request, tag=None, course_id=None, branch=None, version_guid=
             try:
                 matches = CONTENT_RE.search(request.META["HTTP_CONTENT_RANGE"])
                 content_range = matches.groupdict()
-            except KeyError:    # Single chunk
+            except KeyError: # Single chunk
                 # no Content-Range header, so make one that will work
                 content_range = {'start': 0, 'stop': 1, 'end': 2}
 
@@ -144,7 +144,7 @@ def import_handler(request, tag=None, course_id=None, branch=None, version_guid=
                               }]
                 })
 
-            else:   # This was the last chunk.
+            else: # This was the last chunk.
 
                 # Use sessions to keep info about import progress
                 session_status = request.session.setdefault("import_status", {})
@@ -177,19 +177,19 @@ def import_handler(request, tag=None, course_id=None, branch=None, version_guid=
                     # find the 'course.xml' file
                     def get_all_files(directory):
                         """
-                        For each file in the directory, yield a 2-tuple of (file-name,
-                        directory-path)
-                        """
+For each file in the directory, yield a 2-tuple of (file-name,
+directory-path)
+"""
                         for dirpath, _dirnames, filenames in os.walk(directory):
                             for filename in filenames:
                                 yield (filename, dirpath)
 
                     def get_dir_for_fname(directory, filename):
                         """
-                        Returns the dirpath for the first file found in the directory
-                        with the given name.  If there is no file in the directory with
-                        the specified name, return None.
-                        """
+Returns the dirpath for the first file found in the directory
+with the given name. If there is no file in the directory with
+the specified name, return None.
+"""
                         for fname, dirpath in get_all_files(directory):
                             if fname == filename:
                                 return dirpath
@@ -234,7 +234,7 @@ def import_handler(request, tag=None, course_id=None, branch=None, version_guid=
                     logging.debug('created all course groups at {0}'.format(course_items[0].location))
 
                 # Send errors to client with stage at which error occured.
-                except Exception as exception:   # pylint: disable=W0703
+                except Exception as exception: # pylint: disable=W0703
                     return JsonResponse(
                         {
                             'ErrMsg': str(exception),
@@ -247,7 +247,7 @@ def import_handler(request, tag=None, course_id=None, branch=None, version_guid=
                     shutil.rmtree(course_dir)
 
                 return JsonResponse({'Status': 'OK'})
-    elif request.method == 'GET':  # assume html
+    elif request.method == 'GET': # assume html
         course_module = modulestore().get_item(old_location)
         return render_to_response('import.html', {
             'context_course': course_module,
@@ -263,14 +263,14 @@ def import_handler(request, tag=None, course_id=None, branch=None, version_guid=
 @login_required
 def import_status_handler(request, tag=None, course_id=None, branch=None, version_guid=None, block=None, filename=None):
     """
-    Returns an integer corresponding to the status of a file import. These are:
+Returns an integer corresponding to the status of a file import. These are:
 
-        0 : No status info found (import done or upload still in progress)
-        1 : Extracting file
-        2 : Validating.
-        3 : Importing to mongo
+0 : No status info found (import done or upload still in progress)
+1 : Extracting file
+2 : Validating.
+3 : Importing to mongo
 
-    """
+"""
     location = BlockUsageLocator(course_id=course_id, branch=branch, version_guid=version_guid, usage_id=block)
     if not has_access(request.user, location):
         raise PermissionDenied()
@@ -289,19 +289,19 @@ def import_status_handler(request, tag=None, course_id=None, branch=None, versio
 @require_http_methods(("GET",))
 def export_handler(request, tag=None, course_id=None, branch=None, version_guid=None, block=None):
     """
-    The restful handler for exporting a course.
+The restful handler for exporting a course.
 
-    GET
-        html: return html page for import page
-        application/x-tgz: return tar.gz file containing exported course
-        json: not supported
+GET
+html: return html page for import page
+application/x-tgz: return tar.gz file containing exported course
+json: not supported
 
-    Note that there are 2 ways to request the tar.gz file. The request header can specify
-    application/x-tgz via HTTP_ACCEPT, or a query parameter can be used (?_accept=application/x-tgz).
+Note that there are 2 ways to request the tar.gz file. The request header can specify
+application/x-tgz via HTTP_ACCEPT, or a query parameter can be used (?_accept=application/x-tgz).
 
-    If the tar.gz file has been requested but the export operation fails, an HTML page will be returned
-    which describes the error.
-    """
+If the tar.gz file has been requested but the export operation fails, an HTML page will be returned
+which describes the error.
+"""
     location = BlockUsageLocator(course_id=course_id, branch=branch, version_guid=version_guid, usage_id=block)
     if not has_access(request.user, location):
         raise PermissionDenied()

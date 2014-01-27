@@ -3,7 +3,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
   @multipleChoiceTemplate : "( ) incorrect\n( ) incorrect\n(x) correct\n"
   @checkboxChoiceTemplate: "[x] correct\n[ ] incorrect\n[x] correct\n"
   @stringInputTemplate: "= answer\n"
-  @numberInputTemplate: "= answer +- x%\n"
+  @numberInputTemplate: "= answer +- 0.001%\n"
   @selectTemplate: "[[incorrect, (correct), incorrect]]\n"
   @headerTemplate: "Header\n=====\n"
   @explanationTemplate: "[explanation]\nShort explanation\n[explanation]\n"
@@ -522,23 +522,30 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
             floatValue = parseFloat(answersList[0]);
 
         if(!isNaN(floatValue)) {
-          var params = /(.*?)\+\-\s*(.*?$)/.exec(answersList[0]);
+          // Tries to extract parameters from string like 'expr +- tolerance'
+          var params = /(.*?)\+\-\s*(.*?$)/.exec(answersList[0]),
+              answer = answersList[0].replace(/\s+/g, '');
           if(params) {
-            string = '<numericalresponse answer="' + floatValue + '">\n';
+            answer = params[1].replace(/\s+/g, '');
+            string = '<numericalresponse answer="' + answer + '">\n';
             string += '  <responseparam type="tolerance" default="' + params[2] + '" />\n';
           } else {
-            string = '<numericalresponse answer="' + floatValue + '">\n';
+            string = '<numericalresponse answer="' + answer + '">\n';
           }
           string += '  <formulaequationinput />\n';
           string += '</numericalresponse>\n\n';
         } else {
-            var answers = [];
-
-            for(var i = 0; i < answersList.length; i++) {
-                answers.push(answersList[i])
+            var firstAnswer = answersList.shift();
+            if (firstAnswer[0] === '|') { // this is regexp case
+              string = '<stringresponse answer="' + firstAnswer.slice(1).trim() +  '" type="ci regexp" >\n'
             }
-
-            string = '<stringresponse answer="' + answers.join('_or_') + '" type="ci">\n  <textline size="20"/>\n</stringresponse>\n\n';
+            else {
+              string = '<stringresponse answer="' + firstAnswer +  '" type="ci" >\n'
+            }
+            for(var i = 0; i < answersList.length; i++) {
+                string += '  <additional_answer>' + answersList[i] + '</additional_answer>\n'
+            }
+            string +=  '  <textline size="20"/>\n</stringresponse>\n\n';
         }
         return string;
     });

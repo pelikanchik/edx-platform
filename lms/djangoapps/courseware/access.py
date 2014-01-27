@@ -6,23 +6,24 @@ from datetime import datetime, timedelta
 from functools import partial
 
 from django.conf import settings
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import Group, AnonymousUser
 
 from xmodule.course_module import CourseDescriptor
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore import Location
-from xmodule.x_module import XModule, XModuleDescriptor
+from xmodule.x_module import XModule
+
+from xblock.core import XBlock
 
 from student.models import CourseEnrollmentAllowed
 from external_auth.models import ExternalAuthMap
 from courseware.masquerade import is_masquerading_as_student
 from django.utils.timezone import UTC
 from student.models import CourseEnrollment
-from courseware.roles import (
+from student.roles import (
     GlobalStaff, CourseStaffRole, CourseInstructorRole,
     OrgStaffRole, OrgInstructorRole, CourseBetaTesterRole
 )
-
 DEBUG_ACCESS = False
 
 log = logging.getLogger(__name__)
@@ -44,7 +45,8 @@ def has_access(user, obj, action, course_context=None):
     - DISABLE_START_DATES
     - different access for instructor, staff, course staff, and students.
 
-    user: a Django user object. May be anonymous.
+    user: a Django user object. May be anonymous. If none is passed,
+                    anonymous is assumed
 
     obj: The object to check access for.  A module, descriptor, location, or
                     certain special strings (e.g. 'global')
@@ -61,6 +63,10 @@ def has_access(user, obj, action, course_context=None):
     Returns a bool.  It is up to the caller to actually deny access in a way
     that makes sense in context.
     """
+    # Just in case user is passed in as None, make them anonymous
+    if not user:
+        user = AnonymousUser()
+
     # delegate the work to type-specific functions.
     # (start with more specific types, then get more general)
     if isinstance(obj, CourseDescriptor):
@@ -69,12 +75,12 @@ def has_access(user, obj, action, course_context=None):
     if isinstance(obj, ErrorDescriptor):
         return _has_access_error_desc(user, obj, action, course_context)
 
-    # NOTE: any descriptor access checkers need to go above this
-    if isinstance(obj, XModuleDescriptor):
-        return _has_access_descriptor(user, obj, action, course_context)
-
     if isinstance(obj, XModule):
         return _has_access_xmodule(user, obj, action, course_context)
+
+    # NOTE: any descriptor access checkers need to go above this
+    if isinstance(obj, XBlock):
+        return _has_access_descriptor(user, obj, action, course_context)
 
     if isinstance(obj, Location):
         return _has_access_location(user, obj, action, course_context)
@@ -134,26 +140,24 @@ def _has_access_course_desc(user, course, action):
         (staff can always enroll)
         """
         # if using registration method to restrict (say shibboleth)
-        if course.ispublic or course.ispublic == None:
-            # if using registration method to restrict (say shibboleth)
-            if settings.MITX_FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
-                if user is not None and user.is_authenticated() and \
-                    ExternalAuthMap.objects.filter(user=user, external_domain=course.enrollment_domain):
-                    debug("Allow: external_auth of " + course.enrollment_domain)
-                    reg_method_ok = True
-                else:
-                    reg_method_ok = False
+        if settings.FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
+            if user is not None and user.is_authenticated() and \
+                ExternalAuthMap.objects.filter(user=user, external_domain=course.enrollment_domain):
+                debug("Allow: external_auth of " + course.enrollment_domain)
+                reg_method_ok = True
             else:
-                reg_method_ok = True #if not using this access check, it's always OK.
+                reg_method_ok = False
+        else:
+            reg_method_ok = True #if not using this access check, it's always OK.
 
-            now = datetime.now(UTC())
-            start = course.enrollment_start
-            end = course.enrollment_end
+        now = datetime.now(UTC())
+        start = course.enrollment_start
+        end = course.enrollment_end
 
-            if reg_method_ok and (start is None or now > start) and (end is None or now < end):
-                # in enrollment period, so any user is allowed to enroll.
-                debug("Allow: in enrollment period")
-                return True
+        if reg_method_ok and (start is None or now > start) and (end is None or now < end):
+            # in enrollment period, so any user is allowed to enroll.
+            debug("Allow: in enrollment period")
+            return True
 
         # if user is in CourseEnrollmentAllowed with right course_id then can also enroll
         if user is not None and user.is_authenticated() and CourseEnrollmentAllowed:
@@ -175,7 +179,7 @@ def _has_access_course_desc(user, course, action):
         # VS[compat] -- this setting should go away once all courses have
         # properly configured enrollment_start times (if course should be
         # staff-only, set enrollment_start far in the future.)
-        if settings.MITX_FEATURES.get('ACCESS_REQUIRE_STAFF_FOR_COURSE'):
+        if settings.FEATURES.get('ACCESS_REQUIRE_STAFF_FOR_COURSE'):
             # if this feature is on, only allow courses that have ispublic set to be
             # seen by non-staff
             if course.ispublic:
@@ -236,12 +240,12 @@ def _has_access_descriptor(user, descriptor, action, course_context=None):
         don't have to hit the enrollments table on every module load.
         """
         # If start dates are off, can always load
-        if settings.MITX_FEATURES['DISABLE_START_DATES'] and not is_masquerading_as_student(user):
+        if settings.FEATURES['DISABLE_START_DATES'] and not is_masquerading_as_student(user):
             debug("Allow: DISABLE_START_DATES")
             return True
 
         # Check start date
-        if descriptor.start is not None:
+        if 'detached' not in descriptor._class_tags and descriptor.start is not None:
             now = datetime.now(UTC())
             effective_start = _adjust_start_date_for_beta_testers(
                 user,
@@ -335,7 +339,7 @@ def _dispatch(table, action, user, obj):
         debug("%s user %s, object %s, action %s",
               'ALLOWED' if result else 'DENIED',
               user,
-              obj.location.url() if isinstance(obj, XModuleDescriptor) else str(obj)[:60],
+              obj.location.url() if isinstance(obj, XBlock) else str(obj)[:60],
               action)
         return result
 
@@ -363,7 +367,7 @@ def _adjust_start_date_for_beta_testers(user, descriptor, course_context=None):
     the user is looking at.  Once we have proper usages and definitions per the XBlock
     design, this should use the course the usage is in.
 
-    NOTE: If testing manually, make sure MITX_FEATURES['DISABLE_START_DATES'] = False
+    NOTE: If testing manually, make sure FEATURES['DISABLE_START_DATES'] = False
     in envs/dev.py!
     """
     if descriptor.days_early_for_beta is None:

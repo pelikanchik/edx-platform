@@ -4,7 +4,8 @@ if Backbone?
   
     events:
       "click .discussion-flag-abuse": "toggleFlagAbuse"
-      "keypress .discussion-flag-abuse": "toggleFlagAbuseKeypress"
+      "keydown .discussion-flag-abuse":
+        (event) -> DiscussionUtil.activateOnSpace(event, @toggleFlagAbuse)
   
     attrRenderer:
       endorsed: (endorsed) ->
@@ -22,11 +23,11 @@ if Backbone?
         return if not @$(".post-status-closed").length
         if closed
           @$(".post-status-closed").show()
-          @$(".action-openclose").html(@$(".action-openclose").html().replace("Close", "Open"))
+          @$(".action-openclose").html(@$(".action-openclose").html().replace(gettext("Close"), gettext("Open")))
           @$(".discussion-reply-new").hide()
         else
           @$(".post-status-closed").hide()
-          @$(".action-openclose").html(@$(".action-openclose").html().replace("Open", "Close"))
+          @$(".action-openclose").html(@$(".action-openclose").html().replace(gettext("Open"), gettext("Close")))
           @$(".discussion-reply-new").show()
 
       voted: (voted) ->
@@ -106,12 +107,7 @@ if Backbone?
       @model.bind('change', @renderPartialAttrs, @)
       
      
-    toggleFollowingKeypress: (event) ->
-      # Activate on spacebar or enter
-      if event.which == 32 or event.which == 13
-        @toggleFollowing(event)
-
-    toggleFollowing: (event) ->
+    toggleFollowing: (event) =>
       event.preventDefault()
       $elem = $(event.target)
       url = null
@@ -126,19 +122,14 @@ if Backbone?
         url: url
         type: "POST"
 
-    toggleFlagAbuseKeypress: (event) ->
-      # Activate on spacebar or enter
-      if event.which == 32 or event.which == 13
-        @toggleFlagAbuse(event)
-     
-    toggleFlagAbuse: (event) ->
+    toggleFlagAbuse: (event) =>
       event.preventDefault()
       if window.user.id in @model.get("abuse_flaggers") or (DiscussionUtil.isFlagModerator and @model.get("abuse_flaggers").length > 0)
         @unFlagAbuse()
       else
         @flagAbuse()
       
-    flagAbuse: ->
+    flagAbuse: =>
       url = @model.urlFor("flagAbuse")
       DiscussionUtil.safeAjax
         $elem: @$(".discussion-flag-abuse")
@@ -153,7 +144,7 @@ if Backbone?
             temp_array.push(window.user.id)
             @model.set('abuse_flaggers', temp_array)      
        
-    unFlagAbuse: ->
+    unFlagAbuse: =>
       url = @model.urlFor("unFlagAbuse")
       DiscussionUtil.safeAjax
         $elem: @$(".discussion-flag-abuse")
@@ -168,3 +159,59 @@ if Backbone?
                 temp_array = []
 
             @model.set('abuse_flaggers', temp_array)         
+
+    renderVote: =>
+      button = @$el.find(".vote-btn")
+      voted = window.user.voted(@model)
+      voteNum = @model.get("votes")["up_count"]
+      button.toggleClass("is-cast", voted)
+      button.attr("aria-pressed", voted)
+      button.attr("data-tooltip", if voted then gettext("remove vote") else gettext("vote"))
+      buttonTextFmt =
+        if voted
+          ngettext(
+            "%(voteNum)s%(startSrSpan)s vote (click to remove your vote)%(endSrSpan)s",
+            "%(voteNum)s%(startSrSpan)s votes (click to remove your vote)%(endSrSpan)s",
+            voteNum
+          )
+        else
+          ngettext(
+            "%(voteNum)s%(startSrSpan)s vote (click to vote)%(endSrSpan)s",
+            "%(voteNum)s%(startSrSpan)s votes (click to vote)%(endSrSpan)s",
+            voteNum
+          )
+      buttonText = interpolate(
+        buttonTextFmt,
+        {voteNum: voteNum, startSrSpan: "<span class='sr'>", endSrSpan: "</span>"},
+        true
+      )
+      button.html("<span class='plus-icon'/>" + buttonText)
+
+    toggleVote: (event) =>
+      event.preventDefault()
+      if window.user.voted(@model)
+        @unvote()
+      else
+        @vote()
+
+    vote: =>
+      window.user.vote(@model)
+      url = @model.urlFor("upvote")
+      DiscussionUtil.safeAjax
+        $elem: @$el.find(".vote-btn")
+        url: url
+        type: "POST"
+        success: (response, textStatus) =>
+          if textStatus == 'success'
+            @model.set(response)
+
+    unvote: =>
+      window.user.unvote(@model)
+      url = @model.urlFor("unvote")
+      DiscussionUtil.safeAjax
+        $elem: @$el.find(".vote-btn")
+        url: url
+        type: "POST"
+        success: (response, textStatus) =>
+          if textStatus == 'success'
+            @model.set(response)

@@ -7,7 +7,7 @@ from track import contexts
 
 class TestContexts(TestCase):
 
-    COURSE_ID = 'test/course_name/course_run'
+    course_id = 'test/course_name/course_run'
     ORG_ID = 'test'
 
     def test_course_id_from_url(self):
@@ -15,9 +15,9 @@ class TestContexts(TestCase):
 
     def assert_parses_course_id_from_url(self, format_string):
         self.assertEquals(
-            contexts.course_context_from_url(format_string.format(course_id=self.COURSE_ID)),
+            contexts.course_context_from_url(format_string.format(course_id=self.course_id)),
             {
-                'course_id': self.COURSE_ID,
+                'course_id': self.course_id,
                 'org_id': self.ORG_ID
             }
         )

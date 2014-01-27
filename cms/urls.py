@@ -1,10 +1,6 @@
 from django.conf import settings
 from django.conf.urls import patterns, include, url
-
-# TODO: This should be removed once the CMS is running via wsgi on all production servers
-import cms.startup as startup
 from xmodule.modulestore import parsers
-startup.run()
 
 # There is a course creators admin table.
 from ratelimitbackend import admin
@@ -13,7 +9,7 @@ admin.autodiscover()
 urlpatterns = patterns('',  # nopep8
 
     # graph
-    url(r'^graph/subsection/(?P<location>.*?)$', 'contentstore.views.show_graph', name='show_graph'),
+    #url(r'^graph/subsection/(?P<location>.*?)$', 'contentstore.views.show_graph', name='show_graph'),
 
     url(r'^transcripts/upload$', 'contentstore.views.upload_transcripts', name='upload_transcripts'),
     url(r'^transcripts/download$', 'contentstore.views.download_transcripts', name='download_transcripts'),
@@ -23,22 +19,8 @@ urlpatterns = patterns('',  # nopep8
     url(r'^transcripts/rename$', 'contentstore.views.rename_transcripts', name='rename_transcripts'),
     url(r'^transcripts/save$', 'contentstore.views.save_transcripts', name='save_transcripts'),
 
-    url(r'^preview/xblock/(?P<usage_id>.*?)/handler/(?P<handler>[^/]*)(?:/(?P<suffix>[^/]*))?$',
+    url(r'^preview/xblock/(?P<usage_id>.*?)/handler/(?P<handler>[^/]*)(?:/(?P<suffix>.*))?$',
         'contentstore.views.preview_handler', name='preview_handler'),
-
-    # This is the URL to initially render the course advanced settings.
-    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/settings-advanced/(?P<name>[^/]+)$',
-        'contentstore.views.course_config_advanced_page', name='course_advanced_settings'),
-    # This is the URL used by BackBone for updating and re-fetching the model.
-    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/settings-advanced/(?P<name>[^/]+)/update.*$',
-        'contentstore.views.course_advanced_updates', name='course_advanced_settings_updates'),
-
-    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/textbooks/(?P<name>[^/]+)$',
-        'contentstore.views.textbook_index', name='textbook_index'),
-    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/textbooks/(?P<name>[^/]+)/new$',
-        'contentstore.views.create_textbook', name='create_textbook'),
-    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/textbooks/(?P<name>[^/]+)/(?P<tid>\d[^/]*)$',
-        'contentstore.views.textbook_by_id', name='textbook_by_id'),
 
     # temporary landing page for a course
     url(r'^edge/(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<coursename>[^/]+)$',
@@ -98,11 +80,15 @@ urlpatterns += patterns(
     url(r'(?ix)^tabs/{}$'.format(parsers.URL_RE_SOURCE), 'tabs_handler'),
     url(r'(?ix)^settings/details/{}$'.format(parsers.URL_RE_SOURCE), 'settings_handler'),
     url(r'(?ix)^settings/grading/{}(/)?(?P<grader_index>\d+)?$'.format(parsers.URL_RE_SOURCE), 'grading_handler'),
+    url(r'(?ix)^settings/advanced/{}$'.format(parsers.URL_RE_SOURCE), 'advanced_settings_handler'),
+    url(r'(?ix)^textbooks/{}$'.format(parsers.URL_RE_SOURCE), 'textbooks_list_handler'),
+    url(r'(?ix)^textbooks/{}/(?P<tid>\d[^/]*)$'.format(parsers.URL_RE_SOURCE), 'textbooks_detail_handler'),
 )
 
 js_info_dict = {
     'domain': 'djangojs',
-    'packages': ('cms',),
+    # No packages needed, we get LOCALE_PATHS anyway.
+    'packages': (),
 }
 
 urlpatterns += patterns('',
@@ -110,7 +96,7 @@ urlpatterns += patterns('',
     url(r'^i18n.js$', 'django.views.i18n.javascript_catalog', js_info_dict),
 )
 
-if settings.MITX_FEATURES.get('ENABLE_SERVICE_STATUS'):
+if settings.FEATURES.get('ENABLE_SERVICE_STATUS'):
     urlpatterns += patterns('',
         url(r'^status/', include('service_status.urls')),
     )
@@ -118,7 +104,7 @@ if settings.MITX_FEATURES.get('ENABLE_SERVICE_STATUS'):
 urlpatterns += patterns('', url(r'^admin/', include(admin.site.urls)),)
 
 # enable automatic login
-if settings.MITX_FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING'):
+if settings.FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING'):
     urlpatterns += (
         url(r'^auto_auth$', 'student.views.auto_auth'),
     )

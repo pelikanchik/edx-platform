@@ -6,7 +6,7 @@ from functools import partial
 from django.utils.translation import ugettext as _
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
-from mitxmako.shortcuts import render_to_response
+from edxmako.shortcuts import render_to_response
 from django.core.urlresolvers import reverse
 from django.utils.html import escape
 from django.http import Http404
@@ -25,6 +25,9 @@ from django_comment_common.models import FORUM_ROLE_ADMINISTRATOR
 from student.models import CourseEnrollment
 from bulk_email.models import CourseAuthorization
 from lms.lib.xblock.runtime import handler_prefix
+
+
+from .tools import get_units_with_due_date, title_or_url
 
 
 @ensure_csrf_cookie
@@ -55,8 +58,11 @@ def instructor_dashboard_2(request, course_id):
         _section_analytics(course_id, access),
     ]
 
+    if (settings.FEATURES.get('INDIVIDUAL_DUE_DATES') and access['instructor']):
+        sections.insert(3, _section_extensions(course))
+
     # Gate access to course email by feature flag & by course-specific authorization
-    if settings.MITX_FEATURES['ENABLE_INSTRUCTOR_EMAIL'] and \
+    if settings.FEATURES['ENABLE_INSTRUCTOR_EMAIL'] and \
        is_studio_course and CourseAuthorization.instructor_email_enabled(course_id):
         sections.append(_section_send_email(course_id, access, course))
 
@@ -66,7 +72,7 @@ def instructor_dashboard_2(request, course_id):
 
     enrollment_count = sections[0]['enrollment_count']
     disable_buttons = False
-    max_enrollment_for_buttons = settings.MITX_FEATURES.get("MAX_ENROLLMENT_INSTR_BUTTONS")
+    max_enrollment_for_buttons = settings.FEATURES.get("MAX_ENROLLMENT_INSTR_BUTTONS")
     if max_enrollment_for_buttons is not None:
         disable_buttons = enrollment_count > max_enrollment_for_buttons
 
@@ -157,6 +163,21 @@ def _section_student_admin(course_id, access):
         'reset_student_attempts_url': reverse('reset_student_attempts', kwargs={'course_id': course_id}),
         'rescore_problem_url': reverse('rescore_problem', kwargs={'course_id': course_id}),
         'list_instructor_tasks_url': reverse('list_instructor_tasks', kwargs={'course_id': course_id}),
+    }
+    return section_data
+
+
+def _section_extensions(course):
+    """ Provide data for the corresponding dashboard section """
+    section_data = {
+        'section_key': 'extensions',
+        'section_display_name': _('Extensions'),
+        'units_with_due_dates': [(title_or_url(unit), unit.location.url())
+                                 for unit in get_units_with_due_date(course)],
+        'change_due_date_url': reverse('change_due_date', kwargs={'course_id': course.id}),
+        'reset_due_date_url': reverse('reset_due_date', kwargs={'course_id': course.id}),
+        'show_unit_extensions_url': reverse('show_unit_extensions', kwargs={'course_id': course.id}),
+        'show_student_extensions_url': reverse('show_student_extensions', kwargs={'course_id': course.id}),
     }
     return section_data
 

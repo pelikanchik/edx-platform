@@ -15,8 +15,9 @@ from xmodule.x_module import XModule
 from xmodule.xml_module import XmlDescriptor, name_to_pathname
 import textwrap
 from xmodule.contentstore.content import StaticContent
+from xblock.core import XBlock
 
-log = logging.getLogger("mitx.courseware")
+log = logging.getLogger("edx.courseware")
 
 
 class HtmlFields(object):
@@ -234,6 +235,7 @@ class AboutFields(object):
     )
 
 
+@XBlock.tag("detached")
 class AboutModule(AboutFields, HtmlModule):
     """
     Overriding defaults but otherwise treated as HtmlModule.
@@ -241,6 +243,7 @@ class AboutModule(AboutFields, HtmlModule):
     pass
 
 
+@XBlock.tag("detached")
 class AboutDescriptor(AboutFields, HtmlDescriptor):
     """
     These pieces of course content are treated as HtmlModules but we need to overload where the templates are located
@@ -269,6 +272,7 @@ class StaticTabFields(object):
     )
 
 
+@XBlock.tag("detached")
 class StaticTabModule(StaticTabFields, HtmlModule):
     """
     Supports the field overrides
@@ -276,6 +280,7 @@ class StaticTabModule(StaticTabFields, HtmlModule):
     pass
 
 
+@XBlock.tag("detached")
 class StaticTabDescriptor(StaticTabFields, HtmlDescriptor):
     """
     These pieces of course content are treated as HtmlModules but we need to overload where the templates are located
@@ -296,6 +301,7 @@ class CourseInfoFields(object):
     )
 
 
+@XBlock.tag("detached")
 class CourseInfoModule(CourseInfoFields, HtmlModule):
     """
     Just to support xblock field overrides
@@ -303,6 +309,7 @@ class CourseInfoModule(CourseInfoFields, HtmlModule):
     pass
 
 
+@XBlock.tag("detached")
 class CourseInfoDescriptor(CourseInfoFields, HtmlDescriptor):
     """
     These pieces of course content are treated as HtmlModules but we need to overload where the templates are located

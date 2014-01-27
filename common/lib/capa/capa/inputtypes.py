@@ -102,7 +102,8 @@ class Attribute(object):
         val = element.get(self.name)
         if self.default == self._sentinel and val is None:
             raise ValueError(
-                'Missing required attribute {0}.'.format(self.name))
+                'Missing required attribute {0}.'.format(self.name)
+            )
 
         if val is None:
             # not required, so return default
@@ -128,7 +129,7 @@ class InputTypeBase(object):
         """
         Instantiate an InputType class.  Arguments:
 
-        - system    : ModuleSystem instance which provides OS, rendering, and user context.
+        - system    : LoncapaModule instance which provides OS, rendering, and user context.
                       Specifically, must have a render_template function.
         - xml       : Element tree of this Input element
         - state     : a dictionary with optional keys:
@@ -146,7 +147,7 @@ class InputTypeBase(object):
 
         self.xml = xml
         self.tag = xml.tag
-        self.system = system
+        self.capa_system = system
 
         # NOTE: ID should only come from one place.  If it comes from multiple,
         # we use state first, XML second (in case the xml changed, but we have
@@ -156,8 +157,9 @@ class InputTypeBase(object):
 
         self.input_id = state.get('id', xml.get('id'))
         if self.input_id is None:
-            raise ValueError("input id state is None. xml is {0}".format(
-                etree.tostring(xml)))
+            raise ValueError(
+                "input id state is None. xml is {0}".format(etree.tostring(xml))
+            )
 
         self.value = state.get('value', '')
 
@@ -257,10 +259,11 @@ class InputTypeBase(object):
             'value': self.value,
             'status': self.status,
             'msg': self.msg,
-            'STATIC_URL': self.system.STATIC_URL,
+            'STATIC_URL': self.capa_system.STATIC_URL,
         }
-        context.update((a, v) for (
-            a, v) in self.loaded_attributes.iteritems() if a in self.to_render)
+        context.update(
+            (a, v) for (a, v) in self.loaded_attributes.iteritems() if a in self.to_render
+        )
         context.update(self._extra_context())
         return context
 
@@ -282,13 +285,14 @@ class InputTypeBase(object):
 
         context = self._get_render_context()
 
-        html = self.system.render_template(self.template, context)
+        html = self.capa_system.render_template(self.template, context)
         return etree.XML(html)
 
 
 #-----------------------------------------------------------------------------
 
 
+@registry.register
 class OptionInput(InputTypeBase):
     """
     Input type for selecting and Select option input type.
@@ -309,6 +313,9 @@ class OptionInput(InputTypeBase):
         Given options string, convert it into an ordered list of (option_id, option_description) tuples, where
         id==description for now.  TODO: make it possible to specify different id and descriptions.
         """
+        # convert single quotes inside option values to html encoded string
+        options = re.sub(r"([a-zA-Z])('|\\')([a-zA-Z])", r"\1&#39;\3", options)
+        options = re.sub(r"\\'", r"&#39;", options)  # replace already escaped single quotes
         # parse the set of possible options
         lexer = shlex.shlex(options[1:-1].encode('utf8'))
         lexer.quotes = "'"
@@ -316,7 +323,8 @@ class OptionInput(InputTypeBase):
         lexer.whitespace = ", "
 
         # remove quotes
-        tokens = [x[1:-1].decode('utf8') for x in lexer]
+        # convert escaped single quotes (html encoded string) back to single quotes
+        tokens = [x[1:-1].decode('utf8').replace("&#39;", "'") for x in lexer]
 
         # make list of (option_id, option_description), with description=id
         return [(t, t) for t in tokens]
@@ -329,14 +337,13 @@ class OptionInput(InputTypeBase):
         return [Attribute('options', transform=cls.parse_options),
                 Attribute('inline', False)]
 
-registry.register(OptionInput)
-
 #-----------------------------------------------------------------------------
 
 
 # TODO: consolidate choicegroup, radiogroup, checkboxgroup after discussion of
 # desired semantics.
 
+@registry.register
 class ChoiceGroup(InputTypeBase):
     """
     Radio button or checkbox inputs: multiple choice or true/false
@@ -390,7 +397,7 @@ class ChoiceGroup(InputTypeBase):
 
     @staticmethod
     def extract_choices(element):
-        '''
+        """
         Extracts choices for a few input types, such as ChoiceGroup, RadioGroup and
         CheckboxGroup.
 
@@ -398,7 +405,7 @@ class ChoiceGroup(InputTypeBase):
 
         TODO: allow order of choices to be randomized, following lon-capa spec.  Use
         "location" attribute, ie random, top, bottom.
-        '''
+        """
 
         choices = []
 
@@ -411,12 +418,10 @@ class ChoiceGroup(InputTypeBase):
         return choices
 
 
-registry.register(ChoiceGroup)
-
-
 #-----------------------------------------------------------------------------
 
 
+@registry.register
 class JavascriptInput(InputTypeBase):
     """
     Hidden field for javascript to communicate via; also loads the required
@@ -447,20 +452,16 @@ class JavascriptInput(InputTypeBase):
         if self.value == "":
             self.value = 'null'
 
-registry.register(JavascriptInput)
-
-
 
 #-----------------------------------------------------------------------------
 
 
+@registry.register
 class JSInput(InputTypeBase):
     """
-    DO NOT USE! HAS NOT BEEN TESTED BEYOND 700X PROBLEMS, AND MAY CHANGE IN
-    BACKWARDS-INCOMPATIBLE WAYS.
-      Inputtype for general javascript inputs. Intended to be used with
+    Inputtype for general javascript inputs. Intended to be used with
     customresponse.
-      Loads in a sandboxed iframe to help prevent css and js conflicts between
+    Loads in a sandboxed iframe to help prevent css and js conflicts between
     frame and top-level window.
 
     iframe sandbox whitelist:
@@ -478,7 +479,8 @@ class JSInput(InputTypeBase):
                  height="500"
                  width="400"/>
 
-     See the documentation in the /doc/public folder for more information.
+    See the documentation in docs/data/source/course_data_formats/jsinput.rst
+    for more information.
     """
 
     template = "jsinput.html"
@@ -498,23 +500,26 @@ class JSInput(InputTypeBase):
             Attribute('set_statefn', None),  # Function to call iframe to
                                              #   set state
             Attribute('width', "400"),       # iframe width
-            Attribute('height', "300")       # iframe height
+            Attribute('height', "300"),      # iframe height
+            Attribute('sop', None)           # SOP will be relaxed only if this
+                                             # attribute is set to false.
         ]
 
     def _extra_context(self):
         context = {
-            'applet_loader': '{static_url}js/capa/src/jsinput.js'.format(
-                static_url=self.system.STATIC_URL),
+            'jschannel_loader': '{static_url}js/capa/src/jschannel.js'.format(
+                static_url=self.capa_system.STATIC_URL),
+            'jsinput_loader': '{static_url}js/capa/src/jsinput.js'.format(
+                static_url=self.capa_system.STATIC_URL),
             'saved_state': self.value
         }
 
         return context
 
-
-registry.register(JSInput)
 #-----------------------------------------------------------------------------
 
 
+@registry.register
 class TextLine(InputTypeBase):
     """
     A text line input.  Can do math preview if "math"="1" is specified.
@@ -572,7 +577,8 @@ class TextLine(InputTypeBase):
             # Preprocessor to insert between raw input and Mathjax
             self.preprocessor = {
                 'class_name': self.loaded_attributes['preprocessorClassName'],
-                'script_src': self.loaded_attributes['preprocessorSrc']}
+                'script_src': self.loaded_attributes['preprocessorSrc'],
+            }
             if None in self.preprocessor.values():
                 self.preprocessor = None
 
@@ -580,11 +586,10 @@ class TextLine(InputTypeBase):
         return {'do_math': self.do_math,
                 'preprocessor': self.preprocessor, }
 
-registry.register(TextLine)
-
 #-----------------------------------------------------------------------------
 
 
+@registry.register
 class FileSubmission(InputTypeBase):
     """
     Upload some files (e.g. for programming assignments)
@@ -593,9 +598,6 @@ class FileSubmission(InputTypeBase):
     template = "filesubmission.html"
     tags = ['filesubmission']
 
-    # pulled out for testing
-    submitted_msg = ("Your file(s) have been submitted; as soon as your submission is"
-                     " graded, this message will be replaced with the grader's feedback.")
 
     @staticmethod
     def parse_files(files):
@@ -617,6 +619,11 @@ class FileSubmission(InputTypeBase):
         Do some magic to handle queueing status (render as "queued" instead of "incomplete"),
         pull queue_len from the msg field.  (TODO: get rid of the queue_len hack).
         """
+        _ = self.capa_system.i18n.ugettext
+        submitted_msg = _("Your file(s) have been submitted. As soon as your submission is"
+                          " graded, this message will be replaced with the grader's feedback.")
+        self.submitted_msg = submitted_msg
+
         # Check if problem has been queued
         self.queue_len = 0
         # Flag indicating that the problem has been queued, 'msg' is length of
@@ -624,33 +631,29 @@ class FileSubmission(InputTypeBase):
         if self.status == 'incomplete':
             self.status = 'queued'
             self.queue_len = self.msg
-            self.msg = FileSubmission.submitted_msg
+            self.msg = self.submitted_msg
 
     def _extra_context(self):
         return {'queue_len': self.queue_len, }
 
-registry.register(FileSubmission)
-
 
 #-----------------------------------------------------------------------------
 
+@registry.register
 class CodeInput(InputTypeBase):
     """
     A text area input for code--uses codemirror, does syntax highlighting, special tab handling,
     etc.
     """
 
-    #template = "codeinput.html"
-    template = "textbox.html"
-    tags = ['codeinput',
-            'textbox',
-            # Another (older) name--at some point we may want to make it use a
-            # non-codemirror editor.
-            ]
+    template = "codeinput.html"
+    tags = [
+        'codeinput',
+        'textbox',
+        # Another (older) name--at some point we may want to make it use a
+        # non-codemirror editor.
+    ]
 
-    # pulled out for testing
-    submitted_msg = ("Submitted.  As soon as your submission is"
-                     " graded, this message will be replaced with the grader's feedback.")
 
     @classmethod
     def get_attributes(cls):
@@ -666,7 +669,7 @@ class CodeInput(InputTypeBase):
                 Attribute('linenumbers', 'true'),
                 # Template expects tabsize to be an int it can do math with
                 Attribute('tabsize', 4, transform=int),
-                ]
+        ]
 
     def setup_code_response_rendering(self):
         """
@@ -687,21 +690,25 @@ class CodeInput(InputTypeBase):
             self.msg = self.submitted_msg
 
     def setup(self):
-        ''' setup this input type '''
+        """ setup this input type """
+        _ = self.capa_system.i18n.ugettext
+        submitted_msg = _("Your answer has been submitted. As soon as your submission is"
+                          " graded, this message will be replaced with the grader's feedback.")
+        self.submitted_msg = submitted_msg
+
         self.setup_code_response_rendering()
 
     def _extra_context(self):
         """Defined queue_len, add it """
         return {'queue_len': self.queue_len, }
 
-registry.register(CodeInput)
-
 
 #-----------------------------------------------------------------------------
 
 
+@registry.register
 class MatlabInput(CodeInput):
-    '''
+    """
     InputType for handling Matlab code input
 
     TODO: API_KEY will go away once we have a way to specify it per-course
@@ -712,17 +719,20 @@ class MatlabInput(CodeInput):
           %api_key=API_KEY
         </plot_payload>
     </matlabinput>
-    '''
+    """
     template = "matlabinput.html"
     tags = ['matlabinput']
 
-    plot_submitted_msg = ("Submitted. As soon as a response is returned, "
-                          "this message will be replaced by that feedback.")
 
     def setup(self):
-        '''
+        """
         Handle matlab-specific parsing
-        '''
+        """
+        _ = self.capa_system.i18n.ugettext
+        submitted_msg = _("Submitted. As soon as a response is returned, "
+                          "this message will be replaced by that feedback.")
+        self.submitted_msg = submitted_msg
+
         self.setup_code_response_rendering()
 
         xml = self.xml
@@ -738,10 +748,10 @@ class MatlabInput(CodeInput):
         if 'queuestate' in self.input_state and self.input_state['queuestate'] == 'queued':
             self.status = 'queued'
             self.queue_len = 1
-            self.msg = self.plot_submitted_msg
+            self.msg = self.submitted_msg
 
     def handle_ajax(self, dispatch, data):
-        '''
+        """
         Handle AJAX calls directed to this input
 
         Args:
@@ -750,14 +760,14 @@ class MatlabInput(CodeInput):
         Returns:
             dict - 'success' - whether or not we successfully queued this submission
                  - 'message' - message to be rendered in case of error
-        '''
+        """
 
         if dispatch == 'plot':
             return self._plot_data(data)
         return {}
 
     def ungraded_response(self, queue_msg, queuekey):
-        '''
+        """
         Handle the response from the XQueue
         Stores the response in the input_state so it can be rendered later
 
@@ -767,7 +777,7 @@ class MatlabInput(CodeInput):
 
         Returns:
             nothing
-        '''
+        """
         # check the queuekey against the saved queuekey
         if('queuestate' in self.input_state and self.input_state['queuestate'] == 'queued'
                 and self.input_state['queuekey'] == queuekey):

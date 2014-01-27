@@ -18,11 +18,12 @@ from django.conf import settings
 
 from xmodule.contentstore.content import StaticContent
 from xmodule.exceptions import NotFoundError
-from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.django import modulestore, loc_mapper
 from xmodule.contentstore.django import contentstore
-from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
+from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError, InsufficientSpecificationError
 
 from util.json_request import JsonResponse
+from xmodule.modulestore.locator import BlockUsageLocator
 
 from ..transcripts_utils import (
     generate_subs_from_source,
@@ -53,10 +54,10 @@ log = logging.getLogger(__name__)
 
 def error_response(response, message, status_code=400):
     """
-    Simplify similar actions: log message and return JsonResponse with message included in response.
+Simplify similar actions: log message and return JsonResponse with message included in response.
 
-    By default return 400 (Bad Request) Response.
-    """
+By default return 400 (Bad Request) Response.
+"""
     log.debug(message)
     response['status'] = message
     return JsonResponse(response, status_code)
@@ -65,32 +66,26 @@ def error_response(response, message, status_code=400):
 @login_required
 def upload_transcripts(request):
     """
-    Upload transcripts for current module.
+Upload transcripts for current module.
 
-    returns: response dict::
+returns: response dict::
 
-        status: 'Success' and HTTP 200 or 'Error' and HTTP 400.
-        subs: Value of uploaded and saved html5 sub field in video item.
-    """
+status: 'Success' and HTTP 200 or 'Error' and HTTP 400.
+subs: Value of uploaded and saved html5 sub field in video item.
+"""
     response = {
         'status': 'Unknown server error',
         'subs': '',
     }
 
-    item_location = request.POST.get('id')
-    if not item_location:
-        return error_response(response, 'POST data without "id" form data.')
+    locator = request.POST.get('locator')
+    if not locator:
+        return error_response(response, 'POST data without "locator" form data.')
 
-    # This is placed before has_access() to validate item_location,
-    # because has_access() raises InvalidLocationError if location is invalid.
     try:
-        item = modulestore().get_item(item_location)
-    except (ItemNotFoundError, InvalidLocationError):
-        return error_response(response, "Can't find item by location.")
-
-    # Check permissions for this user within this course.
-    if not has_access(request.user, item_location):
-        raise PermissionDenied()
+        item = _get_item(request, request.POST)
+    except (ItemNotFoundError, InvalidLocationError, InsufficientSpecificationError):
+        return error_response(response, "Can't find item by locator.")
 
     if 'file' not in request.FILES:
         return error_response(response, 'POST data without "file" form data.')
@@ -121,7 +116,7 @@ def upload_transcripts(request):
     if video_list:
         sub_attr = source_subs_name
 
-        try:  # Generate and save for 1.0 speed, will create subs_sub_attr.srt.sjson subtitles file in storage.
+        try: # Generate and save for 1.0 speed, will create subs_sub_attr.srt.sjson subtitles file in storage.
             generate_subs_from_source({1: sub_attr}, source_subs_ext, source_subs_filedata, item)
         except TranscriptsGenerationException as e:
             return error_response(response, e.message)
@@ -134,12 +129,12 @@ def upload_transcripts(request):
             try:
                 # updates item.sub with `video_name` if it is successful.
                 copy_or_rename_transcript(video_name, sub_attr, item)
-                selected_name = video_name  # name to write to item.sub field, chosen at random.
+                selected_name = video_name # name to write to item.sub field, chosen at random.
             except NotFoundError:
                 # subtitles file `sub_attr` is not presented in the system. Nothing to copy or rename.
                 return error_response(response, "Can't find transcripts in storage for {}".format(sub_attr))
 
-        item.sub = selected_name  # write one of  new subtitles names to item.sub attribute.
+        item.sub = selected_name # write one of new subtitles names to item.sub attribute.
         save_module(item)
         response['subs'] = item.sub
         response['status'] = 'Success'
@@ -152,26 +147,20 @@ def upload_transcripts(request):
 @login_required
 def download_transcripts(request):
     """
-    Passes to user requested transcripts file.
+Passes to user requested transcripts file.
 
-    Raises Http404 if unsuccessful.
-    """
-    item_location = request.GET.get('id')
-    if not item_location:
-        log.debug('GET data without "id" property.')
+Raises Http404 if unsuccessful.
+"""
+    locator = request.GET.get('locator')
+    if not locator:
+        log.debug('GET data without "locator" property.')
         raise Http404
 
-    # This is placed before has_access() to validate item_location,
-    # because has_access() raises InvalidLocationError if location is invalid.
     try:
-        item = modulestore().get_item(item_location)
-    except (ItemNotFoundError, InvalidLocationError):
-        log.debug("Can't find item by location.")
+        item = _get_item(request, request.GET)
+    except (ItemNotFoundError, InvalidLocationError, InsufficientSpecificationError):
+        log.debug("Can't find item by locator.")
         raise Http404
-
-    # Check permissions for this user within this course.
-    if not has_access(request.user, item_location):
-        raise PermissionDenied()
 
     subs_id = request.GET.get('subs_id')
     if not subs_id:
@@ -204,31 +193,31 @@ def download_transcripts(request):
 @login_required
 def check_transcripts(request):
     """
-    Check state of transcripts availability.
+Check state of transcripts availability.
 
-    request.GET['data'] has key `videos`, which can contain any of the following::
+request.GET['data'] has key `videos`, which can contain any of the following::
 
-        [
-            {u'type': u'youtube', u'video': u'OEoXaMPEzfM', u'mode': u'youtube'},
-            {u'type': u'html5',    u'video': u'video1',             u'mode': u'mp4'}
-            {u'type': u'html5',    u'video': u'video2',             u'mode': u'webm'}
-        ]
-        `type` is youtube or html5
-        `video` is html5 or youtube video_id
-        `mode` is youtube, ,p4 or webm
+[
+{u'type': u'youtube', u'video': u'OEoXaMPEzfM', u'mode': u'youtube'},
+{u'type': u'html5', u'video': u'video1', u'mode': u'mp4'}
+{u'type': u'html5', u'video': u'video2', u'mode': u'webm'}
+]
+`type` is youtube or html5
+`video` is html5 or youtube video_id
+`mode` is youtube, ,p4 or webm
 
-    Returns transcripts_presence dict::
+Returns transcripts_presence dict::
 
-        html5_local: list of html5 ids, if subtitles exist locally for them;
-        is_youtube_mode: bool, if we have youtube_id, and as youtube mode is of higher priority, reflect this with flag;
-        youtube_local: bool, if youtube transcripts exist locally;
-        youtube_server: bool, if youtube transcripts exist on server;
-        youtube_diff: bool, if youtube transcripts exist on youtube server, and are different from local youtube ones;
-        current_item_subs: string, value of item.sub field;
-        status: string, 'Error' or 'Success';
-        subs: string, new value of item.sub field, that should be set in module;
-        command: string, action to front-end what to do and what to show to user.
-    """
+html5_local: list of html5 ids, if subtitles exist locally for them;
+is_youtube_mode: bool, if we have youtube_id, and as youtube mode is of higher priority, reflect this with flag;
+youtube_local: bool, if youtube transcripts exist locally;
+youtube_server: bool, if youtube transcripts exist on server;
+youtube_diff: bool, if youtube transcripts exist on youtube server, and are different from local youtube ones;
+current_item_subs: string, value of item.sub field;
+status: string, 'Error' or 'Success';
+subs: string, new value of item.sub field, that should be set in module;
+command: string, action to front-end what to do and what to show to user.
+"""
     transcripts_presence = {
         'html5_local': [],
         'html5_equal': False,
@@ -240,7 +229,7 @@ def check_transcripts(request):
         'status': 'Error',
     }
     try:
-        __, videos, item = validate_transcripts_data(request)
+        __, videos, item = _validate_transcripts_data(request)
     except TranscriptsRequestValidationException as e:
         return error_response(transcripts_presence, e.message)
 
@@ -283,7 +272,7 @@ def check_transcripts(request):
         if transcripts_presence['youtube_server'] and transcripts_presence['youtube_local']:
             try:
                 youtube_server_subs = get_transcripts_from_youtube(youtube_id)
-                if json.loads(local_transcripts) == youtube_server_subs:  # check transcripts for equality
+                if json.loads(local_transcripts) == youtube_server_subs: # check transcripts for equality
                     transcripts_presence['youtube_diff'] = False
             except GetTranscriptsFromYouTubeException:
                 pass
@@ -300,10 +289,10 @@ def check_transcripts(request):
             transcripts_presence['html5_local'].append(html5_id)
         except NotFoundError:
             log.debug("Can't find transcripts in storage for non-youtube video_id: %s", html5_id)
-        if len(html5_subs) == 2:  # check html5 transcripts for equality
+        if len(html5_subs) == 2: # check html5 transcripts for equality
             transcripts_presence['html5_equal'] = json.loads(html5_subs[0]) == json.loads(html5_subs[1])
 
-    command, subs_to_use = transcripts_logic(transcripts_presence, videos)
+    command, subs_to_use = _transcripts_logic(transcripts_presence, videos)
     transcripts_presence.update({
         'command': command,
         'subs': subs_to_use,
@@ -311,23 +300,23 @@ def check_transcripts(request):
     return JsonResponse(transcripts_presence)
 
 
-def transcripts_logic(transcripts_presence, videos):
+def _transcripts_logic(transcripts_presence, videos):
     """
-    By `transcripts_presence` content, figure what show to user:
+By `transcripts_presence` content, figure what show to user:
 
-    returns: `command` and `subs`.
+returns: `command` and `subs`.
 
-    `command`: string,  action to front-end what to do and what show to user.
-    `subs`: string, new value of item.sub field, that should be set in module.
+`command`: string, action to front-end what to do and what show to user.
+`subs`: string, new value of item.sub field, that should be set in module.
 
-    `command` is one of::
+`command` is one of::
 
-        replace: replace local youtube subtitles with server one's
-        found: subtitles are found
-        import: import subtitles from youtube server
-        choose: choose one from two html5 subtitles
-        not found: subtitles are not found
-    """
+replace: replace local youtube subtitles with server one's
+found: subtitles are found
+import: import subtitles from youtube server
+choose: choose one from two html5 subtitles
+not found: subtitles are not found
+"""
     command = None
 
     # new value of item.sub field, that should be set in module.
@@ -337,23 +326,23 @@ def transcripts_logic(transcripts_presence, videos):
     if (
             transcripts_presence['youtube_diff'] and
             transcripts_presence['youtube_local'] and
-            transcripts_presence['youtube_server']):  # youtube server and local exist
+            transcripts_presence['youtube_server']): # youtube server and local exist
         command = 'replace'
         subs = videos['youtube']
-    elif transcripts_presence['youtube_local']:  # only youtube local exist
+    elif transcripts_presence['youtube_local']: # only youtube local exist
         command = 'found'
         subs = videos['youtube']
-    elif transcripts_presence['youtube_server']:  # only youtube server exist
+    elif transcripts_presence['youtube_server']: # only youtube server exist
         command = 'import'
-    else:  # html5 part
-        if transcripts_presence['html5_local']:  # can be 1 or 2 html5 videos
+    else: # html5 part
+        if transcripts_presence['html5_local']: # can be 1 or 2 html5 videos
             if len(transcripts_presence['html5_local']) == 1 or transcripts_presence['html5_equal']:
                 command = 'found'
                 subs = transcripts_presence['html5_local'][0]
             else:
                 command = 'choose'
                 subs = transcripts_presence['html5_local'][0]
-        else:  # html5 source have no subtitles
+        else: # html5 source have no subtitles
             # check if item sub has subtitles
             if transcripts_presence['current_item_subs'] and not transcripts_presence['is_youtube_mode']:
                 log.debug("Command is use existing %s subs", transcripts_presence['current_item_subs'])
@@ -372,51 +361,51 @@ def transcripts_logic(transcripts_presence, videos):
 @login_required
 def choose_transcripts(request):
     """
-    Replaces html5 subtitles, presented for both html5 sources, with chosen one.
+Replaces html5 subtitles, presented for both html5 sources, with chosen one.
 
-    Code removes rejected html5 subtitles and updates sub attribute with chosen html5_id.
+Code removes rejected html5 subtitles and updates sub attribute with chosen html5_id.
 
-    It does nothing with youtube id's.
+It does nothing with youtube id's.
 
-    Returns: status `Success` and resulted item.sub value or status `Error` and HTTP 400.
-    """
+Returns: status `Success` and resulted item.sub value or status `Error` and HTTP 400.
+"""
     response = {
         'status': 'Error',
         'subs': '',
     }
 
     try:
-        data, videos, item = validate_transcripts_data(request)
+        data, videos, item = _validate_transcripts_data(request)
     except TranscriptsRequestValidationException as e:
         return error_response(response, e.message)
 
-    html5_id = data.get('html5_id')  # html5_id chosen by user
+    html5_id = data.get('html5_id') # html5_id chosen by user
 
     # find rejected html5_id and remove appropriate subs from store
     html5_id_to_remove = [x for x in videos['html5'] if x != html5_id]
     if html5_id_to_remove:
         remove_subs_from_store(html5_id_to_remove, item)
 
-    if item.sub != html5_id:  # update sub value
+    if item.sub != html5_id: # update sub value
         item.sub = html5_id
         save_module(item)
-    response = {'status': 'Success',  'subs': item.sub}
+    response = {'status': 'Success', 'subs': item.sub}
     return JsonResponse(response)
 
 
 @login_required
 def replace_transcripts(request):
     """
-    Replaces all transcripts with youtube ones.
+Replaces all transcripts with youtube ones.
 
-    Downloads subtitles from youtube and replaces all transcripts with downloaded ones.
+Downloads subtitles from youtube and replaces all transcripts with downloaded ones.
 
-    Returns: status `Success` and resulted item.sub value or status `Error` and HTTP 400.
-    """
+Returns: status `Success` and resulted item.sub value or status `Error` and HTTP 400.
+"""
     response = {'status': 'Error', 'subs': ''}
 
     try:
-        __, videos, item = validate_transcripts_data(request)
+        __, videos, item = _validate_transcripts_data(request)
     except TranscriptsRequestValidationException as e:
         return error_response(response, e.message)
 
@@ -431,39 +420,31 @@ def replace_transcripts(request):
 
     item.sub = youtube_id
     save_module(item)
-    response = {'status': 'Success',  'subs': item.sub}
+    response = {'status': 'Success', 'subs': item.sub}
     return JsonResponse(response)
 
 
-def validate_transcripts_data(request):
+def _validate_transcripts_data(request):
     """
-    Validates, that request contains all proper data for transcripts processing.
+Validates, that request contains all proper data for transcripts processing.
 
-    Returns tuple of 3 elements::
+Returns tuple of 3 elements::
 
-        data: dict, loaded json from request,
-        videos: parsed `data` to useful format,
-        item:  video item from storage
+data: dict, loaded json from request,
+videos: parsed `data` to useful format,
+item: video item from storage
 
-    Raises `TranscriptsRequestValidationException` if validation is unsuccessful
-    or `PermissionDenied` if user has no access.
-    """
+Raises `TranscriptsRequestValidationException` if validation is unsuccessful
+or `PermissionDenied` if user has no access.
+"""
     data = json.loads(request.GET.get('data', '{}'))
     if not data:
         raise TranscriptsRequestValidationException('Incoming video data is empty.')
 
-    item_location = data.get('id')
-
-    # This is placed before has_access() to validate item_location,
-    # because has_access() raises InvalidLocationError if location is invalid.
     try:
-        item = modulestore().get_item(item_location)
-    except (ItemNotFoundError, InvalidLocationError):
-        raise TranscriptsRequestValidationException("Can't find item by location.")
-
-    # Check permissions for this user within this course.
-    if not has_access(request.user, item_location):
-        raise PermissionDenied()
+        item = _get_item(request, data)
+    except (ItemNotFoundError, InvalidLocationError, InsufficientSpecificationError):
+        raise TranscriptsRequestValidationException("Can't find item by locator.")
 
     if item.category != 'video':
         raise TranscriptsRequestValidationException('Transcripts are supported only for "video" modules.')
@@ -473,7 +454,7 @@ def validate_transcripts_data(request):
     for video_data in data.get('videos'):
         if video_data['type'] == 'youtube':
             videos['youtube'] = video_data['video']
-        else:  # do not add same html5 videos
+        else: # do not add same html5 videos
             if videos['html5'].get('video') != video_data['video']:
                 videos['html5'][video_data['video']] = video_data['mode']
 
@@ -483,22 +464,22 @@ def validate_transcripts_data(request):
 @login_required
 def rename_transcripts(request):
     """
-    Create copies of existing subtitles with new names of HTML5 sources.
+Create copies of existing subtitles with new names of HTML5 sources.
 
-    Old subtitles are not deleted now, because we do not have rollback functionality.
+Old subtitles are not deleted now, because we do not have rollback functionality.
 
-    If succeed, Item.sub will be chosen randomly from html5 video sources provided by front-end.
-    """
+If succeed, Item.sub will be chosen randomly from html5 video sources provided by front-end.
+"""
     response = {'status': 'Error', 'subs': ''}
 
     try:
-        __, videos, item = validate_transcripts_data(request)
+        __, videos, item = _validate_transcripts_data(request)
     except TranscriptsRequestValidationException as e:
         return error_response(response, e.message)
 
     old_name = item.sub
 
-    for new_name in videos['html5'].keys():  # copy subtitles for every HTML5 source
+    for new_name in videos['html5'].keys(): # copy subtitles for every HTML5 source
         try:
             # updates item.sub with new_name if it is successful.
             copy_or_rename_transcript(new_name, old_name, item)
@@ -507,7 +488,7 @@ def rename_transcripts(request):
             error_response(response, "Can't find transcripts in storage for {}".format(old_name))
 
     response['status'] = 'Success'
-    response['subs'] = item.sub  # item.sub has been changed, it is not equal to old_name.
+    response['subs'] = item.sub # item.sub has been changed, it is not equal to old_name.
     log.debug("Updated item.sub to %s", item.sub)
     return JsonResponse(response)
 
@@ -515,21 +496,20 @@ def rename_transcripts(request):
 @login_required
 def save_transcripts(request):
     """
-    Saves video module with updated values of fields.
+Saves video module with updated values of fields.
 
-    Returns: status `Success` or status `Error` and HTTP 400.
-    """
+Returns: status `Success` or status `Error` and HTTP 400.
+"""
     response = {'status': 'Error'}
 
     data = json.loads(request.GET.get('data', '{}'))
     if not data:
         return error_response(response, 'Incoming video data is empty.')
 
-    item_location = data.get('id')
     try:
-        item = modulestore().get_item(item_location)
-    except (ItemNotFoundError, InvalidLocationError):
-        return error_response(response, "Can't find item by location.")
+        item = _get_item(request, data)
+    except (ItemNotFoundError, InvalidLocationError, InsufficientSpecificationError):
+        return error_response(response, "Can't find item by locator.")
 
     metadata = data.get('metadata')
     if metadata is not None:
@@ -538,7 +518,7 @@ def save_transcripts(request):
         for metadata_key, value in metadata.items():
             setattr(item, metadata_key, value)
 
-        save_module(item)  # item becomes updated with new values
+        save_module(item) # item becomes updated with new values
 
         if new_sub:
             manage_video_subtitles_save(None, item)
@@ -553,3 +533,24 @@ def save_transcripts(request):
         response['status'] = 'Success'
 
     return JsonResponse(response)
+
+
+def _get_item(request, data):
+    """
+Obtains from 'data' the locator for an item.
+Next, gets that item from the modulestore (allowing any errors to raise up).
+Finally, verifies that the user has access to the item.
+
+Returns the item.
+"""
+    locator = BlockUsageLocator(data.get('locator'))
+    old_location = loc_mapper().translate_locator_to_location(locator)
+
+    # This is placed before has_access() to validate the location,
+    # because has_access() raises InvalidLocationError if location is invalid.
+    item = modulestore().get_item(old_location)
+
+    if not has_access(request.user, locator):
+        raise PermissionDenied()
+
+    return item

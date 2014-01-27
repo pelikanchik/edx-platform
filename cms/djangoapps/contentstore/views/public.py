@@ -6,7 +6,7 @@ from django.core.context_processors import csrf
 from django.shortcuts import redirect
 from django.conf import settings
 
-from mitxmako.shortcuts import render_to_response
+from edxmako.shortcuts import render_to_response
 
 from external_auth.views import ssl_login_shortcut
 
@@ -16,8 +16,8 @@ __all__ = ['signup', 'login_page', 'howitworks']
 @ensure_csrf_cookie
 def signup(request):
     """
-    Display the signup form.
-    """
+Display the signup form.
+"""
     csrf_token = csrf(request)['csrf_token']
     return render_to_response('signup.html', {'csrf': csrf_token})
 
@@ -26,8 +26,8 @@ def signup(request):
 @ensure_csrf_cookie
 def login_page(request):
     """
-    Display the login form.
-    """
+Display the login form.
+"""
     csrf_token = csrf(request)['csrf_token']
     return render_to_response('login.html', {
         'csrf': csrf_token,

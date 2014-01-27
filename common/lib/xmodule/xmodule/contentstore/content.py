@@ -10,7 +10,6 @@ from urlparse import urlparse, urlunparse
 
 from xmodule.modulestore import Location
 from .django import contentstore
-# to install PIL on MacOSX: 'easy_install http://dist.repoze.org/PIL-1.1.6.tar.gz'
 from PIL import Image
 
 
@@ -177,7 +176,10 @@ class ContentStore(object):
 
     def get_all_content_for_course(self, location, start=0, maxresults=-1, sort=None):
         '''
-        Returns a list of all static assets for a course. The return format is a list of dictionary elements. Example:
+        Returns a list of static assets for a course, followed by the total number of assets.
+        By default all assets are returned, but start and maxresults can be provided to limit the query.
+
+        The return format is a list of dictionary elements. Example:
 
             [
 

@@ -6,7 +6,7 @@
 
 <div
     id="video_${id}"
-    class="video"
+    class="video closed"
 
     data-problem-id="${problem_id}"
     data-streams="${youtube_streams}"
@@ -18,8 +18,10 @@
     ${'data-webm-source="{}"'.format(sources.get('webm')) if sources.get('webm') else ''}
     ${'data-ogg-source="{}"'.format(sources.get('ogv')) if sources.get('ogv') else ''}
 
+    data-save-state-url="${ajax_url}"
     data-caption-data-dir="${data_dir}"
     data-show-captions="${show_captions}"
+    data-speed="${speed}"
     data-start="${start}"
     data-end="${end}"
     data-caption-asset-path="${caption_asset_path}"
@@ -49,6 +51,7 @@
 
       <article class="video-wrapper">
           <span tabindex="0" class="spinner" aria-hidden="false" aria-label="${_('Loading video player')}"></span>
+          <span tabindex="-1" class="btn-play is-hidden" aria-hidden="true" aria-label="${_('Play video')}"></span>
           <div class="video-player-pre"></div>
           <section class="video-player">
               <section class="xmodule_display xmodule_CapaModule" data-type="Problem" id="frame_problem" style="display: none"></section>
@@ -57,8 +60,7 @@
               <h3 class="hidden">${_('ERROR: No playable video sources found!')}</h3>
           </section>
           <div class="video-player-post"></div>
-
-          <section class="video-controls">
+          <section class="video-controls is-hidden">
               <div class="slider" title="Video position"></div>
               <div>
                   <ul class="vcr">
@@ -94,11 +96,10 @@
         <li></li>
       </ol>
     </div>
-  </div>
 
-  <a class="nav-skip sr" id="after-transcript_${id}" href="#before-transcript_${id}">${_('Go back to start of transcript.')}</a>
+    <a class="nav-skip sr" id="after-transcript_${id}" href="#before-transcript_${id}">${_('Go back to start of transcript.')}</a>
 
-  <div class="focus_grabber last"></div>
+    <div class="focus_grabber last"></div>
   <ul class="wrapper-downloads">
     % if sources.get('main'):
         <li class="video-sources">

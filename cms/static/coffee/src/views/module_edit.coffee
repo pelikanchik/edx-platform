@@ -1,6 +1,6 @@
 define ["backbone", "jquery", "underscore", "gettext", "xblock/runtime.v1",
         "js/views/feedback_notification", "js/views/metadata", "js/collections/metadata"
-        "js/utils/modal", "jquery.inputnumber", "xmodule"],
+        "js/utils/modal", "jquery.inputnumber", "xmodule", "coffee/src/main"],
 (Backbone, $, _, gettext, XBlock, NotificationView, MetadataView, MetadataCollection, ModalUtils) ->
   class ModuleEdit extends Backbone.View
     tagName: 'li'
@@ -66,7 +66,7 @@ define ["backbone", "jquery", "underscore", "gettext", "xblock/runtime.v1",
     changedMetadata: ->
       return _.extend(@metadataEditor.getModifiedMetadataValues(), @customMetadata())
 
-    createItem: (parent, payload) ->
+    createItem: (parent, payload, callback=->) ->
       payload.parent_locator = parent
       @createItemStatus = 1
       $.postJSON(
@@ -76,7 +76,7 @@ define ["backbone", "jquery", "underscore", "gettext", "xblock/runtime.v1",
               @model.set(id: data.locator)
               @$el.data('locator', data.locator)
               @render()
-      )
+      ).success(callback)
 
     render: ->
       if @model.id

@@ -125,14 +125,14 @@ class @Problem
   # Use this if you want to make an ajax call on the input type object
   # static method so you don't have to instantiate a Problem in order to use it
   # Input:
-  # url: the AJAX url of the problem
-  # input_id: the input_id of the input you would like to make the call on
-  # NOTE: the id is the ${id} part of "input_${id}" during rendering
-  # If this function is passed the entire prefixed id, the backend may have trouble
-  # finding the correct input
-  # dispatch: string that indicates how this data should be handled by the inputtype
-  # callback: the function that will be called once the AJAX call has been completed.
-  # It will be passed a response object
+  #   url: the AJAX url of the problem
+  #   input_id: the input_id of the input you would like to make the call on
+  #     NOTE: the id is the ${id} part of "input_${id}" during rendering
+  #           If this function is passed the entire prefixed id, the backend may have trouble
+  #           finding the correct input
+  #   dispatch: string that indicates how this data should be handled by the inputtype
+  #   callback: the function that will be called once the AJAX call has been completed.
+  #             It will be passed a response object
   @inputAjax: (url, input_id, dispatch, data, callback) ->
     data['dispatch'] = dispatch
     data['input_id'] = input_id
@@ -171,7 +171,7 @@ class @Problem
   # If some function wants to be called before sending the answer to the
   # server, give it a chance to do so.
   #
-  # check_waitfor allows the callee to send alerts if the user's input is
+  # check_save_waitfor allows the callee to send alerts if the user's input is
   # invalid. To do so, the callee must throw an exception named "Waitfor
   # Exception". This and any other errors or exceptions that arise from the
   # callee are rethrown and abort the submission.
@@ -179,18 +179,23 @@ class @Problem
   # In order to use this feature, add a 'data-waitfor' attribute to the input,
   # and specify the function to be called by the check button before sending
   # off @answers
-  check_waitfor: =>
+  check_save_waitfor: (callback) =>
     for inp in @inputs
       if ($(inp).is("input[waitfor]"))
         try
-          $(inp).data("waitfor")()
-          @refreshAnswers()
+          $(inp).data("waitfor")(() =>
+            @refreshAnswers()
+            callback()
+          )
         catch e
           if e.name == "Waitfor Exception"
             alert e.message
           else
             alert "Could not grade your answer. The submission was aborted."
           throw e
+        return true
+      else
+        return false
 
 
 
@@ -232,7 +237,7 @@ class @Problem
     @inputs.each (index, element) ->
       if element.type is 'file'
         required_files = $(element).data("required_files")
-        allowed_files = $(element).data("allowed_files")
+        allowed_files  = $(element).data("allowed_files")
         for file in element.files
           if allowed_files.length != 0 and file.name not in allowed_files
             unallowed_file_submitted = true
@@ -282,7 +287,10 @@ class @Problem
       $.ajaxWithPrefix("#{@url}/problem_check", settings)
 
   check: =>
-    @check_waitfor()
+    if not @check_save_waitfor(@check_internal)
+      @check_internal()
+
+  check_internal: =>
     Logger.log 'problem_check', @answers
 
     if( responsesBeingProcessedCount == 0)
@@ -340,24 +348,28 @@ class @Problem
         # inputtype functions.
 
         @el.find(".capa_inputtype").each (index, inputtype) =>
-            classes = $(inputtype).attr('class').split(' ')
-            for cls in classes
-              display = @inputtypeDisplays[$(inputtype).attr('id')]
-              showMethod = @inputtypeShowAnswerMethods[cls]
-              showMethod(inputtype, display, answers) if showMethod?
+          classes = $(inputtype).attr('class').split(' ')
+          for cls in classes
+            display = @inputtypeDisplays[$(inputtype).attr('id')]
+            showMethod = @inputtypeShowAnswerMethods[cls]
+            showMethod(inputtype, display, answers) if showMethod?
 
         if MathJax?
           @el.find('.problem > div').each (index, element) =>
             MathJax.Hub.Queue ["Typeset", MathJax.Hub, element]
 
+        `// Translators: the word Answer here refers to the answer to a problem the student must solve.`
         @$('.show-label').text gettext('Hide Answer(s)')
+
         @el.addClass 'showed'
         @updateProgress response
     else
       @$('[id^=answer_], [id^=solution_]').text ''
       @$('[correct_answer]').attr correct_answer: null
       @el.removeClass 'showed'
-      @$('.show-label').text(gettext('Show Answer(s)'))
+      `// Translators: the word Answer here refers to the answer to a problem the student must solve.`
+      @$('.show-label').text gettext('Show Answer(s)')
+
 
       @el.find(".capa_inputtype").each (index, inputtype) =>
         display = @inputtypeDisplays[$(inputtype).attr('id')]
@@ -374,6 +386,10 @@ class @Problem
     @el.find('.capa_alert').css(opacity: 0).animate(opacity: 1, 700)
 
   save: =>
+    if not @check_save_waitfor(@save_internal)
+      @save_internal()
+
+  save_internal: =>
     Logger.log 'problem_save', @answers
     $.postWithPrefix "#{@url}/problem_save", @answers, (response) =>
       saveMessage = response.msg
@@ -431,6 +447,7 @@ class @Problem
     formulaequationinput: (element) ->
       $(element).find('input').on 'input', ->
         $p = $(element).find('p.status')
+        `// Translators: the word unanswered here is about answering a problem the student must solve.`
         $p.text gettext("unanswered")
         $p.parent().removeClass().addClass "unanswered"
 
@@ -439,7 +456,7 @@ class @Problem
       id = ($element.attr('id').match /^inputtype_(.*)$/)[1]
       $element.find('input').on 'change', ->
         $status = $("#status_#{id}")
-        if $status[0] # We found a status icon.
+        if $status[0]  # We found a status icon.
           $status.removeClass().addClass "unanswered"
           $status.empty().css 'display', 'inline-block'
         else
@@ -459,16 +476,17 @@ class @Problem
     textline: (element) ->
       $(element).find('input').on 'input', ->
         $p = $(element).find('p.status')
-        $p.text "unanswered"
+        `// Translators: the word unanswered here is about answering a problem the student must solve.`
+        $p.text gettext("unanswered")
         $p.parent().removeClass().addClass "unanswered"
 
   inputtypeSetupMethods:
 
     'text-input-dynamath': (element) =>
       ###
-Return: function (eqn) -> eqn that preprocesses the user formula input before
-it is fed into MathJax. Return 'false' if no preprocessor specified
-###
+      Return: function (eqn) -> eqn that preprocesses the user formula input before
+                it is fed into MathJax. Return 'false' if no preprocessor specified
+      ###
       data = $(element).find('.text-input-dynamath_data')
 
       preprocessorClassName = data.data('preprocessor')
@@ -483,11 +501,11 @@ it is fed into MathJax. Return 'false' if no preprocessor specified
 
       data = $(element).find(".javascriptinput_data")
 
-      params = data.data("params")
-      submission = data.data("submission")
-      evaluation = data.data("evaluation")
-      problemState = data.data("problem_state")
-      displayClass = window[data.data('display_class')]
+      params        = data.data("params")
+      submission    = data.data("submission")
+      evaluation    = data.data("evaluation")
+      problemState  = data.data("problem_state")
+      displayClass  = window[data.data('display_class')]
 
       if evaluation == ''
           evaluation = null
@@ -521,6 +539,82 @@ it is fed into MathJax. Return 'false' if no preprocessor specified
       answer = answers[input_id]
       for choice in answer
         element.find("section#forinput#{choice}").addClass 'choicetextgroup_show_correct'
+
+    imageinput: (element, display, answers) =>
+      # answers is a dict of (answer_id, answer_text) for each answer for this
+      # question.
+      # @Examples:
+      # {'anwser_id': {
+      #   'rectangle': '(10,10)-(20,30);(12,12)-(40,60)',
+      #   'regions': '[[10,10], [30,30], [10, 30], [30, 10]]'
+      # } }
+      types =
+        rectangle: (coords) =>
+          reg = /^\(([0-9]+),([0-9]+)\)-\(([0-9]+),([0-9]+)\)$/
+          rects = coords.replace(/\s*/g, '').split(/;/)
+
+          $.each rects, (index, rect) =>
+            abs = Math.abs
+            points = reg.exec(rect)
+            if points
+              width = abs(points[3] - points[1])
+              height = abs(points[4] - points[2])
+
+              ctx.rect(points[1], points[2], width, height)
+
+          ctx.stroke()
+          ctx.fill()
+
+        regions: (coords) =>
+          parseCoords = (coords) =>
+            reg = JSON.parse(coords)
+
+            # Regions is list of lists [region1, region2, region3, ...] where regionN
+            # is disordered list of points: [[1,1], [100,100], [50,50], [20, 70]].
+            # If there is only one region in the list, simpler notation can be used:
+            # regions="[[10,10], [30,30], [10, 30], [30, 10]]" (without explicitly
+            # setting outer list)
+            if typeof reg[0][0][0] == "undefined"
+              # we have [[1,2],[3,4],[5,6]] - single region
+              # instead of [[[1,2],[3,4],[5,6], [[1,2],[3,4],[5,6]]]
+              # or [[[1,2],[3,4],[5,6]]] - multiple regions syntax
+              reg = [reg]
+
+            return reg
+
+          $.each parseCoords(coords), (index, region) =>
+            ctx.beginPath()
+            $.each region, (index, point) =>
+              if index is 0
+                ctx.moveTo(point[0], point[1])
+              else
+                ctx.lineTo(point[0], point[1]);
+
+            ctx.closePath()
+            ctx.stroke()
+            ctx.fill()
+
+      element = $(element)
+      id = element.attr('id').replace(/inputtype_/,'')
+      container = element.find("#answer_#{id}")
+      canvas = document.createElement('canvas')
+      canvas.width = container.data('width')
+      canvas.height = container.data('height')
+
+      if canvas.getContext
+        ctx = canvas.getContext('2d')
+      else
+        return console.log 'Canvas is not supported.'
+
+      ctx.fillStyle = 'rgba(255,255,255,.3)';
+      ctx.strokeStyle = "#FF0000";
+      ctx.lineWidth = "2";
+
+      $.each answers, (key, answer) =>
+        $.each answer, (key, value) =>
+          types[key](value) if types[key]? and value
+
+      container.html(canvas)
 
   inputtypeHideAnswerMethods:
     choicegroup: (element, display) =>

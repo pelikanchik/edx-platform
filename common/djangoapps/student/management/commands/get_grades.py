@@ -46,7 +46,7 @@ class Command(BaseCommand):
 
     option_list = BaseCommand.option_list + (
         make_option('-c', '--course',
-                    metavar='COURSE_ID',
+                    metavar='course_id',
                     dest='course',
                     default=False,
                     help='Course ID for grade distribution'),

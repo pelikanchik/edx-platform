@@ -5,9 +5,110 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Blades: Video player persist speed preferences between videos. BLD-237.
+
+Blades: Change the download video field to a dropdown that will allow students
+to download the first source listed in the alternate sources. BLD-364.
+
+Blades: Change the track field to a dropdown that will allow students
+to download the transcript of the video without timecodes. BLD-368.
+
+Blades: Video player start-end time range is now shown even before Play is
+clicked. Video player VCR time shows correct non-zero total time for YouTube
+videos even before Play is clicked. BLD-529.
+
+Studio: Add ability to duplicate components on the unit page.
+
+Blades: Adds CookieStorage utility for video player that provides convenient
+  way to work with cookies.
+
+Blades: Fix comparison of float numbers. BLD-434.
+
+Blades: Allow regexp strings as the correct answer to a string response question. BLD-475.
+
+Common: Add feature flags to allow developer use of pure XBlocks
+  - ALLOW_ALL_ADVANCED_COMPONENTS disables the hard-coded list of advanced
+    components in Studio, and allows any xblock to be added as an
+    advanced component in Studio settings
+  - XBLOCK_SELECT_FUNCTION allows the insertion of a custom function
+    to limit loading of XBlocks with (including allowing pure xblocks)
+
+Studio: Add sorting by column to the Files & Uploads page.
+See mongo_indexes.md for new indices that should be added.
+
+Common: Previously, theming was activated by providing a value for the THEME_NAME
+  setting. Now, theming is activated by setting the "USE_CUSTOM_THEME" feature
+  flag to True -- a THEME_NAME setting is still required to determine *which*
+  theme to use.
+
+Studio: Newly-created courses default to being published on Jan 1, 2030
+
+Studio: Added pagination to the Files & Uploads page.
+
+Common: Centralized authorization mechanisms and removed the app-specific ones.
+
+Blades: Video player improvements:
+  - Disable edX controls on iPhone/iPod (native controls are used).
+  - Disable unsupported controls (volume, playback rate) on iPad/Android.
+  - Controls becomes visible after click on video or play placeholder to avoid
+    issues with YouTube API on iPad/Android.
+  - Captions becomes visible just after full initialization of video player.
+  - Fix blinking of captions after initialization of video player. BLD-206.
+
+LMS: Fix answer distribution download for small courses. LMS-922, LMS-811
+
+Blades: Add template for the zooming image in studio. BLD-206.
+
+Blades: Update behavior of start/end time fields. BLD-506.
+
+Blades: Make LTI module not send grade_back_url if has_score=False. BLD-561.
+
+Blades: Show answer for imageresponse. BLD-21.
+
+Blades: LTI additional Python tests. LTI must use HTTPS for
+lis_outcome_service_url. BLD-564.
+
+Studio: Enable Terms of Service and Privacy Policy links to be served by
+  an alternate site. STUD-151.
+
+Blades: Fix bug when Image mapping problems are not working for students in IE. BLD-413.
+
+Blades: Add template that displays the most up-to-date features of
+drag-and-drop. BLD-479.
+
+Blades: LTI fix bug e-reader error when popping out window. BLD-465.
+
+Common: Switch from mitx.db to edx.db for sqlite databases. This will effectively
+  reset state for local instances of the code, unless you manually rename your
+  mitx.db file to edx.db.
+
+Common: significant performance improvement for authorization checks and location translations.
+  Ensure all auth checks, check all possible permutations of the auth key (Instructor dashboard
+  now shows when it should for all courses in lms).
+  Made queries for Studio dashboard 2 orders of magnitude faster (and fewer).
+
+Blades: Video Transcripts: Fix clear and download buttons. BLD-438.
+
+Common: Switch over from MITX_FEATURES to just FEATURES. To override items in
+  the FEATURES dict, the environment variable you must set to do so is also
+  now called FEATURES instead of MITX_FEATURES.
+
+LMS: Change the forum role granted to global staff on enrollment in a
+course. Previously, staff were given the Moderator role; now, they are
+given the Student role.
+
+Blades: Fix Numerical input to support mathematical operations. BLD-525.
+
+Blades: Improve calculator's tooltip accessibility. Add possibility to navigate
+  through the hints via arrow keys. BLD-533.
+
 LMS: Add feature for providing background grade report generation via Celery
   instructor task, with reports uploaded to S3. Feature is visible on the beta
   instructor dashboard. LMS-58
+
+Blades: Added grading support for LTI module. LTI providers can now grade
+student's work and send edX scores. OAuth1 based authentication
+implemented. BLD-384.
 
 LMS: Beta-tester status is now set on a per-course-run basis, rather than being
   valid across all runs with the same course name. Old group membership will
@@ -19,6 +120,8 @@ Blades: Enabled several Video Jasmine tests. BLD-463.
 Studio: Continued modification of Studio pages to follow a RESTful framework.
 includes Settings pages, edit page for Subsection and Unit, and interfaces
 for updating xblocks (xmodules) and getting their editing HTML.
+
+LMS: Improve accessibility of inline discussions in courseware.
 
 Blades: Put 2nd "Hide output" button at top of test box & increase text size for
 code response questions. BLD-126.
@@ -39,7 +142,6 @@ LMS: Trap focus on the loading element when a user loads more threads
 in the forum sidebar to improve accessibility.
 
 LMS: Add error recovery when a user loads more threads in the forum sidebar.
->>>>>>> origin/master
 
 LMS: Add a user-visible alert modal when a forums AJAX request fails.
 

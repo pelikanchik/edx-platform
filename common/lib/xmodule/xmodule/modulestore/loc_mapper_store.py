@@ -14,26 +14,26 @@ import urllib
 
 class LocMapperStore(object):
     '''
-    This store persists mappings among the addressing schemes. At this time, it's between the old i4x Location
-    tuples and the split mongo Course and Block Locator schemes.
+This store persists mappings among the addressing schemes. At this time, it's between the old i4x Location
+tuples and the split mongo Course and Block Locator schemes.
 
-    edX has used several different addressing schemes. The original ones were organically created based on
-    immediate needs and were overly restrictive esp wrt course ids. These were slightly extended to support
-    some types of blocks may need to have draft states during editing to keep live courses from seeing the wip.
-    A later refactoring generalized course ids to enable governance and more complex naming, branch naming with
-    anything able to be in any branch.
+edX has used several different addressing schemes. The original ones were organically created based on
+immediate needs and were overly restrictive esp wrt course ids. These were slightly extended to support
+some types of blocks may need to have draft states during editing to keep live courses from seeing the wip.
+A later refactoring generalized course ids to enable governance and more complex naming, branch naming with
+anything able to be in any branch.
 
-    The expectation is that the configuration will have this use the same store as whatever is the default
-    or dominant store, but that's not a requirement. This store creates its own connection.
-    '''
+The expectation is that the configuration will have this use the same store as whatever is the default
+or dominant store, but that's not a requirement. This store creates its own connection.
+'''
 
     def __init__(
         self, host, db, collection, port=27017, user=None, password=None,
         **kwargs
     ):
         '''
-        Constructor
-        '''
+Constructor
+'''
         self.db = pymongo.database.Database(
             pymongo.MongoClient(
                 host=host,
@@ -53,38 +53,38 @@ class LocMapperStore(object):
     def create_map_entry(self, course_location, course_id=None, draft_branch='draft', prod_branch='published',
                          block_map=None):
         """
-        Add a new entry to map this course_location to the new style CourseLocator.course_id. If course_id is not
-        provided, it creates the default map of using org.course.name from the location (just like course_id) if
-        the location.category = 'course'; otherwise, it uses org.course.
+Add a new entry to map this course_location to the new style CourseLocator.course_id. If course_id is not
+provided, it creates the default map of using org.course.name from the location (just like course_id) if
+the location.category = 'course'; otherwise, it uses org.course.
 
-        You can create more than one mapping to the
-        same course_id target. In that case, the reverse translate will be arbitrary (no guarantee of which wins).
-        The use
-        case for more than one mapping is to map both org/course/run and org/course to the same new course_id thus
-        making a default for org/course. When querying for just org/course, the translator will prefer any entry
-        which does not have a name in the _id; otherwise, it will return an arbitrary match.
+You can create more than one mapping to the
+same course_id target. In that case, the reverse translate will be arbitrary (no guarantee of which wins).
+The use
+case for more than one mapping is to map both org/course/run and org/course to the same new course_id thus
+making a default for org/course. When querying for just org/course, the translator will prefer any entry
+which does not have a name in the _id; otherwise, it will return an arbitrary match.
 
-        Note: the opposite is not true. That is, it never makes sense to use 2 different CourseLocator.course_id
-        keys to index the same old Locator org/course/.. pattern. There's no checking to ensure you don't do this.
+Note: the opposite is not true. That is, it never makes sense to use 2 different CourseLocator.course_id
+keys to index the same old Locator org/course/.. pattern. There's no checking to ensure you don't do this.
 
-        NOTE: if there's already an entry w the given course_location, this may either overwrite that entry or
-        throw an error depending on how mongo is configured.
+NOTE: if there's already an entry w the given course_location, this may either overwrite that entry or
+throw an error depending on how mongo is configured.
 
-        :param course_location: a Location preferably whose category is 'course'. Unlike the other
-        map methods, this one doesn't take the old-style course_id.  It should be called with
-        a course location not a block location; however, if called w/ a non-course Location, it creates
-        a "default" map for the org/course pair to a new course_id.
-        :param course_id: the CourseLocator style course_id
-        :param draft_branch: the branch name to assign for drafts. This is hardcoded because old mongo had
-        a fixed notion that there was 2 and only 2 versions for modules: draft and production. The old mongo
-        did not, however, require that a draft version exist. The new one, however, does require a draft to
-        exist.
-        :param prod_branch: the branch name to assign for the production (live) copy. In old mongo, every course
-        had to have a production version (whereas new split mongo does not require that until the author's ready
-        to publish).
-        :param block_map: an optional map to specify preferred names for blocks where the keys are the
-        Location block names and the values are the BlockUsageLocator.block_id.
-        """
+:param course_location: a Location preferably whose category is 'course'. Unlike the other
+map methods, this one doesn't take the old-style course_id. It should be called with
+a course location not a block location; however, if called w/ a non-course Location, it creates
+a "default" map for the org/course pair to a new course_id.
+:param course_id: the CourseLocator style course_id
+:param draft_branch: the branch name to assign for drafts. This is hardcoded because old mongo had
+a fixed notion that there was 2 and only 2 versions for modules: draft and production. The old mongo
+did not, however, require that a draft version exist. The new one, however, does require a draft to
+exist.
+:param prod_branch: the branch name to assign for the production (live) copy. In old mongo, every course
+had to have a production version (whereas new split mongo does not require that until the author's ready
+to publish).
+:param block_map: an optional map to specify preferred names for blocks where the keys are the
+Location block names and the values are the BlockUsageLocator.block_id.
+"""
         if course_id is None:
             if course_location.category == 'course':
                 course_id = "{0.org}.{0.course}.{0.name}".format(course_location)
@@ -106,26 +106,26 @@ class LocMapperStore(object):
 
     def translate_location(self, old_style_course_id, location, published=True, add_entry_if_missing=True):
         """
-        Translate the given module location to a Locator. If the mapping has the run id in it, then you
-        should provide old_style_course_id with that run id in it to disambiguate the mapping if there exists more
-        than one entry in the mapping table for the org.course.
+Translate the given module location to a Locator. If the mapping has the run id in it, then you
+should provide old_style_course_id with that run id in it to disambiguate the mapping if there exists more
+than one entry in the mapping table for the org.course.
 
-        The rationale for auto adding entries was that there should be a reasonable default translation
-        if the code just trips into this w/o creating translations. The downfall is that ambiguous course
-        locations may generate conflicting block_ids.
+The rationale for auto adding entries was that there should be a reasonable default translation
+if the code just trips into this w/o creating translations. The downfall is that ambiguous course
+locations may generate conflicting block_ids.
 
-        Will raise ItemNotFoundError if there's no mapping and add_entry_if_missing is False.
+Will raise ItemNotFoundError if there's no mapping and add_entry_if_missing is False.
 
-        :param old_style_course_id: the course_id used in old mongo not the new one (optional, will use location)
-        :param location:  a Location pointing to a module
-        :param published: a boolean to indicate whether the caller wants the draft or published branch.
-        :param add_entry_if_missing: a boolean as to whether to raise ItemNotFoundError or to create an entry if
-        the course
-        or block is not found in the map.
+:param old_style_course_id: the course_id used in old mongo not the new one (optional, will use location)
+:param location: a Location pointing to a module
+:param published: a boolean to indicate whether the caller wants the draft or published branch.
+:param add_entry_if_missing: a boolean as to whether to raise ItemNotFoundError or to create an entry if
+the course
+or block is not found in the map.
 
-        NOTE: unlike old mongo, draft branches contain the whole course; so, it applies to all category
-        of locations including course.
-        """
+NOTE: unlike old mongo, draft branches contain the whole course; so, it applies to all category
+of locations including course.
+"""
         location_id = self._interpret_location_course_id(old_style_course_id, location)
 
         maps = self.location_map.find(location_id).sort('_id.name', pymongo.ASCENDING)
@@ -169,22 +169,22 @@ class LocMapperStore(object):
 
     def translate_locator_to_location(self, locator, get_course=False):
         """
-        Returns an old style Location for the given Locator if there's an appropriate entry in the
-        mapping collection. Note, it requires that the course was previously mapped (a side effect of
-        translate_location or explicitly via create_map_entry) and
-        the block's usage_id was previously stored in the
-        map (a side effect of translate_location or via add|update_block_location).
+Returns an old style Location for the given Locator if there's an appropriate entry in the
+mapping collection. Note, it requires that the course was previously mapped (a side effect of
+translate_location or explicitly via create_map_entry) and
+the block's usage_id was previously stored in the
+map (a side effect of translate_location or via add|update_block_location).
 
-        If get_course, then rather than finding the map for this locator, it finds the 'course' root
-        for the mapped course.
+If get_course, then rather than finding the map for this locator, it finds the 'course' root
+for the mapped course.
 
-        If there are no matches, it returns None.
+If there are no matches, it returns None.
 
-        If there's more than one location to locator mapping to the same course_id, it looks for the first
-        one with a mapping for the block usage_id and picks that arbitrary course location.
+If there's more than one location to locator mapping to the same course_id, it looks for the first
+one with a mapping for the block usage_id and picks that arbitrary course location.
 
-        :param locator: a BlockUsageLocator
-        """
+:param locator: a BlockUsageLocator
+"""
         # This does not require that the course exist in any modulestore
         # only that it has a mapping entry.
         maps = self.location_map.find({'course_id': locator.course_id})
@@ -218,27 +218,27 @@ class LocMapperStore(object):
 
     def add_block_location_translator(self, location, old_course_id=None, usage_id=None):
         """
-        Similar to translate_location which adds an entry if none is found, but this cannot create a new
-        course mapping entry, only a block within such a mapping entry. If it finds no existing
-        course maps, it raises ItemNotFoundError.
+Similar to translate_location which adds an entry if none is found, but this cannot create a new
+course mapping entry, only a block within such a mapping entry. If it finds no existing
+course maps, it raises ItemNotFoundError.
 
-        In the case that there are more than one mapping record for the course identified by location, this
-        method adds the mapping to all matching records! (translate_location only adds to one)
+In the case that there are more than one mapping record for the course identified by location, this
+method adds the mapping to all matching records! (translate_location only adds to one)
 
-        It allows the caller to specify
-        the new-style usage_id for the target rather than having the translate concoct its own.
-        If the provided usage_id already exists in one of the found maps for the org/course, this function
-        raises DuplicateItemError unless the old item id == the new one.
+It allows the caller to specify
+the new-style usage_id for the target rather than having the translate concoct its own.
+If the provided usage_id already exists in one of the found maps for the org/course, this function
+raises DuplicateItemError unless the old item id == the new one.
 
-        If the caller does not provide a usage_id and there exists an entry in one of the course variants,
-        it will use that entry. If more than one variant uses conflicting entries, it will raise DuplicateItemError.
+If the caller does not provide a usage_id and there exists an entry in one of the course variants,
+it will use that entry. If more than one variant uses conflicting entries, it will raise DuplicateItemError.
 
-        Returns the usage_id used in the mapping
+Returns the usage_id used in the mapping
 
-        :param location: a fully specified Location
-        :param old_course_id: the old-style org/course or org/course/run string (optional)
-        :param usage_id: the desired new block_id. If left as None, this will generate one as per translate_location
-        """
+:param location: a fully specified Location
+:param old_course_id: the old-style org/course or org/course/run string (optional)
+:param usage_id: the desired new block_id. If left as None, this will generate one as per translate_location
+"""
         location_id = self._interpret_location_course_id(old_course_id, location)
 
         maps = self.location_map.find(location_id)
@@ -285,18 +285,18 @@ class LocMapperStore(object):
 
     def update_block_location_translator(self, location, usage_id, old_course_id=None, autogenerated_usage_id=False):
         """
-        Update all existing maps from location's block to the new usage_id. Used for changing the usage_id,
-        thus the usage_id is required.
+Update all existing maps from location's block to the new usage_id. Used for changing the usage_id,
+thus the usage_id is required.
 
-        Returns the usage_id. (which is primarily useful in the case of autogenerated_usage_id)
+Returns the usage_id. (which is primarily useful in the case of autogenerated_usage_id)
 
-        :param location: a fully specified Location
-        :param usage_id: the desired new block_id.
-        :param old_course_id: the old-style org/course or org/course/run string (optional)
-        :param autogenerated_usage_id: a flag used mostly for internal calls to indicate that this usage_id
-        was autogenerated and thus can be overridden if it's not unique. If you set this flag, the stored
-        usage_id may not be the one you submitted.
-        """
+:param location: a fully specified Location
+:param usage_id: the desired new block_id.
+:param old_course_id: the old-style org/course or org/course/run string (optional)
+:param autogenerated_usage_id: a flag used mostly for internal calls to indicate that this usage_id
+was autogenerated and thus can be overridden if it's not unique. If you set this flag, the stored
+usage_id may not be the one you submitted.
+"""
         location_id = self._interpret_location_course_id(old_course_id, location)
 
         maps = self.location_map.find(location_id)
@@ -323,11 +323,11 @@ class LocMapperStore(object):
 
     def delete_block_location_translator(self, location, old_course_id=None):
         """
-        Remove all existing maps from location's block.
+Remove all existing maps from location's block.
 
-        :param location: a fully specified Location
-        :param old_course_id: the old-style org/course or org/course/run string (optional)
-        """
+:param location: a fully specified Location
+:param old_course_id: the old-style org/course or org/course/run string (optional)
+"""
         location_id = self._interpret_location_course_id(old_course_id, location)
 
         maps = self.location_map.find(location_id)
@@ -357,13 +357,13 @@ class LocMapperStore(object):
 
     def _interpret_location_course_id(self, course_id, location):
         """
-        Take the old style course id (org/course/run) and return a dict for querying the mapping table.
-        If the course_id is empty, it uses location, but this may result in an inadequate id.
+Take the old style course id (org/course/run) and return a dict for querying the mapping table.
+If the course_id is empty, it uses location, but this may result in an inadequate id.
 
-        :param course_id: old style 'org/course/run' id from Location.course_id where Location.category = 'course'
-        :param location: a Location object which may be to a module or a course. Provides partial info
-        if course_id is omitted.
-        """
+:param course_id: old style 'org/course/run' id from Location.course_id where Location.category = 'course'
+:param location: a Location object which may be to a module or a course. Provides partial info
+if course_id is omitted.
+"""
         if course_id:
             # re doesn't allow ?P<_id.org> and ilk
             matched = re.match(r'([^/]+)/([^/]+)/([^/]+)', course_id)
@@ -376,15 +376,15 @@ class LocMapperStore(object):
 
     def _block_id_is_guid(self, name):
         """
-        Does the given name look like it's a guid?
-        """
+Does the given name look like it's a guid?
+"""
         return len(name) == 32 and re.search(r'[^0-9A-Fa-f]', name) is None
 
     def _verify_uniqueness(self, name, block_map):
         '''
-        Verify that the name doesn't occur elsewhere in block_map. If it does, keep adding to it until
-        it's unique.
-        '''
+Verify that the name doesn't occur elsewhere in block_map. If it does, keep adding to it until
+it's unique.
+'''
         for targets in block_map.itervalues():
             if isinstance(targets, dict):
                 for values in targets.itervalues():
@@ -399,17 +399,16 @@ class LocMapperStore(object):
 
     def _encode_for_mongo(self, fieldname):
         """
-        Fieldnames in mongo cannot have periods nor dollar signs. So encode them.
-        :param fieldname: an atomic field name. Note, don't pass structured paths as it will flatten them
-        """
+Fieldnames in mongo cannot have periods nor dollar signs. So encode them.
+:param fieldname: an atomic field name. Note, don't pass structured paths as it will flatten them
+"""
         for char in [".", "$"]:
             fieldname = fieldname.replace(char, '%{:02x}'.format(ord(char)))
         return fieldname
 
     def _decode_from_mongo(self, fieldname):
         """
-        The inverse of _encode_for_mongo
-        :param fieldname: with period and dollar escaped
-        """
+The inverse of _encode_for_mongo
+:param fieldname: with period and dollar escaped
+"""
         return urllib.unquote(fieldname)
-

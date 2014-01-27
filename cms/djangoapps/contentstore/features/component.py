@@ -57,6 +57,8 @@ def see_a_multi_step_component(step, category):
                     '\n    \n',
                 'Announcement':
                     '<p> Words of encouragement! This is a short note that most students will read. </p>',
+                'Zooming Image':
+                    '<h2>ZOOMING DIAGRAMS</h2>',
                 'E-text Written in LaTeX':
                     '<h2>Example: E-text page</h2>',
             }
@@ -130,3 +132,25 @@ def delete_one_component(step):
 def edit_and_save_component(step):
     world.css_click('.edit-button')
     world.css_click('.save-button')
+
+
+@step(u'I duplicate the (first|second|third) component$')
+def duplicated_component(step, ordinal):
+    ord_map = {
+        "first": 0,
+        "second": 1,
+        "third": 2,
+    }
+    index = ord_map[ordinal]
+    duplicate_btn_css = 'a.duplicate-button'
+    world.css_click(duplicate_btn_css, int(index))
+
+
+@step(u'I see a Problem component with display name "([^"]*)" in position "([^"]*)"$')
+def see_component_in_position(step, display_name, index):
+    component_css = 'section.xmodule_CapaModule'
+
+    def find_problem(_driver):
+        return world.css_text(component_css, int(index)).startswith(display_name.upper())
+
+    world.wait_for(find_problem, timeout_msg='Did not find the duplicated problem')

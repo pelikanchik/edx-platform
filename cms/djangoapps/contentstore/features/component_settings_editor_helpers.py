@@ -4,6 +4,7 @@
 from lettuce import world
 from nose.tools import assert_equal, assert_in  # pylint: disable=E0611
 from terrain.steps import reload_the_page
+from common import type_in_codemirror
 
 
 @world.absorb
@@ -114,6 +115,16 @@ def edit_component():
     world.css_click('a.edit-button')
 
 
+def enter_xml_in_advanced_problem(step, text):
+    """
+    Edits an advanced problem (assumes only on page),
+    types the provided XML, and saves the component.
+    """
+    world.edit_component()
+    type_in_codemirror(0, text)
+    world.save_component(step)
+
+
 @world.absorb
 def verify_setting_entry(setting, display_name, value, explicitly_set):
     """
@@ -129,7 +140,7 @@ def verify_setting_entry(setting, display_name, value, explicitly_set):
         for the problem, rather than derived from the defaults. This is verified
         by the existence of a "Clear" button next to the field value.
     """
-    assert_equal(display_name, setting.find_by_css('.setting-label')[0].html)
+    assert_equal(display_name, setting.find_by_css('.setting-label')[0].html.strip())
 
     # Check if the web object is a list type
     # If so, we use a slightly different mechanism for determining its value
@@ -161,9 +172,14 @@ def verify_all_setting_entries(expected_entries):
 
 
 @world.absorb
-def save_component_and_reopen(step):
+def save_component(step):
     world.css_click("a.save-button")
     world.wait_for_ajax_complete()
+
+
+@world.absorb
+def save_component_and_reopen(step):
+    save_component(step)
     # We have a known issue that modifications are still shown within the edit window after cancel (though)
     # they are not persisted. Refresh the browser to make sure the changes WERE persisted after Save.
     reload_the_page(step)

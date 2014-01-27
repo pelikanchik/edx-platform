@@ -15,8 +15,8 @@ from auth.authz import add_user_to_creator_group, remove_user_from_creator_group
 
 class CreatorGroupTest(TestCase):
     """
-    Tests for the course creator group.
-    """
+Tests for the course creator group.
+"""
 
     def setUp(self):
         """ Test case setup """
@@ -26,14 +26,14 @@ class CreatorGroupTest(TestCase):
 
     def test_creator_group_not_enabled(self):
         """
-        Tests that is_user_in_creator_group always returns True if ENABLE_CREATOR_GROUP
-        and DISABLE_COURSE_CREATION are both not turned on.
-        """
+Tests that is_user_in_creator_group always returns True if ENABLE_CREATOR_GROUP
+and DISABLE_COURSE_CREATION are both not turned on.
+"""
         self.assertTrue(is_user_in_creator_group(self.user))
 
     def test_creator_group_enabled_but_empty(self):
         """ Tests creator group feature on, but group empty. """
-        with mock.patch.dict('django.conf.settings.MITX_FEATURES', {"ENABLE_CREATOR_GROUP": True}):
+        with mock.patch.dict('django.conf.settings.FEATURES', {"ENABLE_CREATOR_GROUP": True}):
             self.assertFalse(is_user_in_creator_group(self.user))
 
             # Make user staff. This will cause is_user_in_creator_group to return True.
@@ -42,7 +42,7 @@ class CreatorGroupTest(TestCase):
 
     def test_creator_group_enabled_nonempty(self):
         """ Tests creator group feature on, user added. """
-        with mock.patch.dict('django.conf.settings.MITX_FEATURES', {"ENABLE_CREATOR_GROUP": True}):
+        with mock.patch.dict('django.conf.settings.FEATURES', {"ENABLE_CREATOR_GROUP": True}):
             self.assertTrue(add_user_to_creator_group(self.admin, self.user))
             self.assertTrue(is_user_in_creator_group(self.user))
 
@@ -56,21 +56,21 @@ class CreatorGroupTest(TestCase):
 
     def test_add_user_not_authenticated(self):
         """
-        Tests that adding to creator group fails if user is not authenticated
-        """
+Tests that adding to creator group fails if user is not authenticated
+"""
         self.user.is_authenticated = False
         self.assertFalse(add_user_to_creator_group(self.admin, self.user))
 
     def test_add_user_not_active(self):
         """
-        Tests that adding to creator group fails if user is not active
-        """
+Tests that adding to creator group fails if user is not active
+"""
         self.user.is_active = False
         self.assertFalse(add_user_to_creator_group(self.admin, self.user))
 
     def test_course_creation_disabled(self):
         """ Tests that the COURSE_CREATION_DISABLED flag overrides course creator group settings. """
-        with mock.patch.dict('django.conf.settings.MITX_FEATURES',
+        with mock.patch.dict('django.conf.settings.FEATURES',
                              {'DISABLE_COURSE_CREATION': True, "ENABLE_CREATOR_GROUP": True}):
             # Add user to creator group.
             self.assertTrue(add_user_to_creator_group(self.admin, self.user))
@@ -122,8 +122,8 @@ class CreatorGroupTest(TestCase):
 
 class CourseGroupTest(TestCase):
     """
-    Tests for instructor and staff groups for a particular course.
-    """
+Tests for instructor and staff groups for a particular course.
+"""
 
     def setUp(self):
         """ Test case setup """
@@ -133,8 +133,8 @@ class CourseGroupTest(TestCase):
 
     def test_add_user_to_course_group(self):
         """
-        Tests adding user to course group (happy path).
-        """
+Tests adding user to course group (happy path).
+"""
         # Create groups for a new course (and assign instructor role to the creator).
         self.assertFalse(is_user_in_course_group_role(self.creator, self.location, INSTRUCTOR_ROLE_NAME))
         create_all_course_groups(self.creator, self.location)
@@ -147,16 +147,16 @@ class CourseGroupTest(TestCase):
 
     def test_add_user_to_course_group_permission_denied(self):
         """
-        Verifies PermissionDenied if caller of add_user_to_course_group is not instructor role.
-        """
+Verifies PermissionDenied if caller of add_user_to_course_group is not instructor role.
+"""
         create_all_course_groups(self.creator, self.location)
         with self.assertRaises(PermissionDenied):
             add_user_to_course_group(self.staff, self.staff, self.location, STAFF_ROLE_NAME)
 
     def test_remove_user_from_course_group(self):
         """
-        Tests removing user from course group (happy path).
-        """
+Tests removing user from course group (happy path).
+"""
         create_all_course_groups(self.creator, self.location)
 
         self.assertTrue(add_user_to_course_group(self.creator, self.staff, self.location, STAFF_ROLE_NAME))
@@ -170,8 +170,8 @@ class CourseGroupTest(TestCase):
 
     def test_remove_user_from_course_group_permission_denied(self):
         """
-        Verifies PermissionDenied if caller of remove_user_from_course_group is not instructor role.
-        """
+Verifies PermissionDenied if caller of remove_user_from_course_group is not instructor role.
+"""
         create_all_course_groups(self.creator, self.location)
         with self.assertRaises(PermissionDenied):
             remove_user_from_course_group(self.staff, self.staff, self.location, STAFF_ROLE_NAME)
@@ -200,3 +200,4 @@ class CourseGroupTest(TestCase):
         add_user_to_course_group(creator2, staff2, location2, STAFF_ROLE_NAME)
 
         self.assertSetEqual({self.creator, creator2}, get_users_with_instructor_role())
+
