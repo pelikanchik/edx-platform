@@ -159,9 +159,11 @@ def course_listing(request):
             course_loc.url_reverse('course/', ''),
             get_lms_link_for_item(course.location),
             course.display_org_with_default,
-            course.available_for_demo,
             course.display_number_with_default,
-            course.location.name
+            course.location.name,
+            course.available_for_demo,
+            course.show_in_lms,
+            course.has_dynamic_graph
         )
 
     return render_to_response('index.html', {

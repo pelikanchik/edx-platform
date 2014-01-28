@@ -153,6 +153,7 @@
 		.delete-button,
         .insert-button,
         .snapshot,
+        .duplicate-button,
         .insert-to-end-button {
 			float: left;
 			@include white-button;

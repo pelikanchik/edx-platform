@@ -94,15 +94,29 @@ def render_accordion(request, course, chapter, section, field_data_cache):
     """
 
     # grab the table of contents
+    staff_access = has_access(request.user, course, 'staff')
+    student_id = None
+    if student_id is None or student_id == request.user.id:
+        # always allowed to see your own profile
+        student = request.user
+    else:
+        # Requesting access to a different student's profile
+        if not staff_access:
+            raise Http404
+        student = User.objects.get(id=int(student_id))
+
+    student = User.objects.prefetch_related("groups").get(id=student.id)
     user = User.objects.prefetch_related("groups").get(id=request.user.id)
     request.user = user	# keep just one instance of User
     toc = toc_for_course(user, request, course, chapter, section, field_data_cache)
     is_demo = UserProfile.objects.get(user=request.user).is_demo
+    courseware_summary = grades.progress_summary(student, request, course)
 
     context = dict([('toc', toc),
                     ('course_id', course.id),
                     ('is_demo', is_demo),
                     ('csrf', csrf(request)['csrf_token']),
+                    ('courseware_summary', courseware_summary),
                     ('due_date_display_format', course.due_date_display_format)] + template_imports.items())
     return render_to_string('courseware/accordion.html', context)
 

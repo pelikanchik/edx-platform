@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import logging
 from functools import partial
 
@@ -91,7 +92,8 @@ def _asset_index(request, location):
         )
 
     asset_json = []
-    for asset in assets:
+    for asset in assets[0]:
+        print asset
         asset_id = asset['_id']
         asset_location = StaticContent.compute_location(asset_id['org'], asset_id['course'], asset_id['name'])
         # note, due to the schema change we may not have a 'thumbnail_location' in the result set

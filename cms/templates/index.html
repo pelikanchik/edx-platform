@@ -134,7 +134,7 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
       %if len(courses) > 0:
       <div class="courses">
         <ul class="list-courses">
-          %for course, url, lms_link, org, num, run, available_for_demo, show_in_lms, has_dynamic_graph, advanced_settings_link in sorted(courses, key=lambda s: s[7], reverse = True):
+          %for course, url, lms_link, org, num, run, available_for_demo, show_in_lms, has_dynamic_graph in sorted(courses, key=lambda s: s[7], reverse = True):
 
           <li class="course-item"
 
@@ -168,7 +168,7 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
               </li>
             </ul>
 
-            <div style="font-size:10px;"><a href = "${advanced_settings_link}">${_("Course preferences")}</a>
+            <div style="font-size:10px;">${_("Course preferences")}</a>
 
                   %if show_in_lms:
                      ${_("Course Shows")}

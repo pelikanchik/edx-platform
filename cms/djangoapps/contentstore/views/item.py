@@ -108,8 +108,16 @@ def xblock_handler(request, tag=None, package_id=None, branch=None, version_guid
                     log.debug("Unable to render studio_view for %r", component, exc_info=True)
                     content = render_to_string('html_error.html', {'message': str(exc)})
 
+                mod_class = component.__class__.__name__
+                current_module_class = 'other'
+                if "CapaDescriptor" in mod_class:
+                    current_module_class = 'problem'
+                if "VideoDescriptor" in mod_class:
+                    current_module_class = 'video'
+
                 return render_to_response('component.html', {
                     'preview': get_preview_html(request, component),
+                    'module_class': current_module_class,
                     'editor': content
                 })
         elif request.method == 'DELETE':
@@ -244,8 +252,12 @@ def _save_item(request, usage_loc, item_location, data=None, children=None, meta
 def _create_item(request):
     """View for create items."""
     parent_locator = BlockUsageLocator(request.json['parent_locator'])
+    print request.json
     parent_location = loc_mapper().translate_locator_to_location(parent_locator)
-    category = request.json['category']
+    try:
+        category = request.json['category']
+    except KeyError:
+        category = 'problem'
 
     display_name = request.json.get('display_name')
 

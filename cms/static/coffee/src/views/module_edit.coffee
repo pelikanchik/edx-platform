@@ -163,7 +163,6 @@ define ["backbone", "jquery", "underscore", "gettext", "xblock/runtime.v1",
     clickInsertButton: (event) ->
       event.preventDefault()
       vidtime = @$el.find('.vidtime')
-      vidtime = @$el.find('.vidtime')
       time_str = vidtime.html()
       cur_time_str = time_str.substr(0,time_str.indexOf('/')-1)
       duration_time_str = time_str.substr(time_str.indexOf('/')+2)
@@ -190,6 +189,7 @@ define ["backbone", "jquery", "underscore", "gettext", "xblock/runtime.v1",
       if hours_str.length == 1
         hours_str = "0" + hours_str
       time_format = hours_str + ":" + minutes_str + ":" + seconds_str
+      $(".video_control").click()
       new_component = document.getElementsByClassName('multiple-templates')
       for elem in new_component
         if elem.getAttribute('data-type') == 'problem'

@@ -170,6 +170,18 @@ class CapaFields(object):
         default=False,
         scope=Scope.settings
     )
+    problem_now = Boolean(
+        display_name="Show problem commonly or into video",
+        help="True - commonly. False - into video.",
+        scope=Scope.settings,
+        default=True
+    )
+    problem_time = String(
+        display_name="Time in video when student will see the problem",
+        help="Set time in HH:MM:SS format",
+        scope=Scope.settings,
+        default=None
+    )
 
 
 class CapaMixin(CapaFields):
@@ -545,6 +557,20 @@ class CapaMixin(CapaFields):
         else:
             check_button = False
 
+        show_return_to_video_button = True
+        problem_time_to_show = -1
+
+        if self.problem_now:
+            show_return_to_video_button = False
+        else:
+            hours = self.problem_time[0:2]
+            minutes = self.problem_time[3:5]
+            seconds = self.problem_time[6:8]
+            hours_int = int(hours)
+            minutes_int = int(minutes)
+            seconds_int = int(seconds)
+            problem_time_to_show = hours_int*3600+minutes_int*60+seconds_int
+
         content = {
             'name': self.display_name_with_default,
             'html': html,
@@ -560,6 +586,8 @@ class CapaMixin(CapaFields):
             'answer_available': self.answer_available(),
             'attempts_used': self.attempts,
             'attempts_allowed': self.max_attempts,
+            'problem_now': self.problem_now,
+            'problem_time': problem_time_to_show,
         }
 
         html = self.runtime.render_template('problem.html', context)

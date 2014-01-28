@@ -35,15 +35,14 @@
     $(".register").click(function(event) {
 
 
-       %if user.is_authenticated() and user.profile.is_demo and not course.available_for_demo:
+       % if user.is_authenticated() and user.profile.is_demo and not course.available_for_demo:
             location.href = "${reverse('register_user')}?course_id=${course.id}&enrollment_action=enroll";
-       %else:
+       % else:
             $("#class_enroll_form").submit();
        %endif
       event.preventDefault();
     });
 
-    % if settings.FEATURES.get('ENABLE_SHOPPING_CART') and settings.FEATURES.get('ENABLE_PAID_COURSE_REGISTRATION'):
     $(".demo").click(function(event) {
       $("#demo_register_form").submit();
       event.preventDefault();
@@ -56,7 +55,8 @@
       }
     });
 
-    % if settings.MITX_FEATURES.get('ENABLE_SHOPPING_CART') and settings.MITX_FEATURES.get('ENABLE_PAID_COURSE_REGISTRATION'):
+
+    % if settings.FEATURES.get('ENABLE_SHOPPING_CART') and settings.FEATURES.get('ENABLE_PAID_COURSE_REGISTRATION'):
       add_course_complete_handler = function(jqXHR, textStatus) {
         if (jqXHR.status == 200) {
           location.href = "${cart_link}";
@@ -266,10 +266,10 @@
                 <img src="${static.url('images/social/email-sharing.png')}" alt="Email someone to say you've registered for this course">
               </a>
             % else:
-              <% 
+              <%
                 site_domain = MicrositeConfiguration.get_microsite_configuration_value('site_domain', 'www.edx.org')
                 platform_name = MicrositeConfiguration.get_microsite_configuration_value('platform_name', 'edX')
-                
+
                 tweet_action = "http://twitter.com/intent/tweet?text=I+just+registered+for+"+course.number+"+"+get_course_about_section(course, 'title')+"+through+"+MicrositeConfiguration.get_microsite_configuration_value('course_about_twitter_account', '@edxonline')+":+http://"+site_domain+reverse('about_course', args=[course.id])
 
                 facebook_link = MicrositeConfiguration.get_microsite_configuration_value('course_about_facebook_link', 'http://www.facebook.com/EdxOnline')

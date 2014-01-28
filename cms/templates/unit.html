@@ -56,26 +56,288 @@ require(["domReady!", "jquery", "js/models/module_info", "coffee/src/views/unit"
       </div>
       <div class="main-column">
         <article class="unit-body window">
-        <p class="unit-name-input"><label  for="unit-display-name-input">${_("Display Name:")}</label><input type="text" value="${unit.display_name_with_default | h}" class="unit-display-name-input" /></p>
-          <ol class="components">
-            % for id, locator in components:
-            <li class="component" data-locator="${locator}" data-id="${id}" />
+          <p class="unit-name-input"><label>${_("Display Name:")}</label><input type="text" value="${unit.display_name_with_default | h}" class="unit-display-name-input" /></p>
+
+
+          % if context_course.has_dynamic_graph:
+          <label>${_("Direct Term")}</label>
+
+
+            <div id='termConstructor' class = 'termConstructor' style = "width: 100%;">
+                    <table class='termEditor' style = "width: 100%;">
+
+                        <tbody data-bind="foreach: disjunctions">
+                            <tr>
+
+                                <td rowspan = "2">
+                                    <div><img class = "close" src = '${static.url("img/Delete-icon.png")}' data-bind='click: $root.removeDisjunction'/></div>
+                                </td>
+                                <td>
+                                     ${_("Jump to")}
+                                     <select data-bind='value: direct_element_id, valueUpdate: "afterkeydown"'>
+
+                                         % for every_unit in subsection.get_children():
+                                                <option value="${every_unit.url_name}">${every_unit.display_name_with_default}</option>
+                                          % endfor
+
+                                     </select> ${_("if all of theese terms are done:")}
+
+                                </td>
+
+                            </tr>
+                            <tr>
+
+                                <td align = "center">
+                                    <table>
+
+                                        <tbody data-bind="foreach: conjunctions">
+                                            <tr>
+
+                                                <td>
+
+                                                <select data-bind='value: source_element_id, valueUpdate: "afterkeydown"'>
+
+                                                      % for every_unit in subsection.get_children():
+                                                            <option value="${every_unit.url_name}">${every_unit.display_name_with_default}</option>
+                                                       % endfor
+
+                                                </select>
+
+                                                </td>
+
+
+                                                <td>
+                                                    <select data-bind='value: field, valueUpdate: "afterkeydown"'>
+                                                        <option value="score_abs">${_("Score (absolute)")}</option>
+                                                        <option value="score_rel">${_("Score (relative, %)")}</option>
+                                                    </select>
+                                                </td>
+                                                <td>
+
+                                                    <select data-bind='value: sign, valueUpdate: "afterkeydown"'>
+                                                        <option value="more">&#62;</option>
+                                                        <option value="more-equals">&#8805;</option>
+                                                        <option value="equals">=</option>
+                                                        <option value="less-equals">&#8804;</option>
+                                                        <option value="less">&#60;</option>
+                                                    </select>
+
+                                                </td>
+                                                <td><input data-bind='value: value, valueUpdate: "afterkeydown"' class = "value" /></td>
+                                                <td style="vertical-align: middle"><img width="20" src = "${static.url('img/edit_remove.png')}" data-bind='click: $root.removeConjunction' class = "del" /></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                     <div style = "width:100%">
+                                         <img class = "add" src = '${static.url("img/plus_16.png")}' data-bind='click: $root.addConjunction' />
+                                     </div>
+
+
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                 <div style="width: 100%; padding:10px 0px ">
+                    <img class = "add" style="width:20px; margin: 3px;" src = '${static.url("img/plus_32.png")}' data-bind='click: addDisjunction' />
+                </div>
+                </div>
+
+                <input disabled data-bind='value: term_string' style="font-size: 10px; display:none;" type="text" class="unit-direct-term-input" />
+
+                  <p class="unit-term-input" style="text-align: center;"> <input type="button" class = "save-term" value = '${_("Save")}' style="width:200px;margin:auto 0;" /></p>
+
+          <script>
+            require(['jquery','knockout', 'knockout-mapping', 'numeric'], function($, ko, mapping, numeric) {
+
+                var input_json = '${unit.direct_term_with_default|h}'.replace(/\&#34;/g, '"');
+                //var dataFromDB = ko.utils.parseJson(unlock_term).disjunctions;
+                //var input_json = '[{"direct_element_id":"95bbd1de07d744e8a114f3a61c405c91","disjunctions":[{"conjunctions":[{"source_element_id":"95bbd1de07d744e8a114f3a61c405c91","field":"score_rel","sign":"less","value":"111"}]},{"conjunctions":[{"source_element_id":"95bbd1de07d744e8a114f3a61c405c91","field":"score_abs","sign":"more","value":"999"}]}]}]';
+                /*var initialData = [
+{
+direct_element_id: ko.observable(),
+conjunctions: [
+{ source_element_id: ko.observable(), field: "score_rel" , sign: "less" , value: "5" }]
+}
+];*/
+
+
+                // входная строка преобразуется из json в объект и приводим к виду, с которым работает конструктор
+                var input_structure = [];
+                var input_dict = $.parseJSON(input_json);
+                $.each(input_dict, function(){
+                   itself = this;
+                   var disjunctions = [];
+                   $.each(itself.disjunctions, function(){
+                        input_structure.push({
+                            direct_element_id:itself.direct_element_id,
+                            conjunctions:this.conjunctions
+                        });
+                   });
+                });
+
+                //var output_json = ko.toJSON(input_structure);
+                //console.log(output_json);
+
+                var DisjunctionsModel = function(disjunctions) {
+                    var self = this;
+
+                    self.disjunctions = mapping.fromJS(input_structure);
+
+                    self.addDisjunction = function() {
+                        self.disjunctions.push({
+                            direct_element_id: ko.observable(),
+                            conjunctions: ko.observableArray([{
+                                source_element_id: ko.observable(),
+                                field: ko.observable("score_abs"),
+                                sign: ko.observable("more"),
+                                value: ko.observable("0")
+                            }])
+                        });
+
+                        check_numeric();
+                        hovers();
+                    };
+
+                    self.removeDisjunction = function(disjunction) {
+                        self.disjunctions.remove(disjunction);
+
+                    };
+
+                    self.addConjunction = function(disjunction) {
+                        disjunction.conjunctions.push({
+                            source_element_id: ko.observable(),
+                            field: ko.observable("score_abs"),
+                            sign: ko.observable("more"),
+                            value: ko.observable("0")
+                        });
+                        check_numeric();
+                        hovers();
+                    };
+
+                    self.removeConjunction = function(conjunction) {
+                        $.each(self.disjunctions(), function() { this.conjunctions.remove(conjunction) })
+                    };
+
+                    // объект, полученный на выходе после работы конструктора, преобразуется обратно в канонический вид.
+
+                    self.term_string = ko.computed(function () {
+
+                        var output_json = ko.toJSON({disjunctions: self.disjunctions});
+                        var output_dict = jQuery.parseJSON(output_json).disjunctions;
+
+                        var elements = [];
+                        var elements_id = [];
+
+                        $.each(output_dict, function(){
+
+                            var disjunctions = [];
+
+                                   itself = this;
+                                   //element_id = itself.direct_element_id;
+
+                                   if ($.inArray(itself.direct_element_id,elements_id)==-1){
+
+                                       $.each(output_dict, function(){
+                                           if (itself.direct_element_id == this.direct_element_id){
+                                               disjunctions.push({conjunctions:this.conjunctions});
+                                           }
+                                       });
+
+
+                                       elements.push({
+                                           direct_element_id: itself.direct_element_id,
+                                           disjunctions:disjunctions
+                                       });
+
+
+                                       elements_id.push(itself.direct_element_id);
+
+                                   };
+                            }
+                        );
+                        var output_json = ko.toJSON(elements);
+
+                        return output_json;
+
+                    });
+
+                    function update(){
+                        self.lastSavedJson(JSON.stringify(ko.toJS({disjunctions: self.disjunctions}), null, 0));
+                    }
+                };
+
+                ko.applyBindings(new DisjunctionsModel());
+
+
+                function hovers(){
+                    $("img.close").hover(
+                        function () {
+                            $(this).parent().parent().parent().css("background-color","#fcc");
+                            $(this).parent().parent().parent().next().css("background-color","#fcc");
+                        },
+                        function () {
+                            $(this).parent().parent().parent().css("background-color","");
+                            $(this).parent().parent().parent().next().css("background-color","");
+                        }
+                    );
+
+
+                    $("img.del").hover(
+                        function () {
+                            $(this).parent().parent().css("background-color","#fcc");
+                        },
+                        function () {
+                            $(this).parent().parent().css("background-color","");
+                        }
+                    );
+
+                    $("img.add").hover(
+                        function () {
+                            $(this).parent().css("background-color","#cfc");
+                        },
+                        function () {
+                            $(this).parent().css("background-color","");
+                        }
+                    );
+                };
+
+                hovers();
+
+                function check_numeric(){
+                    $("input.value").numeric();
+                }
+
+                check_numeric();
+            });
+
+        </script>
+
+
+          % endif
+
+
+
+            <ol class="components">
+            % for locator in components:
+            <li class="component" data-locator="${locator}"/>
             % endfor
             <li class="new-component-item adding">
               <div class="new-component">
-                <h5>${_("Add New Component")}</h5>
+
+                  <h5>${_("Add New Component")}</h5>
                 <ul class="new-component-type">
                   % for type, templates in sorted(component_templates.items()):
                   <li>
                   % if type == 'advanced' or len(templates) > 1:
-                    <a href="#" class="multiple-templates" data-type="${type}">
+                    <a href="#" class="multiple-templates" data-type="${type}" style = "height:60px;">
                   % else:
                     % for __, category, __, __ in templates:
-                    <a href="#" class="single-template" data-type="${type}" data-category="${category}">
+                    <a href="#" class="single-template" data-type="${type}" data-category="${category}" style = "height:60px;">
                     % endfor
                   % endif
                       <span class="large-template-icon large-${type}-icon"></span>
-                      <span class="name">${type}</span>
+                      ##<span class="name">${type}</span>
                     </a>
                   </li>
                   % endfor
@@ -89,7 +351,7 @@ require(["domReady!", "jquery", "js/models/module_info", "coffee/src/views/unit"
                     <div class="tab-group tabs">
                             <ul class="problem-type-tabs nav-tabs">
                               <li class="current">
-                                <a class="link-tab" href="#tab1">${_("Common Problem Types")}</a>
+                               <a class="link-tab" href="#tab1">${_("Common Problem Types")}</a>
                               </li>
                               <li>
                                 <a class="link-tab" href="#tab2">${_("Advanced")}</a>
@@ -138,7 +400,7 @@ require(["domReady!", "jquery", "js/models/module_info", "coffee/src/views/unit"
                         </div>
                     </div>
                     % endif
-                    <a href="#" class="cancel-button">Cancel</a>
+                    <a href="#" class="cancel-button">${_("Cancel")}</a>
                 </div>
                 % endif
                 % endfor

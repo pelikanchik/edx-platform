@@ -1,17 +1,17 @@
 # -*- coding: utf-8 -*-
-#   Copyright (c) 2008 Mikeal Rogers
+# Copyright (c) 2008 Mikeal Rogers
 #
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-#       http://www.apache.org/licenses/LICENSE-2.0
+# http://www.apache.org/licenses/LICENSE-2.0
 #
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 from django.template import Context
 from django.http import HttpResponse
@@ -28,12 +28,12 @@ log = logging.getLogger(__name__)
 
 def marketing_link(name):
     """Returns the correct URL for a link to the marketing site
-    depending on if the marketing site is enabled
+depending on if the marketing site is enabled
 
-    Since the marketing site is enabled by a setting, we have two
-    possible URLs for certain links. This function is to decides
-    which URL should be provided.
-    """
+Since the marketing site is enabled by a setting, we have two
+possible URLs for certain links. This function is to decides
+which URL should be provided.
+"""
 
     # link_map maps URLs from the marketing site to the old equivalent on
     # the Django site
@@ -60,13 +60,13 @@ def marketing_link(name):
 
 def marketing_link_context_processor(request):
     """
-    A django context processor to give templates access to marketing URLs
+A django context processor to give templates access to marketing URLs
 
-    Returns a dict whose keys are the marketing link names usable with the
-    marketing_link method (e.g. 'ROOT', 'CONTACT', etc.) prefixed with
-    'MKTG_URL_' and whose values are the corresponding URLs as computed by the
-    marketing_link method.
-    """
+Returns a dict whose keys are the marketing link names usable with the
+marketing_link method (e.g. 'ROOT', 'CONTACT', etc.) prefixed with
+'MKTG_URL_' and whose values are the corresponding URLs as computed by the
+marketing_link method.
+"""
     return dict(
         [
             ("MKTG_URL_" + k, marketing_link(k))
@@ -107,9 +107,9 @@ def render_to_string(template_name, dictionary, context=None, namespace='main'):
 
 def render_to_response(template_name, dictionary=None, context_instance=None, namespace='main', **kwargs):
     """
-    Returns a HttpResponse whose content is filled with the result of calling
-    lookup.get_template(args[0]).render with the passed arguments.
-    """
+Returns a HttpResponse whose content is filled with the result of calling
+lookup.get_template(args[0]).render with the passed arguments.
+"""
 
     # see if there is an override template defined in the microsite
     template_name = MicrositeConfiguration.get_microsite_template_path(template_name)

@@ -217,3 +217,13 @@ class OrgInstructorRole(OrgRole):
     """An organization instructor"""
     def __init__(self, *args, **kwargs):
         super(OrgInstructorRole, self).__init__('instructor', *args, **kwargs)
+
+
+class CourseCreatorRole(GroupBasedRole):
+    """
+    This is the group of people who have permission to create new courses (we may want to eventually
+    make this an org based role).
+    """
+    ROLE = "course_creator_group"
+    def __init__(self, *args, **kwargs):
+        super(CourseCreatorRole, self).__init__(self.ROLE, *args, **kwargs)
