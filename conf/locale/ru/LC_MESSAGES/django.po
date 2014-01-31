@@ -3387,7 +3387,7 @@ msgstr "Подтверждение учетной записи"
 
 #: lms/templates/register-shib.html:159 lms/templates/register.html:248
 msgid "I agree to the {link_start}Terms of Service{link_end}"
-msgstr "Я согласен с {link_start}Условиями предоставления услуг{link_end}"
+msgstr "Я принимаю {link_start}пользовательское соглашение{link_end}"
 
 #: lms/templates/register-shib.html:175 lms/templates/register.html:264
 msgid "I agree to the {link_start}Honor Code{link_end}"
@@ -7080,7 +7080,8 @@ msgstr "Вставить задачу прямо сейчас"
 msgid "Insert problem at the end of video"
 msgstr "Вставить задачу в конец"
 
-
+msgid "Terms of Service"
+msgstr "Пользовательское соглашение"
 #django_partial.po
 
 
