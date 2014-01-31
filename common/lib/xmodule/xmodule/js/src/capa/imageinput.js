@@ -53,8 +53,5 @@ window.ImageInput = (function ($, undefined) {
 
         this.inputEl.val(result);
     }
-<<<<<<< HEAD
 }).call(this, window.jQuery);
-=======
-}).call(this, window.jQuery);
->>>>>>> 24be010... image input fix
+
