@@ -3369,7 +3369,7 @@ msgstr "Введите логин пользователя:"
 #: lms/templates/register-shib.html:122 lms/templates/register.html:135
 #: lms/templates/register.html:165
 msgid "example: JaneDoe"
-msgstr "пример: JaneDoe"
+msgstr "пример: TomBeatsJerry"
 
 #: lms/templates/register-shib.html:123 lms/templates/register.html:136
 #: lms/templates/register.html:166
@@ -3438,7 +3438,7 @@ msgstr "нельзя будет изменить позже"
 #: lms/templates/register.html:140
 #: lms/templates/verify_student/face_upload.html:310
 msgid "example: Jane Doe"
-msgstr "пример: Jane Doe"
+msgstr "пример: Иван Иванов"
 
 #: lms/templates/register.html:141 lms/templates/register.html:174
 msgid "Needed for any certificates you may earn"
