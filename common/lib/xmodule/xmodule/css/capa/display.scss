@@ -331,11 +331,13 @@ section.problem {
     p.answer {
       @include inline-block();
       margin-bottom: 0;
+      color: green;
+      font-weight: bold;
       margin-left: $baseline/2;
 
       &:before {
         display: inline;
-        content: "Answer: ";
+        content: " ";
         font-weight: bold;
 
       }
