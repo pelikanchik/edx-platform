@@ -131,6 +131,15 @@ msgstr "Связаться с техподдержкой"
 msgid "Files &amp; Uploads"
 msgstr "Файлы и Загрузки"
 
+#: cms/templates/asset_index.html:78
+msgid "Uploading…"
+msgstr "Загрузка..."
+
+#: cms/templates/asset_index.html:94 cms/templates/asset_index.html:183
+#: cms/templates/asset_index.html:200 cms/templates/import.html:41
+msgid "Choose File"
+msgstr "Выберите файл"
+
 #: cms/templates/asset_index.html:134 cms/templates/course_info.html:49
 #: cms/templates/edit-tabs.html:28 cms/templates/overview.html:118
 #: cms/templates/textbooks.html:57 cms/templates/widgets/header.html:28
@@ -147,6 +156,10 @@ msgstr "Действия на странице"
 #: cms/templates/asset_index.html:142 cms/templates/asset_index.html:192
 msgid "Upload New File"
 msgstr "Загрузить новый файл"
+
+#: cms/templates/asset_index.html:113
+msgid "Load Another File"
+msgstr "Загрузить другой файл"
 
 #: cms/templates/asset_index.html:153
 msgid "List of uploaded files and assets in this course"
@@ -173,43 +186,51 @@ msgstr "URL"
 msgid "Actions"
 msgstr "Действия"
 
-#: cms/templates/asset_index.html:178
-msgid "What files are included here?"
-msgstr "Какие файлы включены сюда?"
+#: cms/templates/asset_index.html:172
+msgid "What files are listed here?"
+msgstr "Какие файлы здесь отображены?"
 
-#: cms/templates/asset_index.html:179
+#: cms/templates/asset_index.html:173
 msgid ""
-"Any file you upload to the course will be listed here, including your course"
-" image, textbook chapters, and any files you add directly to this page."
-msgstr "Все файлы, которые вы относятся к данному курсу, будут отображаться здесь. Сюда входят изображение курса, главы учебников и любые файлы, которые вы добавляете непосредственно на эту страницу."
+"In addition to the files you upload on this page, any files that you add to "
+"the course appear in this list. These files include your course image, "
+"textbook chapters, and files that appear on your Course Handouts sidebar."
+msgstr "Кроме загруженных вами на эту страницу файлов, любые файлы, "
+"которые вы добавили в курс появятся в этом списке. Сюда входят изображение "
+"курса, главы учебников и файлы, которые появятся на боковой панели "
+"раздаточных материалов."
 
 #: cms/templates/asset_index.html:182
 msgid "What can I do on this page?"
 msgstr "Что я могу делать на этой странице?"
 
-#: cms/templates/asset_index.html:183
+#: cms/templates/asset_index.html:178
 msgid ""
-"You can click the file name to view or download the file, upload a new file,"
-" delete a file, and lock a file to prevent people who are not enrolled from "
-"accessing that specific file. You can also copy the location (URL) of a file"
-" to use elsewhere in your course."
-msgstr "Нажмите на имя файла, чтобы просмотреть или скачать файл. Вы можете загрузить новый файл, удалить файл или заблокировать его, чтобы закрыть доступ к нему для пользователей, не являющихся участниками курса. Вы также можете скопировать ссылку на файл (URL), чтобы использовать где-либо еще в Вашем курсе."
+"You can upload new files or view, download, or delete existing files. You "
+"can lock a file so that people who are not enrolled in your course cannot "
+"access that file."
+msgstr "Вы можете загрузить новые файлы или посмотреть, скачать, удалить "
+"существующие. Вы можете заблокировать файл, чтобы люди, которые не "
+"зарегистрированы на ваш курс не могли получить доступ к этому файлу."
 
-#: cms/templates/asset_index.html:190
+#: cms/templates/asset_index.html:179
+msgid ""
+"Use the URL listed for a file to create a link to that file in the Course "
+"Handouts sidebar or in the body of the course."
+msgstr "Используйте URL файла для создания ссылки на этот файл в панели "
+"Раздаточных Материалов в вашем курсе. "
+
+#: cms/templates/asset_index.html:187
 #: lms/templates/courseware/courseware.html:176
 #: lms/templates/verify_student/_modal_editname.html:32
 msgid "close"
 msgstr "закрыть"
 
-#: cms/templates/asset_index.html:203 cms/templates/import.html:41
-msgid "Choose File"
-msgstr "Выберите файл"
-
-#: cms/templates/asset_index.html:219
+#: cms/templates/asset_index.html:216
 msgid "Your file has been deleted."
 msgstr "Файл был удален."
 
-#: cms/templates/asset_index.html:224
+#: cms/templates/asset_index.html:221
 msgid "close alert"
 msgstr "закрыть уведомление"
 
@@ -227,22 +248,24 @@ msgid "Current Checklists"
 msgstr "Текущий курс"
 
 #: cms/templates/checklists.html:56
-msgid "What are checklists?"
+msgid "What are course checklists?"
 msgstr "Для чего нужен контроль процесса создания курса?"
 
 #: cms/templates/checklists.html:58
 msgid ""
-"Running a course on edX is a complex undertaking. Course checklists are "
-"designed to help you understand and keep track of all the steps necessary to"
-" get your course ready for students."
+"Course checklists are tools to help you understand and keep track of all the"
+" steps necessary to get your course ready for students."
 msgstr "Создание курса - это непросто. Список задач, приведенный здесь, поможет вам понять, что нужно сделать для того, чтобы подготовить и запустить курс."
 
 #: cms/templates/checklists.html:61
 msgid ""
-"These checklists are shared among your course team, and any changes you make"
-" are immediately visible to other members of the team and saved "
-"automatically."
+"Any changes you make to these checklists are saved automatically and are "
+"immediately visible to other course team members."
 msgstr "Этот список един для всей вашей команды. Любые изменения, внесенные вами, сохраняются автоматически и сразу же отобразятся у остальных членов команды."
+
+#: cms/templates/checklists.html:66
+msgid "Studio checklists"
+msgstr "Список задач Студии"
 
 #: cms/templates/component.html:10
 msgid "Editor"
@@ -303,48 +326,43 @@ msgstr "Создать новость"
 
 #: cms/templates/course_info.html:67
 msgid ""
-"Course updates are announcements or notifications you want to share with "
-"your class. Other course authors have used them for important exam/date "
-"reminders, change in schedules, and to call out any important steps students"
-" need to be aware of."
-msgstr "Новости или объявления, которые вы хотите опубликовать для студентов. Многие авторы используют этот раздел для указания дат экзаменов, оповещений об изменении в расписании или любых важных вещах, связанных с курсом."
+"Use course updates to notify students of important dates or exams, highlight particular discussions in the forums, announce schedule changes, and respond to student questions. You add or edit updates in HTML."
+msgstr "Используйте новости курса, чтобы объявить ученикам выжную информацию или информацию об экзаменах, выделить определнное обсуждение на форуме, объявить изменения в расписании, ответить на вопросы учеников. Вы добавляете и редактируете новости в HTML."
 
-#: cms/templates/edit-tabs.html:29 cms/templates/export.html:95
-#: cms/templates/static-pages.html:4 cms/templates/widgets/header.html:40
+#: cms/templates/edit-tabs.html:32 cms/templates/export.html:121
+#: cms/templates/widgets/header.html:56
 msgid "Static Pages"
-msgstr "Статические страницы"
+msgstr "Статичные страницы"
 
-#: cms/templates/edit-tabs.html:36
+#: cms/templates/edit-tabs.html:39
 msgid "New Page"
 msgstr "Новая страница"
 
-#: cms/templates/edit-tabs.html:46
+#: cms/templates/edit-tabs.html:49
 msgid ""
-"Static Pages are additional pages that supplement your Courseware. Other "
-"course authors have used them to share a syllabus, calendar, handouts, and "
-"more."
-msgstr "Статические страницы - это дополнительные страницы в курсе. На них может располагаться расписание курса, цели, требования и т.п."
+"Use Static Pages to share a syllabus, a calendar, handouts, or other "
+"supplements to your courseware."
+msgstr "Используйте Статические Страницы, чтобы делиться с учениками учебным планом, календарем, раздаточными материалами, или другими дополнениниями к вашему курсу."
 
-#: cms/templates/edit-tabs.html:50
-msgid "How do Static Pages look to students in my course?"
-msgstr "Где студенты могут увидеть статические страницы?"
-
-
-#: cms/templates/edit-tabs.html:78
-msgid "How Static Pages are Used in Your Course"
-msgstr "Как статические страницы используются в вашем курсе:"
-
-#: cms/templates/edit-tabs.html:80
-msgid "Preview of how Static Pages are used in your course"
-msgstr "Предварительный просмотр статических страниц, используемых в вашем курсе"
+#: cms/templates/edit-tabs.html:53
+msgid "What do static pages look like in my course?"
+msgstr "Как статические страницы выглядят в моем курсе?"
 
 #: cms/templates/edit-tabs.html:81
-msgid ""
-"These pages will be presented in your course's main navigation alongside "
-"Courseware, Course Info, Discussion, etc."
-msgstr "Эти страницы будут расположены на главной панели навигации вашего курса, вместе с информацией о курсе, форуме, wiki-страницей курса и т.д."
+msgid "Static Pages in Your Course"
+msgstr "Статические Страницы в Вашекм Курсе "
 
-#: cms/templates/edit-tabs.html:86 cms/templates/howitworks.html:161
+#: cms/templates/edit-tabs.html:82
+msgid "Preview of Static Pages in your course"
+msgstr "Предварительный просмотр Статических Страницы в вашем курсе"
+
+#: cms/templates/edit-tabs.html:84
+msgid ""
+"The names of your Static Pages appear in your course's main navigation bar, "
+"along with Courseware, Course Info, Discussion, Wiki, and Progress."
+msgstr "Названия ваших Статических Страниц появятся на главной навигационной панели вашего курса вместе с Содержанием, Информацией о курсе, Вики и Оценками."
+
+#: cms/templates/edit-tabs.html:89 cms/templates/howitworks.html:161
 #: cms/templates/howitworks.html:174 cms/templates/howitworks.html:187
 msgid "close modal"
 msgstr "закрыть форму"
@@ -475,15 +493,30 @@ msgstr "Экспортировать курс"
 msgid "About Exporting Courses"
 msgstr "Об экспорте курсов"
 
-#: cms/templates/export.html:89
+#. Translators: ".tar.gz" is a file extension, and should not be translated
+#: cms/templates/export.html:97
 msgid ""
-"When exporting your course, you will receive a .tar.gz formatted file that "
-"contains the following course data:"
-msgstr "При экспорте курса вы получите файл в формате .tar.gz, который содержит следующие данные курса:"
+"You can export courses and edit them outside of Studio. The exported file is"
+" a .tar.gz file (that is, a .tar file compressed with GNU Zip) that contains"
+" the course structure and content. You can also re-import courses that "
+"you've exported."
+msgstr "Вы можете экспортировать и редактировать курс вне Студии. Экпортированный файл - это .tar.gz файл (.tar файл сжатый с помощью GNU Zip), который содержит структуру и контент курса. Также вы можете импортировать курсы, которые вы экспортировали."
 
-#: cms/templates/export.html:92
-msgid "Course Structure (Sections and sub-section ordering)"
-msgstr "Структура курса (разделы и подразделы)"
+#: cms/templates/export.html:102
+msgid "Export My Course Content"
+msgstr "Экспортировать Контент Моего Курса"
+
+#: cms/templates/export.html:108
+msgid "Export Course Content"
+msgstr "Экспортировать Контент Курса"
+
+#: cms/templates/export.html:118
+msgid "Course Content (all Sections, Sub-sections, and Units)"
+msgstr "Контент курса (все Разделы, Подразделы и Элементы Подразделов)"
+
+#: cms/templates/export.html:119
+msgid "Course Structure"
+msgstr "Структура курса"
 
 #: cms/templates/export.html:93
 msgid "Individual Units"
@@ -497,20 +530,65 @@ msgstr "Отдельные задачи"
 msgid "Course Assets"
 msgstr "Файлы, загрузки, учебники курса"
 
-#: cms/templates/export.html:99
+#: cms/templates/export.html:123
+msgid "Course Settings"
+msgstr "Настройки курса"
+
+#: cms/templates/export.html:128
+msgid "Data {em_start}not exported{em_end} with your course:"
+msgstr "Данные {em_start}неэкспортируемые{em_end} с вашим курсом"
+
+#: cms/templates/export.html:130
+msgid "User Data"
+msgstr "Данные Пользователя"
+
+#: cms/templates/export.html:131
+msgid "Course Team Data"
+msgstr "Данные Команды Курса"
+
+#: cms/templates/export.html:132
+msgid "Forum/discussion Data"
+msgstr "Форум/обсуждение Курса"
+
+#: cms/templates/export.html:133
+msgid "Certificates"
+msgstr "Сертификаты Участников"
+
+#: cms/templates/export.html:141
+msgid "Why export a course?"
+msgstr "Зачем экспортировать курс?"
+
+#: cms/templates/export.html:142
 msgid ""
-"Your course export <strong>will not include</strong>: student data, "
-"forum/discussion data, course settings, certificates, grading information, "
-"or user data."
-msgstr "В экспорт вашего курса <strong>не будет включено следующее</strong>: данные о студентах, форум/обсуждение курса, настройки курса, сертификаты участников, информация об оценках и данные пользователей."
+"You may want to edit the XML in your course directly, outside of Studio. You"
+" may want to create a backup copy of your course. Or, you may want to create"
+" a copy of your course that you can later import into another course "
+"instance and customize."
+msgstr "Если вы хотите редактировать XML вашего курса вне Студии. Если вы хотите создать резервную копию вашего курса. Или вы хотите создать копию вашего курса, чтобы затем импортировать его в другой."
 
-#: cms/templates/export.html:105
-msgid "Export Course:"
-msgstr "Экспорт курса:"
+#: cms/templates/export.html:146
+msgid "What content is exported?"
+msgstr "Что экспортируется?"
 
-#: cms/templates/export.html:109
-msgid "Download Files"
-msgstr "Скачать файлы"
+#: cms/templates/export.html:148
+msgid ""
+"Only the course content and structure (including sections, subsections, and "
+"units) are exported. Other data, including student data, grading "
+"information, discussion forum data, course settings, and course team "
+"information, is not exported."
+msgstr "Экспортируется только структура и контент курса (включая разделы, подразделы и элементы подраздела). Остальные данные, включая данные учеников, информацию об оценках, данные форума, настройки курса и информация о команде курса не будут экспортированы."
+
+#: cms/templates/export.html:152
+msgid "Opening the downloaded file"
+msgstr "Как открыть загруженный файл?"
+
+#. Translators: ".tar.gz" is a file extension, and should not be translated
+#: cms/templates/export.html:154
+msgid ""
+"Use an archive program to extract the data from the .tar.gz file. Extracted "
+"data includes the course.xml file, as well as subfolders that contain course"
+" content."
+msgstr "Для извлечения данных из файла .tar.gz используйте архиватор. Извлеченные данные включают в себя файл course.xml и директории с контентом курса."
 
 #: cms/templates/howitworks.html:8
 msgid "Welcome"
@@ -562,7 +640,7 @@ msgstr "Передумайте в любой момент"
 msgid ""
 "Draft your outline and build content anywhere. Simple drag and drop tools "
 "let your reorganize quickly."
-msgstr "Составьте черновик структуры курса и добавляйте материалы куда угодно. Можно легко поменять порядок содержимого через перетаскивание."
+msgstr "Составьте черновик структуры курса и добавляйте материалы куда угодно. Можно легко поменять порядок контента через перетаскивание."
 
 #: cms/templates/howitworks.html:57
 msgid "Go A Week Or A Semester At A Time"
@@ -714,22 +792,36 @@ msgstr "Импорт курса"
 msgid "You may import existing course structure and content into Studio."
 msgstr "Если у вас уже есть готовая структура курса и материалы, вы можете импортировать их через Студию."
 
+#: cms/templates/import.html:24
+msgid ""
+"Be sure you want to import a course before continuing. Content of the "
+"imported course replaces all the content of this course. {em_start}You "
+"cannot undo a course import{em_end}. We recommend that you first export the "
+"current course, so you have a backup copy of it."
+msgstr "Перед тем как продолжить, удостоверьтесь, что вы действительно хотите импортировать курс. Импортированная структура курса полностью заменит структуру данного, причем импорт нельзя отменить. Если вы это делаете впервые, то рекомендуем создать резервную копию этого курса."
+
+#: cms/templates/import.html:26
+msgid ""
+"The course that you import must be in a .tar.gz file (that is, a .tar file "
+"compressed with GNU Zip). This .tar.gz file must contain a course.xml file. "
+"It may also contain other files."
+msgstr "Курс, который вы импортируете должен быть в формате .tar.gz (это файл .tar сжатый с помощью GNU Zip). Этот файл .tar.gz должен содержать файл course.xml. Также он может содержать и другие файлы."
+
 #: cms/templates/import.html:27
 msgid ""
-"Importing is not something to take lightly as the course content you "
-"successfully upload will be integrated into your course content and cannot "
-"be reversed."
-msgstr "Импорт - достаточно сложный процесс. Импортированная структура курса будет встроена в уже существующую структуру, причем импорт нельзя отменить."
-
-#: cms/templates/import.html:28
-msgid ""
-"During the initial stages of the import process, please do not navigate away"
-" from this page."
-msgstr "Не покидайте эту страницу, пока проходят начальные стадии импорта"
+"The import process has five stages. During the first two stages, you must "
+"stay on this page. You can leave this page after the Unpacking stage has "
+"completed. We recommend, however, that you don't make important changes to "
+"your course until the import operation has completed."
+msgstr "Процесс импорта включает в себя пять стадий. Не покидайте эту страницу, пока проходят первые две стадии импорта. Вы можете покинуть эту страницу после завершения стадии распаковывания. Рекомендуем не делать важных изменений в курсе до конца операции импорта."
 
 #: cms/templates/import.html:37
-msgid "Select a File (.tar.gz format) to Replace Your Course Content"
-msgstr "Выберите файл (в формате .tar.gz), чтобы заменить содержимое Вашего курса"
+msgid "Select a .tar.gz File to Replace Your Course Content"
+msgstr "Выберите Файл (в формате .tar.gz), чтобы Заменить Контент Вашего Курса"
+
+#: cms/templates/import.html:39
+msgid "Choose a File to Import"
+msgstr "Выберите Файл для Импорта"
 
 #: cms/templates/import.html:45
 msgid "File Chosen:"
@@ -791,6 +883,41 @@ msgstr "Загруженный вами контент теперь интегр
 #: cms/templates/import.html:118
 msgid "View Updated Outline"
 msgstr "Показать обновлённый вид"
+
+#: cms/templates/import.html:128
+msgid "Why import a course?"
+msgstr "Зачем импортировать курс?"
+
+#: cms/templates/import.html:129
+msgid ""
+"You may want to run a new version of an existing course, or replace an "
+"existing course altogether. Or, you may have developed a course outside "
+"Studio."
+msgstr "Вы можете запустить новую версию уже существующего курса, или полностью заменить существующий курс. Также вы можете импортировать курс созданный не в Студии."
+
+#: cms/templates/import.html:133
+msgid "What content is imported?"
+msgstr "Что импортируется?"
+
+#: cms/templates/import.html:134
+msgid ""
+"Only the course content and structure (including sections, subsections, and "
+"units) are imported. Other data, including student data, grading "
+"information, discussion forum data, course settings, and course team "
+"information, remains the same as it was in the existing course."
+msgstr "Импортируется только контент курса и структура (включая разделы, подразделы и элементы подразделов). Другие данные, включая данные ученика, информацию об оценках, данные обсуждений, настройки курса и информация о команде курса, остаются от существующего курса."
+
+#: cms/templates/import.html:138
+msgid "Warning: Importing while a course is running"
+msgstr "Предупреждение: Импорт при запущенном курсе"
+
+#: cms/templates/import.html:139
+msgid ""
+"If you perform an import while your course is running, and you change the "
+"URL names (or url_name nodes) of any Problem components, the student data "
+"associated with those Problem components may be lost. This data includes "
+"students' problem scores."
+msgstr "Если вы выполняете импорт в запущенный курс и меняете URL (или url_name узлов) какой-либо задачи, данные ученика, относящиеся к этой задаче, могут быть потеряны. Эти данные включают в себя и баллы учеников."
 
 #: cms/templates/import.html:129
 msgid "Gzipped Tar Files (.tar.gz) Only"
@@ -1257,14 +1384,12 @@ msgid ""
 msgstr "Участники команды курса являются его соавторами. У них есть полный доступ ко всему содержимому курса и одинаковые права на редактирование. У администраторов есть права добавлять и удалять членов команды."
 
 #: cms/templates/manage_users.html:154
-msgid "Tranferring Ownership"
+msgid "Transferring Ownership"
 msgstr "Смена владельца курса"
 
 #: cms/templates/manage_users.html:155
 msgid ""
-"There must always be an Admin assigned to every course. To transfer your "
-"ownership of the course, add Admin access to another user and request they "
-"remove you from the Course Team list."
+"Every course must have an Admin. If you're the Admin and you want transfer ownership of the course, click Add admin access to make another user the Admin, then ask that user to remove you from the Course Team list."
 msgstr "В каждом курсе всегда должен быть администратор. Для передачи кому-либо прав владения курсом назначьте другого администратора и попросите удалить себя из списка участников."
 
 #: cms/templates/overview.html:8 cms/templates/overview.html:119
@@ -1392,7 +1517,7 @@ msgid "Course Schedule"
 msgstr "Расписание курса"
 
 #: cms/templates/settings.html:113
-msgid "Dates that control when your course can be viewed."
+msgid "Dates that control when your course can be viewed"
 msgstr "Даты, определяющие, когда ваш курс станет доступным для просмотра"
 
 #: cms/templates/settings.html:119
@@ -1485,7 +1610,7 @@ msgid "Course Image"
 msgstr "Изображение"
 
 #: cms/templates/settings.html:215
-msgid "You can manage this image along with all of your other"
+msgid "You can manage this image along with all of your other <a href='{}'>files &amp; uploads</a>"
 msgstr "Вы можете выбрать изображение, которое будет отображаться на странице курса."
 
 #: cms/templates/settings.html:215
@@ -1538,21 +1663,22 @@ msgstr "Общее время курса в часах"
 
 #: cms/templates/settings.html:277 cms/templates/settings_advanced.html:81
 #: cms/templates/settings_graders.html:127
-msgid "How will these settings be used?"
+msgid "How are these settings used?"
 msgstr "Как эти параметры будут использоваться?"
 
 #: cms/templates/settings.html:278
 msgid ""
-"Your course's schedule settings determine when students can enroll in and "
-"begin a course."
-msgstr "Настройки расписания вашего курса определяют, когда студенты смогут зарегистрироваться и начать прохождение курса."
+"Your course's schedule determines when students can enroll in and begin a "
+"course."
+msgstr "Настройки расписания вашего курса определяют, когда ученики смогут зарегистрироваться и начать прохождение курса."
 
 #: cms/templates/settings.html:280
 msgid ""
-"Additionally, details provided on this page are also used in edX's catalog "
-"of courses, which new and returning students use to choose new courses to "
-"study."
-msgstr "Кроме того, данные, указанные на этой странице, отображаются в общем списке курсов. Этот список используется студентами для выбора новых курсов."
+"Other information from this page appears on the About page for your course. "
+"This information includes the course overview, course image, introduction "
+"video, and estimated time requirements. Students use About pages to choose "
+"new courses to take."
+msgstr "Кроме того, данные, указанные на этой странице, отображаются в общем списке курсов. Этот список используется учениками для выбора новых курсов."
 
 #: cms/templates/settings.html:287 cms/templates/settings_advanced.html:91
 #: cms/templates/settings_graders.html:137
@@ -1919,17 +2045,28 @@ msgstr "Категории и метки для любых оцениваемы�
 msgid "New Assignment Type"
 msgstr "Новая форма контроля"
 
-#: cms/templates/settings_graders.html:128
+#: cms/templates/settings_graders.html:131
 msgid ""
-"Your grading settings will be used to calculate students grades and "
-"performance."
-msgstr "Ваши настройки оценивания будут использоваться для расчета отметок студентов и оценки того, насколько успешно они проходят курсы."
+"You can use the slider under Overall Grade Range to specify whether your "
+"course is pass/fail or graded by letter, and to establish the thresholds for"
+" each grade."
+msgstr "При помощи ползунка под заголовком 'Общие пределы оценок' Вы можете определить "
+"тип оценивания вашего курса: pass/fail или оценка в виде буквы, и настроить "
+"границы для каждой оценки."
 
-#: cms/templates/settings_graders.html:130
+#: cms/templates/settings_graders.html:133
 msgid ""
-"Overall grade range will be used in students' final grades, which are "
-"calculated by the weighting you determine for each custom assignment type."
-msgstr "Общая шкала будет использоваться для выставления итоговых оценок студентов. Они рассчитываются с помощью весовых коэффициентов, которые вы можете указать для каждого типа заданий."
+"You can specify whether your course offers students a grace period for late "
+"assignments."
+msgstr "Вы можете настроить, есть ли у курса грейс-период для срока поздней сдачи задания."
+
+#: cms/templates/settings_graders.html:134
+msgid ""
+"You can also create assignment types, such as homework, labs, quizzes, and "
+"exams, and specify how much of a student's grade each assignment type is "
+"worth."
+msgstr "Вы можете создавать типы заданий, например, домашнее задание, лабораторная работа, "
+"контрольная работа, экзамен, и определять сколько стоит каждый тип заданий. "
 
 #: cms/templates/signup.html:5 cms/templates/widgets/header.html:156
 #: lms/templates/index.html:25
@@ -8156,3 +8293,202 @@ msgstr "ревизии"
 #: lms/templates/wiki/plugins/attachments/index.html:130
 msgid "There are no attachments for this article."
 msgstr "Нет приложений для этой статьи."
+
+#: cms/djangoapps/contentstore/features/checklists.py:28
+#: common/lib/xmodule/xmodule/course_module.py:237
+msgid "Getting Started With Studio"
+msgstr "Приступая к работе со Студией"
+
+#: common/lib/xmodule/xmodule/course_module.py:238
+msgid "Add Course Team Members"
+msgstr "Добавить Членов Команды"
+
+#: common/lib/xmodule/xmodule/course_module.py:239
+msgid "Grant your collaborators permission to edit your course so you can work together."
+msgstr "Предоставьте вашим соавторам доступ к редактированию вашего курса, чтобы работать вместе."
+
+#: common/lib/xmodule/xmodule/course_module.py:242
+msgid "Edit Course Team"
+msgstr "Редактировать Команду Курса"
+
+#: common/lib/xmodule/xmodule/course_module.py:244
+msgid "Set Important Dates for Your Course"
+msgstr "Установить Важные Даты для Вашего Курса"
+
+#: common/lib/xmodule/xmodule/course_module.py:245
+msgid "Establish your course's student enrollment and launch dates on the Schedule and Details page."
+msgstr "На странице Расписание и Детали установите даты регистрации и начала курса для ваших учеников."
+
+#: common/lib/xmodule/xmodule/course_module.py:248
+msgid "Edit Course Details &amp; Schedule"
+msgstr "Редактировать Расписание и Детали"
+
+#: common/lib/xmodule/xmodule/course_module.py:250
+msgid "Draft Your Course's Grading Policy"
+msgstr "Черновик Ваших Правил Оценивания Курса"
+
+#: common/lib/xmodule/xmodule/course_module.py:251
+msgid "Set up your assignment types and grading policy even if you haven't created all your assignments."
+msgstr "Установите типы заданий и правила оценивания, даже если вы еще не создали все задания."
+
+#: common/lib/xmodule/xmodule/course_module.py:254
+msgid "Edit Grading Settings"
+msgstr "Редактировать Оценивание"
+
+#: common/lib/xmodule/xmodule/course_module.py:256
+msgid "Explore the Other Studio Checklists"
+msgstr "Изучить Другие Списки Контроля Студии"
+
+#: common/lib/xmodule/xmodule/course_module.py:257
+msgid "Discover other available course authoring tools, and find help when you need it."
+msgstr "Откройте другие доступные инструменты создания курса и читайте справку, когда вы в ней нуждаетесь."
+
+#: cms/djangoapps/contentstore/features/checklists.py:29
+#: common/lib/xmodule/xmodule/course_module.py:262
+msgid "Draft a Rough Course Outline"
+msgstr "Черновик Структуры Курса"
+
+#: common/lib/xmodule/xmodule/course_module.py:263
+msgid "Create Your First Section and Subsection"
+msgstr "Создайте Ваш Первый Раздел и Подраздел"
+
+#: common/lib/xmodule/xmodule/course_module.py:264
+msgid "Use your course outline to build your first Section and Subsection."
+msgstr "Используйте структуру вашего курса для создания вашего Первого Раздела и Подраздела."
+
+#: common/lib/xmodule/xmodule/course_module.py:267
+msgid "Edit Course Outline"
+msgstr "Редактировать Структуру Курса"
+
+#: common/lib/xmodule/xmodule/course_module.py:269
+msgid "Set Section Release Dates"
+msgstr "Установите Дату Начала для Раздела"
+
+#: common/lib/xmodule/xmodule/course_module.py:270
+msgid "Specify the release dates for each Section in your course. Sections become visible to students on their release dates."
+msgstr "Определите дату начала для каждого Раздела в вашем курсе. В этот день Раздел станет видимым для учеников."
+
+#: common/lib/xmodule/xmodule/course_module.py:275
+msgid "Designate a Subsection as Graded"
+msgstr "Сделайте Раздел Оцениваемым"
+
+#: common/lib/xmodule/xmodule/course_module.py:276
+msgid "Set a Subsection to be graded as a specific assignment type. Assignments within graded Subsections count toward a student's final grade."
+msgstr "Установите тип оценивания Раздела как у задания определенного типа. Задания из оцениваемых Разделов идут в итоговую оценку ученика."
+
+#: common/lib/xmodule/xmodule/course_module.py:281
+msgid "Reordering Course Content"
+msgstr "Упорядочите Контент Курса"
+
+#: common/lib/xmodule/xmodule/course_module.py:282
+msgid "Use drag and drop to reorder the content in your course."
+msgstr "Используйте интерфейс 'drag and drop' для упорядочивания контента вашего курса."
+
+#: common/lib/xmodule/xmodule/course_module.py:287
+msgid "Renaming Sections"
+msgstr "Переименование Разделов"
+
+#: common/lib/xmodule/xmodule/course_module.py:288
+msgid "Rename Sections by clicking the Section name from the Course Outline."
+msgstr "Переименуйте Разделы кликом по имени Раздела в Структуре Курса"
+
+#: common/lib/xmodule/xmodule/course_module.py:293
+msgid "Deleting Course Content"
+msgstr "Удаление Контента Курса"
+
+#: common/lib/xmodule/xmodule/course_module.py:294
+msgid "Delete Sections, Subsections, or Units you don't need anymore. Be careful, as there is no Undo function."
+msgstr "Удалите Разделы, Подразделы или Элементы Подраздела, которые вам больше не нужны. Будьте осторожны, удаленные разделы нельзя восстановить."
+
+#: common/lib/xmodule/xmodule/course_module.py:299
+msgid "Add an Instructor-Only Section to Your Outline"
+msgstr "Добавить в Структуру Раздел Только для Преподавателя"
+
+#: common/lib/xmodule/xmodule/course_module.py:300
+msgid "Some course authors find using a section for unsorted, in-progress work useful. To do this, create a section and set the release date to the distant future."
+msgstr "Некоторым авторам курсов удобно использовать какой-то раздел для хранения черновых элементов курса. Для этого создайте раздел и установите дату начала на далекое будущее."
+
+#: cms/djangoapps/contentstore/features/checklists.py:30
+#: common/lib/xmodule/xmodule/course_module.py:305
+msgid "Explore edX's Support Tools"
+msgstr "Изучить Инструменты Поддержки"
+
+#: common/lib/xmodule/xmodule/course_module.py:306
+msgid "Explore the Studio Help Forum"
+msgstr "Изучить Центр Поддержки Студии"
+
+#: common/lib/xmodule/xmodule/course_module.py:307
+msgid "Access the Studio Help forum from the menu that appears when you click your user name in the top right corner of Studio."
+msgstr "Доступ к Центру Поддержки Студии можно получить из меню Помощь в правом верхнем углу Студии."
+
+#: common/lib/xmodule/xmodule/course_module.py:310
+msgid "Visit Studio Help"
+msgstr "Перейти к Центру Поддержки Студии"
+
+#: common/lib/xmodule/xmodule/course_module.py:312
+msgid "Enroll in edX 101"
+msgstr "Зарегистрируйтесь на edX 101"
+
+#: common/lib/xmodule/xmodule/course_module.py:313
+msgid "Register for edX 101, edX's primer for course creation."
+msgstr "Зарегистрируйтесь на курс edX 101, это курс по созданию курсов для начинающих авторов."
+
+#: common/lib/xmodule/xmodule/course_module.py:316
+msgid "Register for edX 101"
+msgstr "Зарегистрироваться на edX 101"
+
+#: common/lib/xmodule/xmodule/course_module.py:318
+msgid "Download the Studio Documentation"
+msgstr "Загрузите Документацию к Студии"
+
+#: common/lib/xmodule/xmodule/course_module.py:319
+msgid "Download the searchable Studio reference documentation in PDF form."
+msgstr "Загрузите документацию к Студии в формате PDF, по которой возможен поиск."
+
+#: common/lib/xmodule/xmodule/course_module.py:322
+msgid "Download Documentation"
+msgstr "Загрузить Документацию"
+
+#: cms/djangoapps/contentstore/features/checklists.py:31
+#: common/lib/xmodule/xmodule/course_module.py:324
+msgid "Draft Your Course About Page"
+msgstr "Черновик страницы о курсе"
+
+#: common/lib/xmodule/xmodule/course_module.py:325
+msgid "Draft a Course Description"
+msgstr "Черновик Описания Курса"
+
+#: common/lib/xmodule/xmodule/course_module.py:326
+msgid "Courses on edX have an About page that includes a course video, description, and more. Draft the text students will read before deciding to enroll in your course."
+msgstr "Курсы на edX содержат страницу О курсе, которая содержит видео, описание, и т.д. Введите текст, который ученики увидят перед регистрацией на ваш курс."
+
+#: common/lib/xmodule/xmodule/course_module.py:329
+#: common/lib/xmodule/xmodule/course_module.py:335
+#: common/lib/xmodule/xmodule/course_module.py:341
+#: common/lib/xmodule/xmodule/course_module.py:347
+msgid "Edit Course Schedule &amp; Details"
+msgstr "Редактировать Расписание и Детали"
+
+#: common/lib/xmodule/xmodule/course_module.py:331
+msgid "Add Staff Bios"
+msgstr "Добавить Биографии Членов Команды Курса"
+
+#: common/lib/xmodule/xmodule/course_module.py:332
+msgid "Showing prospective students who their instructor will be is helpful. Include staff bios on the course About page."
+msgstr "Знакомство будущих учеников с их преподавателями будет полезно. Добавьте биографии членов команды курса на страницу О курсе."
+
+#: common/lib/xmodule/xmodule/course_module.py:337
+msgid "Add Course FAQs"
+msgstr "Добавить Инструкции к Курсу"
+
+#: common/lib/xmodule/xmodule/course_module.py:338
+msgid "Include a short list of frequently asked questions about your course."
+msgstr "Включает короткий список часто задаваемых вопросов о вашем курсе."
+
+#: common/lib/xmodule/xmodule/course_module.py:343
+msgid "Add Course Prerequisites"
+msgstr "Добавить Необходимые Требования"
+
+#: common/lib/xmodule/xmodule/course_module.py:344
+msgid "Let students know what knowledge and/or skills they should have before they enroll in your course."
+msgstr "Объявите ученикам какие знания и/или навыки необходимы перед регистрацией на ваш курс."
