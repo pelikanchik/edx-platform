@@ -7140,10 +7140,52 @@ msgstr "Чтобы приступить к занятиям, перейдите 
 
 msgid "This email was automatically sent from {site_name} to "
 	"{full_name}"
-msgstr "Письмо было сгенерировано автоматически на сайте {site_name}"
+msgstr "Письмо было сгенерировано автоматически на сайте {site_name} для {full_name}"
 
 msgid "You have been enrolled in {course_name}"
 msgstr "Регистрация на курс {course_name}"
+
+
+#enroll_email_allowedmessage.txt
+
+
+msgid "Dear student,"
+msgstr "Здравствуйте,"
+
+msgid "You have been invited to join {course_name} at {site_name} by a "
+"member of the course staff."
+msgstr "Вы были зарегистрированы на курс {course_name} на {site_name} администратором."
+
+msgid "To access the course visit {course_url} and login."
+msgstr "Для получения доступа к курсу перейдите на страницу: {course_url} и авторизуйтесь."
+
+msgid "To access the course visit {course_about_url} and register for the course."
+msgstr "Для получения доступа к курсу перейдите на страницу: {course_url} и зарегистрируйтесь на курс."
+
+msgid "To finish your registration, please visit {registration_url} and fill "
+"out the registration form making sure to use {email_address} in the E-mail field."
+msgstr "Для завершения регистрации, пожалуйста, перейдите на страницу: {registration_url} и "
+"заполните регистрационную форму, убедитесь, что в поле E-mail указано {email_address}."
+
+msgid "Once you have registered and activated your account, you will see "
+"{course_name} listed on your dashboard."
+msgstr "Как только вы зарегистрируетесь и активируете свой аккаунт, вы увидите "
+"{course_name} на панели ваших курсов."
+
+msgid "Once you have registered and activated your account, visit {course_about_url} "
+"to join the course."
+msgstr "Как только вы зарегистрируетесь и активируете свой аккаунт, перейдите на страницу: "
+"{course_about_url}, чтобы зарегистрироваться на курс."
+
+msgid "This email was automatically sent from {site_name} to {email_address}"
+msgstr "Письмо было сгенерировано автоматически на сайте {site_name} для {email_address}"
+
+
+#enroll_email_allowedsubject.txt
+
+
+msgid "You have been invited to register for {course_name}"
+msgstr "Вы были приглашены зарегистрироваться на {course_name}"
 
 #User Info
 
