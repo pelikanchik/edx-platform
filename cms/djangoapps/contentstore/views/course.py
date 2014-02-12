@@ -163,7 +163,8 @@ def course_listing(request):
             course.location.name,
             course.available_for_demo,
             course.show_in_lms,
-            course.has_dynamic_graph
+            course.has_dynamic_graph,
+            reverse('course_advanced_settings', kwargs={'org' : course.org, 'course' : course.location.course, 'name': course.location.name}),
         )
 
     return render_to_response('index.html', {

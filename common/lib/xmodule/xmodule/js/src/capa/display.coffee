@@ -218,6 +218,10 @@ class @Problem
     if $('input:file').length == 0
       @check()
       return
+    else
+      if $('input:file')[0].accept == ".srt"
+        @check()
+        return
 
     if not window.FormData
       alert "Submission aborted! Sorry, your browser does not support file uploads. If you can, please use Chrome or Safari which have been verified to support file uploads."
@@ -291,13 +295,14 @@ class @Problem
       @check_internal()
 
   check_internal: =>
+
     Logger.log 'problem_check', @answers
 
     if( responsesBeingProcessedCount == 0)
       $('.check-all').html(gettext('Wait...')).addClass('check-all-disabled')
 
-    $("#" + @element_id + " .check").val(gettext('Wait...')).prop('disabled', true);
-    responsesBeingProcessedCount++;
+    $("#" + @element_id + " .check").val(gettext('Wait...')).prop('disabled', true)
+    responsesBeingProcessedCount++
 
 
     # Segment.io
@@ -317,7 +322,7 @@ class @Problem
       $("#" + @element_id + " .check").val(gettext('Check')).prop('disabled', false)
       responsesBeingProcessedCount--
       if( responsesBeingProcessedCount == 0)
-        $('.check-all').html(gettext('Check all')).removeClass('check-all-disabled');
+        $('.check-all').html(gettext('Check all')).removeClass('check-all-disabled')
 
       Logger.log 'problem_graded', [@answers, response.contents], @id
 

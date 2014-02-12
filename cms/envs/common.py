@@ -51,7 +51,7 @@ FEATURES = {
     'STUDIO_NPS_SURVEY': True,
 
     # Segment.io - must explicitly turn it on for production
-    'SEGMENT_IO': False,
+    'SEGMENT_IO': True,
 
     # Enable URL that shows information about the status of various services
     'ENABLE_SERVICE_STATUS': False,
@@ -198,7 +198,7 @@ import monitoring.exceptions  # noqa
 
 ############################ DJANGO_BUILTINS ################################
 # Change DEBUG/TEMPLATE_DEBUG in your environment settings files, not here
-DEBUG = False
+DEBUG = True
 TEMPLATE_DEBUG = False
 
 # Site info

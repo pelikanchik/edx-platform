@@ -1004,10 +1004,10 @@ Used by form in signup_modal.html, which is included into navigation.html
         message = render_to_string('emails/activation_email.txt', d)
 
         # don't send email if we are doing load testing or random user generation for some reason
-        if not (settings.MITX_FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING')):
+        if not (settings.FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING')):
             try:
-                if settings.MITX_FEATURES.get('REROUTE_ACTIVATION_EMAIL'):
-                    dest_addr = settings.MITX_FEATURES['REROUTE_ACTIVATION_EMAIL']
+                if settings.FEATURES.get('REROUTE_ACTIVATION_EMAIL'):
+                    dest_addr = settings.FEATURES['REROUTE_ACTIVATION_EMAIL']
                     message = ("Activation for %s (%s): %s\n" % (user, user.email, profile.name) +
                                '-' * 80 + '\n\n' + message)
                     send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [dest_addr], fail_silently=False)

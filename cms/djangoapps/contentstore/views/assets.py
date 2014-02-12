@@ -101,6 +101,7 @@ def _asset_index(request, location):
         thumbnail_location = Location(_thumbnail_location) if _thumbnail_location is not None else None
 
         asset_locked = asset.get('locked', False)
+        print _get_asset_json(asset['displayname'], asset['uploadDate'], asset_location, thumbnail_location, asset_locked)
         asset_json.append(_get_asset_json(asset['displayname'], asset['uploadDate'], asset_location, thumbnail_location, asset_locked))
 
     return render_to_response('asset_index.html', {
@@ -136,6 +137,8 @@ def _upload_asset(request, location):
     upload_file = request.FILES['file']
     filename = upload_file.name
     mime_type = upload_file.content_type
+    print '\n\n\n\n\n'
+    print upload_file
 
     content_loc = StaticContent.compute_location(old_location.org, old_location.course, filename)
 
