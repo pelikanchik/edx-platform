@@ -63,7 +63,7 @@ msgstr "Да, удалить"
 
 #: cms/static/js/base.js:387 cms/static/js/views/course_info_update.js:147
 msgid "Deleting&hellip;"
-msgstr "Удаление&hellip;"
+msgstr "Удаление..."
 
 #: cms/static/js/base.js:403 cms/static/js/views/asset.js:67
 #: cms/static/js/views/course_info_update.js:165
@@ -102,7 +102,7 @@ msgstr "Обязательное поле."
 #: cms/static/js/views/course_info_update.js:81
 #: cms/static/js/views/overview.js:232
 msgid "Saving&hellip;"
-msgstr "Сохранение&hellip;"
+msgstr "Сохранение..."
 
 #: cms/static/js/base.js:851
 msgid "Will Release:"
