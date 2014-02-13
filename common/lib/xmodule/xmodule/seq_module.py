@@ -148,7 +148,9 @@ class SequenceModule(SequenceFields, XModule):
         return progress
 
     def handle_ajax(self, dispatch, data):  # TODO: bounds checking
-        ''' get = request.POST instance '''
+        '''
+        get = request.POST instance
+        '''
         if dispatch == 'dynamo':
             section = self
             cur_position = self.position
