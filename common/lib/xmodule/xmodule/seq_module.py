@@ -121,7 +121,8 @@ def elementary_conjunction(term, section):
 
 
 class SequenceModule(SequenceFields, XModule):
-    ''' Layout module which lays out content in a temporal sequence
+    '''
+    Layout module which lays out content in a temporal sequence
     '''
     js = {'coffee': [resource_string(__name__,
                                      'js/src/sequence/display.coffee')],
