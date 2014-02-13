@@ -138,7 +138,8 @@ class SequenceModule(SequenceFields, XModule):
             self.position = int(self.system.position)
 
     def get_progress(self):
-        ''' Return the total progress, adding total done and total available.
+        '''
+        Return the total progress, adding total done and total available.
         (assumes that each submodule uses the same "units" for progress.)
         '''
         # TODO: Cache progress or children array?
