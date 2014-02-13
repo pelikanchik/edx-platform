@@ -9,6 +9,8 @@ import traceback
 import struct
 import sys
 
+from django.utils.translation import ugettext as _
+
 from pkg_resources import resource_string
 
 from capa.capa_problem import LoncapaProblem, LoncapaSystem
@@ -374,7 +376,6 @@ class CapaMixin(CapaFields):
         """
         # The logic flow is a little odd so that _('xxx') strings can be found for
         # translation while also running _() just once for each string.
-        _ = self.runtime.service(self, "i18n").ugettext
         check = _('Check')
         final_check = _('Final Check')
 
