@@ -354,7 +354,7 @@ def instructor_dashboard(request, course_id):
             except Exception as err:
                 msg += '<br/><p>Error: {0}</p>'.format(escape(err))
 
-    if action == _u('Dump list of enrolled students' or action == 'List enrolled students'):
+    if action == _u('Dump list of enrolled students') or action == _u('List enrolled students'):
         log.debug(action)
         datatable = get_student_grade_summary_data(request, course, course_id, get_grades=False, use_offline=use_offline)
         datatable['title'] = 'List of students enrolled in {0}'.format(course_id)
