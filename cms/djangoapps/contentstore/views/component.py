@@ -125,6 +125,8 @@ def subsection_handler(request, tag=None, package_id=None, branch=None, version_
             if field.name not in ['display_name', 'start', 'due', 'format'] and field.scope == Scope.settings
         )
 
+        sections = modulestore().get_item(course.location, depth=3).get_children()
+
         can_view_live = False
         subsection_units = item.get_children()
         for unit in subsection_units:
@@ -150,6 +152,7 @@ def subsection_handler(request, tag=None, package_id=None, branch=None, version_
                 'locator': locator,
                 'policy_metadata': policy_metadata,
                 'subsection_units': subsection_units,
+                'sections': sections,
                 'can_view_live': can_view_live
             }
         )
