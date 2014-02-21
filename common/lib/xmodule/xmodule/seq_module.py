@@ -175,7 +175,7 @@ class SequenceModule(SequenceFields, XModule):
                             conjunctions_result = True
                             for conjunction in disjunction["conjunctions"]:
                                 conjunctions_result *= elementary_conjunction(conjunction, section)
-                            if conjunctions_result is True:
+                            if conjunctions_result == 1:
                                 new_position = 1
                                 for check_child in self.get_children():
                                     if term_result in check_child.id:
