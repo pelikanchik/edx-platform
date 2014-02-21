@@ -49,7 +49,6 @@ class VerticalModule(VerticalFields, XModule):
                 if not problem_now:
                     show_now = 'false'
             except AttributeError:
-                print "AttrError"
                 pass
 
             all_contents.append({

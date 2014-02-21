@@ -169,19 +169,17 @@ class SequenceModule(SequenceFields, XModule):
                                 new_position = 1
                                 for check_child in self.get_children():
                                     if term_result in check_child.id:
-
+                                        self.position = new_position
                                         return json.dumps({'position': new_position})
                                     new_position += 1
-
                             conjunctions_result = True
                             for conjunction in disjunction["conjunctions"]:
-
-                                conjunctions_result = conjunctions_result * elementary_conjunction(conjunction, section)
-
-                            if conjunctions_result == True:
+                                conjunctions_result *= elementary_conjunction(conjunction, section)
+                            if conjunctions_result is True:
                                 new_position = 1
                                 for check_child in self.get_children():
                                     if term_result in check_child.id:
+                                        self.position = new_position
                                         return json.dumps({'position': new_position})
                                     new_position += 1
                 pos += 1
