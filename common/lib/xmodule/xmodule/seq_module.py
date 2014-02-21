@@ -169,7 +169,7 @@ class SequenceModule(SequenceFields, XModule):
                                 new_position = 1
                                 for check_child in self.get_children():
                                     if term_result in check_child.id:
-
+                                        self.position = new_position
                                         return json.dumps({'position': new_position})
                                     new_position += 1
 
@@ -182,6 +182,7 @@ class SequenceModule(SequenceFields, XModule):
                                 new_position = 1
                                 for check_child in self.get_children():
                                     if term_result in check_child.id:
+                                        self.position = new_position
                                         return json.dumps({'position': new_position})
                                     new_position += 1
                 pos += 1
