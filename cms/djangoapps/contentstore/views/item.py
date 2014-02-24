@@ -95,11 +95,17 @@ def xblock_handler(request, tag=None, package_id=None, branch=None, version_guid
                 return JsonResponse(rsp)
             else:
                 component = modulestore().get_item(old_location)
+                print old_location
+                print component
                 # Wrap the generated fragment in the xmodule_editor div so that the javascript
                 # can bind to it correctly
                 component.runtime.wrappers.append(partial(wrap_xblock, handler_prefix))
+                print component.runtime.wrappers.append(partial(wrap_xblock, handler_prefix))
 
                 try:
+                    print component.render('studio_view')
+
+                    # /!\
                     content = component.render('studio_view').content
                 # catch exceptions indiscriminately, since after this point they escape the
                 # dungeon and surface as uneditable, unsaveable, and undeletable
