@@ -473,7 +473,7 @@ should never actually be user-visible.
             return HttpResponseBadRequest(_("Course id is invalid"))
 
         if not has_access(user, course, 'enroll'):
-            return HttpResponseBadRequest(_("Enrollment is closed"))
+            return HttpResponseBadRequest(_(course.enrollment_is_closed_msg))
 
         # If this course is available in multiple modes, redirect them to a page
         # where they can choose which mode they want.
