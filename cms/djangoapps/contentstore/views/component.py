@@ -31,6 +31,7 @@ from xblock.runtime import Mixologist
 
 __all__ = ['OPEN_ENDED_COMPONENT_TYPES',
            'ADVANCED_COMPONENT_POLICY_KEY',
+           'show_graph',
            'subsection_handler',
            'unit_handler'
            ]
@@ -62,10 +63,14 @@ def is_section_exist(section_id, sections):
     return False
 
 
-def show_graph(request, location):
+#@require_http_methods(("GET", "POST", "PUT"))
+#@ensure_csrf_cookie
+@login_required
+def show_graph(request, tag=None, package_id=None, branch=None, version_guid=None, block=None):
 
+    locator = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
     try:
-        item = modulestore().get_item(location, depth=1)
+        old_location, course, item, lms_link = _get_item_in_course(request, locator)
     except ItemNotFoundError:
         return HttpResponseBadRequest()
 
@@ -75,6 +80,7 @@ def show_graph(request, location):
 
     return render_to_response('graph.html',
                               {'subsection': item})
+
 
 
 @require_http_methods(["GET"])

@@ -9,7 +9,14 @@ admin.autodiscover()
 urlpatterns = patterns('',  # nopep8
 
     # graph
+    # old version:
+    # url(r'^graph/subsection/(?P<location>.*?)$', 'contentstore.views.show_graph', name='show_graph'),
+
+    # new version:
     #url(r'^graph/subsection/(?P<location>.*?)$', 'contentstore.views.show_graph', name='show_graph'),
+    #url(r'(?ix)^subsection($|/){}$'.format(parsers.URL_RE_SOURCE), 'subsection_handler'),
+    url(r'(?ix)^graph/subsection($|/){}$'.format(parsers.URL_RE_SOURCE),
+        'contentstore.views.show_graph', name='show_graph'),
 
     url(r'^transcripts/upload$', 'contentstore.views.upload_transcripts', name='upload_transcripts'),
     url(r'^transcripts/download$', 'contentstore.views.download_transcripts', name='download_transcripts'),
