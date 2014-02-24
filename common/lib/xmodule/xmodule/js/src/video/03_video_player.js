@@ -753,8 +753,7 @@ function (HTML5Video, Resizer) {
                 var index = $("#temp_index_problem").html();
                 if (index.length === 0)
                 {
-                  var return_to_video = document.getElementsByClassName("return-to-video");
-                  return_to_video[0].style.display = 'block';
+                  document.getElementsByClassName("return-to-video")[0].style.display = 'block';
                   var iframe = document.getElementById(this.id);
                   iframe.style.display = 'none';
                   var frame_problem = document.getElementById("frame_problem");
@@ -771,6 +770,13 @@ function (HTML5Video, Resizer) {
                   var problem_id = $("#vert-" + r).data('id').replace(/:\/\//,'-').replace(/\//g,'-');
                   $("#frame_problem").attr({'data-old-id': problem_id});
                   $("#problem_" + problem_id).appendTo("#frame_problem");
+                  var problem_action = document.getElementsByClassName("action")[0];
+                  console.log(problem_action)
+                  var video_controls = document.getElementsByClassName("video-controls")[0];
+                  console.log(video_controls);
+                  $('.show-label').text(gettext('Show/Hide Answer(s)'));
+                  $(problem_action).appendTo($(video_controls));
+                  //problem_action.style.display = 'none';
                 }
               }
             }

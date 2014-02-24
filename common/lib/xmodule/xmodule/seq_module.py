@@ -157,9 +157,11 @@ class SequenceModule(SequenceFields, XModule):
             section = self
             cur_position = self.position
             pos = 1
+            print cur_position
             for child in self.get_children():
                 if pos == cur_position:
                     term = json.loads(child.direct_term_with_default)
+                    print term
                     for element_term in term:
                         if not element_term["disjunctions"]:
                             return json.dumps({'position': cur_position})

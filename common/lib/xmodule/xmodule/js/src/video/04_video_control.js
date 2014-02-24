@@ -230,6 +230,14 @@ function () {
       vcr[0].style.display = 'block';
       var return_to_video = document.getElementsByClassName("return-to-video");
       return_to_video[0].style.display = 'none';
+
+      var problem_action = document.getElementsByClassName("action")[0];
+      console.log(problem_action);
+      var video_controls = document.getElementsByClassName("video-controls")[0];
+      console.log(video_controls);
+
+      //problem_action.style.display = 'block';
+
       var r = $("#temp_index_problem").html();
       $("#temp_index_problem").html("");
       var problem_id = $("#frame_problem").attr("data-old-id");
@@ -237,6 +245,8 @@ function () {
       var cur_class = cur_vert.find(".xmodule_display.xmodule_CapaModule");
       cur_class.html("");
       $("#problem_" + problem_id).appendTo(cur_class);
+      $(problem_action).appendTo($("#problem_" + problem_id));
+      $(video_controls).find('section').remove();
       $("#frame_problem").html("");
       this.videoPlayer.play();
     }

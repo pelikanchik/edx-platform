@@ -3317,6 +3317,10 @@ msgstr "Показать ответ"
 msgid "Hide Answer(s)"
 msgstr "Скрыть ответ"
 
+#martynov
+msgid "Show/Hide Answer(s)"
+msgstr "Показать/скрыть ответ"
+
 #: lms/templates/problem.html:27
 msgid "(for question(s) above - adjacent to each field)"
 msgstr "(для вопроса сверху - примыкают к каждому полю)"
