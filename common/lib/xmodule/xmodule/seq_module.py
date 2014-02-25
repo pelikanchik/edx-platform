@@ -183,6 +183,7 @@ class SequenceModule(SequenceFields, XModule):
                                         return json.dumps({'position': new_position})
                                     new_position += 1
                 pos += 1
+            return json.dumps({'position': cur_position})
         if dispatch == 'goto_position':
             self.position = int(data['position'])
             return json.dumps({'success': True})
