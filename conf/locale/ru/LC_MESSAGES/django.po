@@ -8173,3 +8173,7 @@ msgstr "ревизии"
 #: lms/templates/wiki/plugins/attachments/index.html:130
 msgid "There are no attachments for this article."
 msgstr "Нет приложений для этой статьи."
+
+#: lms/templates/dashboard.html:83
+msgid "Please verify your new email"
+msgstr "Пожалуйста, подтвердите ваш новый email"
