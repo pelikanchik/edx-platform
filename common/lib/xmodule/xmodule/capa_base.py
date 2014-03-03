@@ -172,6 +172,15 @@ class CapaFields(object):
         default=False,
         scope=Scope.settings
     )
+    checkanswer = Integer(
+        display_name="Is answer correct",
+        help=("Is it possible to check correctness of answer"),
+        values=[
+            {"display_name": "Yes", "value": 1},
+            {"display_name": "No", "value": 0}],
+        scope = Scope.settings,
+        default=1
+    )
     problem_now = Boolean(
         display_name="Show problem commonly or into video",
         help="True - commonly. False - into video.",
@@ -549,6 +558,10 @@ class CapaMixin(CapaFields):
         # then generate an error message instead.
         except Exception as err:  # pylint: disable=broad-except
             html = self.handle_problem_html_error(err)
+
+        if self.checkanswer == 0:
+            html = html.replace("incorrect", "not_known")
+            html = html.replace("correct", "not_known")
 
         # The convention is to pass the name of the check button
         # if we want to show a check button, and False otherwise

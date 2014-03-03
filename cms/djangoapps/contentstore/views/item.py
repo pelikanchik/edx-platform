@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """Views for items (modules)."""
 
 import logging
@@ -95,7 +96,7 @@ def xblock_handler(request, tag=None, package_id=None, branch=None, version_guid
                 return JsonResponse(rsp)
             else:
                 component = modulestore().get_item(old_location)
-                # Wrap the generated fragment in the xmodule_editor div so that the javascript
+                 # Wrap the generated fragment in the xmodule_editor div so that the javascript
                 # can bind to it correctly
                 component.runtime.wrappers.append(partial(wrap_xblock, handler_prefix))
 
@@ -252,7 +253,6 @@ def _save_item(request, usage_loc, item_location, data=None, children=None, meta
 def _create_item(request):
     """View for create items."""
     parent_locator = BlockUsageLocator(request.json['parent_locator'])
-    print request.json
     parent_location = loc_mapper().translate_locator_to_location(parent_locator)
     try:
         category = request.json['category']
