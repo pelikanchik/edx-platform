@@ -13,6 +13,7 @@ from .mako_module import MakoModuleDescriptor
 from .progress import Progress
 from .x_module import XModule
 from .xml_module import XmlDescriptor
+import time
 
 log = logging.getLogger(__name__)
 
@@ -77,11 +78,11 @@ def elementary_conjunction(term, section):
 
             progress = unit.get_progress()
 
-            if term["field"]=="score_rel":
+            if term["field"] == "score_rel":
                 value = Progress.percent(progress)
 
 
-            if term["field"]=="score_abs":
+            if term["field"] == "score_abs":
                 str_value = Progress.frac(progress)
                 value = str_value[0]
 
@@ -100,13 +101,13 @@ def elementary_conjunction(term, section):
             else:
                 return False
 
-        if term["sign"]== "less":
+        if term["sign"] == "less":
             if value < term["value"]:
                 return True
             else:
                 return False
 
-        if term["sign"]== "less-equals":
+        if term["sign"] == "less-equals":
             if value <= term["value"]:
                 return True
             else:
@@ -154,6 +155,8 @@ class SequenceModule(SequenceFields, XModule):
         get = request.POST instance
         '''
         if dispatch == 'dynamo':
+            print "start"
+            print time.time()
             section = self
             cur_position = self.position
             pos = 1
@@ -164,6 +167,8 @@ class SequenceModule(SequenceFields, XModule):
                     print term
                     for element_term in term:
                         if not element_term["disjunctions"]:
+                            print "end"
+                            print time.time()
                             return json.dumps({'position': cur_position})
                         for disjunction in element_term["disjunctions"]:
                             term_result = element_term["direct_element_id"]
@@ -172,6 +177,8 @@ class SequenceModule(SequenceFields, XModule):
                                 for check_child in self.get_children():
                                     if term_result in check_child.id:
                                         self.position = new_position
+                                        print "end"
+                                        print time.time()
                                         return json.dumps({'position': new_position})
                                     new_position += 1
                             conjunctions_result = True
@@ -182,12 +189,18 @@ class SequenceModule(SequenceFields, XModule):
                                 for check_child in self.get_children():
                                     if term_result in check_child.id:
                                         self.position = new_position
+                                        print "end"
+                                        print time.time()
                                         return json.dumps({'position': new_position})
                                     new_position += 1
                 pos += 1
+            print "end"
+            print time.time()
             return json.dumps({'position': cur_position})
         if dispatch == 'goto_position':
+            print int(data['position'])
             self.position = int(data['position'])
+            print self.position
             return json.dumps({'success': True})
         raise NotFoundError('Unexpected dispatch type')
 
