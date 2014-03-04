@@ -5,3 +5,6 @@ libs
 .project
 .svn
 .bem/cache
+.bem/lib
+desktop_bundles/*
+!desktop_bundles/lms/lms.bemjson.js

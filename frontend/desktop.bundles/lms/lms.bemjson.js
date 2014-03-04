@@ -70,6 +70,6 @@
             }
         },
         { block: 'i-jquery', mods: { version: '1.8.3' } },
-        { elem: 'js', url: '_lms.ru.js' }
+        { elem: 'js', url: '_lms.js' }
     ]
 })

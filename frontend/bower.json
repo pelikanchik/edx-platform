@@ -1,0 +1,12 @@
+{
+    "name": "lms",
+    "dependencies": {
+        "bem-components": "https://github.com/bem/bem-components.git#v1.31.0",
+        "lego": "git://github.yandex-team.ru/lego/romochka.git#2.10.21",
+        "islands-search": "git://github.yandex-team.ru/lego/islands-search.git#v1.46.0",
+        "islands-components": "git://github.yandex-team.ru/lego/islands-components.git#v1.96.0",
+        "islands-user": "git://github.yandex-team.ru/lego/islands-user.git#v1.0.0",
+        "islands-page": "git://github.yandex-team.ru/lego/islands-page.git#1.57.0",
+        "islands-services": "git://github.yandex-team.ru/lego/islands-services.git#v1.0.0"
+    }
+}
