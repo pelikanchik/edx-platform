@@ -21,10 +21,12 @@
   %>
 </%def>
 <!DOCTYPE html>
-<!--[if IE 7]><html class="ie ie7 lte9 lte8 lte7" lang="en-us"><![endif]-->
-<!--[if IE 8]><html class="ie ie8 lte9 lte8" lang="en-us"><![endif]-->
-<!--[if IE 9]><html class="ie ie9 lte9" lang="en-us"><![endif]-->
-<!--[if gt IE 9]><!--><html lang="en-us"><!--<![endif]-->
+
+<!--[if IE 7]><htm class="i-ua_js_no i-ua_css_standard ie ie7 lte9 lte8 lte7" ><![endif]-->
+<!--[if IE 8]><html class="i-ua_js_no i-ua_css_standard ie ie8 lte9 lte8" ><![endif]-->
+<!--[if IE 9]><html class="i-ua_js_no i-ua_css_standard ie ie9 lte9" ><![endif]-->
+<!--[if gt IE 9]><!--><html class="i-ua_js_no i-ua_css_standard"><!--<![endif]-->
+
 <head>
   <%block name="title">
       <title>${_("Pelican")}</title>
@@ -83,13 +85,14 @@
 
   <meta name="path_prefix" content="${EDX_ROOT_URL}">
   <meta name="google-site-verification" content="_mipQ4AtZQDNmbtOkwehQDOgCxUUV2fb_C0b6wbiRHY" />
+  <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7, IE=edge" />
 
   % if not course:
     <%include file="${google_analytics_file}" />
   % endif
 
   <%include file="widgets/segment-io.html" />
-
+  <%include file="yandex_engine.html" />
 
 % if style_overrides_file:
   <link rel="stylesheet" type="text/css" href="${static.url(style_overrides_file)}" />
@@ -97,7 +100,8 @@
 
 </head>
 
-<body class="<%block name='bodyclass'/>">
+<body class="<%block name='bodyclass'/>  b-page b-page__body i-global i-bem" onclick="return {'i-global':{'lang':'ru','tld':'ru','content-region':'ru','click-host':'//clck.yandex.ru','passport-host':'https://passport.yandex.ru','pass-host':'//pass.yandex.ru','social-host':'//social.yandex.ru','export-host':'//export.yandex.ru','login':'','lego-static-host':'//yandex.st/lego/2.10-122'}}">
+
   <a class="nav-skip" href="#content">${_("Skip to this view's content")}</a>
 
   <%include file="mathjax_accessible.html" />
@@ -111,9 +115,7 @@
     <%block name="bodyextra"/>
   </section>
 
-% if not suppress_toplevel_navigation:
-  <%include file="${footer_file}" />
-% endif
+  <%include file="yandex_templates/footer.html" />
 
   <script>window.baseUrl = "${settings.STATIC_URL}";</script>
   <%static:js group='application'/>

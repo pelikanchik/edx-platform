@@ -1,0 +1,720 @@
+/* lms.css begin */
+/* ../../libs/romochka/blocks-desktop/i-global/_type/i-global_type_simple.css begin */
+/* ../body/i-global__body.css begin */
+/* Global definitions (begin) */ /**/
+    body
+    {
+        font: 0.8em Arial, Helvetica, sans-serif;
+
+        /* Чтобы в FF2- заработал z-index: -1 */ /**/
+        position: relative;
+        z-index: 0;
+
+        margin: 0;
+        padding: 0 0 1em 0;
+
+        color: #000;
+        background: #fff;
+    }
+/* Global definitions (end) */ /**/
+/* ../body/i-global__body.css end */
+/* ../wbr/i-global__wbr.css begin */
+/* Поддержка wbr в Opera и Safari 2/3 (begin) */ /**/
+    /* См. http://harisov.livejournal.com/97666.html */ /**/
+    wbr
+    {
+        display: inline-block;
+    }
+/* Поддержка wbr в Opera и Safari 2/3 (end) */ /**/
+
+/* ../wbr/i-global__wbr.css end */
+/* ../hover/i-global__hover.css begin */
+/* Global definitions: Links hover (begin) */ /**/
+    :link:hover,
+    :visited:hover
+    {
+        color: #f00 !important/*!head*/;
+    }
+/* Global definitions: Links hover (end) */ /**/
+
+/* ../hover/i-global__hover.css end */
+
+/* ../../libs/romochka/blocks-desktop/i-global/_type/i-global_type_simple.css end */
+/* ../../libs/romochka/blocks-desktop/b-foot/b-foot.css begin */
+.b-foot
+{
+    font-size: 85%;
+
+    clear: both;
+
+    margin-top: 3em;
+
+    color: #333;
+    border-top: 1px solid #eaeaea;
+}
+
+.b-foot .b-menu_layout_horiz-simple
+{
+    margin-bottom: 0.6em;
+}
+
+.b-foot__link:link,
+.b-foot__link:visited,
+.b-foot .b-copyright__link:link,
+.b-foot .b-copyright__link:visited,
+.i-ua_js_yes .b-foot .b-link_pseudo_yes
+{
+    white-space: nowrap;
+
+    color: #8792a8;
+}
+
+.b-foot .b-menu_layout_horiz-simple .b-foot__link
+{
+    margin-right: 18px;
+}
+
+.b-foot__layout-column_type_right .b-menu_layout_horiz-simple .b-foot__link
+{
+    margin: 0 0 0 18px;
+}
+
+.b-foot .b-keyboard-loader
+{
+    margin: 0 20px 0.6em 0;
+}
+
+.b-foot .b-copyright
+{
+    margin-bottom: 0.6em;
+}
+/* ../../libs/romochka/blocks-desktop/b-foot/b-foot.css end */
+/* ../../libs/romochka/blocks-desktop/b-foot/layout/b-foot__layout.css begin */
+/* Подвал: раскладка (begin) */ /**/
+    .b-foot__layout
+    {
+        font-size: 100%; /* for.i-ua_css.i-ua_css_quirks */ /**/
+
+        width: 100%;
+
+        border-collapse: collapse;
+    }
+
+    .b-foot__layout-column
+    {
+        padding: 10px 10px 7px 0;
+
+        vertical-align: top;
+    }
+
+    .b-foot__layout-column_type_left
+    {
+        width: 16%;
+    }
+
+    .b-foot__layout-column_type_center
+    {
+        width: 16%;
+    }
+
+    .b-foot__layout-column_type_right
+    {
+        width: 8%;
+        padding: 10px 0 7px 10px;
+    }
+
+    /*.b-foot__layout__column_penultima, *//* предпоследняя ячейка *//**//**/
+    .b-foot__layout-column_type_right
+    {
+        text-align: right;
+    }
+
+    .b-foot__layout-gap,
+    .b-foot__layout-bottom
+    {
+        padding: 0;
+    }
+
+    /* Gap (begin) */ /**/
+        .b-foot__layout-gap
+        {
+            width: 2%;
+        }
+
+        .b-foot__layout-gap-i
+        {
+            display: block;
+            visibility: hidden;
+
+            width: 20px;
+        }
+    /* Gap (end) */ /**/
+/* Подвал: раскладка (end) */ /**/
+/* ../../libs/romochka/blocks-desktop/b-foot/layout/b-foot__layout.css end */
+/* ../../libs/romochka/blocks-desktop/b-menu/b-menu.css begin */
+.b-menu
+{
+}
+
+.b-menu__item-content
+{
+    display: none;
+}
+
+.b-menu__item-content_visibility_visible
+{
+    display: block;
+}
+
+/* ../../libs/romochka/blocks-desktop/b-menu/b-menu.css end */
+/* ../../libs/romochka/blocks-desktop/b-menu/title/b-menu__title.css begin */
+.b-menu__title
+{
+    font-size: 100%;
+    
+    margin: 0;
+    padding: 0;
+}
+
+/* ../../libs/romochka/blocks-desktop/b-menu/title/b-menu__title.css end */
+/* ../../libs/romochka/blocks-desktop/b-menu/item/b-menu__item.css begin */
+.b-menu__item
+{
+}
+
+/* ../../libs/romochka/blocks-desktop/b-menu/item/b-menu__item.css end */
+/* ../../libs/romochka/blocks-desktop/b-menu/_layout/b-menu_layout_horiz-simple.css begin */
+.b-menu_layout_horiz-simple .b-menu__title
+{
+    display: -moz-inline-box;
+    display: inline-block;
+}
+
+/* ../../libs/romochka/blocks-desktop/b-menu/_layout/b-menu_layout_horiz-simple.css end */
+/* ../../libs/romochka/blocks-desktop/b-link/_type/b-link_type_global.css begin */
+:link
+{
+    color: #1a3dc1;
+}
+
+:link:hover,
+:visited:hover
+{
+    color: #f00 !important;
+}
+
+/* ../../libs/romochka/blocks-desktop/b-link/_type/b-link_type_global.css end */
+/* ../../libs/romochka/blocks-desktop/b-link/b-link.css begin */
+
+/* ../../libs/romochka/blocks-desktop/b-link/b-link.css end */
+/* ../../libs/bem-bl/blocks-desktop/b-link/_pseudo/b-link_pseudo_yes.css begin */
+.b-link_pseudo_yes
+{
+    color: #1a3dc1;
+}
+
+.i-ua_js_yes .b-link_pseudo_yes
+{
+    text-decoration: none;
+
+    cursor: pointer;
+}
+
+.i-ua_js_yes .b-link_pseudo_yes .b-link__inner
+{
+    text-decoration: none;
+
+    color: inherit;
+    border-bottom: 1px dotted;
+}
+
+/* ../../libs/bem-bl/blocks-desktop/b-link/_pseudo/b-link_pseudo_yes.css end */
+/* ../../libs/romochka/blocks-desktop/b-link/_pseudo/b-link_pseudo_yes.css begin */
+.b-link_pseudo_yes:hover
+{
+    color: #f00;
+}
+
+/* ../../libs/romochka/blocks-desktop/b-link/_pseudo/b-link_pseudo_yes.css end */
+/* ../../libs/romochka/blocks-desktop/b-dropdowna/b-dropdowna.css begin */
+.b-dropdowna
+{
+    display: inline;
+}
+
+.b-dropdowna__menu .b-menu__layout-vert-separator
+{
+    font: 0/0 a;
+
+    margin: 0 0 4px;
+}
+
+body .b-dropdowna__menu .b-menu__separator
+{
+    margin: 0 -4px;
+
+    border-top-color: #ddd;
+    border-top-style: solid;
+}
+
+.b-dropdowna__menu .b-menu__layout-vert-cell
+{
+    margin-bottom: 0.5em;
+
+    line-height: 1.35em;
+}
+
+.b-dropdowna__menu .b-menu__layout-vert-cell_position_last
+{
+    margin-bottom: 0.2em;
+}
+
+.b-dropdowna__menu .b-link:visited
+{
+    color: #1A3DC1;
+}
+
+/* ../../libs/romochka/blocks-desktop/b-dropdowna/b-dropdowna.css end */
+/* ../../libs/romochka/blocks-desktop/b-popupa/b-popupa.css begin */
+.b-popupa,
+.i-popup .b-popupa .b-popupa
+{
+    display: none;
+}
+
+.i-popup .b-popupa
+{
+    display: block;
+}
+
+.b-popupa__under
+{
+    top: -7px;
+    left: -7px;
+
+    padding: 7px 7px 6px;
+}
+
+.b-popupa__wrap
+{
+    font-size: 100%;
+
+    border-collapse: collapse;
+}
+
+.b-popupa__wrap-cell
+{
+    padding: 0;
+}
+
+.b-popupa__content
+{
+    position: relative;
+    z-index: 10;
+
+    margin: 0;
+    padding: 4px 8px;
+}
+
+/* Адская смесь для всех браузеров кроме IE и FF2.
+   Если первый элемент в body имеет margin-top,
+   то body с position: relative сдвигается на этот оступ.
+   Поэтому добавляем элемент с нулевым верхним оступом и еще с кучей свойств (ради любимой Оперы),
+   используя псевдо-классы.
+
+body:before
+{
+    font: 1px/1px a;
+
+    display: block;
+    visibility: hidden;
+    overflow: hidden;
+
+    width: 1px;
+    height: 1px;
+    margin: 0 0 -1px -10px;
+
+    content: '&#160';
+}*/ /**/
+/* ../../libs/romochka/blocks-desktop/b-popupa/b-popupa.css end */
+/* ../../libs/romochka/blocks-desktop/b-popupa/shadow/b-popupa__shadow.css begin */
+.b-popupa__shadow
+{
+    font: 0/0 a;
+
+    position: absolute;
+    z-index: 8;
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    height: 100%;
+
+    -webkit-box-shadow: -1px 3px 7px rgba(0, 0, 0, 0.2), 1px 0 7px rgba(0, 0, 0, 0.2), 0 3px 4px rgba(0, 0, 0, 0.25);
+    -moz-box-shadow: -1px 3px 7px rgba(0, 0, 0, 0.2), 1px 0 7px rgba(0, 0, 0, 0.2), 0 3px 4px rgba(0, 0, 0, 0.25);
+    box-shadow: -1px 3px 7px rgba(0, 0, 0, 0.2), 1px 0 7px rgba(0, 0, 0, 0.2), 0 3px 4px rgba(0, 0, 0, 0.25);
+}
+
+/* ../../libs/romochka/blocks-desktop/b-popupa/shadow/b-popupa__shadow.css end */
+/* ../../libs/romochka/blocks-desktop/b-popupa/_theme/b-popupa_theme_ffffff.css begin */
+.b-popupa_theme_ffffff .b-popupa__content
+{
+    background: #fff;
+}
+
+.b-popupa_theme_ffffff .b-popupa__tail
+{
+    background-image: url("/blocks-desktop/b-popupa/_theme/b-popupa_theme_ffffff.png");
+}
+
+/* ../../libs/romochka/blocks-desktop/b-popupa/_theme/b-popupa_theme_ffffff.css end */
+/* ../../desktop.blocks/b-popupa/_theme/b-popupa_theme_ffffff.css begin */
+.b-popupa_theme_ffffff .b-popupa__content
+{
+    background: #fff;
+}
+
+.b-popupa_theme_ffffff .b-popupa__tail
+{
+    background-image: url("../../desktop.blocks/b-popupa/_theme/b-popupa_theme_ffffff.png");
+}
+
+/* ../../desktop.blocks/b-popupa/_theme/b-popupa_theme_ffffff.css end */
+/* ../../libs/romochka/blocks-desktop/i-popup/i-popup.css begin */
+.i-popup
+{
+    position: absolute;
+    z-index: 32700;
+
+    display: none;
+}
+
+.i-popup__content
+{
+    height: 100%; /*LEGO-7733*/
+}
+/* ../../libs/romochka/blocks-desktop/i-popup/i-popup.css end */
+/* ../../libs/romochka/blocks-desktop/i-popup/under/i-popup__under.css begin */
+.i-popup__under
+{
+    position: absolute;
+    z-index: -1;
+
+    width: 100%;
+    height: 100%;
+
+    border: 0;
+}
+
+/* LEGO-7661 */
+.i-popup div.i-popup__under
+{
+    display: none;
+}
+
+/* ../../libs/romochka/blocks-desktop/i-popup/under/i-popup__under.css end */
+/* ../../libs/romochka/blocks-desktop/i-popup/_visibility/i-popup_visibility_visible.css begin */
+.i-popup_visibility_visible
+{
+    display: block;
+
+    -ms-animation: show 0.2s;
+    -moz-animation: show 0.2s;
+    -o-animation: show 0.2s;
+    -webkit-animation: show 0.2s;
+}
+
+@-ms-keyframes show
+{
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+@-moz-keyframes show
+{
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+@-webkit-keyframes show
+{
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+/* Fix: ROMOCHKA-43 - init reflow */
+.i-popup_visibility_visible:after
+{
+    content: '';
+}
+
+/* ../../libs/romochka/blocks-desktop/i-popup/_visibility/i-popup_visibility_visible.css end */
+/* ../../libs/romochka/blocks-desktop/i-popup/under/_color/i-popup__under_color_white.css begin */
+.i-popup__under_color_white
+{
+    background: #fff !important;
+}
+/* ../../libs/romochka/blocks-desktop/i-popup/under/_color/i-popup__under_color_white.css end */
+/* ../../libs/romochka/blocks-desktop/i-popup/under/_type/i-popup__under_type_paranja.css begin */
+.i-popup__under_type_paranja
+{
+    position: fixed;
+    z-index: 32000;
+    top: 0;
+    left: 0;
+
+    opacity: 0.9;
+
+    background: #333;
+
+    padding: 0;
+}
+
+/* ../../libs/romochka/blocks-desktop/i-popup/under/_type/i-popup__under_type_paranja.css end */
+/* ../../libs/romochka/blocks-desktop/b-popupa/tail/b-popupa__tail.css begin */
+.b-popupa__tail
+{
+    font: 0/0 a;
+
+    position: absolute;
+    z-index: 9;
+    top: 0;
+    
+    background-repeat: no-repeat;
+}
+
+/* Попап открыватся вниз */ /**/
+.b-popupa_direction_down .b-popupa__tail
+{
+    width: 19px;
+    height: 10px;
+    margin: -19px 0 0 19px;
+    
+    background-position: 0 0;
+}
+
+/* Попап открыватся вверх */ /**/
+.b-popupa_direction_up .b-popupa__tail
+{
+    top: 100%;
+
+    width: 19px;
+    height: 10px;
+    margin: 0 0 0 19px;
+    
+    background-position: 0 -10px;
+}
+
+/* Попап открыватся влево */ /**/
+.b-popupa_direction_left .b-popupa__tail
+{
+    left: 100%;
+
+    width: 9px;
+    height: 19px;
+    margin: 19px 0 0;
+    
+    background-position: -32px 0;
+}
+
+/* Попап открыватся вправо */ /**/
+.b-popupa_direction_right .b-popupa__tail
+{
+    width: 9px;
+    height: 19px;
+    margin: 19px 0 0 -10px;
+    
+    background-position: -23px 0;
+}
+
+/* ../../libs/romochka/blocks-desktop/b-popupa/tail/b-popupa__tail.css end */
+/* ../../libs/romochka/blocks-desktop/b-dropdowna/switcher/b-dropdowna__switcher.css begin */
+.b-dropdowna__switcher
+{
+    display: inline-block;
+}
+/* ../../libs/romochka/blocks-desktop/b-dropdowna/switcher/b-dropdowna__switcher.css end */
+/* ../../libs/romochka/blocks-desktop/b-dropdowna/_disabled/b-dropdowna_disabled_yes.css begin */
+.b-dropdowna_disabled_yes .b-dropdowna__switcher,
+.b-dropdowna_disabled_yes .b-dropdowna__switcher .b-link_pseudo_yes,
+.b-dropdowna_disabled_yes .b-dropdowna__switcher a.b-link_pseudo_yes:link,
+.b-dropdowna_disabled_yes .b-dropdowna__switcher a.b-link_pseudo_yes:hover,
+.b-dropdowna_disabled_yes .b-dropdowna__switcher a.b-link_pseudo_yes:visited
+{
+    cursor: default !important;
+
+    color: #bebebe !important;
+}
+
+/* ../../libs/romochka/blocks-desktop/b-dropdowna/_disabled/b-dropdowna_disabled_yes.css end */
+/* ../../libs/romochka/blocks-desktop/b-lang-switcher/b-lang-switcher.css begin */
+.i-ua_js_yes .b-lang-switcher__lang:link,
+.i-ua_js_yes .b-lang-switcher__lang:visited
+{
+    outline: 0;
+
+    color: #1a3dc1;
+
+    text-decoration:none;
+}
+
+.i-ua_js_yes .b-lang-switcher__lang
+{
+    color: #5d5d5d;
+}
+
+.i-ua_js_yes .b-lang-switcher__popup-content .b-lang-switcher__lang-name,
+.i-ua_js_yes .b-lang-switcher__lang .b-link__inner
+{
+    border: 0;
+}
+
+.i-ua_js_yes .b-lang-switcher__lang-name
+{
+    border-bottom: 1px dotted;
+}
+
+.b-lang-switcher__flag
+{
+    position: relative;
+
+    margin: 0 5px -1px 0;
+}
+
+.b-link .b-lang-switcher__flag,
+.b-link_pseudo_yes .b-lang-switcher__flag
+{
+    cursor: pointer;
+}
+
+.b-lang-switcher__menu .b-lang-switcher__lang:link,
+.b-lang-switcher__menu .b-lang-switcher__lang:visited
+{
+    text-decoration: none;
+}
+
+.b-lang-switcher__menu :link .b-lang-switcher__lang-name
+{
+    text-decoration: underline;
+}
+
+.b-lang-switcher__popup-content
+{
+    padding:8px 12px;
+}
+
+.b-lang-switcher__switcher
+{
+    display: inline-block; /*Необходимо по задаче LEGO-4946. convert2xml убирает пустые текстовые ноды и сводит весь код к одной строчке. В ИЕ9 из-за этого не правильно высчитывается высота свитчера*/ /**/
+}
+
+.b-foot .b-lang-switcher__flag
+{
+    margin-bottom: -2px;
+}
+
+/* ../../libs/romochka/blocks-desktop/b-lang-switcher/b-lang-switcher.css end */
+/* ../../libs/bem-bl/blocks-desktop/b-icon/b-icon.css begin */
+.b-icon
+{
+    font: 0/0 a;
+
+    border: 0;
+
+}
+
+/* ../../libs/bem-bl/blocks-desktop/b-icon/b-icon.css end */
+/* ../../libs/romochka/blocks-desktop/b-menu/separator/b-menu__separator.css begin */
+.b-menu__separator
+{
+    display: block;
+}
+
+/* ../../libs/romochka/blocks-desktop/b-menu/separator/b-menu__separator.css end */
+/* ../../libs/romochka/blocks-desktop/b-menu/_layout/b-menu_layout_vert.css begin */
+.b-menu__layout-vert,
+.b-menu__layout-vert-gap,
+.b-menu__layout-vert-cell,
+.b-menu__layout-vert-separator
+{
+    margin: 0;
+    padding: 0;
+
+    list-style: none;
+}
+
+.b-menu_layout_vert .b-menu__separator
+{
+    margin: 1em 0 0;
+
+    border-top: 1px dotted #666;
+}
+/* ../../libs/romochka/blocks-desktop/b-menu/_layout/b-menu_layout_vert.css end */
+/* ../../libs/romochka/blocks-desktop/b-menu/_preset/b-menu_preset_vmenu.css begin */
+.b-menu_preset_vmenu .b-menu__layout-vert-cell,
+.b-menu_preset_vmenu .b-menu__layout-vert-separator
+{
+    margin-bottom: 0.5em;
+}
+
+.b-menu_preset_vmenu .b-menu
+{
+    margin: 0.5em 0 0 1.5em;
+}
+
+.b-menu_preset_vmenu .b-menu__title
+{
+    margin-bottom: 0.5em;
+}
+
+/* ../../libs/romochka/blocks-desktop/b-menu/_preset/b-menu_preset_vmenu.css end */
+/* ../../libs/romochka/blocks-desktop/b-country-flag/_size-16/b-country-flag_size-16_ua.css begin */
+/* This file was generated by script. Don't edit it here.*/
+.b-country-flag_size-16_ua
+{
+   padding: 11px 0 0 16px;
+   background: url(//yandex.st/lego/_/QaG3XxXylZ5KP1AZC_bZ0nO3u5M.png) no-repeat;
+}
+/* ../../libs/romochka/blocks-desktop/b-country-flag/_size-16/b-country-flag_size-16_ua.css end */
+/* ../../libs/romochka/blocks-desktop/b-country-flag/_size-16/b-country-flag_size-16_en.css begin */
+/* This file was generated by script. Don't edit it here.*/
+.b-country-flag_size-16_en
+{
+   padding: 11px 0 0 16px;
+   background: url(//yandex.st/lego/_/8xIpQUvi-n0DQWKWlzcZchJuekg.png) no-repeat;
+}
+/* ../../libs/romochka/blocks-desktop/b-country-flag/_size-16/b-country-flag_size-16_en.css end */
+/* ../../libs/romochka/blocks-desktop/b-country-flag/_size-16/b-country-flag_size-16_ru.css begin */
+/* This file was generated by script. Don't edit it here.*/
+.b-country-flag_size-16_ru
+{
+   padding: 11px 0 0 16px;
+   background: url(//yandex.st/lego/_/Spb22l3caaD3xN3g-_nuzdnS2FA.png) no-repeat;
+}
+/* ../../libs/romochka/blocks-desktop/b-country-flag/_size-16/b-country-flag_size-16_ru.css end */
+/* ../../libs/romochka/blocks-desktop/b-country-flag/_size-16/b-country-flag_size-16_kz.css begin */
+/* This file was generated by script. Don't edit it here.*/
+.b-country-flag_size-16_kz
+{
+   padding: 11px 0 0 16px;
+   background: url(//yandex.st/lego/_/uzZ71PWcVXtsIkeTuwAakheaPOY.png) no-repeat;
+}
+/* ../../libs/romochka/blocks-desktop/b-country-flag/_size-16/b-country-flag_size-16_kz.css end */
+/* ../../libs/romochka/blocks-desktop/b-country-flag/_size-16/b-country-flag_size-16_by.css begin */
+/* This file was generated by script. Don't edit it here.*/
+.b-country-flag_size-16_by
+{
+   padding: 11px 0 0 16px;
+   background: url(//yandex.st/lego/_/O-tmndNZfQ0UH_3x69kKVSzOLpY.png) no-repeat;
+}
+/* ../../libs/romochka/blocks-desktop/b-country-flag/_size-16/b-country-flag_size-16_by.css end */
+/* ../../libs/romochka/blocks-desktop/b-copyright/b-copyright.css begin */
+/* Копирайт (begin) */ /**/
+    .b-copyright
+    {
+        white-space: nowrap;
+    }
+/* Копирайт (end) */ /**/
+/* ../../libs/romochka/blocks-desktop/b-copyright/b-copyright.css end */
+
+/* lms.css end */

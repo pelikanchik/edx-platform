@@ -1,0 +1,6 @@
+/* *html нужен для b-keyboard */
+*html .b-popupa_theme_ffffff .b-popupa__tail
+{
+    background: #fff;
+    border-color: #d6d6d6;
+}

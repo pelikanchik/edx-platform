@@ -1,0 +1,1 @@
+var blocks = module.exports;

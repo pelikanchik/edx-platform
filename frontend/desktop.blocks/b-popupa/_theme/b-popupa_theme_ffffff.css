@@ -1,0 +1,9 @@
+.b-popupa_theme_ffffff .b-popupa__content
+{
+    background: #fff;
+}
+
+.b-popupa_theme_ffffff .b-popupa__tail
+{
+    background-image: url(b-popupa_theme_ffffff.png);
+}
