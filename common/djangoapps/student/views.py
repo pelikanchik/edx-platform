@@ -411,27 +411,36 @@ It should not interrupt a successful registration or login.
             log.exception("Exception automatically enrolling after login: {0}".format(str(e)))
 
 def demo_register(request):
+
     if request.method != "POST":
         raise Http404
-        username = "u_" + "".join(random.choice(string.ascii_letters) for x in range(6)) + "_" +  str(int(time.time()))
-        random_value = ''.join(random.choice(string.ascii_letters) for x in range(8))
-        post_vars = {
-            "username": username,
-            "email": username + "@pelic.ru",
-            "name": "Demo",
-            "password": random_value,
-            "is_demo": True,
-            "terms_of_service": False,
-            "honor_code": False
-        }
-        _do_create_account(post_vars)
-        user = authenticate(username=post_vars['username'], password=post_vars['password'])
-        login(request, user)
-        course_id = request.POST.get("course_id")
-        CourseEnrollment.enroll(user, course_id)
-        if course_id is None:
-            return HttpResponseBadRequest(_("No course ID"))
-        return HttpResponse()
+
+    username = "u_" + "".join(random.choice(string.ascii_letters) for x in range(6)) + "_" +  str(int(time.time()))
+    random_value = ''.join(random.choice(string.ascii_letters) for x in range(8))
+
+    post_vars = {
+        "username": username,
+        "email": username + "@pelic.ru",
+        "name": "Demo",
+        "password": random_value,
+        "is_demo": True,
+        "terms_of_service": False,
+        "honor_code": False,
+    }
+
+    _do_create_account(post_vars)
+
+    user = authenticate(username=post_vars['username'], password=post_vars['password'])
+    login(request, user)
+    course_id = request.POST.get("course_id")
+
+    CourseEnrollment.enroll(user, course_id)
+
+    if course_id is None:
+
+        return HttpResponseBadRequest(_("No course ID"))
+
+    return HttpResponse()
 
 
 @require_POST
