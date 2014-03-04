@@ -6,5 +6,5 @@ libs
 .svn
 .bem/cache
 .bem/lib
-desktop_bundles/*
-!desktop_bundles/lms/lms.bemjson.js
+desktop.bundles
+!desktop.bundles/lms/lms.bemjson.js
