@@ -497,7 +497,7 @@ STATICFILES_DIRS = [
     PROJECT_ROOT / "static",
     ("bem/.bem/lib", REPO_ROOT / "frontend/.bem/lib"), # folder for bem integration
     ("bem/desktop.bundles", REPO_ROOT / "frontend/desktop.bundles"), # folder for bem integration
-    ("bem/common.bundles", REPO_ROOT / "frontend/common.bundles"), # folder for bem integration
+    ("bem/common.blocks", REPO_ROOT / "frontend/common.blocks"), # folder for bem integration
     ("bem/desktop.blocks", REPO_ROOT / "frontend/desktop.blocks") # folder for bem integration
 ]
 
