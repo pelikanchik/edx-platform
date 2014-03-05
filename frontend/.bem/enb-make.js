@@ -39,13 +39,13 @@ module.exports = function(config) {
     config.mode('production', function() {
         config.nodeMask(/desktop\.bundles\/.*/, function(nodeConfig) {
             nodeConfig.addTechs([
-                new (require('enb/techs/borschik'))({ sourceTarget: '?.js', destTarget: '_?.js' }),
-                new (require('enb/techs/borschik'))({ sourceTarget: '?.css', destTarget: '_?.css' }),
-                new (require('enb/techs/borschik'))({ sourceTarget: '?.ie.css', destTarget: '_?.ie.css' }),
-                new (require('enb/techs/borschik'))({ sourceTarget: '?.ie6.css', destTarget: '_?.ie6.css' }),
-                new (require('enb/techs/borschik'))({ sourceTarget: '?.ie7.css', destTarget: '_?.ie7.css' }),
-                new (require('enb/techs/borschik'))({ sourceTarget: '?.ie8.css', destTarget: '_?.ie8.css' }),
-                new (require('enb/techs/borschik'))({ sourceTarget: '?.ie9.css', destTarget: '_?.ie9.css' })
+                new (require('enb/techs/borschik'))({ sourceTarget: '?.js', destTarget: '_?.js', minify:true, freeze: true  }),
+                new (require('enb/techs/borschik'))({ sourceTarget: '?.css', destTarget: '_?.css', minify:true, freeze: true  }),
+                new (require('enb/techs/borschik'))({ sourceTarget: '?.ie.css', destTarget: '_?.ie.css', minify:true, freeze: true  }),
+                new (require('enb/techs/borschik'))({ sourceTarget: '?.ie6.css', destTarget: '_?.ie6.css', minify:true, freeze: true  }),
+                new (require('enb/techs/borschik'))({ sourceTarget: '?.ie7.css', destTarget: '_?.ie7.css', minify:true, freeze: true  }),
+                new (require('enb/techs/borschik'))({ sourceTarget: '?.ie8.css', destTarget: '_?.ie8.css', minify:true, freeze: true  }),
+                new (require('enb/techs/borschik'))({ sourceTarget: '?.ie9.css', destTarget: '_?.ie9.css', minify:true, freeze: true  })
             ]);
         });
     });

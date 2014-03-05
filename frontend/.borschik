@@ -1,0 +1,5 @@
+{
+   "freeze_paths" : {
+        "./": "./desktop.bundles/lms/_/"
+   }
+}
