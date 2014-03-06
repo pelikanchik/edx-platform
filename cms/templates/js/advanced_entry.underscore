@@ -1,6 +1,6 @@
 <li class="field-group course-advanced-policy-list-item">
 
-    <% if (key != "available_for_demo" && key != "show_in_lms" && key != "has_dynamic_graph"){ %>
+    <% if (key != "available_for_demo" && key != "show_in_lms" && key != "has_dynamic_graph" && key != "locked_subsections"){ %>
 
 
       <div class="field is-not-editable text key" id="<%= key %>">
@@ -11,7 +11,7 @@
     <% } %>
 
   <div class="field text value">
-    <% if(key == "show_in_lms" || key == "available_for_demo" || key == "has_dynamic_graph"){ %>
+    <% if(key == "show_in_lms" || key == "available_for_demo" || key == "has_dynamic_graph" || key == "locked_subsections"){ %>
 
     <label for "<%= valueUniqueId %>">
         <% if(key == "show_in_lms"){
@@ -20,6 +20,8 @@
             print (gettext("Available for demousers"))
          }else if (key == "has_dynamic_graph") {
             print (gettext("Has Dynamic Graph"))
+         }else if (key == "locked_subsections") {
+            print (gettext("Has Locked Subsections"))
          } %>
     </label>
     <select class="boolean" id="<%= valueUniqueId %>" rel = "<%= key %>">

@@ -539,3 +539,6 @@ msgstr "Отображать курс в публичной части"
 
 msgid "Processing your account information &hellip;"
 msgstr "Отправка формы..."
+
+msgid "Has Locked Subsections"
+msgstr "Можно ли блокировать доступ к подразделам"
