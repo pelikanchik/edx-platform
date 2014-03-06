@@ -1,17 +1,11 @@
 {
-  "author": "",
-  "name": "lego-project-stub",
-  "version": "1.0.0",
-  "repository": {
-    "type": "git",
-    "url": "git://github.yandex-team.ru/lego/lego-project-stub.git"
-  },
   "engines": {
     "node": "0.6 | 0.7 | 0.8 | 0.9 | 0.10"
   },
   "dependencies": {
     "enb" : ">=0.6.8",
-    "enb-bemhtml" : ">=0.0.3"
+    "enb-bemhtml" : ">=0.0.3",
+    "bower": ">=1.2.8"
   },
   "devDependencies": {},
   "private": true
