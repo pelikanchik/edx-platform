@@ -28,6 +28,8 @@ from .access import has_access
 from xmodule.x_module import XModuleDescriptor
 from xblock.plugin import PluginMissingError
 from xblock.runtime import Mixologist
+from courseware.model_data import FieldDataCache
+from preview import _load_preview_module
 
 __all__ = ['OPEN_ENDED_COMPONENT_TYPES',
            'ADVANCED_COMPONENT_POLICY_KEY',
@@ -168,6 +170,18 @@ def _load_mixed_class(category):
     mixologist = Mixologist(settings.XBLOCK_MIXINS)
     return mixologist.mix(component_class)
 
+def get_problem_choises(problem_html):
+    choices = []
+    if '<choicegroup type="MultipleChoice">' in problem_html:
+        begind = 0
+        endind = 0
+        for i in range(problem_html.count('</choice>')):
+            endind = problem_html.find('</choice>', endind)
+            begind = problem_html.rfind('>', begind, endind) + 1
+            choice = problem_html[begind:endind].encode('utf-8')
+            choices.append(choice)
+            endind += len('</choice>')
+    return choices
 
 @require_http_methods(["GET"])
 @login_required
@@ -297,6 +311,37 @@ def unit_handler(request, tag=None, package_id=None, branch=None, version_guid=N
             index=index
         )
 
+        problems_urls = []
+        units = [unit for unit in containing_subsection.get_children()]
+        for unit in units:
+            unit_problems_urls = []
+            for component in unit.get_children():
+                if component.category == 'problem':
+                    unit_problems_urls.append(component.location.url())
+            problems_urls.append(unit_problems_urls)
+
+        problems_choises = {}
+        problems = {}
+        for i, unit_problems_urls in enumerate(problems_urls):
+            unit_problems = []
+            for problem_url in unit_problems_urls:
+                try:
+                    problem_descriptor = modulestore().get_item(problem_url, depth=1)
+                except Exception as err:
+                    log.debug(err)
+
+                field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+                    course.location.course_id,
+                    request.user,
+                    problem_descriptor
+                )
+                problem_module = _load_preview_module(request, problem_descriptor)
+                problem_html = problem_module.get_context()['data']
+
+                unit_problems.append(problem_descriptor)
+                problems_choises[problem_descriptor.url_name] = get_problem_choises(problem_html)
+            problems[units[i].url_name] = unit_problems
+
         return render_to_response('unit.html', {
             'context_course': course,
             'unit': item,
@@ -317,6 +362,8 @@ def unit_handler(request, tag=None, package_id=None, branch=None, version_guid=N
                 get_default_time_display(item.published_date)
                 if item.published_date is not None else None
             ),
+            'problems_choices': problems_choises,
+            'problems': problems,
         })
     else:
         return HttpResponseBadRequest("Only supports html requests")

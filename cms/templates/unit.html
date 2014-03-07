@@ -70,11 +70,11 @@ require(["domReady!", "jquery", "js/models/module_info", "coffee/src/views/unit"
                             <tr>
 
                                 <td rowspan = "2">
-                                    <div><img class = "close" src = '${static.url("img/Delete-icon.png")}' data-bind='click: $root.removeDisjunction'/></div>
+                                    <div><img class = "close"  src = '${static.url("img/Delete-icon.png")}' data-bind='click: $root.removeDisjunction'/></div>
                                 </td>
                                 <td>
                                      ${_("Jump to")}
-                                     <select data-bind='value: direct_element_id, valueUpdate: "afterkeydown"'>
+                                     <select  data-bind='value: direct_element_id, valueUpdate: "afterkeydown"'>
 
                                          % for every_unit in subsection.get_children():
                                                 <option value="${every_unit.url_name}">${every_unit.display_name_with_default}</option>
@@ -88,48 +88,37 @@ require(["domReady!", "jquery", "js/models/module_info", "coffee/src/views/unit"
                             <tr>
 
                                 <td align = "center">
-                                    <table>
+                                    <table class="terms_table">
 
-                                        <tbody data-bind="foreach: conjunctions">
-                                            <tr>
+                                        <tbody data-bind='foreach: conjunctions' id='uniqid3'>
+                                            <tr class='terms'>
 
-                                                <td>
+                                                <td class="select_unit_td">
 
-                                                <select data-bind='value: source_element_id, valueUpdate: "afterkeydown"'>
+                                                <select data-bind='value: source_element_id, valueUpdate: "afterkeydown"' class="select_unit">
 
                                                       % for every_unit in subsection.get_children():
                                                             <option value="${every_unit.url_name}">${every_unit.display_name_with_default}</option>
                                                        % endfor
 
                                                 </select>
+   </td>
 
-                                                </td>
-
-
-                                                <td>
-                                                    <select data-bind='value: field, valueUpdate: "afterkeydown"'>
-                                                        <option value="score_abs">${_("Score (absolute)")}</option>
-                                                        <option value="score_rel">${_("Score (relative, %)")}</option>
+                                                <td class='select_term_type_td'>
+                                                    <select  data-bind='value: field, valueUpdate: "afterkeydown"' class='select_term_type'>
+                                                        <option disabled selected>Choose type</option>
+                                                        <option value="score_abs" class="valued">${_("Score (absolute)")}</option>
+                                                        <option value="score_rel" class="valued">${_("Score (relative, %)")}</option>
+                                                        <option value="unvalued" class="unvalued">Unvalued</option>
                                                     </select>
                                                 </td>
-                                                <td>
-
-                                                    <select data-bind='value: sign, valueUpdate: "afterkeydown"'>
-                                                        <option value="more">&#62;</option>
-                                                        <option value="more-equals">&#8805;</option>
-                                                        <option value="equals">=</option>
-                                                        <option value="less-equals">&#8804;</option>
-                                                        <option value="less">&#60;</option>
-                                                    </select>
-
-                                                </td>
-                                                <td><input data-bind='value: value, valueUpdate: "afterkeydown"' class = "value" /></td>
-                                                <td style="vertical-align: middle"><img width="20" src = "${static.url('img/edit_remove.png')}" data-bind='click: $root.removeConjunction' class = "del" /></td>
+                                                
+                                                <td style="vertical-align: middle" class = "del" id="delid"><img width="20" src = "${static.url('img/edit_remove.png')}" data-bind='click: $root.removeConjunction' class = "del" /></td>
                                             </tr>
                                         </tbody>
                                     </table>
                                      <div style = "width:100%">
-                                         <img class = "add" src = '${static.url("img/plus_16.png")}' data-bind='click: $root.addConjunction' />
+                                         <img class = "add"  src = '${static.url("img/plus_16.png")}' data-bind='click: $root.addConjunction' />
                                      </div>
 
 
@@ -264,6 +253,55 @@ conjunctions: [
                         self.lastSavedJson(JSON.stringify(ko.toJS({disjunctions: self.disjunctions}), null, 0));
                     }
                 };
+
+                function select_problem_handler(){
+                  parent = $( this ).parent().parent();
+                  parent.children( '.select_choice_td' ).remove();
+                  problem = $("#" + $(this).attr("value"));
+                  del_block = parent.children( '.del' ).detach();
+                  parent.append('<td class="select_choice_td">' + problem.html() + '</td>' + '<td style="vertical-align: middle" class = "del">' + del_block.html() + '</td>');
+                }
+
+                function select_unit_handler(){
+                  parent = $(this).parent().parent();
+                  selected_term_type = parent.children( '.select_term_type_td' ).children().first().val();
+                  if (selected_term_type == 'unvalued'){
+                    parent.children( '.select_choice_td' ).remove();
+                    parent.children( '.select_problem_td' ).remove();
+                    del_block = parent.children(".del").detach();
+                    selected_unit = $(this).val();
+                    problems = $('#' + selected_unit);
+                    parent.append('<td class="select_problem_td" id="uniqid">' + problems.html() + '</td>' + '<td style="vertical-align: middle" class = "del">' + del_block.html() + '</td>');
+                    $( '.select_problem' ).on('change', select_problem_handler);
+                  }
+                }
+
+                function select_term_type_handler() { 
+                  parent = $(this).parent().parent();
+                  if ($( this ).val() == 'score_abs' || $( this ).val() == 'score_rel') {
+                    parent.children( '.select_problem_td' ).remove();
+                    parent.children( '.select_choice_td' ).remove();
+                    if (!parent.children( '.select_sign_td' ).length) {
+                      del_block = parent.children( '.del' ).detach();
+                      content = $( '#select_sign_template' ).html(); 
+                      parent.append('<td class="select_sign_td">' + content + '</td>' + '<td style="vertical-align: middle" class = "del">' + del_block.html() + '</td>');
+                    }
+                  }
+                  else {
+                    parent.children( '.select_sign_td' ).remove();
+                    parent.children( '.select_choice_td' ).remove();
+                    del_block = parent.children( '.del' ).detach();
+                    selected_unit = parent.children( '.select_unit_td' ).children().first().val();
+                    problems = $('#' + selected_unit);
+                    parent.append('<td class="select_problem_td" id="uniqid">' + problems.html() + '</td>' + '<td style="vertical-align: middle" class = "del" id="delid">' + del_block.html() + '</td>');
+
+                    $( '.select_problem' ).on('change', select_problem_handler);
+                    $( '#termConstructor' ).on('change', '.select_unit', select_unit_handler);
+                  }
+                }
+
+                $( '#termConstructor' ).on('change', '.select_unit', select_unit_handler);
+                $( '#termConstructor' ).on('change', '.select_term_type', select_term_type_handler);
 
                 ko.applyBindings(new DisjunctionsModel());
 
@@ -478,6 +516,42 @@ conjunctions: [
         </div>
       </div>
     </div>
+  </div>
+
+<div style="display: none">
+      <div id='select_sign_template'>
+          <select data-bind='value: sign, valueUpdate: "afterkeydown" class="select_sign'>
+              <option value="more">&#62;</option>
+              <option value="more-equals">&#8805;</option>
+              <option value="equals">=</option>
+              <option value="less-equals">&#8804;</option>
+              <option value="less">&#60;</option>
+          </select>
+          <input data-bind='value: value, valueUpdate: "afterkeydown"' class = "value" />
+      </div>
+
+      % for item in problems.items():
+        <div id="${item[0]}"> <!--unit url-->
+          <select data-bind='value: problem, valueUpdate: "afterkeydown"' class="select_problem">
+            <option disabled selected>Choose problem</option>
+            % for every_problem in item[1]:
+              <option value="${every_problem.url_name}">${every_problem.display_name_with_default}</option>
+            % endfor
+          </select>
+        </div>
+      % endfor
+
+    % for unit_problems in problems.values():
+      % for every_problem in unit_problems:
+        <div id="${every_problem.url_name}">
+          <select data-bind='value: source_element_id, valueUpdate: "afterkeydown"' class="select_choice">
+            % for every_choice in problems_choices[every_problem.url_name]:
+              <option value="${every_choice}">${every_choice}</option>
+            % endfor
+          </select>
+        </div>
+      % endfor
+    % endfor
   </div>
 
 </%block>
