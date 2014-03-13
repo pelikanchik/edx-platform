@@ -510,6 +510,12 @@ msgstr "Экспортировать Контент Моего Курса"
 msgid "Export Course Content"
 msgstr "Экспортировать Контент Курса"
 
+#: cms/templates/export.html:116
+msgid ""
+"Data {em_start}exported with{em_end} your course:"
+msgstr ""
+"Данные {em_start}экспортируемые{em_end} с вашим курсом"
+
 #: cms/templates/export.html:118
 msgid "Course Content (all Sections, Sub-sections, and Units)"
 msgstr "Контент курса (все Разделы, Подразделы и Элементы Подразделов)"
@@ -1441,8 +1447,8 @@ msgid "Schedule"
 msgstr "Расписание"
 
 #: cms/templates/overview.html:162
-msgid "Will Release:"
-msgstr "Будет опубликован:"
+msgid "Release date:"
+msgstr "Дата публикации:"
 
 #: cms/templates/overview.html:186
 msgid "Expand/collapse this subsection"
@@ -1461,6 +1467,34 @@ msgid ""
 "On the date set above, this section - {name} - will be released to students."
 " Any units marked private will only be visible to admins."
 msgstr "В указанную выше дату этот раздел  - {name} - будет опубликован и станет доступен студентам. Черновики элементов будут видны только администраторам."
+
+#: cms/templates/overview.html:270
+msgid ""
+"You can create new sections and subsections, set the release date for "
+"sections, and create new units in existing subsections.  You can set the "
+"assignment type for subsections that are to be graded, and you can open a "
+"subsection for further editing."
+msgstr ""
+"Вы можете создавать новые разделы и подразделы, устанавливать дату публикации "
+"для разделов и создавать новые элементы в существующих подразделах. Вы можете "
+"устанавливать способ оценивания разделов, которые будут оцениваться, и вы "
+"можете открывать разделы для дальнейшего редактирования."
+
+#: cms/templates/overview.html:272
+msgid ""
+"In addition, you can drag and drop sections, subsections, and units to "
+"reorganize your course."
+msgstr ""
+"Также вы можете перетаскивать разделы, подразделы и элементы подразделов, "
+"чтобы перестроить ваш курс."
+
+#: cms/templates/overview.html:289:
+msgid ""
+"On the date set below, this section - {name} - will be released to students. Any units marked private will only be visible to admins."
+msgstr ""
+"Этот раздел - {name} - будет опубликован для студентов, в соответствии с "
+"датой ниже. Все непубличные элементы разделов будут доступны только для "
+"администраторов."
 
 #: cms/templates/settings.html:2
 msgid "Schedule &amp; Details Settings"
@@ -1743,6 +1777,12 @@ msgstr "На этой странице вы можете поменять доп
 msgid "Any policies you modify here override all other information you've defined elsewhere in Studio. Do not edit policies unless you are familiar with both their purpose and syntax."
 msgstr "Имейте в виду, что настройки, которые вы укажете здесь, заменят любые аналогичные настройки, определенные на других страницах Студии. Не изменяйте эти параметры, если вы не знаете, для чего они предназначены, а также если вы не знакомы с синтаксисом JSON."
 
+msgid ""
+"{em_start}Note:{em_end} When you enter strings as policy values, ensure that "
+"you use double quotation marks (&quot;) around the string. Do not use single "
+"quotation marks (&apos;)."
+msgstr "{em_start}Примечание:{em_end} когда вы вводите детальные настройки в виде строки, убедитесь, что "
+"вы поместили строку в двойные кавычки (&quot;). Не используйте одинарные кавычки (&apos;)."
 
 
 #: cms/templates/settings_advanced.html:94
@@ -2193,15 +2233,19 @@ msgid "New Textbook"
 msgstr "Новый учебник"
 
 #: cms/templates/textbooks.html:79
-msgid "Why should I break my text into chapters?"
-msgstr "Почему я должен разделять мой курс на главы?"
+msgid "Why should I break my textbook into chapters?"
+msgstr "Почему я должен разделять мой учебник на главы?"
 
 #: cms/templates/textbooks.html:80
 msgid ""
-"It's best practice to break your course's textbook into multiple chapters to"
-" reduce loading times for students. Breaking up textbooks into chapters can "
-"also help students more easily find topic-based information."
-msgstr "Наиболее оптимально разбить учебник вашего курса на несколько разделов, чтобы уменьшить время загрузки файла на компьютерах студентов. Разбиение учебников на разделы могут также помочь студентам легче найти информацию по определенной теме."
+"Breaking your textbook into multiple chapters reduces loading times for "
+"students, especially those with slow Internet connections. Breaking up "
+"textbooks into chapters can also help students more easily find topic-based "
+"information."
+msgstr ""
+"Разделение учебника на главы уменьшает время загрузки у студентов, особенно "
+"при медленном интернете. Также разделение учебника на главы может "
+"помочь студентам легче найти информацию."
 
 #: cms/templates/textbooks.html:83
 msgid "What if my book isn't divided into chapters?"
@@ -2209,10 +2253,11 @@ msgstr "Что делать, если моя книга не делится на
 
 #: cms/templates/textbooks.html:84
 msgid ""
-"If you haven't broken your text into chapters, you can upload the entire "
-"text as a single chapter and enter a name of your choice in the Chapter Name"
-" field."
-msgstr "Если вы не разбили текст учебника на главы, вы можете загрузить весь текст как одну главу и ввести название учебника в Название главы."
+"If your textbook doesn't have individual chapters, you can upload the entire "
+"text as a single chapter and enter a name of your choice in the Chapter Name "
+"field."
+msgstr "Если ваш учебник не содержит отдельных глав, вы можете загрузить весь "
+"текст, как отдельную главу, и ввести название в поле Название Главы."
 
 #: cms/templates/unit.html:7
 msgid "Individual Unit"
@@ -2814,6 +2859,10 @@ msgstr "Судя по всему, вы пока не зарегистриров�
 #: lms/templates/dashboard.html:170
 msgid "Find courses now!"
 msgstr "Найти курсы"
+
+#: lms/templates/dashboard.html:171
+msgid "edit"
+msgstr "изменить"
 
 #: lms/templates/dashboard.html:173
 msgid "Looks like you haven't been enrolled in any courses yet."
@@ -8162,6 +8211,17 @@ msgstr "\nВам нужно <a href=\"%(login_url)s\">войти</a> или <a h
 msgid "You need to log in or sign up to use this function."
 msgstr "Вам нужно войти или зарегистрироваться для использования этой функции."
 
+msgid "Wiki Preview"
+msgstr "Предварительный просмотр"
+
+#: lms/djangoapps/course_wiki/views.py:87
+msgid "Course page automatically created."
+msgstr "Автоматически создана страниа курса"
+
+#: lms/templates/wiki/includes/cheatsheet.html:7
+msgid "Wiki Cheatsheet"
+msgstr "Шпаргалка по Wiki"
+
 #: lms/templates/wiki/includes/cheatsheet.html:7
 msgid "Wiki Syntax Help"
 msgstr "Помощь с вики-синтаксом "
@@ -8261,9 +8321,11 @@ msgstr "Цитаты"
 #, python-format
 msgid ""
 "\n"
-"\t    Markdown syntax is allowed. See the %(start_link)scheatsheet%(end_link)s for help.\n"
-"\t"
-msgstr "\n\t    Здесь можно использовать синтаксис Markdown. Для справки смотрите %(start_link)sшпаргалку%(end_link)s.\n\t"
+"        Markdown syntax is allowed. See the %(start_link)scheatsheet%(end_link)s for help.\n"
+"    "
+msgstr "\n"
+"        Здесь можно использовать синтаксис Markdown. Для справки смотрите %(start_link)sшпаргалку%(end_link)s.\n"
+"    "
 
 #: lms/templates/wiki/plugins/attachments/index.html:5
 msgid "Attachments"
