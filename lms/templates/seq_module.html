@@ -30,7 +30,11 @@
       </ol>
     </div>
     <ul class="sequence-nav-buttons">
-      <li class="next"><a href="#">${_("Next")}</a></li>
+      % if get_course(course_id).has_dynamic_graph:
+        <li class="godynamo"><a href="#">${_("Next")}</a></li>
+      % else:
+        <li class="next"><a href="#">${_("Next")}</a></li>
+      % endif
     </ul>
 
   </nav>
