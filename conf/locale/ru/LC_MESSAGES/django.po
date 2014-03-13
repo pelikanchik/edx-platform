@@ -2838,6 +2838,10 @@ msgid ""
 "email to confirm the email change."
 msgstr "Вы получите подтверждение по электронной почте. Нажмите на ссылку в письме, чтобы подтвердить смену адреса."
 
+#: lms/templates/dashboard.html:83
+msgid "Please verify your new email"
+msgstr "Пожалуйста, подтвердите ваш новый email"
+
 #: lms/templates/dashboard.html:128
 #: lms/templates/courseware/instructor_dashboard.html:133
 #: lms/templates/university_profile/edge.html:15
