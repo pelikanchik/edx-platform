@@ -616,4 +616,7 @@ msgid "Course Handouts"
 msgstr "Раздаточные материалы"
 
 msgid "Date:"
-msgstr "Дата:"
+msgstr "Дата:"msgstr "Отправка формы..."
+
+msgid "Has Locked Subsections"
+msgstr "Можно ли блокировать доступ к подразделам"

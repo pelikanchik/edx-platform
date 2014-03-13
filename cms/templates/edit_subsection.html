@@ -57,7 +57,7 @@
 
         </div>
         <div class="subsection-name-input">
-          % if context_course.has_dynamic_graph:
+          % if context_course.locked_subsections:
           <label>${_("Unlock Term")}</label>
                 <div id='termConstructor' class = 'termConstructor'>
                     <table class='termEditor'>
@@ -126,7 +126,7 @@
         % endif
                 <p style = "text-align: center;"><input type = "button" class = "save-subsection-button" value='${_("Save")}'/></p>
 
-        % if context_course.has_dynamic_graph:
+        % if context_course.locked_subsections:
                 <input disabled data-bind='value: term_string' style="font-size: 10px; display:none;" class="subsection-display-name-input" data-metadata-name="unlock_term">
 
         <script>
