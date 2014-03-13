@@ -1,6 +1,6 @@
 ---
 metadata:
-    display_name: Checkboxes
+    display_name: Выбор ответа
     markdown: |
       A checkboxes problem presents checkbox buttons for student input. Students can select more
       than one option presented.

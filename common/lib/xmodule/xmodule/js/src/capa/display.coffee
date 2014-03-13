@@ -28,6 +28,7 @@ class @Problem
     @$('section.action input.reset').click @reset
     @$('section.action button.show').click @show
     @$('section.action input.save').click @save
+    @$('section.action input.clear').click @clear
 
     @$(".advice-for-problem").each ->
       showDelay = 1000 * parseInt($(this).attr("rel"))
@@ -383,6 +384,12 @@ class @Problem
           hideMethod = @inputtypeHideAnswerMethods[cls]
           hideMethod(inputtype, display) if hideMethod?
 
+  clear: =>
+    Logger.log 'problem_clear', @answers
+    $.postWithPrefix "#{@url}/problem_clear", id: @id, (response) =>
+        @render(response.html)
+        @updateProgress response
+        
   gentle_alert: (msg) =>
     if @el.find('.capa_alert').length
       @el.find('.capa_alert').remove()
