@@ -84,7 +84,7 @@ def course_wiki_redirect(request, course_id):
             course_slug,
             title=course_slug,
             content=cgi.escape(_u("This is the wiki for **{0}**'s _{1}_.").format(course.display_org_with_default, course.display_name_with_default)),
-            user_message=_("Course page automatically created."),
+            user_message=_u("Course page automatically created."),
             user=None,
             ip_address=None,
             article_kwargs={'owner': None,
