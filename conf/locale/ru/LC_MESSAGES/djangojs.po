@@ -210,6 +210,13 @@ msgstr "ОК"
 msgid "Upload a new PDF to “<%= name %>”"
 msgstr "Загрузить новый PDF “<%= name %>”"
 
+#: cms/static/js/views/edit_chapter.js:57
+msgid "Files must be in PDF format."
+msgstr "Файлы должны быть в формате PDF."
+
+msgid "Upload"
+msgstr "Загрузить"
+
 #: cms/static/js/views/edit_textbook.js:63
 #: cms/static/js/views/overview_assignment_grader.js:62
 msgid "Saving"
@@ -540,83 +547,182 @@ msgstr "Отображать курс в публичной части"
 msgid "Processing your account information &hellip;"
 msgstr "Отправка формы..."
 
+#: cms/templates/js/no-textbooks.underscore:2 
 msgid "Add your first textbook"
 msgstr "Добавить первый учебник"
 
+#: cms/templates/js/no-textbooks.underscore:2
 msgid "You haven't added any textbooks to this course yet."
 msgstr "Вы еще не добавили учебники к этому курсу"
 
+#: cms/templates/js/edit-textbook.underscore:12 
 msgid "Textbook Name"
 msgstr "Название учебника"
 
+#: cms/templates/js/edit-textbook.underscore:13
 msgid "Introduction to Cookie Baking"
 msgstr "Введение в физику"
 
+#: cms/templates/js/edit-textbook.underscore:14  
 msgid "provide the title/name of the text book as you would like your students to see it"
 msgstr "введите название учебника, которое будут видеть ученики"
 
+#: cms/templates/js/edit-textbook.underscore:21
 msgid "Add a Chapter"
 msgstr "Добавить Главу"
 
+#: cms/templates/js/edit-chapter.underscore:3
 msgid "Chapter Name"
 msgstr "Навзвание Главы"
 
+#: cms/templates/js//edit-chapter.underscore:4
 msgid "Chapter %s"
 msgstr "Глава %s"
 
+#: cms/templates/js/edit-chapter.underscore:9
 msgid "Chapter Asset"
 msgstr "Файл Главы"
 
+#: cms/templates/js/edit-chapter.underscore:10
 msgid "path/to/introductionToCookieBaking-CH%d.pdf"
 msgstr "path/to/introductionToPhysics-CH%d.pdf"
 
+#: cms/templates/js/edit-chapter.underscore:11
 msgid "upload a PDF file or provide the path to a Studio asset file"
 msgstr "загрузите файл PDF или введите путь к файлу с главой"
 
+#: cms/templates/js/edit-chapter.underscore:12
 msgid "Upload PDF"
 msgstr "Загрузить PDF"
 
+#: cms/templates/js/course_grade_policy.underscore:3
 msgid "Assignment Type Name"
 msgstr "Тип Задания"
 
+#: cms/templates/js//course_grade_policy.underscore:5
 msgid "e.g. Homework, Midterm Exams"
 msgstr "например, Домашнее задание, Промежуточные экзамены "
 
+#: cms/templates/js/course_grade_policy.underscore:9
 msgid "Abbreviation"
 msgstr "Абревиатура"
 
+#: cms/templates/js/course_grade_policy.underscore:11:
 msgid "e.g. HW, Midterm"
 msgstr "например, ДЗ, Промежуточный"
 
+#: cms/templates/js/course_grade_policy.underscore:15:
 msgid "Weight of Total Grade"
 msgstr "Вес от Общей Оценки"
 
+#: cms/templates/js/course_grade_policy.underscore:17
 msgid "as a percent, e.g. 40"
 msgstr "в процентах, например 40"
 
+#: cms/templates/js//course_grade_policy.underscore:21
 msgid "Total Number"
 msgstr "Общее число"
 
+#: cms/templates/js//course_grade_policy.underscore:23
 msgid "total exercises assigned"
 msgstr "общее число задач"
 
+#: cms/templates/js//course_grade_policy.underscore:27
 msgid "Number of Droppable"
 msgstr "Число неоцениваемых"
 
+#: cms/templates/js//course_grade_policy.underscore:29
 msgid "total exercises that won't be graded"
 msgstr "общее число задач, которые не будут оценены"
-
-msgid "Tasks completed"
-msgstr "Проверено пунктов"
 
 msgid "Choose File"
 msgstr "Выберите файл"
 
+#: cms/templates/js/course_info_handouts.underscore:3:
 msgid "Course Handouts"
 msgstr "Раздаточные материалы"
 
+#: cms/templates/js/course_info_update.underscore:5
 msgid "Date:"
 msgstr "Дата:"
 
+#: cms/templates/js/advanced_entry.underscore:24 
 msgid "Has Locked Subsections"
 msgstr "Можно ли блокировать доступ к подразделам"
+
+#: cms/static/coffee/src/views/unit.js:224  
+msgid "Delete this component?"
+msgstr "Удалить этот компонент?"
+
+#: cms/static/coffee/src/views/unit.js:225
+msgid "Deleting this component is permanent and cannot be undone."
+msgstr "Удаление компонента необратимо, его нельзя будет отменить."
+
+#: cms/static/coffee/src/views/unit.js:228 
+msgid "Yes, delete this component"
+msgstr "Да, удалить этот компонент"
+
+#:cms/static/js/views/settings/advanced.js:56:
+msgid "You have to save your changes for applying."
+msgstr "Ваши изменения не вступят в силу, пока вы не сохраните их."
+
+#: cms/static/coffee/src/views/unit.js:195:
+msgid "Duplicating&hellip;"
+msgstr "Дублирование&hellip;"
+
+#: cms/static/coffee/src/main.js:35
+msgid ""
+"This may be happening because of an error with our server or your "
+"internet connection. Try refreshing the page or making sure you are online."
+msgstr ""
+"Это могло произойти из-за ошибки на нашем сервере или вашего интернет "
+"соединения. Попробуйте обновить страницу или проверить, что вы в сети."
+
+#: cms/static/coffee/src/main.js:38
+msgid "Studio's having trouble saving your work"
+msgstr "У студии возникли проблемы при сохранении вашей работы"
+
+#: cms/static/js/base.js:263
+msgid "Delete this Section?"
+msgstr "Удалить этот раздел?"
+
+#: cms/static/js/base.js:263
+msgid "Delete this Subsection?"
+msgstr "Удалить этот подраздел?"
+
+#: cms/static/js/base.js:263
+msgid "Delete this Unit?"
+msgstr "Удалить этот элемент?"
+
+#: cms/static/js/base.js:264
+msgid "Deleting this Section is permanent and cannot be undone."
+msgstr "Удаление раздела необратимо, его нельзя будет отменить."
+
+#: cms/static/js/base.js:264
+msgid "Deleting this Subsection is permanent and cannot be undone."
+msgstr "Удаление подраздела необратимо, его нельзя будет отменить."
+
+#: cms/static/js/base.js:264
+msgid "Deleting this Unit is permanent and cannot be undone."
+msgstr "Удаление элемента необратимо, его нельзя будет отменить."
+
+#: cms/static/js/base.js:267
+msgid "Yes, delete this Section"
+msgstr "Да, удалить этот раздел"
+
+#: cms/static/js/base.js:267
+msgid "Yes, delete this Subsection"
+msgstr "Да, удалить этот подраздел"
+
+#: cms/static/js/base.js:267
+msgid "Yes, delete this Unit"
+msgstr "Да, удалить этот элемент"
+
+#: cms/static/coffee/src/views/tabs.js:106
+msgid "Delete Component Confirmation"
+msgstr "Подтверждение удаления компонента"
+
+#: cms/static/coffee/src/views/tabs.js:107
+msgid "Are you sure you want to delete this component? This action cannot be undone."
+msgstr "Вы уверены, что хотите удалить этот компонент? Это действие нельзя "
+"будет отменить."
