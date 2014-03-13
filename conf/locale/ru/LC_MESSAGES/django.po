@@ -3509,7 +3509,7 @@ msgstr "(для вопроса сверху - примыкают к каждом
 
 #: lms/templates/problem.html:31
 msgid "You have used {num_used} of {num_total} submissions"
-msgstr "Вы использовали {num used} из {num_total} попыток."
+msgstr "Вы использовали {num_used} из {num_total} попыток."
 
 #: lms/templates/provider_login.html:42
 msgid "Email or password is incorrect."
