@@ -474,6 +474,15 @@ class CapaMixin(CapaFields):
             else:
                 return True
 
+    def should_show_clear_button(self):
+        """
+        Return True/False to indicate whether to show the "clear" button.
+        """
+        if 'drag_and_drop_input' in self.data:
+            return True
+        else:
+            return False
+
     def handle_problem_html_error(self, err):
         """
         Create a dummy problem to represent any errors.
@@ -597,6 +606,7 @@ class CapaMixin(CapaFields):
             'check_button': check_button,
             'reset_button': self.should_show_reset_button(),
             'save_button': self.should_show_save_button(),
+            'clear_button': self.should_show_clear_button(),
             'answer_available': self.answer_available(),
             'attempts_used': self.attempts,
             'attempts_allowed': self.max_attempts,
@@ -1173,3 +1183,40 @@ class CapaMixin(CapaFields):
             'success': True,
             'html': self.get_problem_html(encapsulate=False),
         }
+
+    def clear_problem(self, _data):
+        """
+        clears student's input from problem's html.
+
+        Returns a dictionary of the form:
+          {'success': True/False,
+           'html': Problem HTML string }
+
+        Does NOT change any field in problem unit.
+        """
+        event_info = dict()
+        event_info['problem_id'] = self.location.url()
+        event_info['state'] = self.lcp.get_state()
+
+        if self.closed():
+            event_info['failure'] = 'closed'
+            self.system.track_function('clear_problem_fail', event_info)
+            return {'success': False,
+                    'error': "Problem is closed"}
+
+        html = self.get_problem_html(encapsulate=False)
+
+        if self.is_submitted():
+
+            # search student's input
+            beg_ind = html.find('value="', html.find('<input type')) + len('value="')
+            end_ind = html.find('"', beg_ind)
+
+            # get problem's html without student's input
+            html = html[:beg_ind] + html[end_ind:]
+        
+        self.system.track_function('clear_problem', event_info)
+
+        return {'success': True,
+                'html': html}
+
