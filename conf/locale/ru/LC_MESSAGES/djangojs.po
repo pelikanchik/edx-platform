@@ -63,7 +63,7 @@ msgstr "Да, удалить"
 
 #: cms/static/js/base.js:387 cms/static/js/views/course_info_update.js:147
 msgid "Deleting&hellip;"
-msgstr "Удаление&hellip;"
+msgstr "Удаление..."
 
 #: cms/static/js/base.js:403 cms/static/js/views/asset.js:67
 #: cms/static/js/views/course_info_update.js:165
@@ -102,7 +102,7 @@ msgstr "Обязательное поле."
 #: cms/static/js/views/course_info_update.js:81
 #: cms/static/js/views/overview.js:232
 msgid "Saving&hellip;"
-msgstr "Сохранение&hellip;"
+msgstr "Сохранение..."
 
 #: cms/static/js/base.js:851
 msgid "Will Release:"
@@ -539,3 +539,81 @@ msgstr "Отображать курс в публичной части"
 
 msgid "Processing your account information &hellip;"
 msgstr "Отправка формы..."
+
+msgid "Add your first textbook"
+msgstr "Добавить первый учебник"
+
+msgid "You haven't added any textbooks to this course yet."
+msgstr "Вы еще не добавили учебники к этому курсу"
+
+msgid "Textbook Name"
+msgstr "Название учебника"
+
+msgid "Introduction to Cookie Baking"
+msgstr "Введение в физику"
+
+msgid "provide the title/name of the text book as you would like your students to see it"
+msgstr "введите название учебника, которое будут видеть ученики"
+
+msgid "Add a Chapter"
+msgstr "Добавить Главу"
+
+msgid "Chapter Name"
+msgstr "Навзвание Главы"
+
+msgid "Chapter %s"
+msgstr "Глава %s"
+
+msgid "Chapter Asset"
+msgstr "Файл Главы"
+
+msgid "path/to/introductionToCookieBaking-CH%d.pdf"
+msgstr "path/to/introductionToPhysics-CH%d.pdf"
+
+msgid "upload a PDF file or provide the path to a Studio asset file"
+msgstr "загрузите файл PDF или введите путь к файлу с главой"
+
+msgid "Upload PDF"
+msgstr "Загрузить PDF"
+
+msgid "Assignment Type Name"
+msgstr "Тип Задания"
+
+msgid "e.g. Homework, Midterm Exams"
+msgstr "например, Домашнее задание, Промежуточные экзамены "
+
+msgid "Abbreviation"
+msgstr "Абревиатура"
+
+msgid "e.g. HW, Midterm"
+msgstr "например, ДЗ, Промежуточный"
+
+msgid "Weight of Total Grade"
+msgstr "Вес от Общей Оценки"
+
+msgid "as a percent, e.g. 40"
+msgstr "в процентах, например 40"
+
+msgid "Total Number"
+msgstr "Общее число"
+
+msgid "total exercises assigned"
+msgstr "общее число задач"
+
+msgid "Number of Droppable"
+msgstr "Число неоцениваемых"
+
+msgid "total exercises that won't be graded"
+msgstr "общее число задач, которые не будут оценены"
+
+msgid "Tasks completed"
+msgstr "Проверено пунктов"
+
+msgid "Choose File"
+msgstr "Выберите файл"
+
+msgid "Course Handouts"
+msgstr "Раздаточные материалы"
+
+msgid "Date:"
+msgstr "Дата:"
