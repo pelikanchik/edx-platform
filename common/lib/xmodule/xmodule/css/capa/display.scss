@@ -735,7 +735,7 @@ section.problem {
   section.action {
     margin-top: $baseline;
 
-    .save, .check, .show, .reset {
+    .save, .check, .show, .reset, .clear {
       height: ($baseline*2);
       vertical-align: middle;
       font-weight: 600;
