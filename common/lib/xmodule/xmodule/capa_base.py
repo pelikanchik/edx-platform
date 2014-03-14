@@ -1197,16 +1197,16 @@ class CapaMixin(CapaFields):
         event_info = dict()
         event_info['problem_id'] = self.location.url()
         event_info['state'] = self.lcp.get_state()
-
-        if self.closed():
+       
+        if self.closed() and self.max_attempts:
             event_info['failure'] = 'closed'
             self.system.track_function('clear_problem_fail', event_info)
             return {'success': False,
                     'error': "Problem is closed"}
 
         html = self.get_problem_html(encapsulate=False)
-
-        if self.is_submitted():
+        
+        if self.is_submitted() or not self.max_attempts:
 
             # search student's input
             beg_ind = html.find('value="', html.find('<input type')) + len('value="')
