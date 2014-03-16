@@ -1311,7 +1311,7 @@ msgstr "Адрес электронной почты пользователя"
 
 #: cms/templates/manage_users.html:46
 msgid "e.g. jane.doe@gmail.com"
-msgstr "например jane.doe@gmail.com"
+msgstr "например&nbsp;jane.doe@gmail.com"
 
 #: cms/templates/manage_users.html:47
 msgid ""
@@ -2132,11 +2132,19 @@ msgstr "Обязательные поля для регистрации в Ст�
 msgid "Public Username"
 msgstr "Логин пользователя"
 
+#:#: cms/templates/signup.html:40
+msgid "e.g. janedoe"
+msgstr "например&nbsp;janedoe"
+
 #: cms/templates/signup.html:41
 msgid ""
 "This will be used in public discussions with your courses and in our edX101 "
 "support forums"
 msgstr "Этот логин будет использоваться в публичных обсуждениях ваших курсов и на нашем форуме поддержки"
+
+#: cms/templates/signup.html:46
+msgid "e.g. Jane Doe"
+msgstr "например&nbsp;Jane&nbsp;Doe"
 
 #: cms/templates/signup.html:45 lms/templates/dashboard.html:125
 #: lms/templates/register-shib.html:139 lms/templates/register.html:139
@@ -2155,8 +2163,8 @@ msgid "Preferred Language"
 msgstr "Предпочитаемый язык"
 
 #: cms/templates/signup.html:63
-msgid "I agree to the Terms of Service"
-msgstr "Я согласен с условиями предоставления услуг"
+msgid "I agree to the {a_start} Terms of Service {a_end}"
+msgstr "Я согласен с {a_start} условиями предоставления услуг {a_end}"
 
 #: cms/templates/signup.html:69
 msgid "Create My Account &amp; Start Authoring Courses"
@@ -3747,7 +3755,7 @@ msgstr "Электронная почта*"
 
 #: lms/templates/signup_modal.html:26 lms/templates/signup_modal.html:45
 msgid "e.g. yourname@domain.com"
-msgstr "например yourname@domain.com"
+msgstr "например&nbsp;yourname@domain.com"
 
 #: lms/templates/signup_modal.html:28
 msgid "Password *"
@@ -5137,6 +5145,10 @@ msgstr "Результаты студента '{username}' ({email})"
 #: lms/templates/courseware/progress.html:85
 msgid "Practice Scores: "
 msgstr "Результаты: "
+
+#: lms/templates/courseware/progress.html:85
+msgid "Problem Scores: "
+msgstr "Результаты за задачи: "
 
 #: lms/templates/courseware/progress.html:91
 msgid "No problem scores in this section"

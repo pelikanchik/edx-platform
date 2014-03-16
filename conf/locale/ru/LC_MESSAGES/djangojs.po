@@ -738,6 +738,10 @@ msgstr "Загрузить другой файл"
 msgid "Upload New File"
 msgstr "Загрузить новый файл"
 
+#: cms/templates/asset_index.html:72
+msgid "Uploading…"
+msgstr "Загрузка…"
+
 #: cms/static/coffee/src/views/module_edit.js:86
 msgid "<em>Editing:</em> %s"
 msgstr "<em>Редактирование:</em> %s"
