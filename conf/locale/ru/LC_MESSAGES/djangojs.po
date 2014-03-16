@@ -587,6 +587,9 @@ msgstr "Файл Главы"
 msgid "path/to/introductionToCookieBaking-CH%d.pdf"
 msgstr "path/to/introductionToPhysics-CH%d.pdf"
 
+msgid "provide the title/name of the chapter that will be used in navigating"
+msgstr "введите название главы, которое будет использоваться для навигации"
+
 #: cms/templates/js/edit-chapter.underscore:11
 msgid "upload a PDF file or provide the path to a Studio asset file"
 msgstr "загрузите файл PDF или введите путь к файлу с главой"
@@ -726,3 +729,15 @@ msgstr "Подтверждение удаления компонента"
 msgid "Are you sure you want to delete this component? This action cannot be undone."
 msgstr "Вы уверены, что хотите удалить этот компонент? Это действие нельзя "
 "будет отменить."
+
+#: cms/templates/asset_index.html:113
+msgid "Load Another File"
+msgstr "Загрузить другой файл"
+
+#: cms/templates/asset_index.html:142 cms/templates/asset_index.html:192
+msgid "Upload New File"
+msgstr "Загрузить новый файл"
+
+#: cms/static/coffee/src/views/module_edit.js:86
+msgid "<em>Editing:</em> %s"
+msgstr "<em>Редактирование:</em> %s"

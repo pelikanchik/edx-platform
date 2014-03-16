@@ -3360,7 +3360,7 @@ msgstr "Будет отображаться в любых дискуссиях, 
 #: lms/templates/register-shib.html:130 lms/templates/register.html:127
 #: lms/templates/register.html:158
 msgid "example: username@domain.com"
-msgstr "образец: username@domain.com"
+msgstr "пример: username@domain.com"
 
 #: lms/templates/register-shib.html:150 lms/templates/register.html:239
 msgid "Account Acknowledgements"
