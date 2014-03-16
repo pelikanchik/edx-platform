@@ -157,10 +157,6 @@ msgstr "Действия на странице"
 msgid "Upload New File"
 msgstr "Загрузить новый файл"
 
-#: cms/templates/asset_index.html:113
-msgid "Load Another File"
-msgstr "Загрузить другой файл"
-
 #: cms/templates/asset_index.html:153
 msgid "List of uploaded files and assets in this course"
 msgstr "Список загруженных файлов и ценных данных в этом курсе"
@@ -3095,8 +3091,8 @@ msgid ""
 msgstr "{platform_name} — некоммерческая платформа, созданная благодаря партнёрству {Harvard} и {MIT}. Её задача заключается в предоставлении доступа к лучшему высшему образованию имеющим доступ в Интернет студентам всех возрастов по всему миру. Бесплатные онлайн курсы {platform_name} интерактивны и охватывают ряд предметов, включая computer science, здравоохранение и искусственный интеллект."
 
 #: lms/templates/footer.html:77
-msgid "&copy; 2013 {platform_name}, some rights reserved."
-msgstr "&copy; 2013 {platform_name}, некоторые права защищены."
+msgid "&copy; 2014 {platform_name}, some rights reserved."
+msgstr "&copy; 2014 {platform_name}, некоторые права защищены."
 
 #: lms/templates/footer.html:82
 msgid "Terms of Service and Honor Code"
@@ -3569,7 +3565,7 @@ msgstr "Будет отображаться в любых дискуссиях, 
 #: lms/templates/register-shib.html:130 lms/templates/register.html:127
 #: lms/templates/register.html:158
 msgid "example: username@domain.com"
-msgstr "пример: username@domain.com"
+msgstr "пример:&nbsp;username@domain.com"
 
 #: lms/templates/register-shib.html:150 lms/templates/register.html:239
 msgid "Account Acknowledgements"
@@ -5137,6 +5133,10 @@ msgstr "Оценки"
 #: lms/templates/courseware/progress.html:35
 msgid "Course Progress for Student '{username}' ({email})"
 msgstr "Результаты студента '{username}' ({email})"
+
+#: lms/templates/courseware/progress.html:85
+msgid "Practice Scores: "
+msgstr "Результаты: "
 
 #: lms/templates/courseware/progress.html:91
 msgid "No problem scores in this section"
@@ -7576,6 +7576,10 @@ msgstr "Дальше"
 msgid "Final Check"
 msgstr "Заключительная проверка"
 
+#: common/lib/xmodule/xmodule/capa_base.py:1127
+msgid "Your answers have been saved."
+msgstr "Ваши ответы сохранены."
+
 #: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html:23
 msgid "Navigation"
 msgstr "Навигация"
@@ -8336,7 +8340,7 @@ msgid "Attachments"
 msgstr "Вложения"
 
 #: lms/templates/wiki/plugins/attachments/index.html:14
-msgid "Upload new file"
+msgid "Upload New file"
 msgstr "Загрузить новый файл"
 
 #: lms/templates/wiki/plugins/attachments/index.html:17
