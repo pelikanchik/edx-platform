@@ -6,20 +6,11 @@ var redraw, g, renderer;
 var add_edge_mode = false;
 var mouse_x, mouse_y, origin_x, origin_y = null
 
-document.onmousemove = function (e) {
-        e = e || window.event;
-        // -5 - so it doesn't interfere with clicking
-        mouse_x = e.pageX - $('#canvas').offset().left - 5;
-        mouse_y = e.pageY - $('#canvas').offset().top - 5;
-        if (add_edge_mode){
+// adding nodes and edges
+var new_node_x, new_node_y, origin_x, origin_y;
+var origin_node;
 
-            var r = renderer.getCanvas();
-            var path = ["M", origin_x, origin_y, "L", mouse_x, mouse_y].join(",");
-            if (new_edge_line !=undefined) new_edge_line.remove();
-            new_edge_line = r.path(path);
-        }
-        return;
-}
+var new_edge_line;
 
 
 function hideRestOfString(S){
@@ -58,6 +49,21 @@ function parseType(S){
       return S;
     }
 }
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie != '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
 
 
     /* JSON data */
@@ -79,24 +85,12 @@ function is_edge_exists(origin_node, target){
         if (e["direct_element_id"]===target){
             exists = true;
         }
-
-        /*
-        var e = g.nodes[origin_node].edges[i];
-        if ((e.source.id == origin_node)&&(e.target.id == target)){
-            exists = true;
-        }
-        */
         return exists;
     };
-/*    for(var i=0; i<g.nodes[origin_node].edges.length; i++) {
-        console.log(g.nodes[origin_node].edges[i]);
-        var e = g.nodes[origin_node].edges[i];
-        if ((e.source.id == origin_node)&&(e.target.id == target)){
-            exists = true;
-        }
-    };
-*/    return exists;
+    return exists;
 }
+
+
 
 function ajax_save_item(id, metadata){
     $.ajax({
@@ -115,8 +109,136 @@ function ajax_save_item(id, metadata){
 }
 
 
+function add_node_here(){
+
+        var new_node_name = 'Без имени';
+
+    /*
+        var location = "i4x://Org/101/vertical/temp" + Math.round(100*Math.random());
+
+        var i = location.lastIndexOf("/");
+        var node_id = location.slice(i+1);
+
+        g.addNode(node_id, { label : hideRestOfString(new_node_name), render : render} );
+        ids_arr.push(node_id);
+        edges_arr.push([]);
+        names_obj[node_id] = {
+            "name" : new_node_name,
+            "location" : location,
+            "coords_x" : 0,
+            "coords_y" : 0};
+        data_obj[node_id] = [];
+
+        renderer.drawNode(renderer.graph.nodes[node_id])
+
+        raphael_nodes[node_id].set.translate(mouse_x, mouse_y);
+
+    */
+
+        $("#node-name-input").val(new_node_name);
+        $( "#add-new-node" ).dialog({
+            modal: true,
+            width:'auto',
+            buttons: {
+                Ok: function() {
+                    new_node_name = $("#node-name-input").val();
+                    //console.log($("#node-name-input").val());
+                    $.ajax({
+                        url: "/xblock",
+//                        url: "/create_item",
+                        type: "POST",
+                        headers: {
+                                'X-CSRFToken': getCookie('csrftoken')
+                        },
+                        data: {
+                            'parent_locator': $(".parent-location").text(),
+                            'category': 'vertical',
+                            'display_name': new_node_name
+                        },
+                        success : function(answer){
+
+                            var location = answer["id"];
+
+                            var i = location.lastIndexOf("/");
+                            var node_id = location.slice(i+1);
+                            g.addNode(node_id, { label : hideRestOfString(new_node_name), render : render} );
+                            ids_arr.push(node_id);
+                            edges_arr.push([]);
+                            names_obj[node_id] = {
+                                "name" : new_node_name,
+                                "location" : location,
+                                "coords_x" : 0,
+                                "coords_y" : 0};
+        //                        "coords_x" : "None",
+        //                        "coords_y" : "None"};
+                            data_obj[node_id] = [];
+
+                            renderer.drawNode(renderer.graph.nodes[node_id])
+
+                            raphael_nodes[node_id].set.translate(new_node_x, new_node_y);
+                            /*
+                            renderer.enableDragingMode();
+                            renderer.isDrag = raphael_nodes[node_id];
+                            */
+
+                        }
+                    });
+                    $( this ).dialog( "close" );
+                },
+                "Отмена": function() {
+                    $( this ).dialog( "close" );
+                }
+
+            }
+        })
+
+
+}
 /* only do all this when document has finished loading (needed for RaphaelJS) */
 window.onload = function() {
+
+document.onmousemove = function (e) {
+    e = e || window.event;
+    // -5 - so it doesn't interfere with clicking
+    mouse_x = e.pageX - $('#canvas').offset().left - 5;
+    mouse_y = e.pageY - $('#canvas').offset().top - 5;
+    if (!add_edge_mode) return;
+    if (add_edge_mode){
+
+        var r = renderer.getCanvas();
+        var path = ["M", origin_x, origin_y, "L", mouse_x, mouse_y].join(",");
+        if ((new_edge_line !== undefined) && (new_edge_line.removed != true)){
+            new_edge_line.remove();
+        }
+        new_edge_line = r.path(path);
+    }
+    return;
+}
+$("#canvas").click(function (e) {
+    setTimeout(exitMode, 50);
+});
+
+function exitMode(){
+    if (!add_edge_mode) return;
+    add_edge_mode = false;
+//    if(new_edge_line !== undefined){
+    if (new_edge_line.removed != true){
+        new_edge_line.remove();
+    }
+};
+
+$("#canvas").dblclick(canvasDbClick);
+
+function canvasDbClick(e) {
+    if (e.target.nodeName == "svg" || e.target.nodeName == "DIV" ){
+        if (!add_edge_mode){
+            //alert("new node here!")
+            new_node_x = e.pageX - $('#canvas').offset().left - 5;
+            new_node_y = e.pageY - $('#canvas').offset().top - 5;
+            add_node_here();
+        }
+    }
+}
 
 
 

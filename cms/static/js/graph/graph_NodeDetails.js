@@ -5,6 +5,87 @@
 //var j$ = jQuery.noConflict();
 //var $ = jQuery.noConflict();
 
+function create_new_edge(origin_node, target_node, new_edge_data){
+        var origin_node_number = ids_arr.indexOf(origin_node);
+
+        var edges_count = edges_arr[origin_node_number].length;
+        edges_arr[origin_node_number].push(new_edge_data);
+
+        var data = generateEdgeData(
+            edges_arr[origin_node_number][edges_count]["disjunctions"],
+            origin_node);
+
+        g.addEdge(origin_node, target_node, {
+            directed: true,
+            label: data.label,
+            details: data.details,
+            stroke: data.color
+        });
+
+//        var unit_edit = new CMS.Views.UnitEdit({
+        var unit_edit = new UnitEditView({
+    //      el: $('.main-wrapper'),
+//          model: new CMS.Models.Module({
+            model: new ModuleModel({
+                id: names_obj[origin_node]["location"]
+          })
+        });
+
+        var metadata = $.extend({}, unit_edit.model.get('metadata'));
+
+        metadata.display_name = names_obj[origin_node]["name"];
+        metadata.direct_term = JSON.stringify(edges_arr[origin_node_number]);
+
+        $(".graph_string").html(JSON.stringify(edges_arr));
+        ajax_save_item(names_obj[origin_node]["location"], metadata);
+}
+
+function bindNewEdgeTo(ellipse, node){
+
+        if (is_edge_exists(origin_node, node.id)){
+            alert("Такое ребро уже есть");
+            return;
+        }
+        $( "#node-add-condition" ).dialog({
+            modal: true,
+            width:'auto',
+            buttons: {
+                Ok: function() {
+
+                    // "if result > 'Hail Cthulhu'"...
+                    // No. Just no.
+                    if( !$.isNumeric($("#input-value").val()) ) return;
+
+                    var new_edge_data = {"direct_element_id" : node.id,
+                        "disjunctions" : [{
+                                "conjunctions" : [{
+                                    "source_element_id" : origin_node,
+                                    "field" : $("#input-field").val(),
+                                    "sign" :  $("#input-sign").val(),
+                                    "value" :  $("#input-value").val()
+                                }]
+                        }]
+                    }
+
+                    create_new_edge(origin_node, node.id, new_edge_data);
+
+                    save_layout();
+                    load_layout();
+                    renderer.draw();
+
+            //        for (var i = 0; i < g.edges.length; i++) {
+            //            g.drawEdge(g.edges[i]);
+            //        }
+
+
+                    $( this ).dialog( "close" );
+                },
+                "Отмена": function() {
+                    $( this ).dialog( "close" );
+                }
+              }
+        });
+    }
 
 
 function generateEdgeData(disjunctions_array, source){
@@ -165,7 +246,6 @@ function createNodeRenameCallback( node){
 
 
 function showNodeDetails(node){
-    console.log("in details!")
     var S;
 //    var message = names_obj[node.id]["name"];
     $(".node-data").remove();
@@ -185,7 +265,7 @@ function showNodeDetails(node){
     $(".node-name").unbind( "click");
     $(".node-name").bind( "click", renamer );
 
-
+    /*
     $(".node-edit-link").
         attr("href", "/vertex/edit/" + names_obj[node.id]["location"]).
         fancybox({
@@ -203,7 +283,7 @@ function showNodeDetails(node){
                 overlay : {closeClick: false} // prevents closing when clicking OUTSIDE fancybox
             }
         })
-
+        */
         var node_number = ids_arr.indexOf(node.id);
         for(var i=0; i<edges_arr[node_number].length; i++) {
 //            console.log(g.nodes[origin_node].edges[i]);
