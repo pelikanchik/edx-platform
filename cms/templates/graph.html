@@ -15,31 +15,56 @@
 <%block name="content">
 
 
+    <!---
+    <script type="text/javascript"
+            src='${static.url("js/graph/strathausen-dracula-a6a5fa7/js/eve.js")}'>
+            </script>
+            --->
     <script type="text/javascript"
             src='${static.url("js/graph/strathausen-dracula-a6a5fa7/js/raphael-min.js")}'>
             </script>
-
     <script type="text/javascript"
-            src='${static.url("js/graph/strathausen-dracula-a6a5fa7/js/dracula_graffle.js")}'>
+            src='${static.url("js/graph/strathausen-dracula-a6a5fa7/js/g.raphael.js")}'>
             </script>
     <script type="text/javascript"
             src='${static.url("js/graph/strathausen-dracula-a6a5fa7/js/jquery-1.4.2.min.js")}'></script>
 
     <script type="text/javascript"
+            src='${static.url("js/graph/graph.js" )}'></script>
+
+    <script type="text/javascript"
+            src='${static.url("js/graph/strathausen-dracula-a6a5fa7/js/dracula_graffle.js")}'>
+            </script>
+
+    <script type="text/javascript"
             src='${static.url("js/graph/strathausen-dracula-a6a5fa7/js/dracula_graph.js")}'></script>
 
     <script type="text/javascript"
-            src='${static.url("js/graph/graph.js" )}'></script>
+            src='${static.url("js/fancybox/source/jquery.fancybox.pack.js")}'>
+            </script>
+    <link rel="stylesheet"
+          href='${static.url("js/fancybox/source/jquery.fancybox.css")}'
+          type="text/css" media="screen" />`
 
 
+    <link rel="stylesheet"
+          href='${static.url("js/vendor/jquery-ui-1.10.3.custom/css/smoothness/jquery-ui-1.10.3.custom.css")}'
+          type="text/css" media="screen" />`
 
-    <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
-    <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
-    <script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
+    <script type="text/javascript"
+            src='${static.url("js/vendor/jquery-ui-1.10.3.custom/js/jquery-1.9.1.js")}'>
+            </script>
+    <script type="text/javascript"
+            src='${static.url("js/vendor/jquery-ui-1.10.3.custom/js/jquery-ui-1.10.2.custom.js")}'>
+            </script>
         <!---
             jQuery UI 1.10.3 has a bug when dragging makes dialog window jump to the bottom of screen.
             So it is advisable to use version 1.10.2 before it is fixed.
          --->
+    <script type="text/javascript"
+            src='${static.url("js/graph/graph_NodeRender.js" )}'></script>
+    <script type="text/javascript"
+            src='${static.url("js/graph/graph_NodeDetails.js" )}'></script>
 
 <!--- Костыль: я не умею получать тип модуля, поэтому я выдираю его, используя особенности форматирования вывода -->
 <!--- Возможно, стоит добавить всем модулям нужный метод -->
@@ -67,12 +92,67 @@
         ]
      </p>
 
+            <p class="parent-location" style="display:none">${subsection.location}</p>
+
 <div style="display:none">
+    <div id="rename-node" title="Изменить название">
+        <input id="node-rename-input" data-bind='value: value, valueUpdate: "afterkeydown"'/>
+    </div>
     <div id="node-details" title="Подробности">
-        <p class = "dialog-message">Here be dragons</p>
-        <a class="node-edit-link" href="#">Edit</a>
+
+        <p class = "node-name" >Название</p>
+
+        <a class="node-edit-link" href="#">(открыть в редакторе)</a>
+        <hr align="center" width="auto" size="1" color="#000000" />
+        <div id="node-content">
+        </div>
+        <hr align="center" width="auto" size="1" color="#000000" />
+        <div id="node-edges-list">
+            <p class = "node-edges-message">Из этой вершины можно попасть в следующие вершины:</p>
+        </div>
+    </div>
+    <div id="add-new-node" title="Добавление вершины">
+        <input id="node-name-input" data-bind='value: value, valueUpdate: "afterkeydown"'/>
+    </div>
+    <div id="on-exiting-draging-mode" title="Сохранить расположение?">
+        <p>Сохранить изменения в расположении вершин графа?</p>
+    </div>
+    <div id="confirm-edge-deletion" title="Вы уверены?">
+        <p>Вы действительно хотите удалить это ребро?</p>
+    </div>
+    <div id="node-add-condition" title="Добавление перехода">
+
+        <table>
+
+            <tbody data-bind="foreach: conjunctions">
+                <tr>
+                    <td>
+                        <select id="input-field" data-bind='value: field, valueUpdate: "afterkeydown"'>
+                            <option value="score_abs">Результат (абсолютный)</option>
+                            <option value="score_rel">Результат (относительный, %)</option>
+                        </select>
+                    </td>
+                    <td>
+
+                        <select id="input-sign" data-bind='value: sign, valueUpdate: "afterkeydown"'>
+                            <option value="more">&#62;</option>
+                            <option value="more-equals">&#8805;</option>
+                            <option value="equals">=</option>
+                            <option value="less-equals">&#8804;</option>
+                            <option value="less">&#60;</option>
+                        </select>
+
+                    </td>
+                    <td><input id="input-value" data-bind='value: value, valueUpdate: "afterkeydown"' class = "value" /></td>
+                </tr>
+            </tbody>
+        </table>
+
+
     </div>
 </div>
+
+
 
 <div id="canvas"></div>
 <button id="redraw" onclick='redraw();'>Redraw</button>
