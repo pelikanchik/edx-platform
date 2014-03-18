@@ -117,11 +117,17 @@ function generateEdgeData(disjunctions_array, source){
         var condition = disjunctions_array[0]["conjunctions"][0];
 
         var related_vertex_name;
+
+        //condition["source_element_id"] is wrong
+
         if (condition["source_element_id"] === source) {
             related_vertex_name = "";
             about_source = true;
         } else {
-            related_vertex_name = names_obj[condition["source_element_id"]]["name"];
+            console.log(names_obj)
+            console.log(condition["source_element_id"])
+            console.log(names_obj[condition["source_element_id"]])
+            related_vertex_name = names_obj[condition["source_element_id"]] ["name"];
         }
         var percent_sign = (condition["field"] === "score_rel")? "%" : "";
         var sign = parseSign(condition["sign"]);

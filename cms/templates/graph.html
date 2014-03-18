@@ -60,30 +60,24 @@
 <!--- Костыль: я не умею получать тип модуля, поэтому я выдираю его, используя особенности форматирования вывода -->
 <!--- Возможно, стоит добавить всем модулям нужный метод -->
 <!--- (стандартная функция child.module_class не работает) -->
-    <p class="data_string" style="display:none">        {
-        % for every_unit in subsection.get_children():
-        "${every_unit.url_name}" : [
-            % for child in every_unit.get_children():
-               { "url" : "${child.url_name}", "name" : "${child.display_name_with_default}", "type" : "VideoDescriptor" } ,
-            % endfor
-        {} ],<br/>
-        % endfor
-        }
-    </p>
-    <p class="names_string" style="display:none">        {
-        % for every_unit in subsection.get_children():
-        "${every_unit.url_name}" : { "name" : "${every_unit.display_name_with_default}", "location" : "${every_unit.location}"}, <br/>
-        % endfor
-        }
-    </p>
-    <p class="graph_string" style="display:none">        [
+    <p class="data_string" style="display:none">${data_string}</p>
+    <p class="names_string" style="display:none">${names_string} </p>
+    <p class="graph_string2" >        [
         % for every_unit in subsection.get_children():
             ${every_unit.direct_term_with_default} ,<br/>
         % endfor
         ]
      </p>
-
-            <p class="parent-location" style="display:none">${subsection.location}</p>
+    <p class="graph_string" >${graph_string}</p>
+    <p class="names_string2" >        {
+        % for every_unit in subsection.get_children():
+        "${every_unit.url_name}" : { "name" : "${every_unit.display_name_with_default}", "location" : "${every_unit.location}"}, <br/>
+        % endfor
+        }
+    </p>
+    <p class="locators_dict" style="display:none">${locators_dict}</p>
+    <p class="parent-location" style="display:none">${subsection.location}</p>
+    <p class="locator" style="display:none">${locator}</p>
 
 <div style="display:none">
     <div id="rename-node" title="Изменить название">

@@ -113,28 +113,6 @@ function add_node_here(){
 
         var new_node_name = 'Без имени';
 
-    /*
-        var location = "i4x://Org/101/vertical/temp" + Math.round(100*Math.random());
-
-        var i = location.lastIndexOf("/");
-        var node_id = location.slice(i+1);
-
-        g.addNode(node_id, { label : hideRestOfString(new_node_name), render : render} );
-        ids_arr.push(node_id);
-        edges_arr.push([]);
-        names_obj[node_id] = {
-            "name" : new_node_name,
-            "location" : location,
-            "coords_x" : 0,
-            "coords_y" : 0};
-        data_obj[node_id] = [];
-
-        renderer.drawNode(renderer.graph.nodes[node_id])
-
-        raphael_nodes[node_id].set.translate(mouse_x, mouse_y);
-
-    */
-
         $("#node-name-input").val(new_node_name);
         $( "#add-new-node" ).dialog({
             modal: true,
@@ -147,35 +125,48 @@ function add_node_here(){
                         url: "/xblock",
 //                        url: "/create_item",
                         type: "POST",
+                        dataType: "json",
+                        contentType: "application/json",
                         headers: {
                                 'X-CSRFToken': getCookie('csrftoken')
                         },
-                        data: {
-                            'parent_locator': $(".parent-location").text(),
-                            'category': 'vertical',
+                        data: JSON.stringify({
+                            'parent_locator': $(".locator").text(),
+                            'category': "vertical",
                             'display_name': new_node_name
-                        },
+                            }),
                         success : function(answer){
 
-                            var location = answer["id"];
+                            var node_locator = answer["locator"]
+                            //var location = answer["id"];
 
-                            var i = location.lastIndexOf("/");
-                            var node_id = location.slice(i+1);
-                            g.addNode(node_id, { label : hideRestOfString(new_node_name), render : render} );
-                            ids_arr.push(node_id);
+                            var i = node_locator.lastIndexOf("/");
+                            var node_loc = node_locator.slice(i+1);
+                            $.ajax({
+                                url: "/unit/" + node_locator,
+                                type: "GET",
+                                dataType: "json",
+                                contentType: "application/json",
+                                headers: {
+                                        'X-CSRFToken': getCookie('csrftoken')
+                                },
+                                data: JSON.stringify({})
+                                });
+
+                            //var node_id = "temp_trash!";
+                            g.addNode(node_loc, { label : hideRestOfString(new_node_name), render : customRenderFunction} );
+                            ids_arr.push(node_loc);
                             edges_arr.push([]);
-                            names_obj[node_id] = {
+                            names_obj[node_loc] = {
                                 "name" : new_node_name,
-                                "location" : location,
+                                "location" : node_locator,
                                 "coords_x" : 0,
                                 "coords_y" : 0};
-        //                        "coords_x" : "None",
-        //                        "coords_y" : "None"};
-                            data_obj[node_id] = [];
+                            data_obj[node_loc] = [];
 
-                            renderer.drawNode(renderer.graph.nodes[node_id])
+                            renderer.drawNode(renderer.graph.nodes[node_loc])
 
-                            raphael_nodes[node_id].set.translate(new_node_x, new_node_y);
+                            raphael_nodes[node_loc].set.translate(new_node_x, new_node_y);
                             /*
                             renderer.enableDragingMode();
                             renderer.isDrag = raphael_nodes[node_id];
@@ -256,6 +247,7 @@ function canvasDbClick(e) {
     var data_str = $(".data_string").text();
     var names_str = $(".names_string").text();
     var graph_str = $(".graph_string").text();
+    var dict_str = $(".locators_dict").text();
     /*
         Толстый костыль: я не знаю, как сделать так, чтобы последняя (лишняя) запятая не выводилась,
         поэтому я просто удаляю лишнюю запятую руками.
@@ -268,8 +260,6 @@ function canvasDbClick(e) {
     i = graph_str.lastIndexOf(",");
     graph_str = graph_str.slice(0, i) + graph_str.slice(i+1);
 
-
-//    var names = jQuery.parseJSON('{ "9c522b8de7f349eca566c7da934aa334" : "2.2. Вероятностное пространство", "b40da5f79a4d4cc18eba6e06cc80c8dc" : "2.3. Событие, вероятность", "a09f673c00914203a66ff531c5ac8799" : "2.4. Две монетки", "67b72948e71f4d5facae44d6564e8d44" : "2.5. Две монетки", "e00c271f85884ddbb208a491830172bf" : "2.5.2. Отступление про ребра и зависание в воздухе", "6e07ca8275404ed4af030d8b05d1e0af" : "2.6. Решение", "4248689b2d7d44a9a232e89dc26dba52" : "2.7. Ответ и новая задачка", "dddf4927b92a4cd58faeedeba96e2db6" : "2.7.1. Решение", "907cfc12b07a4eefaa0f9efea5831bd5" : "2.7.2. Верно", "93845c777c67468badc9b75d23f17cb9" : "2.7.4. Неверно", "b229b18864a24819bb12fa3cb866b621" : "2.8. Простую или сложную?", "e970a8e7dd214c338bcf22fe2011a9f0" : "2.8.1. Простая задачка", "dc03b5d3bfe54dd0956638a94e2376d4" : "2.8.2. Верно, следующий вопрос", "6e9b14242b1241beb5a3676bdef1f2ec" : "2.8.3. Неверно", "4df81d49e19b4f15a9fbeef8db617f08" : "2.8.4. Оба ответа на задачку даны верно", "33605177a0fe40c287821f04531a4482" : "2.9. Задача про три монеты", "6abde8cef4894e7789e7a5a16d848f2d" : "2.9.1. Неверно", "adb35fda9df94d988823592d0647a41d" : "2.9.2. Верно, следующий вопрос", "591e25c30efc42359e7843f88f8b6ab4" : "2.9.3. Верно, следующий вопрос", "b7da075aa6594ae6bf7b9bbbbf7e5add" : "2.9.4. Всё хорошо, что делаем дальше?", "b771b98e9bce4277831588bcd2a5f068" : "3.1. Решение сложной задачки", "1455eb5e4bb84a398352c86df66e2726" : "3.2. Решение сложной задачки", "285a9823025b4ee7a04ff25f57211a96" : "3.3. Начало тренировки", "83d4e82c156e49e4bc3fb2f975880ca5" : "The End"} ');
     names_obj = jQuery.parseJSON(names_str);
     data_obj = jQuery.parseJSON(data_str);
 
@@ -277,13 +267,16 @@ function canvasDbClick(e) {
 
     var render = customRenderFunction;
 
+    //console.log(names_obj)
     jQuery.each(names_obj, function(id, obj) {
+        console.log("adding node with id " + id)
         var label = hideRestOfString(obj["name"]);
         g.addNode(id, { label : label, render : render} );
         ids_arr.push(id);
     });
 
     edges_arr = jQuery.parseJSON(graph_str );
+    console.log(edges_arr)
 
 
     var source;
@@ -291,12 +284,11 @@ function canvasDbClick(e) {
         jQuery.each(edges_arr[node_number], function(edge_number) {
                 source = ids_arr[node_number];
 
-    var edge_data = generateEdgeData(this.disjunctions, source)
-    g.addEdge(source, this.direct_element_id, { directed : true, label: edge_data.label, stroke: edge_data.color, details: edge_data.details });
-    //g.addEdge(source, this.direct_element_id, { directed : true, label: edge_label });
+                var edge_data = generateEdgeData(this.disjunctions, source)
+                g.addEdge(source, this.direct_element_id, { directed : true, label: edge_data.label, stroke: edge_data.color, details: edge_data.details });
 
+        });
     });
-});
 
 
 //    for( var edge in obj) {
