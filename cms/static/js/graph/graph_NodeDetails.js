@@ -5,6 +5,25 @@
 //var j$ = jQuery.noConflict();
 //var $ = jQuery.noConflict();
 
+function ajax_save_edge(id, metadata){
+    $.ajax({
+        //url: "/save_item",
+        url: "/xblock/" + id,
+        type: "POST",
+        dataType: "json",
+        contentType: "application/json",
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        data: JSON.stringify({
+            'id': id,
+            "state":"public",
+            "data":null,
+            "children":null,
+            'metadata': metadata
+            })
+    });
+}
 function create_new_edge(origin_node, target_node, new_edge_data){
         var origin_node_number = ids_arr.indexOf(origin_node);
 
@@ -22,22 +41,17 @@ function create_new_edge(origin_node, target_node, new_edge_data){
             stroke: data.color
         });
 
-//        var unit_edit = new CMS.Views.UnitEdit({
-        var unit_edit = new UnitEditView({
-    //      el: $('.main-wrapper'),
-//          model: new CMS.Models.Module({
-            model: new ModuleModel({
-                id: names_obj[origin_node]["location"]
-          })
-        });
-
-        var metadata = $.extend({}, unit_edit.model.get('metadata'));
-
+        var metadata = {}
         metadata.display_name = names_obj[origin_node]["name"];
-        metadata.direct_term = JSON.stringify(edges_arr[origin_node_number]);
+        var locator_term = edges_arr[origin_node_number]
 
+        metadata.locator_term = JSON.stringify(edges_arr[origin_node_number]);
+        //metadata.direct_term = JSON.stringify(edges_arr[origin_node_number]);
+
+        console.log(names_obj[origin_node])
         $(".graph_string").html(JSON.stringify(edges_arr));
-        ajax_save_item(names_obj[origin_node]["location"], metadata);
+        //ajax_save_edge(names_obj[origin_node]["locator"], metadata);
+        ajax_save_edge(origin_node, metadata);
 }
 
 function bindNewEdgeTo(ellipse, node){
@@ -124,9 +138,6 @@ function generateEdgeData(disjunctions_array, source){
             related_vertex_name = "";
             about_source = true;
         } else {
-            console.log(names_obj)
-            console.log(condition["source_element_id"])
-            console.log(names_obj[condition["source_element_id"]])
             related_vertex_name = names_obj[condition["source_element_id"]] ["name"];
         }
         var percent_sign = (condition["field"] === "score_rel")? "%" : "";

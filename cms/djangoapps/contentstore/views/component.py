@@ -90,7 +90,9 @@ def show_graph(request, tag=None, package_id=None, branch=None, version_guid=Non
         data_string += "\"" + current_locator + "\" : ["
         names_string += "\"" + current_locator + "\" : { \"name\" : \"" + \
                         every_unit.display_name_with_default + "\", \"location\" : \"" + \
-                        str(every_unit.location) + "\"}, <br/>"
+                        str(every_unit.location) + \
+                        "\", \"locator\" : \"" + str(every_unit_locator) + \
+                        "\"}, <br/>"
 
         current_old_location = str(every_unit.location)
         i = current_old_location.rfind("/")
@@ -108,7 +110,11 @@ def show_graph(request, tag=None, package_id=None, branch=None, version_guid=Non
 
     for every_unit in item.get_children():
         edge_json = json.loads(str(every_unit.direct_term_with_default))
+        print "!!!"
+        print edge_json
+        print "!!"
         for x in edge_json:
+            print x
             x["direct_element_id"] = locators_dict[x["direct_element_id"]]
             for every_edge in x["disjunctions"]:
                 for every_cond in every_edge["conjunctions"]:

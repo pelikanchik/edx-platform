@@ -142,18 +142,7 @@ function add_node_here(){
 
                             var i = node_locator.lastIndexOf("/");
                             var node_loc = node_locator.slice(i+1);
-                            $.ajax({
-                                url: "/unit/" + node_locator,
-                                type: "GET",
-                                dataType: "json",
-                                contentType: "application/json",
-                                headers: {
-                                        'X-CSRFToken': getCookie('csrftoken')
-                                },
-                                data: JSON.stringify({})
-                                });
 
-                            //var node_id = "temp_trash!";
                             g.addNode(node_loc, { label : hideRestOfString(new_node_name), render : customRenderFunction} );
                             ids_arr.push(node_loc);
                             edges_arr.push([]);
@@ -269,7 +258,6 @@ function canvasDbClick(e) {
 
     //console.log(names_obj)
     jQuery.each(names_obj, function(id, obj) {
-        console.log("adding node with id " + id)
         var label = hideRestOfString(obj["name"]);
         g.addNode(id, { label : label, render : render} );
         ids_arr.push(id);
@@ -284,8 +272,8 @@ function canvasDbClick(e) {
         jQuery.each(edges_arr[node_number], function(edge_number) {
                 source = ids_arr[node_number];
 
-                var edge_data = generateEdgeData(this.disjunctions, source)
-                g.addEdge(source, this.direct_element_id, { directed : true, label: edge_data.label, stroke: edge_data.color, details: edge_data.details });
+                var edge_data = generateEdgeData(this["disjunctions"], source)
+                g.addEdge(source, this["direct_element_id"], { directed : true, label: edge_data.label, stroke: edge_data.color, details: edge_data.details });
 
         });
     });

@@ -11,10 +11,6 @@
                 var has_video = false;
                 var has_capa = false;
                 var has_text = false;
-                console.log("rendering, everything is OK!")
-                console.log(data_obj)
-                console.log(node.id)
-                console.log(node)
 
                 jQuery.each(data_obj[node.id], function(number) {
                     if (data_obj[node.id][number].type != undefined){
@@ -30,7 +26,6 @@
                         }
                     }
                 });
-                console.log("rendering, everything is OK!")
 
                 var node_form;
                 var vertex_text;
