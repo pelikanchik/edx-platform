@@ -83,8 +83,8 @@ function bindNewEdgeTo(ellipse, node){
 
                     create_new_edge(origin_node, node.id, new_edge_data);
 
-                    save_layout();
-                    load_layout();
+                    //save_layout();
+                    //load_layout();
                     renderer.draw();
 
             //        for (var i = 0; i < g.edges.length; i++) {

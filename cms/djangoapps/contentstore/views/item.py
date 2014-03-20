@@ -217,8 +217,6 @@ def _save_item(request, usage_loc, item_location, data=None, children=None, meta
                         i = old_loc.rfind("/")
                         short_name = old_loc[i+1:]
                         x["direct_element_id"] = short_name
-                        print ("Trying to translate your stuff!")
-                        print (old_loc)
                         for every_edge in x["disjunctions"]:
                             for every_cond in every_edge["conjunctions"]:
                                 old_loc = str(loc_mapper().translate_locator_to_location(every_cond["source_element_id"]))
@@ -232,11 +230,6 @@ def _save_item(request, usage_loc, item_location, data=None, children=None, meta
                     temp_key = metadata_key
                     temp_value = value
 
-                print ("transformed!")
-                print ("FROM")
-                print (value)
-                print ("TO")
-                print (temp_value)
                 field = existing_item.fields[temp_key]
 
                 if temp_value is None:
