@@ -1,6 +1,6 @@
 ---
 metadata:
-    display_name: Задача с адаптивными подсказками в Latex
+    display_name: Задание на LaTex с подсказкой, подстраивающейся под ответ
     source_code: |
         \subsection{Problem With Adaptive Hint}
 
@@ -85,7 +85,7 @@ data: |
     What is the best programming language that exists today? You may enter your answer in upper or lower case, with or without quotes. </p>
         <p>
           <customresponse cfn="test_str" expect="python">
-            <textline correct_answer="python"/>
+            <textline correct_answer="python" label="What is the best programming language that exists today?"/>
             <hintgroup hintfn="hint_fn"/>
           </customresponse>
         </p>

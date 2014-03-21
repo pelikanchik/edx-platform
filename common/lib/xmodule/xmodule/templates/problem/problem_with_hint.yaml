@@ -1,15 +1,15 @@
 ---
 metadata:
-    display_name: Задача с адаптивными подсказками
+    display_name: Задание с подсказкой подстраивающейся под ответ
     markdown: !!null
 data: |
     <problem>
       <text>
         <p>
-          <h4>Problem With Adaptive Hint</h4>
+          <h4>Задача с подсказкой, подстраивающейся под ответ</h4>
         </p>
         <p>
-    This problem demonstrates a question with hints, based on using the <tt class="tt">hintfn</tt> method. </p>
+    Этот пример иллюстрирует использование подсказок, подстраивающихся под ответ пользователя. Основным здесь является метод <tt class="tt">hint_fn</tt></p>
         <script type="text/python" system_path="python_lib">
     def test_str(expect, ans):
       print expect, ans

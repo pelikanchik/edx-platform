@@ -12,7 +12,7 @@
     <header>
         <h3 class="checklist-title title-2 is-selectable" title="Collapse/Expand this Checklist">
             <i class="icon-caret-down ui-toggle-expansion"></i>
-            <%= checklistShortDescription %></h3>
+            <%= gettext(checklistShortDescription) %></h3>
               <span class="checklist-status status">
                 <%= gettext("Tasks Completed:") %> <span class="status-count"><%= itemsChecked %></span>/<span class="status-amount"><%= items.length %></span>
                 <i class="icon-ok"></i>
@@ -38,8 +38,8 @@
                 <% } %>
                 >
                 <label class="task-details" for="<%= taskId %>">
-                    <h4 class="task-name title title-3"><%= item['short_description'] %></h4>
-                    <p class="task-description"><%= item['long_description'] %></p>
+                    <h4 class="task-name title title-3"><%= gettext(item['short_description']) %></h4>
+                    <p class="task-description"><%= gettext(item['long_description']) %></p>
                 </label>
 
                 <% if (item['action_text'] !== '' && item['action_url'] !== '') { %>
@@ -49,7 +49,7 @@
                         <% if (item['action_external']) { %>
                         rel="external" title="<%= gettext("This link will open in a new browser window/tab") %>"
                         <% } %>
-                        ><%= item['action_text'] %></a>
+                        ><%= gettext(item['action_text']) %></a>
                     </li>
                 </ul>
                 <% } %>

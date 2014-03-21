@@ -1,10 +1,10 @@
 ---
 metadata:
-    display_name: Множественное позиционирование
+    display_name: Задание на перетаскивание элементов
     markdown: !!null
 data: |
     <problem>
-      Here's an example of a "Drag and Drop" question set. Click and drag each word in the scrollbar below, up to the numbered bucket which matches the number of letters in the word.
+      Ниже вы видите пример задания на перетаскивание элементов. Петащите слова с панели ниже на ведра, изображенные на картинке, так чтобы число букв в каждом слове соответствовало числу, написанному на ведре.
        <customresponse>
             <drag_and_drop_input img="https://studio.edx.org/c4x/edX/DemoX/asset/L9_buckets.png">
                 <draggable id="1" label="a"/>
@@ -40,12 +40,12 @@ data: |
         </customresponse>
         <customresponse>
             <text>
-                <h2>Drag and Drop with Outline</h2>
-                <p>Please label hydrogen  atoms connected with left carbon atom.</p>
+                <h2>Задание, где выделены области для перетаскивания</h2>
+                <p>Подпишите атомы водорода, связанные с левым атомом углерода.</p>
             </text>
             <drag_and_drop_input img="https://studio.edx.org/c4x/edX/DemoX/asset/ethglycol.jpg" target_outline="true" one_per_target="true" no_labels="true" label_bg_color="rgb(222, 139, 238)">
-                <draggable id="1" label="Hydrogen" />
-                <draggable id="2" label="Hydrogen" />
+                <draggable id="1" label="Водород" />
+                <draggable id="2" label="Водород" />
 
                 <target id="t1_o" x="10" y="67" w="100" h="100"/>
                 <target id="t2" x="133" y="3" w="70" h="70"/>

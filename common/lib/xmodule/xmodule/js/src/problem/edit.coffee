@@ -1,3 +1,4 @@
+
 class @MarkdownEditingDescriptor extends XModule.Descriptor
   # TODO really, these templates should come from or also feed the cheatsheet
   @multipleChoiceTemplate : "( ) incorrect\n( ) incorrect\n(x) correct\n"
@@ -62,7 +63,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
   ###
   confirmConversionToXml: ->
     # TODO: use something besides a JavaScript confirm dialog?
-    return confirm("If you use the Advanced Editor, this problem will be converted to XML and you will not be able to return to the Simple Editor Interface.\n\nProceed to the Advanced Editor and convert this problem to XML?")
+    return confirm(gettext("If you use the Advanced Editor, this problem will be converted to XML and you will not be able to return to the Simple Editor Interface.\n\nProceed to the Advanced Editor and convert this problem to XML?"))
 
   ###
   Event listener for toolbar buttons (only possible when markdown editor is visible).

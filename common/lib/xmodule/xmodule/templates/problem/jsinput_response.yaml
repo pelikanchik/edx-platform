@@ -1,6 +1,6 @@
 ---
 metadata:
-    display_name: Настраиваемое Javascript отображение и проверка
+    display_name: Встроенное задание на Javascript
     markdown: !!null
 data: |
       <problem display_name="webGLDemo">
@@ -24,13 +24,12 @@ data: |
         '''
       </script>
       <p>
-      The shapes below can be selected (yellow) or unselected (cyan).
-      Clicking on them repeatedly will cycle through these two states.
+        Кликните на любой из объектов ниже, чтобы выделить его. Выделенный объект будет желтым.
+        Для того, чтобы снять выделение, кликните на объект еще раз, он вновь станет голубым.
       </p>
       <p>
-      If the cone is selected (and not the cube), a correct answer will be
-      generated after pressing "Check". Clicking on either "Check" or "Save"
-      will register the current state.
+      Для того, чтобы ответ был засчитан как верная, вам необходимо выделить только конус.
+      Для проверки нажмите "Проверить". Нажатие кнопок "Проверить" и "Сохранить" также сохраняет текущее состояние объектов.
       </p>
       <customresponse cfn="vglcfn">
         <jsinput gradefn="WebGLDemo.getGrade"

@@ -263,6 +263,22 @@ msgstr "Этот список един для всей вашей команды
 msgid "Studio checklists"
 msgstr "Список задач Студии"
 
+#: cms/templates/checklists.html:71
+msgid "Getting Started With Studio"
+msgstr "Приступая к Работе со Студией"
+
+#: cms/templates/checklists.html:71
+msgid "Draft a Rough Course Outline"
+msgstr "Черновик Структуры Курса"
+
+#: cms/templates/checklists.html:71
+msgid "Explore edX's Support Tools"
+msgstr "Изучить Инструменты Поддержки"
+
+#: cms/templates/checklists.html:71
+msgid "Draft Your Course About Page"
+msgstr "Черновик страницы о курсе"
+
 #: cms/templates/component.html:10
 msgid "Editor"
 msgstr "Редактор"
@@ -2607,6 +2623,10 @@ msgstr "Есть проблемы вопросы или предложения, 
 #: cms/templates/widgets/tabs-aggregator.html:8
 msgid "name"
 msgstr "имя"
+
+#: common/lib/xmodule/xmodule/video_module.py:311
+msgid "Basic"
+msgstr "Основное"
 
 #: common/templates/course_modes/choose.html:6
 msgid "Register for {} | Choose Your Track"
@@ -5252,6 +5272,10 @@ msgstr "Здесь еще нет сообщений. Станьте первым
 #: lms/templates/discussion/_discussion_module.html:6
 msgid "New Post"
 msgstr "Новое сообщение"
+
+#: lms/templates/discussion/_discussion_module.html:5
+msgid "Show Discussion"
+msgstr "Показать обсуждение"
 
 #: lms/templates/discussion/_filter_dropdown.html:29
 msgid "Filter Topics"
@@ -8431,206 +8455,8 @@ msgstr "ревизии"
 msgid "There are no attachments for this article."
 msgstr "Нет приложений для этой статьи."
 
-#: cms/djangoapps/contentstore/features/checklists.py:28
-#: common/lib/xmodule/xmodule/course_module.py:237
-msgid "Getting Started With Studio"
-msgstr "Приступая к работе со Студией"
-
 msgid "This is the wiki for **{0}**'s _{1}_."
 msgstr "Это вики для **{0}**'s _{1}_."
-#: common/lib/xmodule/xmodule/course_module.py:238
-msgid "Add Course Team Members"
-msgstr "Добавить Членов Команды"
-
-#: common/lib/xmodule/xmodule/course_module.py:239
-msgid "Grant your collaborators permission to edit your course so you can work together."
-msgstr "Предоставьте вашим соавторам доступ к редактированию вашего курса, чтобы работать вместе."
-
-#: common/lib/xmodule/xmodule/course_module.py:242
-msgid "Edit Course Team"
-msgstr "Редактировать Команду Курса"
-
-#: common/lib/xmodule/xmodule/course_module.py:244
-msgid "Set Important Dates for Your Course"
-msgstr "Установить Важные Даты для Вашего Курса"
-
-#: common/lib/xmodule/xmodule/course_module.py:245
-msgid "Establish your course's student enrollment and launch dates on the Schedule and Details page."
-msgstr "На странице Расписание и Детали установите даты регистрации и начала курса для ваших учеников."
-
-#: common/lib/xmodule/xmodule/course_module.py:248
-msgid "Edit Course Details &amp; Schedule"
-msgstr "Редактировать Расписание и Детали"
-
-#: common/lib/xmodule/xmodule/course_module.py:250
-msgid "Draft Your Course's Grading Policy"
-msgstr "Черновик Ваших Правил Оценивания Курса"
-
-#: common/lib/xmodule/xmodule/course_module.py:251
-msgid "Set up your assignment types and grading policy even if you haven't created all your assignments."
-msgstr "Установите типы заданий и правила оценивания, даже если вы еще не создали все задания."
-
-#: common/lib/xmodule/xmodule/course_module.py:254
-msgid "Edit Grading Settings"
-msgstr "Редактировать Оценивание"
-
-#: common/lib/xmodule/xmodule/course_module.py:256
-msgid "Explore the Other Studio Checklists"
-msgstr "Изучить Другие Списки Контроля Студии"
-
-#: common/lib/xmodule/xmodule/course_module.py:257
-msgid "Discover other available course authoring tools, and find help when you need it."
-msgstr "Откройте другие доступные инструменты создания курса и читайте справку, когда вы в ней нуждаетесь."
-
-#: cms/djangoapps/contentstore/features/checklists.py:29
-#: common/lib/xmodule/xmodule/course_module.py:262
-msgid "Draft a Rough Course Outline"
-msgstr "Черновик Структуры Курса"
-
-#: common/lib/xmodule/xmodule/course_module.py:263
-msgid "Create Your First Section and Subsection"
-msgstr "Создайте Ваш Первый Раздел и Подраздел"
-
-#: common/lib/xmodule/xmodule/course_module.py:264
-msgid "Use your course outline to build your first Section and Subsection."
-msgstr "Используйте структуру вашего курса для создания вашего Первого Раздела и Подраздела."
-
-#: common/lib/xmodule/xmodule/course_module.py:267
-msgid "Edit Course Outline"
-msgstr "Редактировать Структуру Курса"
-
-#: common/lib/xmodule/xmodule/course_module.py:269
-msgid "Set Section Release Dates"
-msgstr "Установите Дату Начала для Раздела"
-
-#: common/lib/xmodule/xmodule/course_module.py:270
-msgid "Specify the release dates for each Section in your course. Sections become visible to students on their release dates."
-msgstr "Определите дату начала для каждого Раздела в вашем курсе. В этот день Раздел станет видимым для учеников."
-
-#: common/lib/xmodule/xmodule/course_module.py:275
-msgid "Designate a Subsection as Graded"
-msgstr "Сделайте Раздел Оцениваемым"
-
-#: common/lib/xmodule/xmodule/course_module.py:276
-msgid "Set a Subsection to be graded as a specific assignment type. Assignments within graded Subsections count toward a student's final grade."
-msgstr "Установите тип оценивания Раздела как у задания определенного типа. Задания из оцениваемых Разделов идут в итоговую оценку ученика."
-
-#: common/lib/xmodule/xmodule/course_module.py:281
-msgid "Reordering Course Content"
-msgstr "Упорядочите Контент Курса"
-
-#: common/lib/xmodule/xmodule/course_module.py:282
-msgid "Use drag and drop to reorder the content in your course."
-msgstr "Используйте интерфейс 'drag and drop' для упорядочивания контента вашего курса."
-
-#: common/lib/xmodule/xmodule/course_module.py:287
-msgid "Renaming Sections"
-msgstr "Переименование Разделов"
-
-#: common/lib/xmodule/xmodule/course_module.py:288
-msgid "Rename Sections by clicking the Section name from the Course Outline."
-msgstr "Переименуйте Разделы кликом по имени Раздела в Структуре Курса"
-
-#: common/lib/xmodule/xmodule/course_module.py:293
-msgid "Deleting Course Content"
-msgstr "Удаление Контента Курса"
-
-#: common/lib/xmodule/xmodule/course_module.py:294
-msgid "Delete Sections, Subsections, or Units you don't need anymore. Be careful, as there is no Undo function."
-msgstr "Удалите Разделы, Подразделы или Элементы Подраздела, которые вам больше не нужны. Будьте осторожны, удаленные разделы нельзя восстановить."
-
-#: common/lib/xmodule/xmodule/course_module.py:299
-msgid "Add an Instructor-Only Section to Your Outline"
-msgstr "Добавить в Структуру Раздел Только для Преподавателя"
-
-#: common/lib/xmodule/xmodule/course_module.py:300
-msgid "Some course authors find using a section for unsorted, in-progress work useful. To do this, create a section and set the release date to the distant future."
-msgstr "Некоторым авторам курсов удобно использовать какой-то раздел для хранения черновых элементов курса. Для этого создайте раздел и установите дату начала на далекое будущее."
-
-#: cms/djangoapps/contentstore/features/checklists.py:30
-#: common/lib/xmodule/xmodule/course_module.py:305
-msgid "Explore edX's Support Tools"
-msgstr "Изучить Инструменты Поддержки"
-
-#: common/lib/xmodule/xmodule/course_module.py:306
-msgid "Explore the Studio Help Forum"
-msgstr "Изучить Центр Поддержки Студии"
-
-#: common/lib/xmodule/xmodule/course_module.py:307
-msgid "Access the Studio Help forum from the menu that appears when you click your user name in the top right corner of Studio."
-msgstr "Доступ к Центру Поддержки Студии можно получить из меню Помощь в правом верхнем углу Студии."
-
-#: common/lib/xmodule/xmodule/course_module.py:310
-msgid "Visit Studio Help"
-msgstr "Перейти к Центру Поддержки Студии"
-
-#: common/lib/xmodule/xmodule/course_module.py:312
-msgid "Enroll in edX 101"
-msgstr "Зарегистрируйтесь на edX 101"
-
-#: common/lib/xmodule/xmodule/course_module.py:313
-msgid "Register for edX 101, edX's primer for course creation."
-msgstr "Зарегистрируйтесь на курс edX 101, это курс по созданию курсов для начинающих авторов."
-
-#: common/lib/xmodule/xmodule/course_module.py:316
-msgid "Register for edX 101"
-msgstr "Зарегистрироваться на edX 101"
-
-#: common/lib/xmodule/xmodule/course_module.py:318
-msgid "Download the Studio Documentation"
-msgstr "Загрузите Документацию к Студии"
-
-#: common/lib/xmodule/xmodule/course_module.py:319
-msgid "Download the searchable Studio reference documentation in PDF form."
-msgstr "Загрузите документацию к Студии в формате PDF, по которой возможен поиск."
-
-#: common/lib/xmodule/xmodule/course_module.py:322
-msgid "Download Documentation"
-msgstr "Загрузить Документацию"
-
-#: cms/djangoapps/contentstore/features/checklists.py:31
-#: common/lib/xmodule/xmodule/course_module.py:324
-msgid "Draft Your Course About Page"
-msgstr "Черновик страницы о курсе"
-
-#: common/lib/xmodule/xmodule/course_module.py:325
-msgid "Draft a Course Description"
-msgstr "Черновик Описания Курса"
-
-#: common/lib/xmodule/xmodule/course_module.py:326
-msgid "Courses on edX have an About page that includes a course video, description, and more. Draft the text students will read before deciding to enroll in your course."
-msgstr "Курсы на edX содержат страницу О курсе, которая содержит видео, описание, и т.д. Введите текст, который ученики увидят перед регистрацией на ваш курс."
-
-#: common/lib/xmodule/xmodule/course_module.py:329
-#: common/lib/xmodule/xmodule/course_module.py:335
-#: common/lib/xmodule/xmodule/course_module.py:341
-#: common/lib/xmodule/xmodule/course_module.py:347
-msgid "Edit Course Schedule &amp; Details"
-msgstr "Редактировать Расписание и Детали"
-
-#: common/lib/xmodule/xmodule/course_module.py:331
-msgid "Add Staff Bios"
-msgstr "Добавить Биографии Членов Команды Курса"
-
-#: common/lib/xmodule/xmodule/course_module.py:332
-msgid "Showing prospective students who their instructor will be is helpful. Include staff bios on the course About page."
-msgstr "Знакомство будущих учеников с их преподавателями будет полезно. Добавьте биографии членов команды курса на страницу О курсе."
-
-#: common/lib/xmodule/xmodule/course_module.py:337
-msgid "Add Course FAQs"
-msgstr "Добавить Инструкции к Курсу"
-
-#: common/lib/xmodule/xmodule/course_module.py:338
-msgid "Include a short list of frequently asked questions about your course."
-msgstr "Включает короткий список часто задаваемых вопросов о вашем курсе."
-
-#: common/lib/xmodule/xmodule/course_module.py:343
-msgid "Add Course Prerequisites"
-msgstr "Добавить Необходимые Требования"
-
-#: common/lib/xmodule/xmodule/course_module.py:344
-msgid "Let students know what knowledge and/or skills they should have before they enroll in your course."
-msgstr "Объявите ученикам какие знания и/или навыки необходимы перед регистрацией на ваш курс."
 
 #: admin.py:72 models/article.py:28
 msgid "created"

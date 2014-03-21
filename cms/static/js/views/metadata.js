@@ -252,7 +252,7 @@ function(BaseView, _, MetadataModel, AbstractEditor, VideoList) {
         templateName: "metadata-option-entry",
 
         getValueFromEditor : function () {
-            var selectedText = this.$el.find('#' + this.uniqueId).find(":selected").text();
+            var selectedText = this.$el.find('#' + this.uniqueId).find(":selected").val();
             var selectedValue;
             _.each(this.model.getOptions(), function (modelValue) {
                 if (modelValue === selectedText) {
@@ -274,7 +274,7 @@ function(BaseView, _, MetadataModel, AbstractEditor, VideoList) {
                 }
             });
             this.$el.find('#' + this.uniqueId + " option").filter(function() {
-                return $(this).text() === value;
+                return $(this).val() === value;
             }).prop('selected', true);
         }
     });
