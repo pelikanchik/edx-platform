@@ -1,22 +1,20 @@
 ---
 metadata:
-    display_name: Выбор ответа
+    display_name: Тестовое задание с несколькими правильными ответами
     markdown: |
-      A checkboxes problem presents checkbox buttons for student input. Students can select more
-      than one option presented.
-
-      [x] correct
-      [ ] incorrect
-      [x] correct
-
+      В данном задании ученики должны отметить верные ответы галочками. Верных ответов может быть несколько.
+      
+      [x] Верный ответ
+      [ ] Неверный ответ
+      [x] Верный ответ
 data: |
       <problem>
-        <p>A checkboxes problem presents checkbox buttons for student input. Students can select more than one option presented.</p>
+        <p>В данном задании ученики должны отметить верные ответы галочками. Верных ответов может быть несколько.</p>
         <choiceresponse>
           <checkboxgroup direction="vertical">
-            <choice correct="true">correct</choice>
-            <choice correct="false">incorrect</choice>
-            <choice correct="true">correct</choice>
+            <choice correct="true">Верный ответ</choice>
+            <choice correct="false">Неверный ответ</choice>
+            <choice correct="true">Верный ответ</choice>
           </checkboxgroup>
         </choiceresponse>
       </problem>

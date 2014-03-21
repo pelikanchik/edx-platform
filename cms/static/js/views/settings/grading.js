@@ -23,7 +23,7 @@ var GradingView = ValidatingView.extend({
         var self = this;
         this.template = _.template($("#course_grade_policy-tpl").text());
         this.gradeCutoffTemplate = _.template('<li class="grade-specific-bar" style="width:<%= width %>%"><span class="letter-grade" contenteditable="true">' +
-                '<%= descriptor %>' +
+                '<%= gettext(descriptor) %>' +
                 '</span><span class="range"></span>' +
                 '<% if (removable) {%><a href="#" class="remove-button">remove</a><% ;} %>' +
         '</li>');

@@ -1,6 +1,6 @@
 ---
 metadata:
-    display_name: Задача в LaTeX
+    display_name: Задание в LaTeX
     source_code: |
         % Nearly any kind of edX problem can be authored using Latex as
         % the source language.  Write latex as usual, including equations.  The

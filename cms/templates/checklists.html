@@ -63,12 +63,12 @@ require(["domReady!", "jquery", "js/collections/checklist", "js/views/checklist"
       </div>
 
       <div class="bit">
-        <h3 class="title title-3">Studio checklists</h3>
+        <h3 class="title title-3">${_("Studio checklists")}</h3>
         <nav class="nav-page checklists-current">
           <ol>
             % for checklist in checklists:
             <li class="nav-item">
-              <a rel="view" href="${'#course-checklist' + str(loop.index)}">${checklist['short_description']}</a>
+              <a rel="view" href="${'#course-checklist' + str(loop.index)}">${_(checklist['short_description'])}</a>
             </li>
             % endfor
           </ol>
