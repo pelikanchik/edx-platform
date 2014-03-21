@@ -57,6 +57,8 @@
     <script type="text/javascript"
             src='${static.url("js/graph/graph_NodeDetails.js" )}'></script>
 
+<img id = "Delete-icon-base" src = '${static.url("img/Delete-icon.png")}' />
+
 <!--- Костыль: я не умею получать тип модуля, поэтому я выдираю его, используя особенности форматирования вывода -->
 <!--- Возможно, стоит добавить всем модулям нужный метод -->
 <!--- (стандартная функция child.module_class не работает) -->
@@ -135,5 +137,6 @@
 
 <div id="canvas"></div>
 <button id="redraw" onclick='redraw();'>Redraw</button>
+<button id="mode" onclick="moving_mode();">mode</button>
 
 </%block>

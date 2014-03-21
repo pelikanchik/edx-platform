@@ -78,18 +78,17 @@ function getCookie(name) {
 
 function is_edge_exists(origin_node, target){
     var exists = false;
-
     var origin_node_number = ids_arr.indexOf(origin_node);
+
     for(var i=0; i<edges_arr[origin_node_number].length; i++){
         var e = edges_arr[origin_node_number][i]
         if (e["direct_element_id"]===target){
             exists = true;
+            return exists;
         }
-        return exists;
     };
     return exists;
 }
-
 
 
 function ajax_save_item(id, metadata){
@@ -297,6 +296,32 @@ function canvasDbClick(e) {
         layouter.layout();
         renderer.draw();
     };
+
+
+    moving_mode = function() {
+        if (renderer.getDragingMode()) {
+        /*
+            $( "#on-exiting-draging-mode" ).dialog({
+                resizable: false,
+                height: 200,
+                modal: true,
+                buttons: {
+                    "Сохранить": function() {
+                        save_layout();
+                        $( this ).dialog( "close" );
+                    },
+                    "Отмена": function() {
+                        $( this ).dialog( "close" );
+                    }
+                }
+            });
+        */
+            renderer.disableDragingMode();
+        } else {
+            renderer.enableDragingMode();
+        };
+    }
+
 
 };
 

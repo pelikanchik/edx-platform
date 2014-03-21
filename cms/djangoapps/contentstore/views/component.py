@@ -102,6 +102,8 @@ def show_graph(request, tag=None, package_id=None, branch=None, version_guid=Non
         for child in every_unit.get_children():
             data_string += "{ \"url\" : \"" + child.url_name + "\", \"name\" : \"" + child.display_name_with_default + "\""
             data_string += ", \"type\" : \"VideoDescriptor\" },"
+            print "CHILD:"
+            print child
         data_string += "{} ], <br/>"
     data_string += "}"
     names_string += "}"
@@ -110,11 +112,7 @@ def show_graph(request, tag=None, package_id=None, branch=None, version_guid=Non
 
     for every_unit in item.get_children():
         edge_json = json.loads(str(every_unit.direct_term_with_default))
-        print "!!!"
-        print edge_json
-        print "!!"
         for x in edge_json:
-            print x
             x["direct_element_id"] = locators_dict[x["direct_element_id"]]
             for every_edge in x["disjunctions"]:
                 for every_cond in every_edge["conjunctions"]:

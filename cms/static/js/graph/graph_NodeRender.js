@@ -29,8 +29,23 @@
 
                 var node_form;
                 var vertex_text;
-                color = (has_capa)? "#ffd700" : "#080808";
+
+                // ===========================
+                // XXX
+                // TEMPORARY HACK HERE
+                // I don't know how to get node type yet, so
+                // so I will just draw everything like that.
+
+                has_text = true;
+                has_capa = true;
+                has_video = false;
+                color = Raphael.getColor();
+                //color = (has_capa)? "#ffd700" : "#080808";
                 //color = (has_capa)? "#ffd700" : Raphael.getColor();
+
+                //
+                //
+                // ===========================
 
 
                 if (has_video){

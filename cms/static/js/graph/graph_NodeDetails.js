@@ -189,6 +189,9 @@ function createEdgeDeletionCallback( source_node_number, edge_number, string_id)
                 var source_id = ids_arr[source_node_number];
                 var target_id = edge.direct_element_id;
 
+                console.log(source_id)
+                console.log(target_id)
+
                 if (!is_edge_exists(source_id, target_id)){
                     alert("Такого ребра не существует!");
                     return;
@@ -198,20 +201,19 @@ function createEdgeDeletionCallback( source_node_number, edge_number, string_id)
 
                 g.removeEdge(source_id, target_id);
 
-                var unit_edit = new CMS.Views.UnitEdit({
-                  model: new CMS.Models.Module({
-                    id: names_obj[source_id]["location"]
-                  })
-                });
-
-                var metadata = $.extend({}, unit_edit.model.get('metadata'));
-
+                var metadata = {}
                 metadata.display_name = names_obj[source_id]["name"];
-                metadata.direct_term = JSON.stringify(edges_arr[source_node_number]);
+                var locator_term = edges_arr[source_node_number]
+                console.log(locator_term)
+
+                metadata.locator_term = JSON.stringify(edges_arr[source_node_number]);
+                //metadata.direct_term = JSON.stringify(edges_arr[origin_node_number]);
 
                 $(".graph_string").html(JSON.stringify(edges_arr));
+                //ajax_save_edge(names_obj[origin_node]["locator"], metadata);
+                ajax_save_edge(source_id, metadata);
+
                 $("." + string_id).hide();   //css( "display", "none" );
-                ajax_save_item(names_obj[source_id]["location"], metadata);
                 $( this ).dialog( "close" );
             },
             "Отмена": function() {
@@ -237,15 +239,11 @@ function createNodeRenameCallback( node){
                     var node_name = $("#node-rename-input").val();
                     names_obj[node.id]["name"] = node_name;
 
-                    var unit_edit = new CMS.Views.UnitEdit({
-                      model: new CMS.Models.Module({
-                        id: names_obj[node.id]["location"]
-                      })
-                    });
-                    var metadata = $.extend({}, unit_edit.model.get('metadata'));
-
+                    var metadata = {}
                     metadata.display_name = node_name;
-                    ajax_save_item(names_obj[node.id]["location"], metadata);
+
+                    var locator_term = names_obj[node.id]["locator"]
+                    ajax_save_edge(locator_term, metadata);
 
                     renderer.renameNode(node, node_name)
 
@@ -281,6 +279,8 @@ function showNodeDetails(node){
 
     $(".node-name").unbind( "click");
     $(".node-name").bind( "click", renamer );
+
+    $(".node-edit-link").attr("href", "/unit/" + names_obj[node.id]["locator"]);
 
     /*
     $(".node-edit-link").
@@ -318,13 +318,15 @@ function showNodeDetails(node){
             var data = generateEdgeData(edge.disjunctions, node.id).description;
             text_description = "Если набрать в " + data.related_vertex_name + " " + data.sign + " " + data.value + data.percent;
 
+
             // TODO:
             // make a normal function generating this string
 
+            var img_src = $("#Delete-icon-base").attr("src");
             $( "#node-edges-list").append(
                 "<p class=\"node-data " + string_id + "\" title=\"" + text_description + "\">"
 //                + "<img class = \"close\" src = \"/static/img/Delete-icon.png\" data-bind='click: $root.removeDisjunction'/>"
-                + "<img class = \"close " + string_id + "\" src = \"/static/img/Delete-icon.png\" id = \"" + img_id + "\"/>"
+                + "<img class = \"close " + string_id + "\" src = \"" + img_src + "\" id = \"" + img_id + "\"/>"
                 + S + "</p>"
             );
 
@@ -333,6 +335,12 @@ function showNodeDetails(node){
 
             $( "#" + img_id ).unbind( "click");
             $( "#" + img_id ).bind( "click", handler );
+            /*
+            $( "#node-edges-list").append(
+                "<p class=\"node-data " + string_id + "\" title=\"" + text_description + "\">"
+                + S + "</p>"
+            );
+            */
 
         };
 
