@@ -277,26 +277,49 @@ function canvasDbClick(e) {
         });
     });
 
+    var x_arr = [], y_arr = [];
+    var is_defined = true;
+
+        jQuery.each(names_obj, function(id, obj) {
+
+            if ((obj["coords_x"]==="None") || (obj["coords_y"]==="None")) {
+
+                x_arr.push(Math.random());
+                y_arr.push(Math.random());
+    //          is_defined=false;
+            } else {
+                x_arr.push(obj["coords_x"]);
+                y_arr.push(obj["coords_y"]);
+            }
+        });
 
 //    for( var edge in obj) {
 
     /* layout the graph using the Spring layout implementation */
-    var layouter = new Graph.Layout.Spring(g);
+    var layouter;
+    if (is_defined) {
+        layouter = new Graph.Layout.Saved(g, x_arr, y_arr);
+    } else {
+        layouter = new Graph.Layout.Spring(g);
+    }
 
     var width = $(document).width() - 20;
 
-
-//    var height = $(document).height() - 60;
     var height = 100 + 50*ids_arr.length;
+
+
 
     /* draw the graph using the RaphaelJS draw implementation */
     renderer = new Graph.Renderer.Raphael('canvas', g, width, height);
 
     redraw = function() {
+        var layouter = new Graph.Layout.Spring(g);
+        console.log("!! in REDRAW")
         layouter.layout();
+        console.log(layouter)
         renderer.draw();
+        console.log(renderer)
     };
-
 
     moving_mode = function() {
         if (renderer.getDragingMode()) {
@@ -321,6 +344,41 @@ function canvasDbClick(e) {
             renderer.enableDragingMode();
         };
     }
+
+    save_layout = function() {
+
+        // подозреваю, что это можно сделать не в цикле.
+        var counter = 0;
+        for (var node_id in g.nodes) {
+
+            var metadata = {}
+
+            var node = g.nodes[node_id];
+
+            var bBox = raphael_nodes[node_id].getBBox();
+
+            metadata.coords_x = (bBox.x + bBox.width / 2) / width;
+            metadata.coords_y = (bBox.y + bBox.height / 2) / height;
+
+            // what if they are undefined?
+            // no, they were initialized by random
+            x_arr[counter] = metadata.coords_x;
+            y_arr[counter] = metadata.coords_y;
+            counter++;
+
+            ajax_save_node(node_id, metadata);
+
+            //if (states_obj[node_id] == "public")
+            // ...
+        }
+
+//        $(".graph_string").html(JSON.stringify(edges_arr));
+
+    };
+    load_layout = function() {
+        var layouter = new Graph.Layout.Saved(g, x_arr, y_arr);
+        renderer.draw();
+    };
 
 
 };

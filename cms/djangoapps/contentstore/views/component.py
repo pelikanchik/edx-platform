@@ -92,6 +92,8 @@ def show_graph(request, tag=None, package_id=None, branch=None, version_guid=Non
                         every_unit.display_name_with_default + "\", \"location\" : \"" + \
                         str(every_unit.location) + \
                         "\", \"locator\" : \"" + str(every_unit_locator) + \
+                        "\", \"coords_x\" : \"" + str(every_unit.coords_x) + \
+                        "\", \"coords_y\" : \"" + str(every_unit.coords_y) + \
                         "\"}, <br/>"
 
         current_old_location = str(every_unit.location)
@@ -101,9 +103,7 @@ def show_graph(request, tag=None, package_id=None, branch=None, version_guid=Non
 
         for child in every_unit.get_children():
             data_string += "{ \"url\" : \"" + child.url_name + "\", \"name\" : \"" + child.display_name_with_default + "\""
-            data_string += ", \"type\" : \"VideoDescriptor\" },"
-            print "CHILD:"
-            print child
+            data_string += ", \"type\" : \"" + child.get_class + "\" },"
         data_string += "{} ], <br/>"
     data_string += "}"
     names_string += "}"

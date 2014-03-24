@@ -5,7 +5,7 @@
 //var j$ = jQuery.noConflict();
 //var $ = jQuery.noConflict();
 
-function ajax_save_edge(id, metadata){
+function ajax_save_node(id, metadata){
     $.ajax({
         //url: "/save_item",
         url: "/xblock/" + id,
@@ -48,10 +48,9 @@ function create_new_edge(origin_node, target_node, new_edge_data){
         metadata.locator_term = JSON.stringify(edges_arr[origin_node_number]);
         //metadata.direct_term = JSON.stringify(edges_arr[origin_node_number]);
 
-        console.log(names_obj[origin_node])
         $(".graph_string").html(JSON.stringify(edges_arr));
-        //ajax_save_edge(names_obj[origin_node]["locator"], metadata);
-        ajax_save_edge(origin_node, metadata);
+        //ajax_save_node(names_obj[origin_node]["locator"], metadata);
+        ajax_save_node(origin_node, metadata);
 }
 
 function bindNewEdgeTo(ellipse, node){
@@ -210,8 +209,8 @@ function createEdgeDeletionCallback( source_node_number, edge_number, string_id)
                 //metadata.direct_term = JSON.stringify(edges_arr[origin_node_number]);
 
                 $(".graph_string").html(JSON.stringify(edges_arr));
-                //ajax_save_edge(names_obj[origin_node]["locator"], metadata);
-                ajax_save_edge(source_id, metadata);
+                //ajax_save_node(names_obj[origin_node]["locator"], metadata);
+                ajax_save_node(source_id, metadata);
 
                 $("." + string_id).hide();   //css( "display", "none" );
                 $( this ).dialog( "close" );
@@ -243,7 +242,7 @@ function createNodeRenameCallback( node){
                     metadata.display_name = node_name;
 
                     var locator_term = names_obj[node.id]["locator"]
-                    ajax_save_edge(locator_term, metadata);
+                    ajax_save_node(locator_term, metadata);
 
                     renderer.renameNode(node, node_name)
 
