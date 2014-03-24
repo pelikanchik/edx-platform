@@ -57,20 +57,14 @@
     <script type="text/javascript"
             src='${static.url("js/graph/graph_NodeDetails.js" )}'></script>
 
-<img id = "Delete-icon-base" src = '${static.url("img/Delete-icon.png")}' />
+<img id = "Delete-icon-base" style="display:none" src = '${static.url("img/Delete-icon.png")}' />
 
 <!--- Костыль: я не умею получать тип модуля, поэтому я выдираю его, используя особенности форматирования вывода -->
 <!--- Возможно, стоит добавить всем модулям нужный метод -->
 <!--- (стандартная функция child.module_class не работает) -->
     <p class="data_string" style="display:none">${data_string}</p>
-    <p class="names_string" >${names_string} </p>
-    <p class="graph_string2" >        [
-        % for every_unit in subsection.get_children():
-            ${every_unit.direct_term_with_default} ,<br/>
-        % endfor
-        ]
-     </p>
-    <p class="graph_string" >${graph_string}</p>
+    <p class="names_string" style="display:none">${names_string} </p>
+    <p class="graph_string" style="display:none">${graph_string}</p>
     <p class="locators_dict" style="display:none">${locators_dict}</p>
     <p class="parent-location" style="display:none">${subsection.location}</p>
     <p class="locator" style="display:none">${locator}</p>
