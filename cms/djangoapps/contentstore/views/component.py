@@ -31,6 +31,7 @@ from xblock.runtime import Mixologist
 
 __all__ = ['OPEN_ENDED_COMPONENT_TYPES',
            'ADVANCED_COMPONENT_POLICY_KEY',
+           'show_graph',
            'subsection_handler',
            'unit_handler'
            ]
@@ -62,10 +63,15 @@ def is_section_exist(section_id, sections):
     return False
 
 
-def show_graph(request, location):
+#@require_http_methods(("GET", "POST", "PUT"))
+#@ensure_csrf_cookie
+@login_required
+def show_graph(request, tag=None, package_id=None, branch=None, version_guid=None, block=None):
 
+    locator = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
+    print (locator)
     try:
-        item = modulestore().get_item(location, depth=1)
+        old_location, course, item, lms_link = _get_item_in_course(request, locator)
     except ItemNotFoundError:
         return HttpResponseBadRequest()
 
@@ -73,8 +79,57 @@ def show_graph(request, location):
     if item.location.category != 'sequential':
         return HttpResponseBadRequest()
 
+    data_string = "{"
+    names_string = "{"
+    locators_dict = {}
+    for every_unit in item.get_children():
+
+        every_unit_locator = loc_mapper().translate_location(None, every_unit.location)
+
+        current_locator = str(every_unit_locator).replace("/", "\/")
+        data_string += "\"" + current_locator + "\" : ["
+        names_string += "\"" + current_locator + "\" : { \"name\" : \"" + \
+                        every_unit.display_name_with_default + "\", \"location\" : \"" + \
+                        str(every_unit.location) + \
+                        "\", \"locator\" : \"" + str(every_unit_locator) + \
+                        "\"}, <br/>"
+
+        current_old_location = str(every_unit.location)
+        i = current_old_location.rfind("/")
+        short_name = current_old_location[i+1:]
+        locators_dict[short_name] = str(every_unit_locator)
+
+        for child in every_unit.get_children():
+            data_string += "{ \"url\" : \"" + child.url_name + "\", \"name\" : \"" + child.display_name_with_default + "\""
+            data_string += ", \"type\" : \"VideoDescriptor\" },"
+            print "CHILD:"
+            print child
+        data_string += "{} ], <br/>"
+    data_string += "}"
+    names_string += "}"
+
+    graph_string = "["
+
+    for every_unit in item.get_children():
+        edge_json = json.loads(str(every_unit.direct_term_with_default))
+        for x in edge_json:
+            x["direct_element_id"] = locators_dict[x["direct_element_id"]]
+            for every_edge in x["disjunctions"]:
+                for every_cond in every_edge["conjunctions"]:
+                    every_cond["source_element_id"] = locators_dict[every_cond["source_element_id"]]
+
+        edge = json.dumps(edge_json)
+        graph_string += edge + " ,<br/>"
+    graph_string += "]"
+
     return render_to_response('graph.html',
-                              {'subsection': item})
+                              {'subsection': item,
+                               'locator': locator,
+                               'data_string': data_string,
+                               'names_string': names_string,
+                               'graph_string': graph_string,
+                               'locators_dict': locators_dict})
+
 
 
 @require_http_methods(["GET"])
