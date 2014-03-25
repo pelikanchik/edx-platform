@@ -140,21 +140,25 @@ function add_node_here(){
                             //var location = answer["id"];
 
                             var i = node_locator.lastIndexOf("/");
-                            var node_loc = node_locator.slice(i+1);
 
-                            g.addNode(node_loc, { label : hideRestOfString(new_node_name), render : customRenderFunction} );
-                            ids_arr.push(node_loc);
+                            g.addNode(node_locator, { label : hideRestOfString(new_node_name), render : customRenderFunction} );
+                            ids_arr.push(node_locator);
                             edges_arr.push([]);
-                            names_obj[node_loc] = {
+                            names_obj[node_locator] = {
                                 "name" : new_node_name,
-                                "location" : node_locator,
+                                "locator" : node_locator,
                                 "coords_x" : 0,
                                 "coords_y" : 0};
-                            data_obj[node_loc] = [];
+                            data_obj[node_locator] = [];
 
-                            renderer.drawNode(renderer.graph.nodes[node_loc])
+                            //console.log(node_locator)
+                            //console.log(node_loc)
 
-                            raphael_nodes[node_loc].set.translate(new_node_x, new_node_y);
+                            renderer.drawNode(renderer.graph.nodes[node_locator])
+
+                            raphael_nodes[node_locator].set.translate(new_node_x, new_node_y);
+                            renderer.makeDraggable(node_locator);
+                            //renderer.enableDragingMode();
                             /*
                             renderer.enableDragingMode();
                             renderer.isDrag = raphael_nodes[node_id];
@@ -311,14 +315,11 @@ function canvasDbClick(e) {
 
     /* draw the graph using the RaphaelJS draw implementation */
     renderer = new Graph.Renderer.Raphael('canvas', g, width, height);
-
+    renderer.enableDragingMode()
     redraw = function() {
         var layouter = new Graph.Layout.Spring(g);
-        console.log("!! in REDRAW")
         layouter.layout();
-        console.log(layouter)
         renderer.draw();
-        console.log(renderer)
     };
 
     moving_mode = function() {

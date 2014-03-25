@@ -31,8 +31,8 @@
                 var vertex_text;
 
                 //color = Raphael.getColor();
-                //color = (has_capa)? "#ffd700" : "#080808";
-                color = (has_capa)? "#ffd700" : Raphael.getColor();
+                color = (has_capa)? "#ffd700" : "#080808";
+                //color = (has_capa)? "#ffd700" : Raphael.getColor();
 
 
                 if (has_video){
@@ -84,9 +84,12 @@
                 var renamer = createNodeRenameCallback(node);
 //                vertex_text.node.ondblclick = renamer;
 
+                node_form.node.ondblclick = function(){
+                    show_details();
+                }
                 node_form.node.onclick = function(){
-                    if (add_edge_mode) bindNewEdgeTo(node_form, node);
-                    if (!renderer.getDragingMode()) show_details();
+                    if (add_edge_mode) bindNewEdgeTo(node_form, node)
+                    // if (!renderer.getDragingMode()) show_details();
                 };
                 vertex_text.node.onclick = function(){
                     if (add_edge_mode) bindNewEdgeTo(node_form, node);

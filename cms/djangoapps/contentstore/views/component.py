@@ -113,10 +113,17 @@ def show_graph(request, tag=None, package_id=None, branch=None, version_guid=Non
     for every_unit in item.get_children():
         edge_json = json.loads(str(every_unit.direct_term_with_default))
         for x in edge_json:
+            #print()
+
+            #try:
             x["direct_element_id"] = locators_dict[x["direct_element_id"]]
             for every_edge in x["disjunctions"]:
                 for every_cond in every_edge["conjunctions"]:
                     every_cond["source_element_id"] = locators_dict[every_cond["source_element_id"]]
+            #except KeyError:
+            #    # we are dealing with a ghost of removed node
+            #    print(x)
+            #    del x
 
         edge = json.dumps(edge_json)
         graph_string += edge + " ,<br/>"

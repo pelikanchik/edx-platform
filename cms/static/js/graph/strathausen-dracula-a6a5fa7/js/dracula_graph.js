@@ -373,16 +373,22 @@ Graph.Renderer.Raphael.prototype = {
         return this.draging_mode;
     },
 
+    makeDraggable: function(id){
+        console.log(id)
+        console.log(this.graph.nodes)
+        var shape = this.graph.nodes[id].shape;
+        shape.mousedown(this.dragger);
+        shape.items.forEach(function(item){
+            item.node.style.cursor = "move";
+        });
+    },
+
     enableDragingMode: function(){
 //        console.log(this.draging_mode);
-        if (this.draging_mode) return;
+        //if (this.draging_mode) return;
         this.draging_mode = true;
-        for (var i in this.graph.nodes) {
-            var shape = this.graph.nodes[i].shape;
-            shape.mousedown(this.dragger);
-            shape.items.forEach(function(item){
-                item.node.style.cursor = "move";
-            });
+        for (var id in this.graph.nodes) {
+            this.makeDraggable(id)
         }
     },
     disableDragingMode: function(){
