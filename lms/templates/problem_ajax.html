@@ -1,2 +1,8 @@
-<section id="problem_${element_id}" class="problems-wrapper" data-problem-id="${id}" data-url="${ajax_url}" data-progress_status="${progress_status}" data-progress_detail="${progress_detail}"></section>
+<section id="problem_${element_id}" class="problems-wrapper
+
+            %if element_id:
+                styleset-${element_id}
+            %endif
+
+" data-problem-id="${id}" data-url="${ajax_url}" data-progress_status="${progress_status}" data-progress_detail="${progress_detail}"></section>
 

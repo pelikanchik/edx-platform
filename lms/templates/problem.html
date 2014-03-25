@@ -7,7 +7,11 @@
 
 ##<section class="problem-progress"></section>
 
-<section class="problem">
+<section class="problem" data-problem_time="${problem_time}">
+
+  % if additional_css:
+  <style>${additional_css}</style>
+  % endif
   ${ problem['html'] }
 
   <section class="action">
@@ -30,6 +34,17 @@
       ${_("You have used {num_used} of {num_total} submissions").format(num_used=attempts_used, num_total=attempts_allowed)}
     </section>
     % endif
+    %if not problem_now and not is_studio:
+        <input class="resume" type="button" value="${_('Resume')}" />
+    %endif
+    %if not problem_now and is_studio:
+        <input class="show-preview-backshot" type="button" value="${_('Preview')}" />
+        <input class="hide-preview-backshot" type="button" value="${_('Back to editor')}" />
+        <input class="update-view-button" type="button" value="${_('Update')}" />
+    %endif
+    %if problem_time and is_studio:
+        <label class = "problem-time-label">${problem_time}</label>
+    %endif
   </section>
 </section>
 

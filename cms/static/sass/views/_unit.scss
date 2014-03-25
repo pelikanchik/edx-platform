@@ -73,6 +73,12 @@ body.course.unit,.view-unit {
       letter-spacing: 1px;
       text-transform: uppercase;
     }
+
+    h2.problem-header{
+      margin: 0px 0px 15px 0px;
+      font-weight: 400;
+      font-size: 1.2em;
+    }
     // ====================
 
     // Component List Meta
@@ -1196,3 +1202,40 @@ body.unit {
 div.wrapper-comp-editor.is-inactive ~ div.launch-latex-compiler{
  display: none;
 }
+
+
+.problems-wrapper {
+
+    line-height: 1.6em;
+    .action {
+        font-size: 13px;
+    }
+
+    label{
+       font-size: 16px;
+       font-weight: 400;
+    }
+}
+
+
+.problems-wrapper.preview {
+    background: rgba(255, 255, 255, 1);
+    padding: 20px;
+    line-height: 1.6em;
+    height: $yandex-player-height - 40px;
+    position: absolute;
+    top: 70px;
+    width: $yandex-player-width - 40px;
+
+    .action {
+        position: absolute;
+        width: $yandex-player-width - 10px;
+        left: 0px;
+        bottom: 0px;
+        background: rgba(0,0,0,0.5);
+        padding: 5px;
+    }
+
+
+}
+

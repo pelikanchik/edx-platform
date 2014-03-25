@@ -1,0 +1,9 @@
+html
+{
+    zoom: expression(
+        runtimeStyle.zoom = 1,
+        document.execCommand('BackgroundImageCache', false, true)
+    );
+
+    /* IE6 кешируем фоновые картинки */ /**/
+}

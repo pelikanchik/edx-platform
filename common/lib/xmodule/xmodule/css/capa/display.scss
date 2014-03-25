@@ -735,22 +735,32 @@ section.problem {
   section.action {
     margin-top: $baseline;
 
-    .save, .check, .show, .reset {
+    .save, .check, .show, .reset, .resume, .show-preview-backshot, .hide-preview-backshot, .update-view-button {
       height: ($baseline*2);
       vertical-align: middle;
       font-weight: 600;
     }
 
-    .save {
+    .save, .resume, .show-preview-backshot, .hide-preview-backshot, .update-view-button {
       @extend .blue-button !optional;
     }
-
+    .hide-preview-backshot, .update-view-button {
+      display: none;
+    }
     .show {
 
       .show-label {
         font-weight: 600;
         font-size: 1.0em;
       }
+    }
+    .problem-time-label{
+      padding: 5px;
+      width: 100px;
+      float: right;
+      border-radius: 5px;
+      background-color: rgba(100, 200, 100, 0.5);
+      text-align: center;
     }
 
     .submission_feedback {

@@ -1,0 +1,13 @@
+/* Сброс стилей для <q> (begin) */ /**/
+    q
+    {
+        quotes: none;
+    }
+
+    /* for Safari */ /**/
+    q:before, q:after
+    {
+        content: '';
+        content: none;
+    }
+/* Сброс стилей для <q> (end) */ /**/

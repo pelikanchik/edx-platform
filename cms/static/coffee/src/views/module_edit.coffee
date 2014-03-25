@@ -162,23 +162,34 @@ define ["backbone", "jquery", "underscore", "gettext", "xblock/runtime.v1",
 
     clickInsertButton: (event) ->
       event.preventDefault()
-      vidtime = @$el.find('.vidtime')
-      time_str = vidtime.html()
-      cur_time_str = time_str.substr(0,time_str.indexOf('/')-1)
-      duration_time_str = time_str.substr(time_str.indexOf('/')+2)
-      cur_time_str_parts = cur_time_str.split(':')
-      time = 0
-      for elem in cur_time_str_parts
-        time_part = parseInt(elem)
-        time = time*60+time_part
-      if time > 0
-        if cur_time_str == duration_time_str
-          time = time-1
-      if time == 0
-        time = 1
-      seconds = time%60
-      minutes = ((time-seconds)/60)%60
-      hours = (time-minutes*60-seconds)/3600
+
+      if !@$el.find('.vidtime').html()
+        #yandex
+        current_time = GetPlayer().getCurrentTime();
+        duration_time = GetPlayer().getMovieInfo().duration;
+        if current_time > 0
+          if current_time == duration_time
+            current_time -= 1
+      else
+        #youtube
+        vidtime = @$el.find('.vidtime')
+        time_str = vidtime.html()
+        cur_time_str = time_str.substr(0,time_str.indexOf('/')-1)
+        duration_time_str = time_str.substr(time_str.indexOf('/')+2)
+        cur_time_str_parts = cur_time_str.split(':')
+        current_time = 0
+        for elem in cur_time_str_parts
+          time_part = parseInt(elem)
+          current_time = current_time*60+time_part
+        if current_time > 0
+          if cur_time_str == duration_time_str
+            current_time = current_time - 1
+
+      if current_time == 0
+         current_time = 1
+      seconds = current_time%60
+      minutes = ((current_time-seconds)/60)%60
+      hours = (current_time-minutes*60-seconds)/3600
       seconds_str = seconds + ""
       if seconds_str.length == 1
         seconds_str = "0" + seconds_str
@@ -199,22 +210,28 @@ define ["backbone", "jquery", "underscore", "gettext", "xblock/runtime.v1",
 
     clickInsertToEndButton: (event) ->
       event.preventDefault()
-      vidtime = @$el.find('.vidtime')
-      time_str = vidtime.html()
-      duration_time_str = time_str.substr(time_str.indexOf('/')+2)
-      duration_time_str = duration_time_str.split(':')
-      time = 0
-      for elem in duration_time_str
-        time_part = parseInt(elem)
-        time = time*60+time_part
-      if time == 0
+      if !@$el.find('.vidtime').html()
+        #yandex
+        current_time = GetPlayer().getCurrentTime();
+        duration_time = GetPlayer().getMovieInfo().duration;
+      else
+        #youtube
+        vidtime = @$el.find('.vidtime').html()
+        duration_time_str = vidtime.substr(vidtime.indexOf('/')+2)
+        duration_time_str = duration_time_str.split(':')
+        duration_time = 0
+        for elem in duration_time_str
+          time_part = parseInt(elem)
+          duration_time = duration_time * 60 + time_part
+
+      if duration_time == 0
         alert "Video wasn't loaded yet. Please, press Play button"
       else
-        time = time-1
-        seconds = time%60
-        minutes = ((time-seconds)/60)%60
-        hours = (time-minutes*60-seconds)/3600
-        seconds_str = seconds + ""
+        duration_time -= 1
+        seconds = duration_time%60
+        minutes = ((duration_time-seconds)/60)%60
+        hours = (duration_time-minutes*60-seconds)/3600
+        seconds_str = parseInt(seconds) + ""
         if seconds_str.length == 1
           seconds_str = "0" + seconds_str
         minutes_str = minutes + ""

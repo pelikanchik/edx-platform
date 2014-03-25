@@ -56,6 +56,9 @@ FEATURES = {
     # Enable URL that shows information about the status of various services
     'ENABLE_SERVICE_STATUS': False,
 
+    # Use YouTube or Yandex player
+    'VIDEO_PLAYER_NAME': 'Yandex',
+
     # Don't autoplay videos for course authors
     'AUTOPLAY_VIDEOS': False,
 

@@ -1,0 +1,9 @@
+/* Global definitions: Давим показ alt как title (begin) */ /**/
+    img
+    {
+        behavior: expression(
+            runtimeStyle.behavior = 0,
+            (!title && alt) ? title = "" : 0
+        );
+    }
+/* Global definitions: Давим показ alt как title (end) */ /**/

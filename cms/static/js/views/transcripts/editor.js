@@ -75,7 +75,7 @@ function($, Backbone, _, Utils, MetadataView, MetadataCollection) {
                 component_locator = this.$el.closest('.component').data('locator'),
                 subs = getField(metadataCollection, 'sub'),
                 values = {},
-                videoUrl, metadata, modifiedValues;
+                videoUrl, metadata, modifiedValues, yandex_video_insertion_code;
 
             // If metadataCollection is not passed, just exit.
             if (!metadataCollection || !metadataView) {
@@ -83,7 +83,14 @@ function($, Backbone, _, Utils, MetadataView, MetadataCollection) {
             }
 
             // Get field that should be synchronized with `Advanced` tab fields.
-            videoUrl = getField(this.collection, 'video_url');
+
+            try{
+                videoUrl = getField(this.collection, 'video_url');
+            }
+            catch(err){
+                console.log(err);
+            }
+            yandex_video_insertion_code = getField(this.collection, 'yandex_video_insertion_code');
 
             modifiedValues = metadataView.getModifiedMetadataValues();
 
@@ -144,9 +151,12 @@ function($, Backbone, _, Utils, MetadataView, MetadataCollection) {
 
             result.push(values.youtube);
             result = result.concat(values.html5Sources);
-
-            videoUrl.setValue(result);
-
+            try{
+                videoUrl.setValue(result);
+            }
+            catch(err){
+                console.log(err);
+            }
             // Synchronize other fields that has the same `field_name` property.
             Utils.syncCollections(metadataCollection, this.collection);
 
@@ -192,8 +202,15 @@ function($, Backbone, _, Utils, MetadataView, MetadataCollection) {
 
             // Get value from `Basic` tab `VideoUrl` field that should be
             // synchronized.
-            videoUrlValue = getField(this.collection, 'video_url')
+
+            try{
+                videoUrlValue = getField(this.collection, 'video_url')
                                 .getDisplayValue();
+            }
+            catch(err){
+                console.log(err);
+            }
+
 
             // Change list representation format to more convenient and group
             // them by mode (`youtube`, `html5`).

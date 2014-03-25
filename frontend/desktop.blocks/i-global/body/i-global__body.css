@@ -1,0 +1,15 @@
+/* Global definitions (begin) */ /**/
+    body
+    {
+        font: 1em Arial, Helvetica, sans-serif;
+        /* Чтобы в FF2- заработал z-index: -1 */ /**/
+        position: relative;
+        z-index: 0;
+
+        margin: 0;
+        padding: 0 0 1em 0;
+
+        color: #000;
+        background: #fff;
+    }
+/* Global definitions (end) */ /**/

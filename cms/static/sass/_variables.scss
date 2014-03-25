@@ -9,7 +9,7 @@ $gw-gutter: $baseline;
 $fg-column: $gw-column;
 $fg-gutter: $gw-gutter;
 $fg-max-columns: 12;
-$fg-max-width: 1280px;
+$fg-max-width: 1340px;
 $fg-min-width: 900px;
 
 // ====================
@@ -218,5 +218,5 @@ $body-line-height: golden-ratio(.875em, 1);
 $action-primary-active-bg: #1AA1DE; // $m-blue
 $very-light-text: #fff;
 
-
-
+$yandex-player-height: 480px;
+$yandex-player-width: 800px;

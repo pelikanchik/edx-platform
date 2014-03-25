@@ -1,6 +1,6 @@
 ({
     block: 'b-page',
-    title: 'Привет!',
+    title: 'template',
     head: [
         { elem: 'css', url: '_lms.css', ie: false },
         { elem: 'css', url: '_lms.ie8.css', ie: 8 },
@@ -17,39 +17,6 @@
                         elem: 'layout-column',
                         elemMods: { type : 'center' },
                         content: [
-                            {
-                                block: 'b-lang-switcher',
-                                lang: { code: 'ru', name: 'Ru' },
-                                direction: 'up',
-                                content: [
-                                    {
-                                        elem: 'lang',
-                                        lang: { code: 'by', name: 'By' },
-                                        url: '?lang=by'
-                                    },
-                                    {
-                                        elem: 'lang',
-                                        lang: { code: 'kz', name: 'Kz' },
-                                        url: '?lang=kz'
-                                    },
-                                    {
-                                        elem: 'lang',
-                                        lang: { code: 'ua', name: 'Ua' },
-                                        url: '?lang=ua'
-                                    },
-                                    {
-                                        elem: 'lang',
-                                        lang: { code: 'en', name: 'En' },
-                                        url: '?lang=en'
-                                    },
-                                    {
-                                        elem: 'lang',
-                                        lang: { code: 'ru', name: 'Ru' },
-                                        url: '?lang=ru',
-                                        elemMods: { selected: 'yes' }
-                                    }
-                                ]
-                            }
                         ]
                     },
                     {
@@ -62,7 +29,7 @@
                         content: [
                             {
                                 block: 'b-copyright',
-                                start: 2008
+                                start: 2013
                             }
                         ]
                     }

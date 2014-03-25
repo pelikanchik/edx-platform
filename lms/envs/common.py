@@ -158,6 +158,9 @@ FEATURES = {
     # Toggle to indicate use of a custom theme
     'USE_CUSTOM_THEME': False,
 
+    # Use YouTube or Yandex player
+    'VIDEO_PLAYER_NAME': 'Yandex',
+
     # Don't autoplay videos for students
     'AUTOPLAY_VIDEOS': False,
 

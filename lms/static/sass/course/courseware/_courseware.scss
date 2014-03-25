@@ -51,6 +51,8 @@ div.course-wrapper {
       margin: 0;
       line-height: 1.4;
       list-style: none;
+      position: relative;
+
 
       > li {
         @extend .clearfix;
@@ -122,6 +124,36 @@ div.course-wrapper {
           padding: 0;
           }
         }
+      }
+      > li.backshot{
+
+          display: none;
+          position: absolute;
+          left:0px;
+          top: 50px;
+          padding: 0px;
+          height:$yandex-player-height;
+          width: $yandex-player-width;
+          overflow: auto;
+
+        li.backshot.shown{
+          display: list-item;
+        }
+          .problems-wrapper{
+            background: rgba(255,255,255,1.0);
+            height: 390px;
+            padding: 20px;
+            overflow: auto;
+          }
+          .action {
+            position: absolute;
+            padding: 5px;
+            width: $yandex-player-width - 10px;
+            left: 0px;
+            bottom: 0px;
+            background: rgba(0,0,0,0.5);
+
+          }
       }
     }
 

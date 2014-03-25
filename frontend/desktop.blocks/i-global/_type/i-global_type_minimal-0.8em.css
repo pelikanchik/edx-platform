@@ -1,0 +1,13 @@
+@import url(i-global_type_minimal.css);
+
+/* Грязный хак для сервисов, которые не задают font-size: 80% для body (begin) */ /**/
+    body .l-head
+    {
+        font: 0.8em Arial, Helvetica, sans-serif;
+    }
+
+    body .b-foot
+    {
+        font: 0.7em Arial, Helvetica, sans-serif;
+    }
+/* Грязный хак для сервисов, которые не задают font-size: 80% для body (end) */ /**/

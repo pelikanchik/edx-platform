@@ -44,7 +44,6 @@ import time
 
 log = logging.getLogger(__name__)
 
-
 class VideoFields(object):
     """Fields for `VideoModule` and `VideoDescriptor`."""
     display_name = String(
@@ -66,6 +65,24 @@ class VideoFields(object):
     )
     # TODO: This should be moved to Scope.content, but this will
     # require data migration to support the old video module.
+    yandex_video_insertion_code = String(
+        help='Yandex.Video Insertion Code: <br>&lt;iframe width="450" height="225" src="http://video.yandex.ru/iframe/<span style = "color:green">&lt;login&gt;</span>/<span style = "color:green">&lt;video_id&gt;</span>/" frameborder="0" allowfullscreen="1"&gt;&lt;/iframe&gt;</pre>',
+        display_name="Yandex.Video Insertion Code",
+        scope=Scope.settings,
+        default='<iframe width="450" height="225" src="http://video.yandex.ru/iframe/gerasimenko-alex/m50aaectal.1507/" frameborder="0" allowfullscreen="1"></iframe>'
+    )
+    #yandex_id_1_0 = String(
+    #    help="This is the Yandex.Video ID",
+    #    display_name="Yandex.Video ID",
+    #    scope=Scope.settings,
+    #    default="m50aaectal.1507"
+    #)
+    #yandex_login_1_0 = String(
+    #    help="This is the Yandex.Video host login.",
+    #    display_name="Yandex.Video login",
+    #    scope=Scope.settings,
+    #    default="gerasimenko-alex"
+    #)
     youtube_id_1_0 = String(
         help="This is the Youtube ID reference for the normal speed video.",
         display_name="Youtube ID",
@@ -172,29 +189,38 @@ class VideoModule(VideoFields, XModule):
 
     # To make sure that js files are called in proper order we use numerical
     # index. We do that to avoid issues that occurs in tests.
-    js = {
-        'js': [
-            resource_string(__name__, 'js/src/video/00_cookie_storage.js'),
-            resource_string(__name__, 'js/src/video/00_resizer.js'),
-            resource_string(__name__, 'js/src/video/01_initialize.js'),
-            resource_string(__name__, 'js/src/video/025_focus_grabber.js'),
-            resource_string(__name__, 'js/src/video/02_html5_video.js'),
-            resource_string(__name__, 'js/src/video/03_video_player.js'),
-            resource_string(__name__, 'js/src/video/04_video_control.js'),
-            resource_string(__name__, 'js/src/video/05_video_quality_control.js'),
-            resource_string(__name__, 'js/src/video/06_video_progress_slider.js'),
-            resource_string(__name__, 'js/src/video/07_video_volume_control.js'),
-            resource_string(__name__, 'js/src/video/08_video_speed_control.js'),
-            resource_string(__name__, 'js/src/video/09_video_caption.js'),
-            resource_string(__name__, 'js/src/video/10_main.js')
-        ]
-    }
     css = {'scss': [resource_string(__name__, 'css/video/display.scss')]}
     js_module_name = "Video"
 
+    def sources_for_player(player_name):
+        if player_name == "Yandex":
+            return [
+                resource_string(__name__, 'js/src/video/yandex/yandex_player_main.js')
+            ]
+        elif player_name == "YouTube":
+            return [
+                resource_string(__name__, 'js/src/video/00_cookie_storage.js'),
+                resource_string(__name__, 'js/src/video/00_resizer.js'),
+                resource_string(__name__, 'js/src/video/01_initialize.js'),
+                resource_string(__name__, 'js/src/video/025_focus_grabber.js'),
+                resource_string(__name__, 'js/src/video/02_html5_video.js'),
+                resource_string(__name__, 'js/src/video/03_video_player.js'),
+                resource_string(__name__, 'js/src/video/04_video_control.js'),
+                resource_string(__name__, 'js/src/video/05_video_quality_control.js'),
+                resource_string(__name__, 'js/src/video/06_video_progress_slider.js'),
+                resource_string(__name__, 'js/src/video/07_video_volume_control.js'),
+                resource_string(__name__, 'js/src/video/08_video_speed_control.js'),
+                resource_string(__name__, 'js/src/video/09_video_caption.js'),
+                resource_string(__name__, 'js/src/video/10_main.js')
+            ]
+
+    js = {
+        'js': sources_for_player("Yandex")
+    }
+
+
     def handle_ajax(self, dispatch, data):
         ACCEPTED_KEYS = ['speed']
-
         if dispatch == 'save_user_state':
             for key in data:
                 if hasattr(self, key) and key in ACCEPTED_KEYS:
@@ -229,29 +255,65 @@ class VideoModule(VideoFields, XModule):
             elif self.sub:
                 track_url = self.runtime.handler_url(self, 'download_transcript')
 
-        return self.system.render_template('video.html', {
-            'ajax_url': self.system.ajax_url + '/save_user_state',
-            'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', False),
-            # This won't work when we move to data that
-            # isn't on the filesystem
-            'data_dir': getattr(self, 'data_dir', None),
-            'display_name': self.display_name_with_default,
-            'caption_asset_path': caption_asset_path,
-            'end': self.end_time.total_seconds(),
-            'id': self.location.html_id(),
-            'problem_id': problem_id,
-            'show_captions': json.dumps(self.show_captions),
-            'sources': sources,
-            'speed': self.speed or self.global_speed,
-            'start': self.start_time.total_seconds(),
-            'sub': self.sub,
-            'track': track_url,
-            'youtube_streams': _create_youtube_string(self),
-            # TODO: Later on the value 1500 should be taken from some global
-            # configuration setting field.
-            'yt_test_timeout': 1500,
-            'yt_test_url': settings.YOUTUBE_TEST_URL,
-        })
+        parts_of_url = self.yandex_video_insertion_code.split("video.yandex.ru/iframe/")[1].split("/")
+        print parts_of_url
+        login = parts_of_url[0]
+        storage_id = parts_of_url[1]
+
+        if settings.FEATURES.get('VIDEO_PLAYER_NAME') == "Yandex":
+            return self.system.render_template('video_yandex.html', {
+                "yandex_id_1_0": storage_id,
+                "yandex_login_1_0": login,
+                'ajax_url': self.system.ajax_url + '/save_user_state',
+                'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', False),
+                # This won't work when we move to data that
+                # isn't on the filesystem
+                'data_dir': getattr(self, 'data_dir', None),
+                'display_name': self.display_name_with_default,
+                'caption_asset_path': caption_asset_path,
+                'end': self.end_time.total_seconds(),
+                'id': self.location.html_id(),
+                'problem_id': problem_id,
+                'show_captions': json.dumps(self.show_captions),
+                'sources': sources,
+                'speed': self.speed or self.global_speed,
+                'start': self.start_time.total_seconds(),
+                'sub': self.sub,
+                'track': track_url,
+                'youtube_streams': _create_youtube_string(self),
+                # TODO: Later on the value 1500 should be taken from some global
+                # configuration setting field.
+                'yt_test_timeout': 1500,
+                'yt_test_url': settings.YOUTUBE_TEST_URL,
+
+            })
+
+        elif settings.FEATURES.get('VIDEO_PLAYER_NAME') == "YouTube":
+            return self.system.render_template('video.html', {
+                'ajax_url': self.system.ajax_url + '/save_user_state',
+                'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', False),
+                # This won't work when we move to data that
+                # isn't on the filesystem
+                'data_dir': getattr(self, 'data_dir', None),
+                'display_name': self.display_name_with_default,
+                'caption_asset_path': caption_asset_path,
+                'end': self.end_time.total_seconds(),
+                'id': self.location.html_id(),
+                'problem_id': problem_id,
+                'show_captions': json.dumps(self.show_captions),
+                'sources': sources,
+                'speed': self.speed or self.global_speed,
+                'start': self.start_time.total_seconds(),
+                'sub': self.sub,
+                'track': track_url,
+                'youtube_streams': _create_youtube_string(self),
+                # TODO: Later on the value 1500 should be taken from some global
+                # configuration setting field.
+                'yt_test_timeout': 1500,
+                'yt_test_url': settings.YOUTUBE_TEST_URL,
+
+            })
+
 
     def get_transcript(self, subs_id):
         '''
@@ -471,6 +533,7 @@ class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor
         metadata_fields = copy.deepcopy(self.editable_metadata_fields)
 
         display_name = metadata_fields['display_name']
+        yandex_video_insertion_code = metadata_fields['yandex_video_insertion_code']
         video_url = metadata_fields['html5_sources']
         youtube_id_1_0 = metadata_fields['youtube_id_1_0']
 
@@ -482,11 +545,11 @@ class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor
 
         _ = self.runtime.service(self, "i18n").ugettext
         video_url.update({
-            'help': _('A YouTube URL or a link to a file hosted anywhere on the web.'),
+            'help': _('URL or a link to a file hosted anywhere on the web.'),
             'display_name': 'Video URL',
             'field_name': 'video_url',
             'type': 'VideoList',
-            'default_value': [get_youtube_link(youtube_id_1_0['default_value'])]
+            'default_value': [youtube_id_1_0['default_value']]
         })
 
         youtube_id_1_0_value = get_youtube_link(youtube_id_1_0['value'])
@@ -494,10 +557,19 @@ class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor
         if youtube_id_1_0_value:
             video_url['value'].insert(0, youtube_id_1_0_value)
 
-        metadata = {
-            'display_name': display_name,
-            'video_url': video_url
-        }
+        if settings.FEATURES.get('VIDEO_PLAYER_NAME') == "Yandex":
+            metadata = {
+                'display_name': display_name,
+                #'video_url': video_url,
+                'yandex_video_insertion_code': yandex_video_insertion_code
+            }
+
+        elif settings.FEATURES.get('VIDEO_PLAYER_NAME') == "YouTube":
+            metadata = {
+                'display_name': display_name,
+                'video_url': video_url,
+                #'yandex_video_insertion_code': yandex_video_insertion_code
+            }
 
         _context.update({'transcripts_basic_tab_metadata': metadata})
         return _context

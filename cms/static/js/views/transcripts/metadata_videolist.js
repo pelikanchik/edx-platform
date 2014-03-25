@@ -285,7 +285,7 @@ function($, Backbone, _, AbstractEditor, Utils, MessageManager, MetadataView) {
                 isNotEmpty = Boolean(entry);
 
             // Empty value should not be validated
-            if (this.checkValidity(data, isNotEmpty)) {
+            if (this.checkValidity(data, 0)) {
                 var fieldsValue = this.getValueFromEditor(),
                     modelValue = this.model.getValue();
 

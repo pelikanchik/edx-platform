@@ -1,0 +1,33 @@
+<%! from django.utils.translation import ugettext as _ %>
+
+% if display_name is not UNDEFINED and display_name is not None:
+    <h2>${display_name}</h2>
+% endif
+
+<div
+
+
+    id="video-${id}"
+    class="video closed"
+
+    data-problem-id="${problem_id}"
+
+    data-yandex-login-1-0="${yandex_login_1_0}",
+    data-yandex-id-1-0="${yandex_id_1_0}",
+    data-autoplay="${autoplay}"
+
+
+>
+
+    <div class="tc-wrapper">
+
+        <object type="application/x-shockwave-flash" data="http://static.video.yandex.net/full-10/" width="800" height="480" id="yandex-player">
+        <param name="allowScriptAccess" value="always">
+        <param name="allowfullscreen" value="false">
+        <param name="hasPriority" value="true">
+        <param name="wmode" value="opaque">
+        <param name="flashvars" value="login=${yandex_login_1_0}&storage_directory=${yandex_id_1_0}&onStateChange=onPlayerStateChange&hidden=share,rotate,about,logo,fullscreen">
+        </object>
+
+    </div>
+</div>

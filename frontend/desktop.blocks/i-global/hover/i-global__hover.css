@@ -1,0 +1,7 @@
+/* Global definitions: Links hover (begin) */ /**/
+    :link:hover,
+    :visited:hover
+    {
+        color: #f00 !important/*!head*/;
+    }
+/* Global definitions: Links hover (end) */ /**/

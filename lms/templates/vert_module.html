@@ -1,12 +1,11 @@
 <ol class="vert-mod" id = "vert_all">
 % for idx, item in enumerate(items):
   <li id="vert-${idx}" data-id="${item['id']}"  data-progress_detail="${item['progress_detail']}" data-problem_time="${item['problem_time']}"
+
       %if item['show_now'] == 'false':
-        style="display: none"
+            class = "backshot "
       %endif
-      %if item['show_now'] == 'true':
-        style="display: block"
-      %endif
+
           >
     ${item['content']}
   </li>

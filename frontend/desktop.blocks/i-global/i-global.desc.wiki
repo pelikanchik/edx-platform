@@ -1,0 +1,141 @@
+Блок i-global в качестве элементов содержит фрагменты кода, относящиеся к разным сущностям на странице, но необходимые
+для работы всех блоков. Существует несколько наборов глобальных настроек в зависимости от того, что за страницу
+планируется получить (см. модификаторы).
+
+=== Параметры
+
+BEMHTML-реализация блока описывает способ передачи параметров в шаблоны (и JavaScript).
+
+Для того, чтобы задать во входных данных параметры, необходимо в BEMJSON описать блок ##i-global##, с атрибутом
+##params## (см. [[#i-global.10_i-global_params пример]]):
+
+%%hl js
+// page.bemjson
+
+([
+{
+    block: 'i-global',
+    params: {
+        // параметры
+    }
+},
+{
+    block: 'b-page',
+    // ...
+}
+])
+%%
+
+((http://lego.yandex-team.ru/doc/concept/globalparams.wiki Полный список параметров блока i-global.))
+
+В BEMHTML-шаблонах, параметры доступны как атрибуты объекта ##this['i-global']##:
+%%hl js
+// b-user.bemhtml
+
+block b-user {
+    content: this['i-global'].user
+}
+%%
+
+Наличие объекта параметров гарантируется в шаблоне
+[[http://svn.yandex.ru/lego/versions/2.10/blocks-common/i-global/i-global.bemhtml i-global.bemhtml]], поэтому, в блоках
+зависящих от параметров, **разработчику необходимо самостоятельно описать ##mustDeps-зависимость## от блока
+##i-global##**.
+
+Параметры из ##i-global## передаются в клиентский JavaScript в виде ##mix##-а с блоком
+[[/desktop/common/blocks/b-page b-page]]. Из JavaScript доступны вызовом метода
+##BEM.blocks['i-global'].param('paramName')##.
+
+%%hl js
+// b-head-tabs__mode_live.js
+
+BEM.blocks['i-global'].param('login') !== '' &&
+    this.updateInformer(this.onUpdateSuccess, this.onUpdateError);
+%%
+
+==== Примечание
+Начиная с версии Лего 2.10 описание параметров в функции ##Lego.init({ })## считается устаревшим, но обратная
+совместимость сохранена ([[https://jira.yandex-team.ru/browse/LEGO-5200 LEGO-5200]]).\\
+Рекомендуется использовать методы блока ##i-global##.
+
+=== Глобальные параметры уровня проекта
+
+Для описания глобальных параметров уровня проекта, таких как ##id##, ##lego-static-host## и пр. необходимо доопределить
+шаблон ##i-global.bemhtml## по специальной моде ##env## на своем уровне переопределения (напр.
+[[https://svn.yandex.ru/lego/versions/2.10/configs/development/i-global.bemhtml /configs/current]]):
+
+%%hl js
+// configs/lego.yandex-team.ru/i-global.bemhtml
+
+block i-global {
+
+    this._mode === 'env': ({
+
+        'id': 'lego',
+        'environment': 'production',
+        'social-host': '//social.yandex.ru',
+        'lego-path': '',
+        'lego-static-host': '//yandex.st/lego/{{LEGO_VERSION}}-{{DEB_BUILD_VERSION}}'
+
+    })
+
+}
+%%
+
+Либо описав их как элементы блока ##i-global##:
+
+%%hl js
+// blocks-desktop/i-global/i-global.bemhtml
+
+block i-global {
+
+    elem id: 'lego'
+    elem lego-static-host: '//yandex.st/lego/{{LEGO_VERSION}}-{{DEB_BUILD_VERSION}}'
+
+}
+%%
+
+=== Публичные параметры
+
+В Лего описаны следующие публичные параметры, пробрасываемые в JavaScript:
+##id##,
+##lang##,
+##content-region##,
+##user-region##,
+##login##,
+##displayName##,
+##index##,
+##yandexuid##,
+##passport-host##,
+##pass-host##,
+##passport-msg##,
+##static-host##,
+##lego-static-host##,
+##social-host##,
+##click-host##,
+##export-host##,
+##social-retpath##,
+##lego-path##,
+##sid##,
+##retpath##.
+
+Для того, чтобы добавить выводимые параметры, необходимо описать нужный параметр, как элемент блока ##i-global##,
+по моде ##public-params##, возвращающий ##true##:
+
+%%hl js
+// blocks-desktop/i-global/i-global.bemhtml
+
+block i-global {
+
+    this._mode === 'public-params' {
+
+        elem oframebust: true
+
+    }
+
+}
+%%
+
+После этого, параметр (в данном случае ##oframebust##), будет подмешан к остальным параметрам в ##i-global##
+и соответствено будет доступен в клиентском JavaScript.
+

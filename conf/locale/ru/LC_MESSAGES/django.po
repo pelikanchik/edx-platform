@@ -7086,6 +7086,14 @@ msgstr "Вставить задачу в конец"
 
 msgid "Terms of Service"
 msgstr "Пользовательское соглашение"
+
+
+#alexger backshots
+
+msgid "Resume"
+msgstr "Вернуться"
+
+
 #django_partial.po
 
 

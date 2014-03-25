@@ -1,0 +1,8 @@
+@import url(../hover/i-global__hover.css);
+
+/* Global definitions: Links (begin) */ /**/
+    :link
+    {
+        color: #1a3dc1;
+    }
+/* Global definitions: Links (end) */ /**/

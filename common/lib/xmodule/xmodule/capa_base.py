@@ -13,6 +13,8 @@ from django.utils.translation import ugettext as _
 
 from pkg_resources import resource_string
 
+from django.conf import settings
+
 from capa.capa_problem import LoncapaProblem, LoncapaSystem
 from capa.responsetypes import StudentInputError, \
     ResponseError, LoncapaProblemError
@@ -190,6 +192,12 @@ class CapaFields(object):
     problem_time = String(
         display_name="Time in video when student will see the problem",
         help="Set time in HH:MM:SS format",
+        scope=Scope.settings,
+        default=None
+    )
+    additional_css = String(
+        display_name="Additional CSS",
+        help="Additional CSS for view modifications",
         scope=Scope.settings,
         default=None
     )
@@ -579,19 +587,27 @@ class CapaMixin(CapaFields):
         else:
             hours = self.problem_time[0:2]
             minutes = self.problem_time[3:5]
-            seconds = self.problem_time[6:8]
+            seconds = self.problem_time[6:]
             hours_int = int(hours)
             minutes_int = int(minutes)
-            seconds_int = int(seconds)
-            problem_time_to_show = hours_int*3600+minutes_int*60+seconds_int
+            seconds_float = float(seconds)
+            problem_time_to_show = hours_int * 60 * 60 + minutes_int * 60 + seconds_float
 
         content = {
             'name': self.display_name_with_default,
             'html': html,
             'weight': self.weight,
         }
+        if "cms" in settings.ROOT_URLCONF:
+            is_studio = True
+        else:
+            is_studio = False
+
+        print settings.ROOT_URLCONF
+        print is_studio
 
         context = {
+            'is_studio': is_studio,
             'problem': content,
             'id': self.id,
             'check_button': check_button,
@@ -601,6 +617,7 @@ class CapaMixin(CapaFields):
             'attempts_used': self.attempts,
             'attempts_allowed': self.max_attempts,
             'problem_now': self.problem_now,
+            'additional_css': self.additional_css,
             'problem_time': problem_time_to_show,
         }
 
