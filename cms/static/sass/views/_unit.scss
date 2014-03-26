@@ -1205,7 +1205,7 @@ div.wrapper-comp-editor.is-inactive ~ div.launch-latex-compiler{
 
 
 .problems-wrapper {
-
+    background: rgb(255, 255, 255);
     line-height: 1.6em;
     .action {
         font-size: 13px;
@@ -1219,7 +1219,6 @@ div.wrapper-comp-editor.is-inactive ~ div.launch-latex-compiler{
 
 
 .problems-wrapper.preview {
-    background: rgba(255, 255, 255, 1);
     padding: 20px;
     line-height: 1.6em;
     height: $yandex-player-height - 40px;
