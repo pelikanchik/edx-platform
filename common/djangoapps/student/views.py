@@ -1089,9 +1089,9 @@ def create_account(request, post_override=None):
     # this is a good idea
     # TODO: Check password is sane
 
-    required_post_vars = ['username', 'email', 'name', 'password', 'terms_of_service', 'honor_code', 'first_name', 'last_name', 'middle_name', 'city', 'company_name', 'position']
+    required_post_vars = ['username', 'email', 'name', 'password', 'terms_of_service', 'honor_code', 'first_name', 'last_name', 'city', 'company_name', 'position']
     if tos_not_required:
-        required_post_vars = ['username', 'email', 'name', 'password', 'honor_code', 'first_name', 'last_name', 'middle_name', 'city', 'company_name', 'position']
+        required_post_vars = ['username', 'email', 'name', 'password', 'honor_code', 'first_name', 'last_name', 'city', 'company_name', 'position']
 
     for a in required_post_vars:
         if len(post_vars[a]) < 2:
