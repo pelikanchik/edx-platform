@@ -430,6 +430,7 @@ class UserProfile(models.Model):
         ('STL', u'Sales Team Leader'),
         ('PLSM', u'Senior Product Line Sales Manager')
     )
+    POSITION_NAMES = sorted(POSITION_NAMES, key=lambda positions: positions[1])
     position = models.CharField(max_length=255, blank=True, choices=POSITION_NAMES, db_index=True)
 
     # Optional demographic data we started capturing from Fall 2012

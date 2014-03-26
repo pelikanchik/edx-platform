@@ -3369,6 +3369,21 @@ msgstr "Введите логин пользователя:"
 msgid "example: JaneDoe"
 msgstr "пример: JaneDoe"
 
+msgid "example: Homer"
+msgstr "пример: Тимофей"
+
+msgid "example: Jay"
+msgstr "пример: Федорович"
+
+msgid "example: Simpson"
+msgstr "пример: Матроскин"
+
+msgid "example: manager"
+msgstr "пример: менеджер"
+
+msgid "example: Moscow"
+msgstr "пример: Москва"
+
 #: lms/templates/register-shib.html:123 lms/templates/register.html:136
 #: lms/templates/register.html:166
 msgid "Will be shown in any discussions or forums you participate in"
@@ -3831,7 +3846,7 @@ msgstr "например Георгий"
 
 #: lms/templates/test_center_register.html:192
 msgid "Middle Name"
-msgstr "Второе имя"
+msgstr "Отчество"
 
 #: lms/templates/test_center_register.html:196
 msgid "Last Name"
@@ -5852,9 +5867,7 @@ msgid "Thanks For Registering!"
 msgstr "Спасибо за регистрацию!"
 
 #: lms/templates/registration/activate_account_notice.html:3
-msgid ""
-"Your account is not active yet. An activation link has been sent to {email},"
-" along with instructions for activating your account."
+msgid "Your account is not active yet. An activation link has been sent to {email}, along with instructions for activating your account."
 msgstr "Ваш аккаунт еще не активен. Ссылка активации была отправлена на {email}, в ней содержатся инструкции по активации аккаунта."
 
 #: lms/templates/registration/activation_complete.html:11
@@ -6850,8 +6863,8 @@ msgstr "Без регистрации"
 msgid "Demo entry for {course.display_number_with_default}"
 msgstr "Демо-вход"
 
-
-
+msgid  "You've entered as a demouser with partial rights. To continue working with full rights you must be <a href = '/register'>registered</a>"
+msgstr "Вы зарегистрированы в системе как демонстрационный пользователь. Вам доступно ограниченное количество разделов некоторых курсов. Для продолжения работы с полными правами необходимо пройти <a href = '/register'>регистрацию</a>"
 
 msgid "Course Shows"
 msgstr "Курс отображается"
