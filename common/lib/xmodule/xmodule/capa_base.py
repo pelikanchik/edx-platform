@@ -580,7 +580,7 @@ class CapaMixin(CapaFields):
             check_button = False
 
         show_return_to_video_button = True
-        problem_time_to_show = -1
+        problem_time_seconds = -1
 
         if self.problem_now:
             show_return_to_video_button = False
@@ -591,7 +591,7 @@ class CapaMixin(CapaFields):
             hours_int = int(hours)
             minutes_int = int(minutes)
             seconds_float = float(seconds)
-            problem_time_to_show = hours_int * 60 * 60 + minutes_int * 60 + seconds_float
+            problem_time_seconds = hours_int * 60 * 60 + minutes_int * 60 + seconds_float
 
         content = {
             'name': self.display_name_with_default,
@@ -618,7 +618,8 @@ class CapaMixin(CapaFields):
             'attempts_allowed': self.max_attempts,
             'problem_now': self.problem_now,
             'additional_css': self.additional_css,
-            'problem_time': problem_time_to_show,
+            'problem_time': problem_time_seconds,
+            'problem_time_format': self.problem_time
         }
 
         html = self.runtime.render_template('problem.html', context)

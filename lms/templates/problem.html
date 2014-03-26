@@ -42,8 +42,8 @@
         <input class="hide-preview-backshot" type="button" value="${_('Back to editor')}" />
         <input class="update-view-button" type="button" value="${_('Update')}" />
     %endif
-    %if problem_time and is_studio:
-        <label class = "problem-time-label">${problem_time}</label>
+    %if problem_time_format and is_studio:
+        <label class = "problem-time-label">${problem_time_format}</label>
     %endif
   </section>
 </section>

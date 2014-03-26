@@ -232,7 +232,7 @@ define ["backbone", "jquery", "underscore", "gettext", "xblock/runtime.v1",
         minutes = ((duration_time-seconds)/60)%60
         hours = (duration_time-minutes*60-seconds)/3600
         seconds_str = parseInt(seconds) + ""
-        if seconds_str.length == 1
+        if seconds_str.length  == 1 || seconds < 10
           seconds_str = "0" + seconds_str
         minutes_str = minutes + ""
         if minutes_str.length == 1
