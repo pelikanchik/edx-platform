@@ -469,6 +469,11 @@ conjunctions: [
                         <span class="subsection-name"><span class="subsection-name-value">${subsection.display_name_with_default}</span></span>
                       </a>
                       ${units.enum_units(subsection, actions=False, selected=unit.location)}
+
+                    % if context_course.has_dynamic_graph:
+                    <a href="#" class="courseware-unit show-graph-item" data-category="${new_unit_category}" data-parent="${loc_mapper().translate_location(context_course.location.course_id, subsection.location, False, True)}"> ${_("Graph")} (${_("beta")})</a>
+                    % endif
+
                     </li>
                   </ol>
                 </li>

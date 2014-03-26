@@ -75,9 +75,9 @@
     </div>
     <div id="node-details" title="Подробности">
 
-        <p class = "node-name" >Название</p>
+        <p class = "node-name" >${_("Name")}</p>
 
-        <a class="node-edit-link" href="#">(открыть в редакторе)</a>
+        <a class="node-edit-link" href="#">(${_("To editor")})</a>
         <hr align="center" width="auto" size="1" color="#000000" />
         <div id="node-content">
         </div>
@@ -103,8 +103,8 @@
                 <tr>
                     <td>
                         <select id="input-field" data-bind='value: field, valueUpdate: "afterkeydown"'>
-                            <option value="score_abs">Результат (абсолютный)</option>
-                            <option value="score_rel">Результат (относительный, %)</option>
+                                <option value="score_abs">${_("Score (absolute)")}</option>
+                                <option value="score_rel">${_("Score (relative, %)")}</option>
                         </select>
                     </td>
                     <td>
@@ -130,11 +130,11 @@
 
 
 <div id="canvas"></div>
-<button id="redraw" onclick='redraw();'>Redraw</button>
+<button id="redraw" onclick='redraw();'>${_("Redraw")}</button>
 <!---
 <button id="mode" onclick="moving_mode();">mode</button>
         --->
-<button id="save" onclick="save_layout();">save</button>
-<button id="load" onclick="load_layout();">load</button>
+<button id="save" onclick="save_layout();">${_("Save")}</button>
+<button id="load" onclick="load_layout();">${_("Load")}</button>
 
 </%block>
