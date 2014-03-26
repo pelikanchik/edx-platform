@@ -735,7 +735,7 @@ section.problem {
   section.action {
     margin-top: $baseline;
 
-    .save, .check, .show, .reset, .resume, .show-preview-backshot, .hide-preview-backshot, .update-view-button {
+    .save, .check, .show, .reset, .clear, .resume, .show-preview-backshot, .hide-preview-backshot, .update-view-button {
       height: ($baseline*2);
       vertical-align: middle;
       font-weight: 600;

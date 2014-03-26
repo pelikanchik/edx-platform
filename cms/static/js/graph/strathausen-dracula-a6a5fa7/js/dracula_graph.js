@@ -22,6 +22,7 @@
  *
  /*--------------------------------------------------------------------------*/
 
+var HOVER_AREA_OPACITY = 0.0;
 /*
  * Edge Factory
  */
@@ -31,6 +32,7 @@ AbstractEdge.prototype = {
     hide: function() {
         this.connection.fg.hide();
         this.connection.bg && this.bg.connection.hide();
+        this.hover_area.hide();
     }
 };
 var EdgeFactory = function() {
@@ -41,13 +43,20 @@ var EdgeFactory = function() {
 };
 EdgeFactory.prototype = {
     build: function(source, target) {
+        return this.build(source, target, "#F0F", "это\nребро\n");
+    },
+
+    build: function(source, target, color, details) {
+        if (color === undefined) color = "#FOF";
         var e = jQuery.extend(true, {}, this.template);
+        e.hover_area = undefined;
         e.source = source;
         e.target = target;
+        e.color = color;
+        e.details = details;
         return e;
     }
 };
-
 /*
  * Graph
  */
@@ -76,7 +85,7 @@ Graph.prototype = {
     addEdge: function(source, target, style) {
         var s = this.addNode(source);
         var t = this.addNode(target);
-        var edge = this.edgeFactory.build(s, t);
+        var edge = this.edgeFactory.build(s, t, style.stroke, style.details);
         jQuery.extend(edge.style,style);
         s.edges.push(edge);
         this.edges.push(edge);
@@ -104,7 +113,18 @@ Graph.prototype = {
                 i--;
             }
         }
+    },
+
+    removeEdge: function(source_id, target_id){
+        for(var i = 0; i < this.edges.length; i++) {
+            if (this.edges[i].source.id == source_id && this.edges[i].target.id == target_id) {
+                this.edges[i].hide();
+                this.edges.splice(i, 1);
+                i--;
+            }
+        }
     }
+
 };
 
 /*
@@ -147,6 +167,7 @@ Graph.Renderer.Raphael = function(element, graph, width, height) {
     this.radius = 40; /* max dimension of a node */
     this.graph = graph;
     this.mouse_in = false;
+    this.draging_mode = false;
 
     /* TODO default node rendering function */
     if(!this.graph.render) {
@@ -166,10 +187,13 @@ Graph.Renderer.Raphael = function(element, graph, width, height) {
         this.set && this.set.animate({"fill-opacity": .1}, 200) && this.set.toFront();
         e.preventDefault && e.preventDefault();
     };
-    
+
     var d = document.getElementById(element);
     d.onmousemove = function (e) {
         e = e || window.event;
+
+        // mouse_x
+
         if (selfRef.isDrag) {
             var bBox = selfRef.isDrag.set.getBBox();
             // TODO round the coordinates here (eg. for proper image representation)
@@ -191,9 +215,53 @@ Graph.Renderer.Raphael = function(element, graph, width, height) {
     d.onmouseup = function () {
         selfRef.isDrag && selfRef.isDrag.set.animate({"fill-opacity": .6}, 500);
         selfRef.isDrag = false;
+        update_hover_area(selfRef);
     };
+
+
     this.draw();
 };
+
+function update_hover_area(selfRef){
+    for (var i in selfRef.graph.edges) {
+        if(selfRef.graph.edges[i].hover_area !=undefined){
+            selfRef.graph.edges[i].hover_area.remove();
+        }
+        selfRef.graph.edges[i].hover_area = initialize_hover_area(selfRef, selfRef.graph.edges[i]);
+    }
+};
+
+
+var popup;
+function initialize_hover_area(selfRef, edge){
+    var connection = edge.connection.fg;
+    var result = connection.clone();
+//    console.log(selfRef.getCanvas());
+
+    result.attr({"stroke-width": 20, "stroke-opacity" : HOVER_AREA_OPACITY, "stroke": "#F00"});
+    result.hover(
+        function(){
+            connection.attr({"stroke": "#000"});
+    //            console.log(popup);
+              // XXX ?
+              if (popup != undefined){
+                popup.hide();
+                popup.remove();
+              }
+              popup = selfRef.r.popup(mouse_x, mouse_y, edge.details);
+              popup.show();
+
+        },function(){
+            connection.attr({"stroke": edge.color});
+            popup.hide();
+    //          popup.remove();
+    })
+
+
+    return result;
+};
+
+
 Graph.Renderer.Raphael.prototype = {
     translate: function(point) {
         return [
@@ -217,9 +285,16 @@ Graph.Renderer.Raphael.prototype = {
         for (var i = 0; i < this.graph.edges.length; i++) {
             this.drawEdge(this.graph.edges[i]);
         }
+        update_hover_area(this);
+    },
+
+    renameNode: function(node, name) {
+        node.shape[1].attr({text: name});
     },
 
     drawNode: function(node) {
+//        console.log("drawing node")
+//        console.log(node)
         var point = this.translate([node.layoutPosX, node.layoutPosY]);
         node.point = point;
 
@@ -258,8 +333,11 @@ Graph.Renderer.Raphael.prototype = {
 
         shape.attr({"fill-opacity": .6});
         /* re-reference to the node an element belongs to, needed for dragging all elements of a node */
-        shape.items.forEach(function(item){ item.set = shape; item.node.style.cursor = "move"; });
-        shape.mousedown(this.dragger);
+        shape.items.forEach(function(item){
+            item.set = shape;
+            item.node.style.cursor = "pointer";
+        });
+//        shape.mousedown(this.dragger);
 
         var box = shape.getBBox();
         shape.translate(Math.round(point[0]-(box.x+box.width/2)),Math.round(point[1]-(box.y+box.height/2)))
@@ -279,12 +357,53 @@ Graph.Renderer.Raphael.prototype = {
         if(!edge.connection) {
             edge.style && edge.style.callback && edge.style.callback(edge); // TODO move this somewhere else
             edge.connection = this.r.connection(edge.source.shape, edge.target.shape, edge.style);
+
+            edge.connection.fg.attr({"stroke-width": 2});
+            // hover area
+            edge.hover_area = initialize_hover_area(this, edge);
             return;
         }
         //FIXME showing doesn't work well
         edge.connection.fg.show();
         edge.connection.bg && edge.connection.bg.show();
         edge.connection.draw();
+
+    },
+    getDragingMode: function(){
+        return this.draging_mode;
+    },
+
+    makeDraggable: function(id){
+        console.log(id)
+        console.log(this.graph.nodes)
+        var shape = this.graph.nodes[id].shape;
+        shape.mousedown(this.dragger);
+        shape.items.forEach(function(item){
+            item.node.style.cursor = "move";
+        });
+    },
+
+    enableDragingMode: function(){
+//        console.log(this.draging_mode);
+        //if (this.draging_mode) return;
+        this.draging_mode = true;
+        for (var id in this.graph.nodes) {
+            this.makeDraggable(id)
+        }
+    },
+    disableDragingMode: function(){
+        if (!this.draging_mode) return;
+        this.draging_mode = false;
+        for (var i in this.graph.nodes) {
+            var shape = this.graph.nodes[i].shape;
+            shape.unmousedown(this.dragger);
+            shape.items.forEach(function(item){
+                item.node.style.cursor = "pointer";
+            });
+        }
+    },
+    getCanvas: function() {
+        return this.r;
     }
 };
 Graph.Layout = {};
@@ -344,7 +463,7 @@ Graph.Layout.Spring.prototype = {
             var node1 = this.graph.nodes[c];
             for (var d in prev) {
                 var node2 = this.graph.nodes[prev[d]];
-                this.layoutRepulsive(node1, node2);
+                this.layoutRepulsive(node2, node1);
                 
             }
             prev.push(c);
@@ -357,8 +476,13 @@ Graph.Layout.Spring.prototype = {
         }
         
         // Move by the given force
+
+//        for (var i = this.graph.nodes.length - 1; i >= 0; i--) {
+
+//        for (var i = 0; i < this.graph.nodes.length; i++) {
         for (i in this.graph.nodes) {
             var node = this.graph.nodes[i];
+
             var xmove = this.c * node.layoutForceX;
             var ymove = this.c * node.layoutForceY;
 
@@ -471,8 +595,53 @@ Graph.Layout.Ordered.prototype = {
     }
 };
 
+
+Graph.Layout.Saved = function(graph, x, y) {
+    this.graph = graph;
+    this.x = x;
+    this.y = y;
+    this.layout();
+};
+Graph.Layout.Saved.prototype = {
+    layout: function() {
+        this.layoutPrepare();
+        this.layoutCalcBounds();
+    },
+
+    layoutPrepare: function() {
+        var counter = 0;
+        for (i in this.graph.nodes) {
+            var node = this.graph.nodes[i];
+            node.layoutPosX = this.x[counter];
+            node.layoutPosY = this.y[counter];
+            counter++;
+        }
+    },
+
+    layoutCalcBounds: function() {
+        var minx = Infinity, maxx = -Infinity, miny = Infinity, maxy = -Infinity;
+
+        for (i in this.graph.nodes) {
+            var x = this.graph.nodes[i].layoutPosX;
+            var y = this.graph.nodes[i].layoutPosY;
+
+            if(x > maxx) maxx = x;
+            if(x < minx) minx = x;
+            if(y > maxy) maxy = y;
+            if(y < miny) miny = y;
+        }
+
+        this.graph.layoutMinX = minx;
+        this.graph.layoutMaxX = maxx;
+
+        this.graph.layoutMinY = miny;
+        this.graph.layoutMaxY = maxy;
+    }
+};
+
+
 /*
- * usefull JavaScript extensions, 
+ * useful JavaScript extensions,
  */
 
 function log(a) {console.log&&console.log(a);}

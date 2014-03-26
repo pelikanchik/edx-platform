@@ -236,7 +236,7 @@ function saveSubsection() {
 function graphPopUpWindow(e) {
     e.preventDefault();
 
-    var url = "/graph" + window.location.pathname;
+    var url = "/graph/subsection/" + $(".show-graph-item").attr("data-parent");
 //    alert(url);
 
     window.open(url,'popupWindow',

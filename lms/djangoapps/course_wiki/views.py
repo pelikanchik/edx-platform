@@ -11,6 +11,7 @@ from wiki.models import URLPath, Article
 
 from courseware.courses import get_course_by_id
 from course_wiki.utils import course_wiki_slug
+from django.utils.translation import ugettext as _u
 
 log = logging.getLogger(__name__)
 
@@ -32,7 +33,6 @@ def course_wiki_redirect(request, course_id):
     """
     course = get_course_by_id(course_id)
     course_slug = course_wiki_slug(course)
-
     valid_slug = True
     if not course_slug:
         log.exception("This course is improperly configured. The slug cannot be empty.")
@@ -83,8 +83,8 @@ def course_wiki_redirect(request, course_id):
             root,
             course_slug,
             title=course_slug,
-            content=cgi.escape(u"This is the wiki for **{0}**'s _{1}_.".format(course.display_org_with_default, course.display_name_with_default)),
-            user_message="Course page automatically created.",
+            content=cgi.escape(_u("This is the wiki for **{0}**'s _{1}_.").format(course.display_org_with_default, course.display_name_with_default)),
+            user_message=_u("Course page automatically created."),
             user=None,
             ip_address=None,
             article_kwargs={'owner': None,

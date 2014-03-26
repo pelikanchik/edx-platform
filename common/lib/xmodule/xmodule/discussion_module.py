@@ -11,7 +11,7 @@ class DiscussionFields(object):
     discussion_id = String(scope=Scope.settings, default="$$GUID$$")
     display_name = String(
         display_name="Display Name",
-        help="Display name for this module",
+        help="Display name for this module.",
         default="Discussion",
         scope=Scope.settings
     )

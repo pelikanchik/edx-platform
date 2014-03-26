@@ -33,9 +33,10 @@ var AdvancedView = ValidatingView.extend({
         listEle$.append(self.renderTemplate("available_for_demo", self.model.get("available_for_demo")));
         listEle$.append(self.renderTemplate("show_in_lms", self.model.get("show_in_lms")));
         listEle$.append(self.renderTemplate("has_dynamic_graph", self.model.get("has_dynamic_graph")));
+        listEle$.append(self.renderTemplate("locked_subsections", self.model.get("locked_subsections")));
         _.each(_.sortBy(_.keys(this.model.attributes), _.identity),
             function(key) {
-                if (key != "available_for_demo" && key != "show_in_lms" && key != "has_dynamic_graph"){
+                if (key != "available_for_demo" && key != "show_in_lms" && key != "has_dynamic_graph" && key != "locked_subsections"){
                     listEle$.append(self.renderTemplate(key, self.model.get(key)));
                 }
             });

@@ -60,9 +60,9 @@ This def will enumerate through a passed in subsection and list all of the units
     </a>
   </li>
 </ol>
-    ## Пока не показываем граф - работает неважно
-    % if context_course.has_dynamic_graph and None:
-    <a href="#" class="show-graph-item"> ${_("Graph")} </a>
+
+    % if context_course.has_dynamic_graph:
+    <a href="#" class="courseware-unit show-graph-item" data-category="${new_unit_category}" data-parent="${subsection_locator}"> ${_("Graph")} </a>
     % endif
 
 

@@ -78,11 +78,11 @@ def elementary_conjunction(term, section):
 
             progress = unit.get_progress()
 
-            if term["field"] == "score_rel":
+            if term["field"]=="score_rel":
                 value = Progress.percent(progress)
 
 
-            if term["field"] == "score_abs":
+            if term["field"]=="score_abs":
                 str_value = Progress.frac(progress)
                 value = str_value[0]
 
@@ -101,13 +101,13 @@ def elementary_conjunction(term, section):
             else:
                 return False
 
-        if term["sign"] == "less":
+        if term["sign"]== "less":
             if value < term["value"]:
                 return True
             else:
                 return False
 
-        if term["sign"] == "less-equals":
+        if term["sign"]== "less-equals":
             if value <= term["value"]:
                 return True
             else:

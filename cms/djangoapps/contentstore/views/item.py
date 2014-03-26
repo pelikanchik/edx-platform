@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """Views for items (modules)."""
 
+import json
 import logging
 from uuid import uuid4
 
@@ -207,16 +208,39 @@ def _save_item(request, usage_loc, item_location, data=None, children=None, meta
         # the intent is to make it None, use the nullout field
         if metadata is not None:
             for metadata_key, value in metadata.items():
-                field = existing_item.fields[metadata_key]
 
-                if value is None:
+                if metadata_key == "locator_term":
+                    temp_key = "direct_term"
+                    json_array = json.loads(value)
+
+                    for x in json_array:
+                        old_loc = str(loc_mapper().translate_locator_to_location(x["direct_element_id"]))
+                        i = old_loc.rfind("/")
+                        short_name = old_loc[i+1:]
+                        x["direct_element_id"] = short_name
+                        for every_edge in x["disjunctions"]:
+                            for every_cond in every_edge["conjunctions"]:
+                                old_loc = str(loc_mapper().translate_locator_to_location(every_cond["source_element_id"]))
+                                i = old_loc.rfind("/")
+                                short_name = old_loc[i+1:]
+                                every_cond["source_element_id"] = short_name
+
+                    temp_value = json.dumps(json_array)
+
+                else:
+                    temp_key = metadata_key
+                    temp_value = value
+
+                field = existing_item.fields[temp_key]
+
+                if temp_value is None:
                     field.delete_from(existing_item)
                 else:
                     try:
-                        value = field.from_json(value)
+                        temp_value = field.from_json(temp_value)
                     except ValueError:
                         return JsonResponse({"error": "Invalid data"}, 400)
-                    field.write_to(existing_item, value)
+                    field.write_to(existing_item, temp_value)
 
         # Save the data that we've just changed to the underlying
         # MongoKeyValueStore before we update the mongo datastore.

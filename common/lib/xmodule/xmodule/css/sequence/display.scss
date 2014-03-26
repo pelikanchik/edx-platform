@@ -268,7 +268,7 @@ nav.sequence-nav {
       box-shadow: 0 1px 0 rgba(255, 255, 255, .7) inset;
       z-index: 1;
 
-      &.prev, &.next {
+      &.prev, &.next, &.godynamo {
 
         a {
           background-position: center;
@@ -315,6 +315,17 @@ nav.sequence-nav {
           background-position: center 15px;
         }
       }
+
+      &.godynamo {
+        right: -10px;
+        border-radius: 0 35px 35px 0;
+
+        a {
+          margin-left: 30px;
+          background-image: url('../images/sequence-nav/next-icon.png');
+          background-position: center 15px;
+        }
+      }
     }
   }
 
@@ -343,7 +354,7 @@ nav.sequence-bottom {
       @include linear-gradient(top, #eee, #ddd);
       box-shadow: 0 1px 0 rgba(255, 255, 255, .7) inset;
 
-      &.prev, &.next {
+      &.prev, &.next, &.godynamo {
         margin-bottom: 0;
 
         a {
@@ -389,6 +400,16 @@ nav.sequence-bottom {
           background-position: center 15px;
         }
       }
+
+      &.godynamo {
+        border-radius: 0 35px 35px 0;
+        border-left: none;
+
+        a {
+          background-image: url('../images/sequence-nav/next-icon.png');
+          background-position: center 15px;
+        }
+      }
     }
   }
 }
@@ -398,7 +419,8 @@ nav.sequence-bottom {
 }
 
 .xmodule_SequenceModule nav.sequence-bottom ul li.next a,
-.xmodule_SequenceModule nav.sequence-bottom ul li.prev a {
+.xmodule_SequenceModule nav.sequence-bottom ul li.prev a,
+.xmodule_SequenceModule nav.sequence-bottom ul li.godyna a {
   outline: 0;
 
   &:focus {

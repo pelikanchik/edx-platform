@@ -57,6 +57,7 @@ class CapaModule(CapaMixin, XModule):
             'problem_check': self.check_problem,
             'problem_reset': self.reset_problem,
             'problem_save': self.save_problem,
+            'problem_clear': self.clear_problem,
             'problem_show': self.get_answer,
             'score_update': self.update_score,
             'input_ajax': self.handle_input_ajax,
@@ -132,6 +133,10 @@ class CapaDescriptor(CapaFields, RawDescriptor):
     metadata_translations = dict(RawDescriptor.metadata_translations)
     metadata_translations['attempts'] = 'max_attempts'
 
+    @property
+    def get_class(self):
+        return "CapaDescriptor"
+
     @classmethod
     def filter_templates(cls, template, course):
         """
@@ -198,8 +203,10 @@ class CapaDescriptor(CapaFields, RawDescriptor):
     rescore_problem = module_attr('rescore_problem')
     reset_problem = module_attr('reset_problem')
     save_problem = module_attr('save_problem')
+    clear_problem = module_attr('clear_problem')
     set_state_from_lcp = module_attr('set_state_from_lcp')
     should_show_check_button = module_attr('should_show_check_button')
     should_show_reset_button = module_attr('should_show_reset_button')
     should_show_save_button = module_attr('should_show_save_button')
+    should_show_clear_button = module_attr('should_show_clear_button')
     update_score = module_attr('update_score')

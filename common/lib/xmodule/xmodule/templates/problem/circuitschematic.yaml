@@ -1,6 +1,6 @@
 ---
 metadata:
-    display_name: Circuit Schematic Builder
+    display_name: Задача на построение электрической цепи
     markdown: !!null
 data: |
       <problem >

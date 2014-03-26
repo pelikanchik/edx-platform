@@ -103,7 +103,7 @@ Write a persuasive essay to a newspaper reflecting your views on censorship in l
   ###
   confirmConversionToXml: ->
     # TODO: use something besides a JavaScript confirm dialog?
-    return confirm("If you use the Advanced Editor, this problem will be converted to XML and you will not be able to return to the Simple Editor Interface.\n\nProceed to the Advanced Editor and convert this problem to XML?")
+    return confirm(gettext("If you use the Advanced Editor, this problem will be converted to XML and you will not be able to return to the Simple Editor Interface.\n\nProceed to the Advanced Editor and convert this problem to XML?"))
 
   ###
   Event listener for toolbar buttons (only possible when markdown editor is visible).

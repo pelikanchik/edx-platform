@@ -1,11 +1,11 @@
 <div class="wrapper-comp-setting metadata-videolist-enum">
-  <label class="label setting-label" for="<%= uniqueId %>"><%= model.get('display_name')%></label>
+  <label class="label setting-label" for="<%= uniqueId %>"><%= gettext(model.get('display_name')) %></label>
   <div class="wrapper-videolist-settings">
     <div class="wrapper-videolist-url videolist-settings-item"><input type="text" id="<%= uniqueId %>"  class="input videolist-url" value="<%= model.get('value')[0] %>"></div>
-    <div class="tip videolist-url-tip setting-help"><%= model.get('help') %></div>
+    <div class="tip videolist-url-tip setting-help"><%= gettext(model.get('help')) %></div>
     <div class="wrapper-videolist-urls">
       <a href="#" class="collapse-action collapse-setting">
-        <i class="icon-plus"></i><%= gettext("Add more video sources") %> <span class="sr"><%= model.get('display_name')%></span>
+        <i class="icon-plus"></i><%= gettext("Add more video sources") %> <span class="sr"><%= gettext(model.get('display_name'))%></span>
       </a>
       <div class="videolist-extra-videos">
         <span class="tip videolist-extra-videos-tip setting-help"><%= gettext('To be sure all students can view the video, we recommend providing alternate versions of the same video: mp4, webm and youtube (if available).') %></span>

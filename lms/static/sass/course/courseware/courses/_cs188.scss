@@ -59,6 +59,14 @@ body.cs188 {
         }
       }
     }
+    li.godynamo {
+      border-bottom: 2px solid $blue;
+      .assignment, .due_date {
+        &, a {
+          font-weight: bold;
+        }
+      }
+    }
   }
 
   .course-staff {

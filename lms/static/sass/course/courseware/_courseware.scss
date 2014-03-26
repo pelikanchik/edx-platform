@@ -323,26 +323,6 @@ div.go-button{
   }
 }
 
-p.godynamo{
-//    right: 300px;
-  margin-top: $go-button-top-margin;
-     z-index: 2;  // no hiding under video
-     @include button(simple, rgb(29, 157, 217)); // nice blue color
-}
-
-p.check-all{
-   margin-top: $go-button-top-margin;
-     z-index: 2; // no hiding under video
-     right: 50px;
-     margin-right: 140px;
-     @include button(simple, rgb(99, 99, 99)); // gray color
-}
-p.check-all-disabled{
-     @include button(simple, rgb(59, 59, 59)); // dark gray color
-//         &:hover{
-
-}
-
 .go-button-static{
    p{
       width: 100px;

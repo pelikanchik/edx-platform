@@ -54,3 +54,4 @@ window.ImageInput = (function ($, undefined) {
         this.inputEl.val(result);
     }
 }).call(this, window.jQuery);
+

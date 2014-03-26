@@ -6,7 +6,7 @@ from xmodule.x_module import XModule
 from xmodule.seq_module import SequenceDescriptor
 from xmodule.progress import Progress
 from pkg_resources import resource_string
-from xblock.fields import Integer, Scope, String
+from xblock.fields import Integer, Scope, String, Float
 
 
 # HACK: This shouldn't be hard-coded to two types
@@ -16,6 +16,16 @@ class_priority = ['video', 'problem']
 
 class VerticalFields(object):
     has_children = True
+    coords_x = Float(
+        scope=Scope.settings,
+        display_name="Координаты X вершины визуализации графа",
+        default=None
+    )
+    coords_y = Float(
+        scope=Scope.settings,
+        display_name="Координаты Y вершины визуализации графа",
+        default=None
+    )
     direct_term = String(
         display_name="Direct Term",
         help="Term for jumping into another unit",

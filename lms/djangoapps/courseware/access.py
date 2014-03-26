@@ -139,25 +139,26 @@ def _has_access_course_desc(user, course, action):
         (CourseEnrollmentAllowed always overrides)
         (staff can always enroll)
         """
-        # if using registration method to restrict (say shibboleth)
-        if settings.FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
-            if user is not None and user.is_authenticated() and \
-                ExternalAuthMap.objects.filter(user=user, external_domain=course.enrollment_domain):
-                debug("Allow: external_auth of " + course.enrollment_domain)
-                reg_method_ok = True
+        if course.ispublic or course.ispublic == None:
+            # if using registration method to restrict (say shibboleth)
+            if settings.FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
+                if user is not None and user.is_authenticated() and \
+                    ExternalAuthMap.objects.filter(user=user, external_domain=course.enrollment_domain):
+                    debug("Allow: external_auth of " + course.enrollment_domain)
+                    reg_method_ok = True
+                else:
+                    reg_method_ok = False
             else:
-                reg_method_ok = False
-        else:
-            reg_method_ok = True #if not using this access check, it's always OK.
+                reg_method_ok = True #if not using this access check, it's always OK.
 
-        now = datetime.now(UTC())
-        start = course.enrollment_start
-        end = course.enrollment_end
+            now = datetime.now(UTC())
+            start = course.enrollment_start
+            end = course.enrollment_end
 
-        if reg_method_ok and (start is None or now > start) and (end is None or now < end):
-            # in enrollment period, so any user is allowed to enroll.
-            debug("Allow: in enrollment period")
-            return True
+            if reg_method_ok and (start is None or now > start) and (end is None or now < end):
+                # in enrollment period, so any user is allowed to enroll.
+                debug("Allow: in enrollment period")
+                return True
 
         # if user is in CourseEnrollmentAllowed with right course_id then can also enroll
         if user is not None and user.is_authenticated() and CourseEnrollmentAllowed:
