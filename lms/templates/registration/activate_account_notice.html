@@ -1,15 +1,14 @@
- %if not is_demo:
-<h2>Спасибо за регистрацию!</h2>
+<%! from django.utils.translation import ugettext as _ %>
+%if not is_demo:
+<h2> ${_("Thanks For Registering!")}</h2>
 
 <p class='activation-message'>
-            Ваш аккаунт ещё не активирован. Активационная ссылка и инструкция отправлены на <strong>${ email }</strong>.
+            ${_("Your account is not active yet. An activation link has been sent to {email}, along with instructions for activating your account.").format(email=email)}
         </p>
 
 %else:
 
         <p class='activation-message'>
-            Вы зарегистрированы в системе как демонстрационный пользователь.
-            Вам доступно ограниченное количество разделов некоторых курсов.
-            Для продолжения работы с полными правами необходимо пройти <a href = "/register">регистрацию</a>, история будет сохранена
+           ${_("You've entered as a demouser with partial rights. To continue working with full rights you must be <a href = '/register'>registered</a>")}
         </p>
 %endif
