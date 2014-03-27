@@ -45,6 +45,10 @@ msgid ""
 "extension."
 msgstr "Формат файла не поддерживается. Пожалуйста, загрузите файл с расширением <code>tar.gz</code>."
 
+#: cms/static/js/base.js:262
+msgid "New Unit"
+msgstr "Новый элемент"
+
 #: cms/static/js/base.js:324
 msgid "There has been an error while saving your changes."
 msgstr "Произошла ошибка при сохранении изменений."
@@ -1475,3 +1479,33 @@ msgstr "Незачет"
 
 msgid "Pass"
 msgstr "Зачет"
+
+#: common/static/coffee/src/discussion/utils.coffee:6
+msgid "Loading content"
+msgstr "Загрузка конетента"
+
+#: common/static/coffee/src/discussion/discussion_module_view.coffee:66
+#: common/static/coffee/src/discussion/utils.coffee:140
+msgid "Sorry"
+msgstr "Извините"
+
+#: common/static/coffee/src/discussion/utils.coffee:141
+msgid ""
+"We had some trouble processing your request. Please ensure you have copied any "
+"unsaved work and then reload the page."
+msgstr ""
+"У нас возникли проблемы при обработке вашего запроса. Пожалуйста, убедитесь, "
+"что вы сделали копию любой несохраненной работы и перезагрузите страницу."
+
+#:common/static/coffee/src/discussion/discussion_module_view.coffee:67
+msgid "We had some trouble loading the discussion. Please try again."
+msgstr ""
+"У нас возникли проблемы при загрузке данного обсуждения. Пожалуйста, "
+"повторите попытку."
+
+#:common/static/coffee/src/discussion/discussion_module_view.coffee:160
+msgid ""
+"We had some trouble loading the threads you requested. Please try again."
+msgstr ""
+"У нас возникли проблемы при загрузке тем, которые вы запросили, Пожалуйста, "
+"повторите попытку."
