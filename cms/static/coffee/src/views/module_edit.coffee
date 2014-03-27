@@ -88,8 +88,14 @@ define ["backbone", "jquery", "underscore", "gettext", "xblock/runtime.v1",
             @$el.addClass('editing')
             ModalUtils.showModalCover(true)
             @$component_editor().slideDown(150)
-            @loadEdit()
+            ret_val = @loadEdit()
+            if not jQuery.isEmptyObject(@metadataEditor.getModifiedMetadataValues())
+              data = @module.save(false)
+              data.metadata = _.extend(data.metadata || {}, @changedMetadata())
+              @model.save(data).done()
+            return ret_val
         )
+            
 
     clickSaveButton: (event) =>
       event.preventDefault()

@@ -994,6 +994,18 @@ msgstr ""
 "Название подкатегории для данного обсуждения. Это название отображается на "
 "левой панели форума курса."
 
+msgid "Week 1"
+msgstr "Неделя 1"
+
+msgid "Discussion"
+msgstr "Обсуждение"
+
+msgid "Topic-Level Student-Visible Label"
+msgstr "Уровень темы метка видимая ученику"
+
+msgid "Text"
+msgstr "Текст"
+
 #: common/lib/xmodule/xmodule/video_module.py:53
 msgid "Video"
 msgstr "Видео"

@@ -458,6 +458,17 @@ msgstr "Посмотреть черновик"
 msgid "View Live"
 msgstr "Посмотреть публичную версию"
 
+#: common/lib/xmodule/xmodule/capa_base.py:88 cms/templates/unit.html:167
+msgid "Blank Advanced Problem"
+msgstr "Пустая продвинутая задача"
+
+#: common/lib/xmodule/xmodule/video_module.py:53
+msgid "Video"
+msgstr "Видео"
+
+msgid "Text"
+msgstr "Текст"
+
 #: cms/templates/error.html:9
 msgid "Internal Server Error"
 msgstr "Внутренняя ошибка сервера"
