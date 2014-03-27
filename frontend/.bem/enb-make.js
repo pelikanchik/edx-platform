@@ -69,7 +69,7 @@ function getLevels(config) {
         {"path":".bem/lib/islands-services/desktop.blocks","check":false},
         {"path":".bem/lib/islands-user/common.blocks","check":false},
         {"path":".bem/lib/islands-user/desktop.blocks","check":false},
-        {"path":"common.blocks","check":true},
+        //{"path":"common.blocks","check":true},
         {"path":"desktop.blocks","check":true}
     ].map(function(level) {
         return config.resolvePath(level);
