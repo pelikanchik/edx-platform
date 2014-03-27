@@ -261,19 +261,19 @@ msgstr "Этот список един для всей вашей команды
 
 #: cms/templates/checklists.html:66
 msgid "Studio checklists"
-msgstr "Список задач Студии"
+msgstr "Список задач студии"
 
 #: cms/templates/checklists.html:71
 msgid "Getting Started With Studio"
-msgstr "Приступая к Работе со Студией"
+msgstr "Приступая к работе со студией"
 
 #: cms/templates/checklists.html:71
 msgid "Draft a Rough Course Outline"
-msgstr "Черновик Структуры Курса"
+msgstr "Черновик структуры курса"
 
 #: cms/templates/checklists.html:71
 msgid "Explore edX's Support Tools"
-msgstr "Изучить Инструменты Поддержки"
+msgstr "Изучить инструменты поддержки"
 
 #: cms/templates/checklists.html:71
 msgid "Draft Your Course About Page"
@@ -2481,7 +2481,7 @@ msgstr "Обновления"
 
 #: cms/templates/widgets/header.html:60
 msgid "Schedule &amp; Details"
-msgstr "Расписание & Детали"
+msgstr "Расписание и Детали"
 
 #: cms/templates/widgets/header.html:83
 msgid "Checklists"
