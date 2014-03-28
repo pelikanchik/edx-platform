@@ -363,8 +363,8 @@ conjunctions: [
                             % if has_markdown or type != "problem":
                                 % if boilerplate_name is None:
                                   <li class="editor-md empty">
-                                    <a href="#" data-category="${category}">
-                                      <span class="name">${name}</span>
+                                    <a href="#" data-category="${category}" style="font-weight: 500;line-height: 23.68px">
+                                      <span class="name">${_(name)}</span>
                                     </a>
                                   </li>
 
@@ -389,7 +389,7 @@ conjunctions: [
                                   <li class="editor-manual">
                                     <a href="#" data-category="${category}"
                                        data-boilerplate="${boilerplate_name}">
-                                      <span class="name">${name}</span>
+                                      <span class="name">${_(name)}</span>
                                     </a>
                                   </li>
                                 % endif

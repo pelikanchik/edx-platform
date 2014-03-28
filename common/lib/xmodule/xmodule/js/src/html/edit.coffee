@@ -138,10 +138,12 @@ class @HTMLEditingDescriptor
     ###
     return @visualEditor
 
-  save: ->
-    @element.off('click', '.editor-tabs .tab', @onSwitchEditor)
+  save: (isDirty) ->
     text = @advanced_editor.getValue()
     visualEditor = @getVisualEditor()
-    if @showingVisualEditor and visualEditor.isDirty()
+    if not isDirty?
+      @element.off('click', '.editor-tabs .tab', @onSwitchEditor)
+      isDirty = visualEditor.isDirty()
+    if @showingVisualEditor and isDirty
       text = rewriteStaticLinks(visualEditor.getContent({no_events: 1}), @base_asset_url, '/static/')
     data: text
