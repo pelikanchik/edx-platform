@@ -315,18 +315,21 @@ function showNodeDetails(node){
             var text_description = "Сложное условие";
 
             var data = generateEdgeData(edge.disjunctions, node.id).description;
-            text_description = "Если набрать в " + data.related_vertex_name + " " + data.sign + " " + data.value + data.percent;
+            console.log(data)
+            if (data.is_complicated) text_description = "Сложное условие"
+                else
+                    text_description = "Если набрать в " + data.related_vertex_name + " " + data.sign + " " + data.value + data.percent;
 
 
             // TODO:
             // make a normal function generating this string
-
+//                + "<img class = \"close\" src = \"/static/img/Delete-icon.png\" data-bind='click: $root.removeDisjunction'/>"
+//<abbr
             var img_src = $("#Delete-icon-base").attr("src");
             $( "#node-edges-list").append(
-                "<p class=\"node-data " + string_id + "\" title=\"" + text_description + "\">"
-//                + "<img class = \"close\" src = \"/static/img/Delete-icon.png\" data-bind='click: $root.removeDisjunction'/>"
+                "<p class=\"node-data " + string_id + "\"><abbr title=\"" + text_description + "\">" + S + "</abbr>"
                 + "<img class = \"close " + string_id + "\" src = \"" + img_src + "\" id = \"" + img_id + "\"/>"
-                + S + "</p>"
+                + "</p>"
             );
 
 //            var handler = createEdgeDeletionCallback(edge, node.id);

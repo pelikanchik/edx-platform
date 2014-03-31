@@ -8,7 +8,6 @@
 <%block name="title">${_("CMS Subsection")}</%block>
 <%block name="bodyclass">is-signedin course view-subsection</%block>
 
-
 <%namespace name="units" file="widgets/units.html" />
 <%namespace name='static' file='static_content.html'/>
 
@@ -62,49 +61,54 @@
 <!--- Костыль: я не умею получать тип модуля, поэтому я выдираю его, используя особенности форматирования вывода -->
 <!--- Возможно, стоит добавить всем модулям нужный метод -->
 <!--- (стандартная функция child.module_class не работает) -->
-    <p class="data_string" style="display:none">${data_string}</p>
-    <p class="names_string" style="display:none">${names_string} </p>
-    <p class="graph_string" style="display:none">${graph_string}</p>
-    <p class="locators_dict" style="display:none">${locators_dict}</p>
-    <p class="parent-location" style="display:none">${subsection.location}</p>
-    <p class="locator" style="display:none">${locator}</p>
+
+<!-- style="display:none" -->
+<div style="display:none">
+
+    <p class="data_string" >${data_string}</p>
+    <p class="names_string">${names_string} </p>
+    <p class="graph_string">${graph_string}</p>
+    <p class="locators_dict">${locators_dict}</p>
+    <p class="parent-location" >${subsection.location}</p>
+    <p class="locator">${locator}</p>
+</div>
+
 
 <div style="display:none">
-    <div id="rename-node" title="Изменить название">
+    <div id="rename-node" title="${_('Rename')}">
         <input id="node-rename-input" data-bind='value: value, valueUpdate: "afterkeydown"'/>
     </div>
-    <div id="node-details" title="Подробности">
+    <div id="node-details" title="${_('Node Details')}">
 
-        <p class = "node-name" >Название</p>
+        <p class = "node-name" >${_('Node Name')}</p>
 
-        <a class="node-edit-link" href="#">(открыть в редакторе)</a>
+        <a class="node-edit-link" href="#">${_('Open in editor')}</a>
         <hr align="center" width="auto" size="1" color="#000000" />
         <div id="node-content">
         </div>
         <hr align="center" width="auto" size="1" color="#000000" />
         <div id="node-edges-list">
-            <p class = "node-edges-message">Из этой вершины можно попасть в следующие вершины:</p>
+            <p class = "node-edges-message"> ${_('Neighbours List')} </p>
         </div>
     </div>
-    <div id="add-new-node" title="Добавление вершины">
+    <div id="add-new-node" title="${_('Adding a new node')}">
         <input id="node-name-input" data-bind='value: value, valueUpdate: "afterkeydown"'/>
     </div>
-    <div id="on-exiting-draging-mode" title="Сохранить расположение?">
-        <p>Сохранить изменения в расположении вершин графа?</p>
+    <div id="on-exiting-draging-mode" title="${_('Save Layout?')}">
+        <p>${_('Do you want to save graphs layout?')}</p>
     </div>
-    <div id="confirm-edge-deletion" title="Вы уверены?">
-        <p>Вы действительно хотите удалить это ребро?</p>
+    <div id="confirm-edge-deletion" title="${_('Are you sure?')}">
+        <p>${_('Are you sure you want this edge removed?')}</p>
     </div>
-    <div id="node-add-condition" title="Добавление перехода">
-
+    <div id="node-add-condition" title="${_('Direct Term')}">
         <table>
 
             <tbody data-bind="foreach: conjunctions">
                 <tr>
                     <td>
                         <select id="input-field" data-bind='value: field, valueUpdate: "afterkeydown"'>
-                            <option value="score_abs">Результат (абсолютный)</option>
-                            <option value="score_rel">Результат (относительный, %)</option>
+                            <option value="score_abs">${_("Score (absolute)")}</option>
+                            <option value="score_rel">${_("Score (relative, %)")}</option>
                         </select>
                     </td>
                     <td>

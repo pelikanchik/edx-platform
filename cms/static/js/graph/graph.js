@@ -45,6 +45,8 @@ function parseType(S){
       return "Задача"
         case "HtmlDescriptor":
       return "Текст"
+        case "DiscussionDescriptor":
+      return "Обсуждение"
     default:
       return S;
     }
@@ -110,7 +112,7 @@ function ajax_save_item(id, metadata){
 
 function add_node_here(){
 
-        var new_node_name = 'Без имени';
+        var new_node_name = 'New Unit';
 
         $("#node-name-input").val(new_node_name);
         $( "#add-new-node" ).dialog({
@@ -246,11 +248,11 @@ function canvasDbClick(e) {
     */
 
     var i = names_str.lastIndexOf(",");
-    names_str = names_str.slice(0, i) + names_str.slice(i+1);
+    names_str = (i>0) ? names_str.slice(0, i) + names_str.slice(i+1) : names_str;
     i = data_str.lastIndexOf(",");
-    data_str = data_str.slice(0, i) + data_str.slice(i+1);
+    data_str = (i>0) ? data_str.slice(0, i) + data_str.slice(i+1) : data_str;
     i = graph_str.lastIndexOf(",");
-    graph_str = graph_str.slice(0, i) + graph_str.slice(i+1);
+    graph_str = (i>0) ? graph_str.slice(0, i) + graph_str.slice(i+1) : graph_str;
 
     names_obj = jQuery.parseJSON(names_str);
     data_obj = jQuery.parseJSON(data_str);
@@ -267,8 +269,6 @@ function canvasDbClick(e) {
     });
 
     edges_arr = jQuery.parseJSON(graph_str );
-    console.log(edges_arr)
-
 
     var source;
     jQuery.each(edges_arr, function(node_number) {
@@ -310,7 +310,6 @@ function canvasDbClick(e) {
     var width = $(document).width() - 20;
 
     var height = 100 + 50*ids_arr.length;
-
 
 
     /* draw the graph using the RaphaelJS draw implementation */

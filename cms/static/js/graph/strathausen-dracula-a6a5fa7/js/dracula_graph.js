@@ -374,8 +374,6 @@ Graph.Renderer.Raphael.prototype = {
     },
 
     makeDraggable: function(id){
-        console.log(id)
-        console.log(this.graph.nodes)
         var shape = this.graph.nodes[id].shape;
         shape.mousedown(this.dragger);
         shape.items.forEach(function(item){

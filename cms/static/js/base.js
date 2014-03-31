@@ -236,8 +236,10 @@ function saveSubsection() {
 function graphPopUpWindow(e) {
     e.preventDefault();
 
-    var url = "/graph/subsection/" + $(".show-graph-item").attr("data-parent");
-//    alert(url);
+    //var tmp = $(e.currentTarget).attr("data-parent")
+    //console.log(tmp)
+
+    var url = "/graph/subsection/" + $(e.currentTarget).attr("data-parent");
 
     window.open(url,'popupWindow',
         'toolbar=no,location=no,fullscreen=yes,directories=no,status=no,menubar=no,scrollbars=yes,resizable=yes,copyhistory=no');
