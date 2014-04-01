@@ -115,7 +115,7 @@ function(BaseView, _, MetadataModel, AbstractEditor, VideoList) {
         },
 
         setValueInEditor : function (value) {
-            if (gettext(value) !== value) {
+            if (gettext(value) !== value && value == this.model.get('default_value')) {
                 this.$el.find('input').val(gettext(value));
                 this.model.setValue(gettext(value));
             } else {
