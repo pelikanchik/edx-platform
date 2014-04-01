@@ -2302,7 +2302,7 @@ msgstr "Вы редактируете черновик."
 msgid "This unit was originally published on {date}."
 msgstr "Этот элемент был опубликован {date}."
 
-#: cms/templates/unit.html:44
+#: cms/templates/unit.html:440
 msgid "View the Live Version"
 msgstr "Просмотр публичной версии"
 
@@ -2316,7 +2316,7 @@ msgstr "Обычные задания"
 
 #: cms/templates/unit.html:83
 msgid "Advanced"
-msgstr "Продвинутые задания"
+msgstr "Расширенные"
 
 #: cms/templates/unit.html:139
 msgid "Unit Settings"
@@ -2637,7 +2637,7 @@ msgstr "имя"
 
 #: common/lib/xmodule/xmodule/video_module.py:311
 msgid "Basic"
-msgstr "Основное"
+msgstr "Основные"
 
 #: common/templates/course_modes/choose.html:6
 msgid "Register for {} | Choose Your Track"

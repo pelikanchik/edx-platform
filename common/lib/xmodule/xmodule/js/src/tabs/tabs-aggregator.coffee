@@ -35,7 +35,7 @@ class @TabsEditingDescriptor
 
       @$tabs.each( (index, value) ->
         if $(value).hasClass('current')
-          previousTab = $(value).html()
+          previousTab = $(value).attr('value')
       )
 
       # init and save data from previous tab
@@ -45,7 +45,7 @@ class @TabsEditingDescriptor
       # (to be implemented when there is a use case for this functionality)
 
       # call onswitch
-      onSwitchFunction = TabsEditingDescriptor.Model.modules[@html_id].tabSwitch[$currentTarget.text()]
+      onSwitchFunction = TabsEditingDescriptor.Model.modules[@html_id].tabSwitch[$currentTarget.attr('value')]
       onSwitchFunction() if $.isFunction(onSwitchFunction)
 
       @$tabs.removeClass('current')
@@ -62,7 +62,7 @@ class @TabsEditingDescriptor
 
   save: ->
     @element.off('click', '.editor-tabs .tab', @onSwitchEditor)
-    current_tab = @$tabs.filter('.current').html()
+    current_tab = @$tabs.filter('.current').attr('value')
     data: TabsEditingDescriptor.Model.getValue(@html_id, current_tab)
 
   setMetadataEditor : (metadataEditor) ->
