@@ -34,29 +34,6 @@ class @Problem
       HideBackshot($(this).parents(".backshot"))
       GetPlayer().playVideo()
 
-    @$('section.action input.show-preview-backshot').click ->
-      unique_id = $(this).parents(".component").find(".problems-wrapper").attr("id")
-      #console.log(unique_id)
-      $(this).parents(".component").children(".xblock").prepend($("#yandex-player").clone(true,true).attr("id","yandex-player-" + unique_id))
-      $(this).parents(".component").find(".problems-wrapper").addClass("preview")
-      problem_time = $(this).parents(".component").find(".problems-wrapper .problem").data("problem_time")
-      $(this).parent().children(".show-preview-backshot").css("display","none")
-      $(this).parent().children(".hide-preview-backshot").css("display","inline")
-      setTimeout (->
-        document["yandex-player-" + unique_id].playVideo()
-        document["yandex-player-" + unique_id].seekTo problem_time
-        document["yandex-player-" + unique_id].pauseVideo()
-        return
-      ), 1000
-
-    @$('section.action input.hide-preview-backshot').click ->
-      unique_id = $(this).parents(".component").find(".problems-wrapper").attr("id")
-      $("#yandex-player-" + unique_id).remove()
-      $(this).parents(".component").find(".problems-wrapper").removeClass("preview")
-      $(this).parent().children(".hide-preview-backshot").css("display","none")
-      $(this).parent().children(".show-preview-backshot").css("display","inline")
-
-
     @$(".advice-for-problem").each ->
       showDelay = 1000 * parseInt($(this).attr("rel"))
       if $.cookie("advice" + $(this).children(".title").attr("rel"))

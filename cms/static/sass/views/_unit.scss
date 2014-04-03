@@ -1218,6 +1218,23 @@ div.wrapper-comp-editor.is-inactive ~ div.launch-latex-compiler{
 }
 
 
+.problems-wrapper.backshot {
+    padding: 20px;
+    line-height: 1.6em;
+    height: $yandex-player-height - 40px;
+    position: relative;
+    width: $yandex-player-width - 40px;
+
+    .action {
+        position: absolute;
+        width: $yandex-player-width - 10px;
+        left: 0px;
+        bottom: 0px;
+        background: rgba(0,0,0,0.5);
+        padding: 5px;
+    }
+
+}
 .problems-wrapper.preview {
     padding: 20px;
     line-height: 1.6em;

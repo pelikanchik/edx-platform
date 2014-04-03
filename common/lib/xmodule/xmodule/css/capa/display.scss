@@ -735,18 +735,24 @@ section.problem {
   section.action {
     margin-top: $baseline;
 
-    .save, .check, .show, .reset, .clear, .resume, .show-preview-backshot, .hide-preview-backshot, .update-view-button {
+    .save, .check, .show, .reset, .clear, .resume, .edit-view-button, .back-from-edit-view-button, .save-view-button {
       height: ($baseline*2);
       vertical-align: middle;
       font-weight: 600;
     }
 
-    .save, .resume, .show-preview-backshot, .hide-preview-backshot, .update-view-button {
+    .save, .resume, .edit-view-button, .back-from-edit-view-button, .save-view-button {
       @extend .blue-button !optional;
     }
-    .hide-preview-backshot, .update-view-button {
+    .back-from-edit-view-button, .save-view-button {
       display: none;
     }
+    .scrollbar{
+      display: inline-block;
+      width: 200px;
+      background: white;
+    }
+
     .show {
 
       .show-label {
@@ -1174,6 +1180,15 @@ section.problem {
     span.mock_label {
       cursor : default;
     }
+  }
+
+
+  .draggable-field{
+      cursor: move;
+  }
+
+  .draggable-field:hover{
+      box-shadow: 0 0 5px #ffff99;
   }
 }
 .advice-for-problem {

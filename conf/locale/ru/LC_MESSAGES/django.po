@@ -7368,6 +7368,18 @@ msgstr "Пользовательское соглашение"
 msgid "Resume"
 msgstr "Вернуться"
 
+msgid "Back"
+msgstr "Вернуться"
+
+msgid "Edit View"
+msgstr "Редактировать вид"
+
+msgid "Additional CSS"
+msgstr "Допольнительные стили"
+
+msgid "Additional CSS for view modifications"
+msgstr "Стили, изменяющие стандартный внешний вид: прозрачность фона, позиция полей ввода"
+
 
 #django_partial.po
 
