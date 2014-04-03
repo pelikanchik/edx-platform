@@ -375,7 +375,7 @@ def index(request, course_id, chapter=None, section=None,
 
             # Save where we are in the chapter
             save_child_position(chapter_module, section)
-            context['fragment'] = section_module.render('student_view')
+            context['fragment'] = section_module.render('student_view', context)
 
         else:
             # section is none, so display a message
