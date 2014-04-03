@@ -16,7 +16,6 @@ div.course-wrapper {
   section.course-content {
     @extend .content;
     padding: 40px;
-    line-height: 1.6;
 
     h1 {
       margin: 0 0 lh();
@@ -143,7 +142,8 @@ div.course-wrapper {
             background: rgba(255,255,255,1.0);
             height: 390px;
             padding: 20px;
-            overflow: auto;
+            overflow-y: auto;
+            overflow-x: hidden;
           }
           .action {
             position: absolute;

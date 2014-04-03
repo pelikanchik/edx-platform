@@ -16,6 +16,9 @@ define ["backbone", "jquery", "underscore", "gettext", "xblock/runtime.v1",
       "click .component-actions .snapshot": 'clickSnapshot'
       "click .component-actions .delete-button": 'onDelete'
       "click .mode a": 'clickModeButton'
+      "click .save-view-button": 'clickSaveViewButton'
+      "click .edit-view-button":'editViewButton'
+      "click .back-from-edit-view-button":'backFromEditViewButton'
 
     initialize: ->
       @onDelete = @options.onDelete
@@ -95,7 +98,80 @@ define ["backbone", "jquery", "underscore", "gettext", "xblock/runtime.v1",
               @model.save(data).done()
             return ret_val
         )
-            
+
+
+    backFromEditViewButton: (event) =>
+      event.preventDefault()
+      unique_id = $(@$el).find(".problems-wrapper").attr("id")
+      $("#yandex-player-" + unique_id).remove()
+
+      $(@$el).find(".problems-wrapper").removeClass("preview");
+      $(@$el).find(".draggable-field").draggable("disable")
+      $(@$el).find(".draggable-field").removeClass("draggable-field").removeClass("ui-draggable-disabled").removeClass("ui-state-disabled");
+      $(@$el).find(".resizable-field").removeClass("resizable-field").removeClass("ui-resizable-disabled").removeClass("ui-state-disabled");
+
+
+      $(@$el).find(".back-from-edit-view-button, .save-view-button, .scrollbar").css "display", "none"
+      $(@$el).find(".edit-view-button, .check, .show, .reset, .clear, .save").css "display", "inline"
+
+    editViewButton: (event) =>
+      event.preventDefault()
+
+      @loadEdit()
+      unique_id = $(@$el).find(".problems-wrapper").attr("id")
+
+      $(@$el).find(".capa_inputtype, .inputtype").addClass "draggable-field"
+      $(@$el).find(".capa_inputtype, .inputtype").addClass "resizable-field"
+      $(@$el).find(".problems-wrapper").addClass "preview"
+
+
+      updateStyles = (element) ->
+        styleset = ""
+        styleset += "#" + element.find(".problems-wrapper").attr("id") + "{overflow-x:hidden;background-color:" + element.find(".problems-wrapper").css("background-color") + "}"
+        element.find(".capa_inputtype, .inputtype").each ->
+          styleset += "#" + $(this).attr("id") + "{position:relative; left:" + $(this).css("left") + "; top: " + $(this).css("top") + "}"
+
+        element.find("[data-field_name='additional_css']").next().val styleset
+
+      updateCssStyle = (id, style) ->
+        $("#" + id).data "styles", "#" + id + "{" + style + "}"
+        updateStyles $("#" + id).parents(".component")
+
+      updateBGOpacity = (id, opacity) ->
+        styles = " rgba(255,255,255," + opacity + ")"
+        $("#" + id).css "background-color", styles
+        $("#" + id).data "styles", "#" + id + "{background-color:" + styles + "}"
+        updateStyles $("#" + id).parents(".component")
+
+      opacityStr = $(@$el).find(".problems-wrapper").css("background-color").split(",")[3]
+      if opacityStr
+        opacityInt = parseInt(parseFloat(opacityStr) * 100)
+      else
+        opacityInt = 100
+      $(@$el).find(".scrollbar").slider
+        max: 100
+        value: 100 - opacityInt
+        min: 0
+        slide: (event, ui) ->
+          updateBGOpacity $(this).parents(".problems-wrapper").attr("id"), 1 - ui.value / 100
+
+      $(@$el).find(".resizable-field").resizable
+      $(@$el).find(".draggable-field").draggable drag: ->
+        updateCssStyle $(this).attr("id"), $(this).attr("style")
+
+      $(@$el).find(".draggable-field").draggable("enable")
+
+      $(@$el).children(".xblock").prepend $("#yandex-player").clone(true, true).attr("id", "yandex-player-" + unique_id)
+      problem_time = $(@$el).find(".problems-wrapper .problem").data("problem_time")
+      $(@$el).find(".edit-view-button, .check, .show, .reset, .clear, .save").css "display", "none"
+      $(@$el).find(".back-from-edit-view-button, .save-view-button").css "display", "inline"
+      $(@$el).find(".scrollbar").css "display", "inline-block"
+      setTimeout (->
+        document["yandex-player-" + unique_id].playVideo()
+        document["yandex-player-" + unique_id].seekTo problem_time
+        document["yandex-player-" + unique_id].pauseVideo()
+        return
+      ), 1000
 
     clickSaveButton: (event) =>
       event.preventDefault()
@@ -122,6 +198,18 @@ define ["backbone", "jquery", "underscore", "gettext", "xblock/runtime.v1",
       @$el.removeClass('editing')
       @$component_editor().slideUp(150)
       ModalUtils.hideModalCover()
+
+    clickSaveViewButton: (event) ->
+      event.preventDefault()
+      data = @module.save()
+      _this = this
+      additional_styles = $(@$el).find("[data-field_name='additional_css']").next().val()
+      data.metadata = _.extend(data.metadata or {},
+        additional_css: additional_styles
+      )
+      @model.save(data).done ->
+        _this.module = null
+        _this.render()
 
     clickEditButton: (event) ->
       event.preventDefault()

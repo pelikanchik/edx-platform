@@ -442,6 +442,7 @@ p, ul, ol, dl {
   clear: both;
   float: left;
   width: 70%;
+  min-width: 904px;
 }
 
 .sidebar {
@@ -543,8 +544,8 @@ hr.divide {
 
   label {
     display: block;
-    margin-bottom: 6px;
-    font-weight: 700;
+    margin-bottom: 5px;
+    font-weight: 400;
 
     &.inline-label {
       display: inline;
@@ -704,7 +705,10 @@ hr.divide {
 .duplicate-button.standard 
 .snapshot.standard,
 .insert-button.standard,
-.insert-to-end-button.standard {
+.insert-to-end-button.standard,
+.save-view-button.standard,
+.edit-view-button.standard,
+.back-from-edit-view-button.standard {
   @extend %t-action4;
   @include white-button;
   float: left;
@@ -718,6 +722,13 @@ hr.divide {
     margin-right: 4px;
   }
 }
+
+
+.back-from-edit-view-button.standard,
+.save-view-button.standard {
+   display: none;
+}
+
 
 .delete-button.standard {
 

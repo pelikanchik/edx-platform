@@ -7,7 +7,7 @@
 
 ##<section class="problem-progress"></section>
 
-<section class="problem" data-problem_time="${problem_time}">
+<section class="problem" data-problem_time="${problem_time}" >
 
   % if additional_css:
   <style>${additional_css}</style>
@@ -41,9 +41,10 @@
         <input class="resume" type="button" value="${_('Resume')}" />
     %endif
     %if not problem_now and is_studio:
-        <input class="show-preview-backshot" type="button" value="${_('Preview')}" />
-        <input class="hide-preview-backshot" type="button" value="${_('Back to editor')}" />
-        <input class="update-view-button" type="button" value="${_('Update')}" />
+        <input class="edit-view-button" type="button" value="${_('Edit View')}" />
+        <input class="back-from-edit-view-button" type="button" value="${_('Back')}" />
+        <input class="save-view-button" type="button" value="${_('Save')}" />
+        <div class="scrollbar"></div>
     %endif
     %if problem_time_format and is_studio:
         <label class = "problem-time-label">${problem_time_format}</label>

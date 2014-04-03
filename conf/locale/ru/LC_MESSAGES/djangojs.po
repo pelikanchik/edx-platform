@@ -510,7 +510,14 @@ msgstr "Завтра"
 msgid "Show Answer(s)"
 msgstr "Показать ответ"
 
-#alexg
+#alexger
+
+msgid "Additional CSS"
+msgstr "Допольнительные стили"
+
+msgid "Additional CSS for view modifications"
+msgstr "Стили, изменяющие стандартный внешний вид: прозрачность фона, позиция полей ввода"
+
 msgid "Hide Answer(s)"
 msgstr "Скрыть ответ"
 
@@ -1509,3 +1516,4 @@ msgid ""
 msgstr ""
 "У нас возникли проблемы при загрузке тем, которые вы запросили, Пожалуйста, "
 "повторите попытку."
+
