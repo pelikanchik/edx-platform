@@ -498,10 +498,7 @@ STATIC_ROOT = ENV_ROOT / "staticfiles"
 STATICFILES_DIRS = [
     COMMON_ROOT / "static",
     PROJECT_ROOT / "static",
-    ("bem/.bem/lib", REPO_ROOT / "frontend/.bem/lib"), # folder for bem integration
     ("bem/desktop.bundles", REPO_ROOT / "frontend/desktop.bundles"), # folder for bem integration
-    ("bem/common.blocks", REPO_ROOT / "frontend/common.blocks"), # folder for bem integration
-    ("bem/desktop.blocks", REPO_ROOT / "frontend/desktop.blocks") # folder for bem integration
 ]
 
 FAVICON_PATH = 'images/favicon.ico'
