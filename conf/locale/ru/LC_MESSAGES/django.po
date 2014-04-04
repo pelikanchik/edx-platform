@@ -7366,7 +7366,7 @@ msgstr "Пользовательское соглашение"
 #alexger backshots
 
 msgid "Resume"
-msgstr "Вернуться"
+msgstr "Продолжить"
 
 msgid "Back"
 msgstr "Вернуться"
