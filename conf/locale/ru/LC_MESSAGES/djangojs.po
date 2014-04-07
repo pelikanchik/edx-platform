@@ -67,7 +67,7 @@ msgstr "Да, удалить"
 
 #: cms/static/js/base.js:387 cms/static/js/views/course_info_update.js:147
 msgid "Deleting&hellip;"
-msgstr "Удаление..."
+msgstr "Удаление…"
 
 #: cms/static/js/base.js:403 cms/static/js/views/asset.js:67
 #: cms/static/js/views/course_info_update.js:165
@@ -106,7 +106,7 @@ msgstr "Обязательное поле."
 #: cms/static/js/views/course_info_update.js:81
 #: cms/static/js/views/overview.js:232
 msgid "Saving&hellip;"
-msgstr "Сохранение..."
+msgstr "Сохранение…"
 
 #: cms/static/js/base.js:851
 msgid "Will Release:"
@@ -548,8 +548,8 @@ msgid "Show In LMS"
 msgstr "Отображать курс в публичной части"
 
 
-msgid "Processing your account information &hellip;"
-msgstr "Отправка формы..."
+msgid "Processing your account information…"
+msgstr "Отправка формы…"
 
 #: cms/templates/js/no-textbooks.underscore:2 
 msgid "Add your first textbook"
@@ -1031,7 +1031,7 @@ msgid ""
 "versions of the same video: mp4, webm and youtube (if available)."
 msgstr ""
 "Удостоверьтесь, что все ученики могут смотреть данное видео, мы рекомендуем "
-"добавить альтернативные варианты данного видео: mp4, webm и yputube (если "
+"добавить альтернативные варианты данного видео: mp4, webm и youtube (если "
 "возможно)."
 
 #: cms/templates/js/transcripts/metadata-videolist-entry.underscore:11
@@ -1509,3 +1509,43 @@ msgid ""
 msgstr ""
 "У нас возникли проблемы при загрузке тем, которые вы запросили, Пожалуйста, "
 "повторите попытку."
+
+#: common/lib/xmodule/xmodule/capa_base.py:532
+msgid "Warning: The problem has been reset to its initial state!"
+msgstr "Предупреждение: задача была сброшена до начального состояния!"
+
+#: common/lib/xmodule/xmodule/capa_base.py:536
+msgid ""
+"The problem's state was corrupted by an invalid submission. The submission "
+"consisted of:"
+msgstr ""
+"Состояние задачи было повреждено некорректным запросом. Запрос состоял из: "
+
+#: common/lib/xmodule/xmodule/capa_base.py:543
+msgid "If this error persists, please contact the course staff."
+msgstr ""
+"Если эта ошибка сохраняется, пожалуйста, свяжитесь с администраторами курса."
+
+#: common/lib/xmodule/xmodule/capa_base.py:936
+msgid "You must wait at least {wait} seconds between submissions."
+msgstr "Интервал между вашими запросами должен быть не менее {wait} секунд."
+
+#: common/lib/xmodule/xmodule/capa_base.py:963
+msgid "Error: {msg}"
+msgstr "Ошибка: {msg}"
+
+#: common/lib/xmodule/xmodule/capa_base.py:1109
+msgid "Problem is closed."
+msgstr "Задача закрыта."
+
+#: common/lib/xmodule/xmodule/capa_base.py:1119
+msgid "Problem needs to be reset prior to save."
+msgstr "Задача должна быть сброшена перед сохранением."
+
+#: common/lib/xmodule/xmodule/capa_base.py:1127
+msgid "Your answers have been saved."
+msgstr "Ваши ответы сохранены."
+
+#: common/lib/xmodule/xmodule/capa_base.py:1129
+msgid "Your answers have been saved but not graded. Click 'Check' to grade them."
+msgstr "Ваши ответы сохранены, но не проверены. Для проверки нажмите 'Проверить'."
