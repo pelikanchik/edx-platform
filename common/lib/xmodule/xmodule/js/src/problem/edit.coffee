@@ -499,20 +499,24 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
           }
         }
 
-        var floatValue = parseFloat(answer);
-        if(!isNaN(floatValue)) {
-          var params = /(.*?)\+\-\s*(.*?$)/.exec(answer);
-          if(params) {
-            string += '<numericalresponse answer="' + floatValue + '">\n';
-            string += '  <responseparam type="tolerance" default="' + params[2] + '" />\n';
-          } else {
-            string += '<numericalresponse answer="' + floatValue + '">\n';
-          }
-          string += '  <textline />\n';
-          string += '</numericalresponse>\n\n';
-        } else {
+        // По умолчанию считаем numericalresponse как stringresponse
+        // При необходимости numericalresponse прописывается в продвинутом редакторе
+        // alexger
+
+        //var floatValue = parseFloat(answer);
+        //if(!isNaN(floatValue)) {
+        //  var params = /(.*?)\+\-\s*(.*?$)/.exec(answer);
+        //  if(params) {
+        //    string += '<numericalresponse answer="' + floatValue + '">\n';
+        //    string += '  <responseparam type="tolerance" default="' + params[2] + '" />\n';
+        //  } else {
+        //    string += '<numericalresponse answer="' + floatValue + '">\n';
+        //  }
+        //  string += '  <textline />\n';
+        //  string += '</numericalresponse>\n\n';
+        //} else {
           string += '<stringresponse answer="' + answer + '" type="ci">\n  <textline size="20"/>\n</stringresponse>\n\n';
-        }
+        //}
         return string;
       });
 
@@ -522,20 +526,24 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
             answersList = p.replace(/^(or)?=\s*/gm, '').split('\n'),
             floatValue = parseFloat(answersList[0]);
 
-        if(!isNaN(floatValue)) {
-          // Tries to extract parameters from string like 'expr +- tolerance'
-          var params = /(.*?)\+\-\s*(.*?$)/.exec(answersList[0]),
-              answer = answersList[0].replace(/\s+/g, '');
-          if(params) {
-            answer = params[1].replace(/\s+/g, '');
-            string = '<numericalresponse answer="' + answer + '">\n';
-            string += '  <responseparam type="tolerance" default="' + params[2] + '" />\n';
-          } else {
-            string = '<numericalresponse answer="' + answer + '">\n';
-          }
-          string += '  <formulaequationinput />\n';
-          string += '</numericalresponse>\n\n';
-        } else {
+        // По умолчанию считаем numericalresponse как stringresponse
+        // При необходимости numericalresponse прописывается в продвинутом редакторе
+        // alexger
+
+        //if(!isNaN(floatValue)) {
+        //  // Tries to extract parameters from string like 'expr +- tolerance'
+        //  var params = /(.*?)\+\-\s*(.*?$)/.exec(answersList[0]),
+        //      answer = answersList[0].replace(/\s+/g, '');
+        //  if(params) {
+        //    answer = params[1].replace(/\s+/g, '');
+        //    string = '<numericalresponse answer="' + answer + '">\n';
+        //    string += '  <responseparam type="tolerance" default="' + params[2] + '" />\n';
+        //  } else {
+        //    string = '<numericalresponse answer="' + answer + '">\n';
+        //  }
+        //  string += '  <formulaequationinput />\n';
+        //  string += '</numericalresponse>\n\n';
+        //} else {
             var firstAnswer = answersList.shift();
             if (firstAnswer[0] === '|') { // this is regexp case
               string = '<stringresponse answer="' + firstAnswer.slice(1).trim() +  '" type="ci regexp" >\n'
@@ -547,7 +555,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
                 string += '  <additional_answer>' + answersList[i] + '</additional_answer>\n'
             }
             string +=  '  <textline size="20"/>\n</stringresponse>\n\n';
-        }
+        //}
         return string;
     });
 
