@@ -140,7 +140,7 @@ div.course-wrapper {
         }
           .problems-wrapper{
             background: rgba(255,255,255,1.0);
-            height: 390px;
+            height: $yandex-player-height - 90px;
             padding: 20px;
             overflow-y: auto;
             overflow-x: hidden;
