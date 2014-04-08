@@ -16,6 +16,9 @@ $fg-min-width: 810px;
 
 // FONTS
 $sans-serif: 'Open Sans', $verdana, sans-serif;
+$f-sans-serif: 'Open Sans','Helvetica Neue', Helvetica, Arial, sans-serif;
+$sans-serif: $f-sans-serif;
+
 $monospace: Monaco, 'Bitstream Vera Sans Mono', 'Lucida Console', monospace;
 $body-font-family: $sans-serif;
 $serif: $georgia;
@@ -298,10 +301,9 @@ $video-thumb-url: '../images/courses/video-thumb.jpg';
 // SPLINT: new standards
 
 // SPLINT: fonts
-$f-serif: 'Bree Serif', Georgia, Cambria, 'Times New Roman', Times, serif;
-$f-sans-serif: 'Open Sans','Helvetica Neue', Helvetica, Arial, sans-serif;
-$f-monospace: 'Bitstream Vera Sans Mono', Consolas, Courier, monospace;
 
+$f-serif: 'Bree Serif', Georgia, Cambria, 'Times New Roman', Times, serif;
+$f-monospace: 'Bitstream Vera Sans Mono', Consolas, Courier, monospace;
 
 $yandex-player-height: 450px;
 $yandex-player-width: 800px;
