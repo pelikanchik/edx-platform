@@ -63,7 +63,7 @@
 <!--- (стандартная функция child.module_class не работает) -->
 
 <!-- style="display:none" -->
-<div style="display:none">
+<div >
 
     <p class="data_string" >${data_string}</p>
     <p class="names_string">${names_string} </p>
@@ -71,6 +71,12 @@
     <p class="locators_dict">${locators_dict}</p>
     <p class="parent-location" >${subsection.location}</p>
     <p class="locator">${locator}</p>
+    <p class="states_string">{
+        % for k,v in states.iteritems():
+            "${ k }" : "${ v }",
+        % endfor
+        }
+    </p>
 </div>
 
 

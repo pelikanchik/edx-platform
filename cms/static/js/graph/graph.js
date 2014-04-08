@@ -7,7 +7,7 @@ var add_edge_mode = false;
 var mouse_x, mouse_y, origin_x, origin_y = null
 
 // adding nodes and edges
-var new_node_x, new_node_y, origin_x, origin_y;
+var new_node_x, new_node_y;
 var origin_node;
 
 var new_edge_line;
@@ -242,9 +242,11 @@ function canvasDbClick(e) {
     var names_str = $(".names_string").text();
     var graph_str = $(".graph_string").text();
     var dict_str = $(".locators_dict").text();
+    var states_str = $(".states_string").text();
     /*
         Толстый костыль: я не знаю, как сделать так, чтобы последняя (лишняя) запятая не выводилась,
         поэтому я просто удаляю лишнюю запятую руками.
+        и вторым костылём обрабатываю случай, когда строка пустая.
     */
 
     var i = names_str.lastIndexOf(",");
@@ -253,9 +255,12 @@ function canvasDbClick(e) {
     data_str = (i>0) ? data_str.slice(0, i) + data_str.slice(i+1) : data_str;
     i = graph_str.lastIndexOf(",");
     graph_str = (i>0) ? graph_str.slice(0, i) + graph_str.slice(i+1) : graph_str;
+    i = states_str.lastIndexOf(",");
+    states_str = (i>0) ? states_str.slice(0, i) + states_str.slice(i+1) : states_str;
 
     names_obj = jQuery.parseJSON(names_str);
     data_obj = jQuery.parseJSON(data_str);
+    states_obj = jQuery.parseJSON(states_str);
 
     ids_arr = [];
 
@@ -368,8 +373,6 @@ function canvasDbClick(e) {
 
             ajax_save_node(node_id, metadata);
 
-            //if (states_obj[node_id] == "public")
-            // ...
         }
 
 //        $(".graph_string").html(JSON.stringify(edges_arr));

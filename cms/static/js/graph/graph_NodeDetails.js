@@ -5,7 +5,8 @@
 //var j$ = jQuery.noConflict();
 //var $ = jQuery.noConflict();
 
-function ajax_save_node(id, metadata){
+function ajax_save_node(id, metadata, change_status){
+    change_status = (typeof change_status !== 'undefined') ? change_status : false;
     $.ajax({
         //url: "/save_item",
         url: "/xblock/" + id,
@@ -17,11 +18,33 @@ function ajax_save_node(id, metadata){
         },
         data: JSON.stringify({
             'id': id,
-            "state":"public",
+            //"state":"public",
             "data":null,
             "children":null,
             'metadata': metadata
             })
+    });
+    if (!change_status && (states_obj[id] == "public")){
+            ajax_publish_node(id);
+    }
+
+}
+
+function ajax_publish_node(id){
+// POST http://0.0.0.0:8001/xblock/JLU.H101.strangeEons%2Fbranch%2Fdraft%2Fblock%2Fverticalf5b
+// {"publish":"make_public"}
+    $.ajax({
+        //url: "/save_item",
+        url: "/xblock/" + id,
+        type: "POST",
+        dataType: "json",
+        contentType: "application/json",
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        data: JSON.stringify({
+            "publish":"make_public"
+        })
     });
 }
 function create_new_edge(origin_node, target_node, new_edge_data){
@@ -137,6 +160,8 @@ function generateEdgeData(disjunctions_array, source){
             related_vertex_name = "";
             about_source = true;
         } else {
+
+            console.log(condition["source_element_id"])
             related_vertex_name = names_obj[condition["source_element_id"]] ["name"];
         }
         var percent_sign = (condition["field"] === "score_rel")? "%" : "";
@@ -242,7 +267,8 @@ function createNodeRenameCallback( node){
                     metadata.display_name = node_name;
 
                     var locator_term = names_obj[node.id]["locator"]
-                    ajax_save_node(locator_term, metadata);
+                    ajax_save_node(locator_term, metadata, true);
+                    // renaming a node leads to drafting it.
 
                     renderer.renameNode(node, node_name)
 
