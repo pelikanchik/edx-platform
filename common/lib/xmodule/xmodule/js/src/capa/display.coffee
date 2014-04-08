@@ -31,7 +31,7 @@ class @Problem
     @$('section.action input.clear').click @clear
 
     @$('section.action input.resume').click ->
-      HideBackshot($(this).parents(".backshot"))
+      HideBackshot($(this).parents("li.backshot"))
       GetPlayer().playVideo()
 
     @$(".advice-for-problem").each ->

@@ -515,8 +515,16 @@ msgstr "Показать ответ"
 msgid "Additional CSS"
 msgstr "Допольнительные стили"
 
+
 msgid "Additional CSS for view modifications"
 msgstr "Стили, изменяющие стандартный внешний вид: прозрачность фона, позиция полей ввода"
+
+
+msgid "Yandex.Video Insertion Code"
+msgstr "Код вставки Яндекс.Видео"
+
+msgid "Yandex.Video Insertion Code: <br>&lt;iframe width=\"450\" height=\"225\" src=\"http://video.yandex.ru/iframe/<span style = \"color:green\">&lt;login&gt;</span>/<span style = \"color:green\">&lt;video_id&gt;</span>/\" frameborder=\"0\" allowfullscreen=\"1\"&gt;&lt;/iframe&gt;</pre>"
+msgstr "Код вставки Яндекс.Видео имеет следующий вид: <br>&lt;iframe width=\"450\" height=\"225\" src=\"http://video.yandex.ru/iframe/<span style = \"color:green\">&lt;login&gt;</span>/<span style = \"color:green\">&lt;video_id&gt;</span>/\" frameborder=\"0\" allowfullscreen=\"1\"&gt;&lt;/iframe&gt;</pre>"
 
 msgid "Hide Answer(s)"
 msgstr "Скрыть ответ"
