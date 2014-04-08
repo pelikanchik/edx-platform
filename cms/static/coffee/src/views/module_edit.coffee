@@ -160,18 +160,19 @@ define ["backbone", "jquery", "underscore", "gettext", "xblock/runtime.v1",
         updateCssStyle $(this).attr("id"), $(this).attr("style")
 
       $(@$el).find(".draggable-field").draggable("enable")
-
-      $(@$el).children(".xblock").prepend $("#yandex-player").clone(true, true).attr("id", "yandex-player-" + unique_id)
-      problem_time = $(@$el).find(".problems-wrapper .problem").data("problem_time")
       $(@$el).find(".edit-view-button, .check, .show, .reset, .clear, .save").css "display", "none"
       $(@$el).find(".back-from-edit-view-button, .save-view-button").css "display", "inline"
-      $(@$el).find(".scrollbar").css "display", "inline-block"
-      setTimeout (->
-        document["yandex-player-" + unique_id].playVideo()
-        document["yandex-player-" + unique_id].seekTo problem_time
-        document["yandex-player-" + unique_id].pauseVideo()
-        return
-      ), 1000
+
+      if $(@$el).find(".problems-wrapper").hasClass("backshot")
+        $(@$el).children(".xblock").prepend $("#yandex-player").clone(true, true).attr("id", "yandex-player-" + unique_id)
+        problem_time = $(@$el).find(".problems-wrapper .problem").data("problem_time")
+        $(@$el).find(".scrollbar").css "display", "inline-block"
+        setTimeout (->
+          document["yandex-player-" + unique_id].playVideo()
+          document["yandex-player-" + unique_id].seekTo problem_time
+          document["yandex-player-" + unique_id].pauseVideo()
+          return
+        ), 1000
 
     clickSaveButton: (event) =>
       event.preventDefault()

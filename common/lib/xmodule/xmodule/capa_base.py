@@ -374,6 +374,8 @@ class CapaMixin(CapaFields):
         """
         Return some html with data about the module
         """
+
+        problem_class = "backshot" if self.problem_now == False else ""
         progress = self.get_progress()
         return self.runtime.render_template('problem_ajax.html', {
             'element_id': self.location.html_id(),
@@ -381,6 +383,7 @@ class CapaMixin(CapaFields):
             'ajax_url': self.runtime.ajax_url,
             'progress_status': Progress.to_js_status_str(progress),
             'progress_detail': Progress.to_js_detail_str(progress),
+            'problem_class': problem_class
         })
 
     def check_button_name(self):

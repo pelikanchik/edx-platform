@@ -47,7 +47,7 @@ function () {
             var videoBlockId = "yandex-player";
             if (state == "play" ){
 
-                $('.backshot').each(function() {
+                $('li.backshot').each(function() {
                     if ($(this).hasClass("shown")){
                         HideBackshot($(this));
                     }
@@ -60,7 +60,7 @@ function () {
                     state_change_time = GetPlayer().getCurrentTime();
                     // Если время прокрутилось назад - сбросить метки просмотра у всех последующих бэкшотов
                     if (previous_state_change_time > state_change_time || state_change_time == 0){
-                        $('.backshot').each(function() {
+                        $('li.backshot').each(function() {
                             var time_to_show = timeToInt($(this).data('problem_time'));
                             if (time_to_show > state_change_time){
                                 $(this).attr("shown","0");
@@ -73,7 +73,7 @@ function () {
 
                     if (intervalStorage.data("interval-id")){
  
-                        $('.backshot').each(function() {
+                        $('li.backshot').each(function() {
                             var time_to_show =  timeToInt($(this).data('problem_time'));
                             var difference_between_now_and_showtime = GetPlayer().getCurrentTime() - time_to_show;
                             if (difference_between_now_and_showtime < 0.8 && difference_between_now_and_showtime > 0){

@@ -7,14 +7,12 @@ define(["js/views/baseview", "underscore"], function(BaseView, _) {
             var self = this;
             var templateName = _.result(this, 'templateName');
             // Backbone model cid is only unique within the collection.
-            console.log(templateName);
             this.uniqueId = _.uniqueId(templateName + "_");
             var tpl = document.getElementById(templateName).text;
             if(!tpl) {
                 console.error("Couldn't load template: " + templateName);
             }
             this.template = _.template(tpl);
-            console.log(this.model);
             this.$el.html(this.template({model: this.model, uniqueId: this.uniqueId, field_name:this.model.attributes.field_name}));
             this.listenTo(this.model, 'change', this.render);
             this.render();
