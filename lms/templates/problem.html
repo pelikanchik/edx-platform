@@ -32,7 +32,7 @@
     % if answer_available:
     <button class="show"><span class="show-label">${_('Show Answer(s)')}</span> <span class="sr">${_("(for question(s) above - adjacent to each field)")}</span></button>
     % endif
-    % if attempts_allowed :
+    % if attempts_allowed:
     <section class="submission_feedback">
       ${_("You have used {num_used} of {num_total} submissions").format(num_used=attempts_used, num_total=attempts_allowed)}
     </section>
@@ -41,9 +41,6 @@
         <input class="resume" type="button" value="${_('Resume')}" />
     %endif
     %if not problem_now and is_studio:
-        <input class="edit-view-button" type="button" value="${_('Edit View')}" />
-        <input class="back-from-edit-view-button" type="button" value="${_('Back')}" />
-        <input class="save-view-button" type="button" value="${_('Save')}" />
         <div class="scrollbar"></div>
     %endif
     %if problem_time_format and is_studio:
