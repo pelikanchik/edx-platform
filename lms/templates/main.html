@@ -98,19 +98,20 @@
 </head>
 
 <body class="<%block name='bodyclass'/>">
-  <a class="nav-skip" href="#content">${_("Skip to this view's content")}</a>
+<div class = "page-wrapper">
+    <a class="nav-skip" href="#content">${_("Skip to this view's content")}</a>
 
-  <%include file="mathjax_accessible.html" />
+    <%include file="mathjax_accessible.html" />
 
-% if not suppress_toplevel_navigation:
-  <%include file="${header_file}" />
-%endif
+  % if not suppress_toplevel_navigation:
+    <%include file="${header_file}" />
+  %endif
 
-  <section class="content-wrapper" id="content">
-    ${self.body()}
-    <%block name="bodyextra"/>
-  </section>
-
+    <section class="content-wrapper" id="content">
+      ${self.body()}
+      <%block name="bodyextra"/>
+    </section>
+</div>
 % if not suppress_toplevel_navigation:
   <%include file="${footer_file}" />
 % endif
