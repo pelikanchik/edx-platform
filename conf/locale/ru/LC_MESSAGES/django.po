@@ -7152,23 +7152,183 @@ msgstr "регистрацию"
 #reg messages
 
 
-msgid "Thank you for signing up for {platform_name}! To activate "
+#: lms/templates/emails/activation_email.txt:4
+msgid ""
+"Thank you for signing up for {platform_name}! To activate "
 "your account, please copy and paste this address into your web "
 "browser's address bar:"
-msgstr "Спасибо за регистрацию! Чтобы активировать вашу учётную запись, пожалуйста, скопируйте следующую ссылку в адресную строку вашего браузера:"
+msgstr ""
+"Спасибо за регистрацию! Чтобы активировать вашу учётную запись, пожалуйста, "
+"скопируйте следующую ссылку в адресную строку вашего браузера:"
 
+#: lms/templates/emails/activation_email.txt:16
+msgid ""
+"If you didn't request this, you don't need to do anything; you won't "
+"receive any more email from us. Please do not reply to this e-mail; "
+"if you require assistance, check the help section of the "
+"{platform_name} web site."
+msgstr ""
+"Если вы не запрашивали данную операцию - проигнорируйте письмо, "
+"вы больше не получите сообщений от нас. На это письмо отвечать не нужно."
+
+#: lms/templates/emails/activation_email.txt:21
+msgid ""
+"If you didn't request this change, you can disregard this email - we have "
+"not yet reset your password."
+msgstr ""
+"Если вы не запрашивали смену пароля - проигнорируйте это сообщение. Ваш "
+"пароль ещё не изменен."
+
+#: lms/templates/emails/activation_email_subject.txt:3
 msgid "Your account for {platform_name}"
 msgstr "Ваш аккаунт на {platform_name}"
 
-msgid "If you didn't request this, you don't need to do anything; you won't "
-      "receive any more email from us. Please do not reply to this e-mail; "
-      "if you require assistance, check the help section of the "
-      "{platform_name} web site."
-msgstr "Если вы не запрашивали подтверждения регистрации - проигнорируйте письмо, вы больше не получите сообщений от нас. На это письмо отвечать не нужно."
+#: lms/templates/emails/confirm_email_change.txt:8
+msgid ""
+"This is to confirm that you changed the e-mail associated with "
+"{platform_name} from {old_email} to {new_email}. If you "
+"did not make this request, please contact us at"
+msgstr ""
+"Это подтверждение, что вы сменили e-mail на {platform_name} с {old_email} на "
+"{new_email}. Если вы не делали данный запрос, пожалуйста, свяжитесь с нами по" 
 
-msgid "If you didn't request this change, you can disregard this email - we have not yet reset your password."
-msgstr "Если вы не запрашивали смену пароля - проигнорируйте это сообщение. Ваш пароль ещё не изменен."
+#: lms/templates/emails/confirm_email_change.txt:18
+msgid ""
+"This is to confirm that you changed the e-mail associated with "
+"{platform_name} from {old_email} to {new_email}. If you "
+"did not make this request, please contact us immediately. Contact "
+"information is listed at:"
+msgstr ""
+"Это подтверждение, что вы сменили e-mail на {platform_name} с {old_email} на "
+"{new_email}. Если вы не делали данный запрос, пожалуйста, срочно свяжитесь "
+"с нами. Контактная информация доступна на:" 
 
+#: lms/templates/emails/confirm_email_change.txt:34
+msgid ""
+"We keep a log of old e-mails, so if this request was unintentional, "
+"we can investigate."
+msgstr ""
+"Мы храним журнал старых e-mail, поэтому, если этот запрос был неумышленным, "
+"мы сможем это расследовать."
+
+#: lms/templates/emails/email_change.txt:3
+msgid ""
+"We received a request to change the e-mail associated with your "
+"{platform_name} account from {old_email} to {new_email}. "
+"If this is correct, please confirm your new e-mail address by "
+"visiting:"
+msgstr ""
+"Мы получили запрос на смену e-mail, связанного с вашим аккаунтом на "
+"{platform_name}, c {old_email} на {new_email}. Если это действительно так, "
+"пожалуйста, подтвердите ваш новый e-mail по адресу:"
+
+#: lms/templates/emails/email_change.txt:20
+msgid ""
+"If you didn't request this, you don't need to do anything; you won't "
+"receive any more email from us. Please do not reply to this e-mail; "
+"if you require assistance, check the about section of the "
+"{platform_name} Courses web site."
+msgstr ""
+"Если вы не запрашивали смену e-mail - проигнорируйте письмо, вы больше не "
+"получите сообщений от нас. На это письмо отвечать не нужно."
+
+#lms/templates/emails/email_change_subject.txt:3
+msgid "Request to change {platform_name} account e-mail"
+msgstr "Запрос на смену e-mail аккаунта на {platform_name}"
+
+#: lms/templates/emails/enroll_email_enrolledmessage.txt:3
+msgid "Dear {full_name}"
+msgstr "Здравствуйте, {full_name}"
+
+#: lms/templates/emails/enroll_email_enrolledmessage.txt:5
+msgid "You have been enrolled in {course_name} at {site_name} by a member "
+	"of the course staff. The course should now appear on your {site_name} "
+	"dashboard."
+msgstr "Вы были зарегистрированы на курс {course_name} на {site_name} администратором. Курс теперь доступен в вашем кабинете."
+
+#: lms/templates/emails/enroll_email_enrolledmessage.txt:12
+msgid "To start accessing course materials, please visit {course_url}"
+msgstr "Чтобы приступить к занятиям, перейдите на страницу: {course_url}"
+
+#: lms/templates/emails/enroll_email_enrolledmessage.txt:17
+msgid "This email was automatically sent from {site_name} to {full_name}"
+msgstr "Письмо было сгенерировано автоматически на сайте {site_name} для {full_name}"
+
+#: lms/templates/emails/enroll_email_enrolledsubject.txt:3
+msgid "You have been enrolled in {course_name}"
+msgstr "Регистрация на курс {course_name}"
+
+
+#: lms/templates/emails/enroll_email_allowedmessage.txt:3
+#: lms/templates/emails/unenroll_email_allowedmessage.txt:3
+msgid "Dear student,"
+msgstr "Здравствуйте,"
+
+#: lms/templates/emails/enroll_email_allowedmessage.txt:5
+msgid "You have been invited to join {course_name} at {site_name} by a "
+"member of the course staff."
+msgstr "Вы были зарегистрированы на курс {course_name} на {site_name} администратором."
+
+#: lms/templates/emails/enroll_email_allowedmessage.txt:13
+msgid "To access the course visit {course_url} and login."
+msgstr "Для получения доступа к курсу перейдите на страницу: {course_url} и авторизуйтесь."
+
+#: lms/templates/emails/enroll_email_allowedmessage.txt:15
+msgid "To access the course visit {course_about_url} and register for the course."
+msgstr "Для получения доступа к курсу перейдите на страницу: {course_url} и зарегистрируйтесь на курс."
+
+#: lms/templates/emails/enroll_email_allowedmessage.txt:21
+msgid "To finish your registration, please visit {registration_url} and fill "
+"out the registration form making sure to use {email_address} in the E-mail field."
+msgstr "Для завершения регистрации, пожалуйста, перейдите на страницу: {registration_url} и "
+"заполните регистрационную форму, убедитесь, что в поле E-mail указано {email_address}."
+
+#: lms/templates/emails/enroll_email_allowedmessage.txt:27
+msgid "Once you have registered and activated your account, you will see "
+"{course_name} listed on your dashboard."
+msgstr "Как только вы зарегистрируетесь и активируете свой аккаунт, вы увидите "
+"{course_name} на панели ваших курсов."
+
+#: lms/templates/emails/enroll_email_allowedmessage.txt:32
+msgid "Once you have registered and activated your account, visit {course_about_url} "
+"to join the course."
+msgstr "Как только вы зарегистрируетесь и активируете свой аккаунт, перейдите на страницу: "
+"{course_about_url}, чтобы зарегистрироваться на курс."
+
+#: lms/templates/emails/enroll_email_allowedmessage.txt:38
+msgid "This email was automatically sent from {site_name} to {email_address}"
+msgstr "Письмо было сгенерировано автоматически на сайте {site_name} для {email_address}"
+
+
+#: lms/templates/emails/enroll_email_allowedsubject.txt:3
+msgid "You have been invited to register for {course_name}"
+msgstr "Вы были приглашены зарегистрироваться на {course_name}"
+
+#: lms/templates/emails/unenroll_email_allowedmessage.txt:5
+msgid ""
+"You have been un-enrolled from course {course_name} by a member "
+"of the course staff. Please disregard the invitation "
+"previously sent."
+msgstr ""
+"Вы были отчислены из курса {course_name} администратором курса. Пожалуйста, "
+"проигнорируйте приглашение высланное ранее."
+
+#: lms/templates/emails/unenroll_email_enrolledmessage.txt:5
+msgid ""
+"You have been un-enrolled in {course_name} at {site_name} by a member "
+"of the course staff. The course will no longer appear on your "
+"{site_name} dashboard."
+msgstr ""
+"Вы были отчислены из курса {course_name} на {site_name} администратором "
+"курса. Курс больше не будет отображаться в списке ваших курсов на {site_name} "
+
+#: lms/templates/emails/unenroll_email_enrolledmessage.txt:11
+msgid "Your other courses have not been affected."
+msgstr "Другие ваши курсы не были затронуты."
+
+#: lms/templates/emails/unenroll_email_subject.txt:3
+msgid "You have been un-enrolled from {course_name}"
+msgstr "Вы были отчислены из {course_name}"
 
 msgid "Username must be minimum of two characters long."
 msgstr "Имя пользователя не должно быть короче 2 символов"
@@ -7221,71 +7381,6 @@ msgstr "Введите e-mail с доверенным доменом"
 msgid "Domain should be {0}."
 msgstr "Домен электронной почты должен быть {0}."
 
-
-
-
-#enroll messages
-
-
-msgid "Dear {full_name}"
-msgstr "Здравствуйте, {full_name}"
-
-msgid "You have been enrolled in {course_name} at {site_name} by a member "
-	"of the course staff. The course should now appear on your {site_name} "
-	"dashboard."
-msgstr "Вы были зарегистрированы на курс {course_name} на {site_name} администратором. Курс теперь доступен в вашем кабинете."
-
-msgid "To start accessing course materials, please visit {course_url}"
-msgstr "Чтобы приступить к занятиям, перейдите на страницу: {course_url}"
-
-msgid "This email was automatically sent from {site_name} to "
-	"{full_name}"
-msgstr "Письмо было сгенерировано автоматически на сайте {site_name} для {full_name}"
-
-msgid "You have been enrolled in {course_name}"
-msgstr "Регистрация на курс {course_name}"
-
-
-#enroll_email_allowedmessage.txt
-
-
-msgid "Dear student,"
-msgstr "Здравствуйте,"
-
-msgid "You have been invited to join {course_name} at {site_name} by a "
-"member of the course staff."
-msgstr "Вы были зарегистрированы на курс {course_name} на {site_name} администратором."
-
-msgid "To access the course visit {course_url} and login."
-msgstr "Для получения доступа к курсу перейдите на страницу: {course_url} и авторизуйтесь."
-
-msgid "To access the course visit {course_about_url} and register for the course."
-msgstr "Для получения доступа к курсу перейдите на страницу: {course_url} и зарегистрируйтесь на курс."
-
-msgid "To finish your registration, please visit {registration_url} and fill "
-"out the registration form making sure to use {email_address} in the E-mail field."
-msgstr "Для завершения регистрации, пожалуйста, перейдите на страницу: {registration_url} и "
-"заполните регистрационную форму, убедитесь, что в поле E-mail указано {email_address}."
-
-msgid "Once you have registered and activated your account, you will see "
-"{course_name} listed on your dashboard."
-msgstr "Как только вы зарегистрируетесь и активируете свой аккаунт, вы увидите "
-"{course_name} на панели ваших курсов."
-
-msgid "Once you have registered and activated your account, visit {course_about_url} "
-"to join the course."
-msgstr "Как только вы зарегистрируетесь и активируете свой аккаунт, перейдите на страницу: "
-"{course_about_url}, чтобы зарегистрироваться на курс."
-
-msgid "This email was automatically sent from {site_name} to {email_address}"
-msgstr "Письмо было сгенерировано автоматически на сайте {site_name} для {email_address}"
-
-
-#enroll_email_allowedsubject.txt
-
-
-msgid "You have been invited to register for {course_name}"
-msgstr "Вы были приглашены зарегистрироваться на {course_name}"
 
 #User Info
 
