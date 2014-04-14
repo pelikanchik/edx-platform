@@ -213,7 +213,11 @@ Graph.Renderer.Raphael = function(element, graph, width, height) {
         }
     };
     d.onmouseup = function () {
-        selfRef.isDrag && selfRef.isDrag.set.animate({"fill-opacity": .6}, 500);
+        //selfRef.isDrag && selfRef.isDrag.set.animate({"fill-opacity": .6}, 500);
+        selfRef.isDrag && selfRef.isDrag.set.forEach(function(x){
+            if (x.type == "set") x.animate({"fill-opacity": .9}, 500)
+                else x.animate({"fill-opacity": .6}, 500)
+        })
         selfRef.isDrag = false;
         update_hover_area(selfRef);
     };
