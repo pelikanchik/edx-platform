@@ -18,6 +18,7 @@ function hideRestOfString(S){
                     // if label is longer tha...
 
     if (S.length > N) S = S.slice(0, N - 3) + "...";
+    //if (S.length > N) S = S.slice(0, N - 3) + "\n" + S.slice(N - 3);
     return S;
 }
 

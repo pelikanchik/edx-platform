@@ -23,9 +23,25 @@ Raphael.fn.connection = function (obj1, obj2, style) {
         to : obj2,
         style : style,*/
         draw : function() {
-        /* get bounding boxes of target and source */
-        var bb1 = obj1.getBBox();
-        var bb2 = obj2.getBBox();
+        /* get bounding boxes of target and source
+         * dirty hack: now shape consists of ellipse, text and popup-text.
+         * popup-text isn't visible, and shouldn't be counted as a part of node while calcuating it's size
+         * so BBox() takes into account only individual elements, not sets.
+         * */
+        var set1 = selfRef.set();
+        obj1.forEach(function(x){
+            if (x.type != "set"){
+                set1.push(x);
+            }
+        })
+        var set2 = selfRef.set();
+        obj2.forEach(function(x){
+            if (x.type != "set"){
+                set2.push(x);
+            }
+        })
+        var bb1 = set1.getBBox();
+        var bb2 = set2.getBBox();
         var off1 = 0;
         var off2 = 0;
 

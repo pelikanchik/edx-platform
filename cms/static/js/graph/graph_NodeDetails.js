@@ -255,6 +255,8 @@ function createNodeRenameCallback( node){
 
         $( "#rename-node" ).dialog({
               modal: true,
+              //height: 300,
+              //width: 350,
               buttons: {
                 Ok: function() {
 
@@ -270,7 +272,7 @@ function createNodeRenameCallback( node){
                     ajax_save_node(locator_term, metadata, true);
                     // renaming a node leads to drafting it.
 
-                    renderer.renameNode(node, node_name)
+                    renderer.renameNode(node, hideRestOfString(node_name))
 
                     $( this ).dialog( "close" );
                 },

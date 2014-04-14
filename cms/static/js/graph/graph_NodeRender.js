@@ -66,6 +66,10 @@
                     var h = node_form.getBBox().height;
                     vertex_text = r.text(0, h/2 + 10, node.label);
                 }
+                var node_box = node_form.getBBox();
+                var node_popup = r.popup(node_box.x, node_box.y, names_obj[node.id]["name"]);
+                //console.log(node_popup);
+                //node_popup.show()
 
                 var show_details = function(){
                     if (!add_edge_mode) showNodeDetails(node);
@@ -79,15 +83,33 @@
 //                    r.rect(node.point[0]-30, node.point[1]-13, 60, 44).attr({"fill": "#feb", r : "12px", "stroke-width" : node.distance == 0 ? "3px" : "1px" })).push(
 //                    r.text(node.point[0], node.point[1] + 10, (node.label || n.id)  ));
                     push(node_form).
-                    push(vertex_text);
+                    push(vertex_text).
+                    push(node_popup);
+                node_popup.hide();
 
                 var renamer = createNodeRenameCallback(node);
 //                vertex_text.node.ondblclick = renamer;
 
+                var popup;
+
                 node_form.node.ondblclick = function(){
+                /*
+                    if (popup != undefined && popup.removed != true){
+                      console.log(popup)
+                      popup.hide();
+                      popup.remove();
+                    }
+                    */
                     show_details();
                 }
                 node_form.node.onclick = function(){
+                /*
+                    if (popup != undefined && popup.removed != true){
+                      console.log(popup)
+                      popup.hide();
+                      popup.remove();
+                    }
+                    */
                     if (add_edge_mode) bindNewEdgeTo(node_form, node)
                     // if (!renderer.getDragingMode()) show_details();
                 };
@@ -96,8 +118,36 @@
                         else renamer();
                 };
 
+
+                shape.hover(function(){
+                    node_form.animate({"fill": Raphael.getColor()}, 200);
+                    node_popup.show()
+                    //vertex_text.attr("text", names_obj[node.id]["name"]);
+                    /*
+                      if (popup != undefined && popup.removed != true){
+                        popup.hide();
+                        popup.remove();
+                      }
+                      popup = r.popup(mouse_x, mouse_y, names_obj[node.id]["name"]);
+                      popup.show();
+                  */
+                },function(){
+                    node_form.animate({"fill": color}, 200);
+                    node_popup.hide()
+                    /*
+                    if ((popup != undefined) && (popup.removed != true)){
+                        console.log(popup)
+                        popup.hide();
+                    }
+                    */
+                    //vertex_text.attr("text", hideRestOfString(names_obj[node.id]["name"]));
+                });
+
+
+                // TODO
+                // FIXME
+                // why do I need this array??
                 raphael_nodes[node.id] = node_form;
-//                console.log(ellipse);
 
                 return shape;
     };
