@@ -261,19 +261,19 @@ msgstr "Этот список един для всей вашей команды
 
 #: cms/templates/checklists.html:66
 msgid "Studio checklists"
-msgstr "Список задач Студии"
+msgstr "Список задач студии"
 
 #: cms/templates/checklists.html:71
 msgid "Getting Started With Studio"
-msgstr "Приступая к Работе со Студией"
+msgstr "Приступая к работе со студией"
 
 #: cms/templates/checklists.html:71
 msgid "Draft a Rough Course Outline"
-msgstr "Черновик Структуры Курса"
+msgstr "Черновик структуры курса"
 
 #: cms/templates/checklists.html:71
 msgid "Explore edX's Support Tools"
-msgstr "Изучить Инструменты Поддержки"
+msgstr "Изучить инструменты поддержки"
 
 #: cms/templates/checklists.html:71
 msgid "Draft Your Course About Page"
@@ -457,6 +457,17 @@ msgstr "Посмотреть черновик"
 #: cms/templates/overview.html:132 cms/templates/unit.html:167
 msgid "View Live"
 msgstr "Посмотреть публичную версию"
+
+#: common/lib/xmodule/xmodule/capa_base.py:88 cms/templates/unit.html:167
+msgid "Blank Advanced Problem"
+msgstr "Пустая продвинутая задача"
+
+#: common/lib/xmodule/xmodule/video_module.py:53
+msgid "Video"
+msgstr "Видео"
+
+msgid "Text"
+msgstr "Текст"
 
 #: cms/templates/error.html:9
 msgid "Internal Server Error"
@@ -2291,7 +2302,7 @@ msgstr "Вы редактируете черновик."
 msgid "This unit was originally published on {date}."
 msgstr "Этот элемент был опубликован {date}."
 
-#: cms/templates/unit.html:44
+#: cms/templates/unit.html:440
 msgid "View the Live Version"
 msgstr "Просмотр публичной версии"
 
@@ -2305,7 +2316,7 @@ msgstr "Обычные задания"
 
 #: cms/templates/unit.html:83
 msgid "Advanced"
-msgstr "Продвинутые задания"
+msgstr "Расширенные"
 
 #: cms/templates/unit.html:139
 msgid "Unit Settings"
@@ -2470,7 +2481,7 @@ msgstr "Обновления"
 
 #: cms/templates/widgets/header.html:60
 msgid "Schedule &amp; Details"
-msgstr "Расписание & Детали"
+msgstr "Расписание и Детали"
 
 #: cms/templates/widgets/header.html:83
 msgid "Checklists"
@@ -2626,7 +2637,7 @@ msgstr "имя"
 
 #: common/lib/xmodule/xmodule/video_module.py:311
 msgid "Basic"
-msgstr "Основное"
+msgstr "Основные"
 
 #: common/templates/course_modes/choose.html:6
 msgid "Register for {} | Choose Your Track"
@@ -6902,8 +6913,8 @@ msgstr "Оценки"
 msgid "Subsection"
 msgstr "Подраздел"
 
-msgid "Processing your account information &hellip;"
-msgstr "Отправка формы..."
+msgid "Processing your account information…"
+msgstr "Отправка формы…"
 
 
 ################ Administration
@@ -7612,9 +7623,45 @@ msgstr "Дальше"
 msgid "Final Check"
 msgstr "Заключительная проверка"
 
+#: common/lib/xmodule/xmodule/capa_base.py:532
+msgid "Warning: The problem has been reset to its initial state!"
+msgstr "Предупреждение: задача была сброшена до начального состояния!"
+
+#: common/lib/xmodule/xmodule/capa_base.py:536
+msgid ""
+"The problem's state was corrupted by an invalid submission. The submission "
+"consisted of:"
+msgstr ""
+"Состояние задачи было повреждено некорректным запросом. Запрос состоял из: "
+
+#: common/lib/xmodule/xmodule/capa_base.py:543
+msgid "If this error persists, please contact the course staff."
+msgstr ""
+"Если эта ошибка сохраняется, пожалуйста, свяжитесь с администраторами курса."
+
+#: common/lib/xmodule/xmodule/capa_base.py:936
+msgid "You must wait at least {wait} seconds between submissions."
+msgstr "Интервал между вашими запросами должен быть не менее {wait} секунд."
+
+#: common/lib/xmodule/xmodule/capa_base.py:963
+msgid "Error: {msg}"
+msgstr "Ошибка: {msg}"
+
+#: common/lib/xmodule/xmodule/capa_base.py:1109
+msgid "Problem is closed."
+msgstr "Задача закрыта."
+
+#: common/lib/xmodule/xmodule/capa_base.py:1119
+msgid "Problem needs to be reset prior to save."
+msgstr "Задача должна быть сброшена перед сохранением."
+
 #: common/lib/xmodule/xmodule/capa_base.py:1127
 msgid "Your answers have been saved."
 msgstr "Ваши ответы сохранены."
+
+#: common/lib/xmodule/xmodule/capa_base.py:1129
+msgid "Your answers have been saved but not graded. Click 'Check' to grade them."
+msgstr "Ваши ответы сохранены, но не проверены. Для проверки нажмите 'Проверить'."
 
 #: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html:23
 msgid "Navigation"

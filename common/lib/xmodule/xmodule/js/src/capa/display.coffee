@@ -393,7 +393,7 @@ class @Problem
   gentle_alert: (msg) =>
     if @el.find('.capa_alert').length
       @el.find('.capa_alert').remove()
-    alert_elem = "<div class='capa_alert'>" + msg + "</div>"
+    alert_elem = "<div class='capa_alert'>" + gettext(msg) + "</div>"
     @el.find('.action').after(alert_elem)
     @el.find('.capa_alert').css(opacity: 0).animate(opacity: 1, 700)
 

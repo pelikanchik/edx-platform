@@ -88,8 +88,20 @@ define ["backbone", "jquery", "underscore", "gettext", "xblock/runtime.v1",
             @$el.addClass('editing')
             ModalUtils.showModalCover(true)
             @$component_editor().slideDown(150)
-            @loadEdit()
+            retValue = @loadEdit()
+            modifiedMetadataValues = @metadataEditor.getModifiedMetadataValues()
+            if 'display_name' of modifiedMetadataValues
+              data = {'metadata': {'display_name': modifiedMetadataValues['display_name']}}
+              @model.save(data).done( =>
+                if @model.id.indexOf('video') isnt -1 and @model.attributes.metadata.display_name 
+                  h2 = $(@$el).find('h2')[0]
+                  $(h2).text(@model.attributes.metadata.display_name )
+                else
+                  @loadDisplay()
+              )
+            return retValue
         )
+            
 
     clickSaveButton: (event) =>
       event.preventDefault()

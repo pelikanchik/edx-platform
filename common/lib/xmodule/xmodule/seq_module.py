@@ -244,6 +244,7 @@ class SequenceModule(SequenceFields, XModule):
                   'position': self.position,
                   'tag': self.location.category,
                   'ajax_url': self.system.ajax_url,
+                  'staff_access': context['staff_access'],
                   }
 
         fragment.add_content(self.system.render_template('seq_module.html', params))

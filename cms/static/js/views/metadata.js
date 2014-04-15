@@ -1,7 +1,7 @@
 define(
     [
         "js/views/baseview", "underscore", "js/models/metadata", "js/views/abstract_editor",
-        "js/views/transcripts/metadata_videolist"
+        "js/views/transcripts/metadata_videolist", "gettext"
     ],
 function(BaseView, _, MetadataModel, AbstractEditor, VideoList) {
     var Metadata = {};
@@ -115,7 +115,12 @@ function(BaseView, _, MetadataModel, AbstractEditor, VideoList) {
         },
 
         setValueInEditor : function (value) {
-            this.$el.find('input').val(value);
+            if (gettext(value) !== value && value == this.model.get('default_value') && !this.model.isExplicitlySet()){
+                this.$el.find('input').val(gettext(value));
+                this.model.setValue(gettext(value));
+            } else {
+                this.$el.find('input').val(value);
+            }
         }
     });
 
