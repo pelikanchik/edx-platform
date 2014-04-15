@@ -161,7 +161,7 @@ function generateEdgeData(disjunctions_array, source){
             about_source = true;
         } else {
 
-            console.log(condition["source_element_id"])
+            //console.log(condition["source_element_id"])
             related_vertex_name = names_obj[condition["source_element_id"]] ["name"];
         }
         var percent_sign = (condition["field"] === "score_rel")? "%" : "";
