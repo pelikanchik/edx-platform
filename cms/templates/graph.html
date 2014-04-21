@@ -92,6 +92,16 @@
                     {id:"more-equals",  parent_id:"score_abs",   title:gettext("more or equals")},
                     {id:"more",         parent_id:"score_abs",   title:gettext("more")}
               ].concat(options);
+
+              $.each(splitters, function(id, value){
+
+                  // Не выводим в списке задания, в которых нет вариантов ответов
+
+                  if (!$.grep(options, function(e){ return e.parent_id == value.id})[0]){
+                        splitters.splice(id,1);
+                  };
+              });
+
           });
 
     </script>

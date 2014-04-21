@@ -118,7 +118,7 @@ def elementary_conjunction(term, section):
             return error_return
         if len(term["option"]) == 0:
             return error_return
-        if len(term["value"]) == 0:
+        if len(term["value"]) == 0 and (term["splitter"] == "score_abs" or term["splitter"] == "score_rel"):
             return error_return
 
         unit = get_unit(term["source_unit"], section)
