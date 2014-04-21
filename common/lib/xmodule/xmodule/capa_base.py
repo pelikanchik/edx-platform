@@ -580,8 +580,10 @@ class CapaMixin(CapaFields):
             html = self.handle_problem_html_error(err)
 
         if self.checkanswer == 0:
-            html = html.replace("incorrect", "not_known")
-            html = html.replace("correct", "not_known")
+            html = html.replace("class=\"incorrect", "class=\"not_known")
+            html = html.replace("class=\"correct", "class=\"not_known")
+            html = html.replace("class=\"choicegroup_incorrect", "class=\"choicegroup_not_known")
+            html = html.replace("class=\"choicegroup_correct", "class=\"choicegroup_not_known")
 
         # The convention is to pass the name of the check button
         # if we want to show a check button, and False otherwise
@@ -615,8 +617,6 @@ class CapaMixin(CapaFields):
         else:
             is_studio = False
 
-        print settings.ROOT_URLCONF
-        print is_studio
 
         context = {
             'is_studio': is_studio,

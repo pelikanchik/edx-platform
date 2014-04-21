@@ -44,6 +44,7 @@ require(["domReady!", "jquery", "js/models/module_info", "coffee/src/views/unit"
 <%namespace name='static' file='static_content.html'/>
 
 <%block name="content">
+
   <div class="main-wrapper edit-state-${unit_state}" data-locator="${unit_locator}">
     <div class="inner-wrapper">
       <div class="alert editing-draft-alert">
@@ -63,7 +64,7 @@ require(["domReady!", "jquery", "js/models/module_info", "coffee/src/views/unit"
           <label>${_("Direct Term")}</label>
 
 
-            <div id='termConstructor' class = 'termConstructor' style = "width: 100%;">
+            <div id='termConstructor' class = 'termConstructor'>
                     <table class='termEditor' style = "width: 100%;">
 
                         <tbody data-bind="foreach: disjunctions">
@@ -74,7 +75,7 @@ require(["domReady!", "jquery", "js/models/module_info", "coffee/src/views/unit"
                                 </td>
                                 <td>
                                      ${_("Jump to")}
-                                     <select data-bind='value: direct_element_id, valueUpdate: "afterkeydown"'>
+                                     <select data-bind='value: direct_unit, valueUpdate: "afterkeydown"'>
 
                                          % for every_unit in subsection.get_children():
                                                 <option value="${every_unit.url_name}">${every_unit.display_name_with_default}</option>
@@ -87,7 +88,7 @@ require(["domReady!", "jquery", "js/models/module_info", "coffee/src/views/unit"
                             </tr>
                             <tr>
 
-                                <td align = "center">
+                                <td align = "left">
                                     <table>
 
                                         <tbody data-bind="foreach: conjunctions">
@@ -95,7 +96,7 @@ require(["domReady!", "jquery", "js/models/module_info", "coffee/src/views/unit"
 
                                                 <td>
 
-                                                <select data-bind='value: source_element_id, valueUpdate: "afterkeydown"'>
+                                                <select data-bind='value: source_unit, valueUpdate: "afterkeydown"'>
 
                                                       % for every_unit in subsection.get_children():
                                                             <option value="${every_unit.url_name}">${every_unit.display_name_with_default}</option>
@@ -105,25 +106,25 @@ require(["domReady!", "jquery", "js/models/module_info", "coffee/src/views/unit"
 
                                                 </td>
 
-
                                                 <td>
-                                                    <select data-bind='value: field, valueUpdate: "afterkeydown"'>
-                                                        <option value="score_abs">${_("Score (absolute)")}</option>
-                                                        <option value="score_rel">${_("Score (relative, %)")}</option>
+                                                    <select data-bind='
+                                                        options: getElementsByParentId("splitters",source_unit(),splitters),
+                                                        optionsText: "title",
+                                                        optionsValue: "id",
+                                                        value: splitter'>
                                                     </select>
                                                 </td>
                                                 <td>
-
-                                                    <select data-bind='value: sign, valueUpdate: "afterkeydown"'>
-                                                        <option value="more">&#62;</option>
-                                                        <option value="more-equals">&#8805;</option>
-                                                        <option value="equals">=</option>
-                                                        <option value="less-equals">&#8804;</option>
-                                                        <option value="less">&#60;</option>
+                                                    <select data-bind='
+                                                        options: getElementsByParentId("options",splitter(),options),
+                                                        optionsText: "title",
+                                                        optionsValue: "id",
+                                                        value: option'>
                                                     </select>
-
                                                 </td>
-                                                <td><input data-bind='value: value, valueUpdate: "afterkeydown"' class = "value" /></td>
+                                                <td data-bind="visible: isInequation(splitter())">
+                                                    <input class = "value" data-bind='value: value, valueUpdate: "afterkeydown"' />
+                                                </td>
                                                 <td style="vertical-align: middle"><img width="20" src = "${static.url('img/edit_remove.png')}" data-bind='click: $root.removeConjunction' class = "del" /></td>
                                             </tr>
                                         </tbody>
@@ -148,27 +149,80 @@ require(["domReady!", "jquery", "js/models/module_info", "coffee/src/views/unit"
                   <p class="unit-term-input" style="text-align: center;"> <input type="button" class = "save-term" value = '${_("Save")}' style="width:200px;margin:auto 0;" /></p>
 
           <script>
-            require(['jquery','knockout', 'knockout-mapping', 'numeric'], function($, ko, mapping, numeric) {
+            require(['jquery','knockout', 'knockout-mapping', 'numeric', 'gettext'], function($, ko, mapping, numeric, gettext) {
 
-                var input_json = '${unit.direct_term_with_default|h}'.replace(/\&#34;/g, '"');
+
+
+                //console.log(conjunction_source);
+
                 //var dataFromDB = ko.utils.parseJson(unlock_term).disjunctions;
-                //var input_json = '[{"direct_element_id":"95bbd1de07d744e8a114f3a61c405c91","disjunctions":[{"conjunctions":[{"source_element_id":"95bbd1de07d744e8a114f3a61c405c91","field":"score_rel","sign":"less","value":"111"}]},{"conjunctions":[{"source_element_id":"95bbd1de07d744e8a114f3a61c405c91","field":"score_abs","sign":"more","value":"999"}]}]}]';
-                /*var initialData = [
-{
-direct_element_id: ko.observable(),
-conjunctions: [
-{ source_element_id: ko.observable(), field: "score_rel" , sign: "less" , value: "5" }]
-}
-];*/
-                // входная строка преобразуется из json в объект и приводим к виду, с которым работает конструктор
+                //var input_json = '[{"direct_unit":"95bbd1de07d744e8a114f3a61c405c91","disjunctions":[{"conjunctions":[{"source_element_id":"95bbd1de07d744e8a114f3a61c405c91","field":"score_rel","sign":"less","value":"111"}]},{"conjunctions":[{"source_element_id":"95bbd1de07d744e8a114f3a61c405c91","field":"score_abs","sign":"more","value":"999"}]}]}]';
+                /*var initialData = [{
+                    disjunctions: [{
+                        direct_unit: "6e13517037114e2e89f9cf5644f7b42d",
+                        conjunctions: [{
+                            source_unit: "6e13517037114e2e89f9cf5644f7b42d",
+                            splitter: "score_rel",
+                            option: "less",
+                            value: "0"
+                        }]
+                    }]
+                }];
+                */
+
+                var input_json =    '${direct_term|h}'.replace(/\&#34;/g, '"');
+
+                var input_data = $.parseJSON(input_json);
+
+
+                options = '${options|h}'.replace(/\&#34;/g, '"');
+                splitters = '${splitters|h}'.replace(/\&#34;/g, '"');
+
+                options = $.parseJSON(options);
+                splitters = $.parseJSON(splitters);
+
+
+                splitters = [
+                    {id:"score_rel",    parent_id:"",   title:gettext("Score (relative, %)")},
+                    {id:"score_abs",    parent_id:"",   title:gettext("Score (absolute)")
+                }].concat(splitters);
+
+                options = [
+                    {id:"less",         parent_id:"score_rel",   title:gettext("less")},
+                    {id:"less-equals",  parent_id:"score_rel",   title:gettext("less or equals")},
+                    {id:"equals",       parent_id:"score_rel",   title:gettext("equals")},
+                    {id:"more-equals",  parent_id:"score_rel",   title:gettext("more or equals")},
+                    {id:"more",         parent_id:"score_rel",   title:gettext("more")},
+                    {id:"less",         parent_id:"score_abs",   title:gettext("less")},
+                    {id:"less-equals",  parent_id:"score_abs",   title:gettext("less or equals")},
+                    {id:"equals",       parent_id:"score_abs",   title:gettext("equals")},
+                    {id:"more-equals",  parent_id:"score_abs",   title:gettext("more or equals")},
+                    {id:"more",         parent_id:"score_abs",   title:gettext("more")}
+                ].concat(options);
+
+
+                getElementsByParentId = function(mode, parent_id, arr){
+                    var elements = $.grep(arr, function(e){
+                        if (mode == "splitters"){
+                            // не выводить, если нет детей
+                            return (e.parent_id == parent_id || e.parent_id == "") && getElementsByParentId("options", e.id, options) != 0
+                        } else {
+                            // выводить всех
+                            return (e.parent_id == parent_id) || e.parent_id == "";
+                        }
+                    });
+
+                    return elements;
+                }
+
                 var input_structure = [];
-                var input_dict = $.parseJSON(input_json);
-                $.each(input_dict, function(){
-                   itself = this;
+                $.each(input_data, function(){
+                   var self = this;
                    var disjunctions = [];
-                   $.each(itself.disjunctions, function(){
+                   $.each(self.disjunctions, function(){
+
                         input_structure.push({
-                            direct_element_id:itself.direct_element_id,
+                            direct_unit:self.direct_unit,
                             conjunctions:this.conjunctions
                         });
                    });
@@ -176,19 +230,26 @@ conjunctions: [
 
                 //var output_json = ko.toJSON(input_structure);
                 //console.log(output_json);
-
                 var DisjunctionsModel = function(disjunctions) {
                     var self = this;
+                    isInequation = function(splitter){
+                        try{
+                            return splitter == "score_abs" || splitter == "score_rel" ;
+                        }
+                        catch(err){
+                            return 0
+                        }
+                    };
 
                     self.disjunctions = mapping.fromJS(input_structure);
 
                     self.addDisjunction = function() {
                         self.disjunctions.push({
-                            direct_element_id: ko.observable(),
+                            direct_unit: ko.observable(),
                             conjunctions: ko.observableArray([{
-                                source_element_id: ko.observable(),
-                                field: ko.observable("score_abs"),
-                                sign: ko.observable("more"),
+                                source_unit: ko.observable(),
+                                splitter: ko.observable(),
+                                option: ko.observable(),
                                 value: ko.observable("0")
                             }])
                         });
@@ -204,9 +265,9 @@ conjunctions: [
 
                     self.addConjunction = function(disjunction) {
                         disjunction.conjunctions.push({
-                            source_element_id: ko.observable(),
-                            field: ko.observable("score_abs"),
-                            sign: ko.observable("more"),
+                            source_unit: ko.observable(),
+                            splitter: ko.observable(),
+                            option: ko.observable(),
                             value: ko.observable("0")
                         });
                         check_numeric();
@@ -222,7 +283,7 @@ conjunctions: [
                     self.term_string = ko.computed(function () {
 
                         var output_json = ko.toJSON({disjunctions: self.disjunctions});
-                        var output_dict = jQuery.parseJSON(output_json).disjunctions;
+                        var output_dict = $.parseJSON(output_json).disjunctions;
 
                         var elements = [];
                         var elements_id = [];
@@ -232,24 +293,25 @@ conjunctions: [
                             var disjunctions = [];
 
                                    itself = this;
-                                   //element_id = itself.direct_element_id;
+                                   //element_id = itself.direct_unit;
 
-                                   if ($.inArray(itself.direct_element_id,elements_id)==-1){
+
+                                   if ($.inArray(itself.direct_unit,elements_id)==-1){
 
                                        $.each(output_dict, function(){
-                                           if (itself.direct_element_id == this.direct_element_id){
+                                           if (itself.direct_unit == this.direct_unit){
                                                disjunctions.push({conjunctions:this.conjunctions});
                                            }
                                        });
 
 
                                        elements.push({
-                                           direct_element_id: itself.direct_element_id,
+                                           direct_unit: itself.direct_unit,
                                            disjunctions:disjunctions
                                        });
 
 
-                                       elements_id.push(itself.direct_element_id);
+                                       elements_id.push(itself.direct_unit);
 
                                    };
                             }
@@ -271,22 +333,22 @@ conjunctions: [
                 function hovers(){
                     $("img.close").hover(
                         function () {
-                            $(this).parent().parent().parent().css("background-color","#fcc");
-                            $(this).parent().parent().parent().next().css("background-color","#fcc");
+                            $(this).parents("tr").css("background-color","#fcc");
+                            $(this).parents("tr").next().css("background-color","#fcc");
                         },
                         function () {
-                            $(this).parent().parent().parent().css("background-color","");
-                            $(this).parent().parent().parent().next().css("background-color","");
+                            $(this).parents("tr").css("background-color","");
+                            $(this).parents("tr").next().css("background-color","");
                         }
                     );
 
 
                     $("img.del").hover(
                         function () {
-                            $(this).parent().parent().css("background-color","#fcc");
+                            $(this).parents("tr tr").css("background-color","#fcc");
                         },
                         function () {
-                            $(this).parent().parent().css("background-color","");
+                            $(this).parents("tr tr").css("background-color","");
                         }
                     );
 

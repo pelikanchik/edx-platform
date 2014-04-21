@@ -43,7 +43,6 @@ body.course.unit,.view-unit {
         font-size: 20px;
       }
     }
-
     .breadcrumbs {
       border-radius: 3px 3px 0 0;
       border-bottom: 1px solid #cbd1db;
@@ -518,6 +517,10 @@ body.course.unit,.view-unit {
         }
       }
     }
+  }
+
+  .unit-body.window > label{
+      padding: 0 2*$baseline;
   }
 }
 

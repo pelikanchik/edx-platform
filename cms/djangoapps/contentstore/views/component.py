@@ -16,6 +16,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.util.date_utils import get_default_time_display
 from xmodule.modulestore.django import loc_mapper
 from xmodule.modulestore.locator import BlockUsageLocator
+from xmodule.seq_module import check_term
 
 from xblock.fields import Scope
 from util.json_request import expect_json, JsonResponse
@@ -28,6 +29,8 @@ from .access import has_access
 from xmodule.x_module import XModuleDescriptor
 from xblock.plugin import PluginMissingError
 from xblock.runtime import Mixologist
+from courseware.model_data import FieldDataCache
+from preview import _load_preview_module
 
 __all__ = ['OPEN_ENDED_COMPONENT_TYPES',
            'ADVANCED_COMPONENT_POLICY_KEY',
@@ -69,7 +72,6 @@ def is_section_exist(section_id, sections):
 def show_graph(request, tag=None, package_id=None, branch=None, version_guid=None, block=None):
 
     locator = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
-    print (locator)
     try:
         old_location, course, item, lms_link = _get_item_in_course(request, locator)
     except ItemNotFoundError:
@@ -79,62 +81,68 @@ def show_graph(request, tag=None, package_id=None, branch=None, version_guid=Non
     if item.location.category != 'sequential':
         return HttpResponseBadRequest()
 
-    data_string = "{"
-    names_string = "{"
+    names = []
+    data = {}
+    graph = []
     locators_dict = {}
     for every_unit in item.get_children():
 
         every_unit_locator = loc_mapper().translate_location(None, every_unit.location)
 
-        current_locator = str(every_unit_locator).replace("/", "\/")
-        data_string += "\"" + current_locator + "\" : ["
-        names_string += "\"" + current_locator + "\" : { \"name\" : \"" + \
-                        every_unit.display_name_with_default + "\", \"location\" : \"" + \
-                        str(every_unit.location) + \
-                        "\", \"locator\" : \"" + str(every_unit_locator) + \
-                        "\", \"coords_x\" : \"" + str(every_unit.coords_x) + \
-                        "\", \"coords_y\" : \"" + str(every_unit.coords_y) + \
-                        "\"}, <br/>"
+        current_locator = str(every_unit_locator)
 
+        names.append({
+            "name": every_unit.display_name_with_default,
+            "location": str(every_unit.location),
+            "location_name": str(every_unit.location.name),
+            "locator": current_locator,
+            "coords_x": str(every_unit.coords_x),
+            "coords_y": str(every_unit.coords_y)
+        })
+
+        data[current_locator] = []
         current_old_location = str(every_unit.location)
         i = current_old_location.rfind("/")
         short_name = current_old_location[i+1:]
-        locators_dict[short_name] = str(every_unit_locator)
+        locators_dict[every_unit.location.name] = str(every_unit_locator)
 
         for child in every_unit.get_children():
-            data_string += "{ \"url\" : \"" + child.url_name + "\", \"name\" : \"" + child.display_name_with_default + "\""
-            data_string += ", \"type\" : \"" + child.get_class + "\" },"
-        data_string += "{} ], <br/>"
-    data_string += "}"
-    names_string += "}"
 
-    graph_string = "["
+            data[current_locator].append({
+                "url":  child.url_name,
+                "name": child.display_name_with_default,
+                "type": child.get_class
+            })
 
     for every_unit in item.get_children():
-        edge_json = json.loads(str(every_unit.direct_term_with_default))
-        for x in edge_json:
+        edge = check_term(json.loads(str(every_unit.direct_term_with_default)))
+        for x in edge:
             #print()
 
             #try:
-            x["direct_element_id"] = locators_dict[x["direct_element_id"]]
+            x["direct_unit"] = locators_dict[x["direct_unit"]]
             for every_edge in x["disjunctions"]:
                 for every_cond in every_edge["conjunctions"]:
-                    every_cond["source_element_id"] = locators_dict[every_cond["source_element_id"]]
+                    every_cond["source_unit"] = locators_dict[every_cond["source_unit"]]
             #except KeyError:
             #    # we are dealing with a ghost of removed node
             #    print(x)
             #    del x
 
-        edge = json.dumps(edge_json)
-        graph_string += edge + " ,<br/>"
-    graph_string += "]"
+        graph.append(edge)
+
+
+    (splitters, options) = get_splitters_and_options(item.get_children(), request)
+
 
     return render_to_response('graph.html',
                               {'subsection': item,
                                'locator': locator,
-                               'data_string': data_string,
-                               'names_string': names_string,
-                               'graph_string': graph_string,
+                               'data_string': json.dumps(data),
+                               'names_string': json.dumps(names),
+                               'graph_string': json.dumps(graph),
+                               'splitters': json.dumps(splitters),
+                               'options': json.dumps(options),
                                'locators_dict': locators_dict})
 
 
@@ -230,6 +238,52 @@ def _load_mixed_class(category):
     mixologist = Mixologist(settings.XBLOCK_MIXINS)
     return mixologist.mix(component_class)
 
+def get_problem_options(request, component):
+
+    try:
+        problem_descriptor = modulestore().get_item(component.location.url(), depth=1)
+    except Exception as err:
+        log.debug(err)
+
+    print component.location.html_id()
+    problem_module = _load_preview_module(request, problem_descriptor)
+    problem_html = problem_module.get_context()['data']
+    options = []
+    inputs = problem_module.lcp.inputs
+
+    for id in inputs:
+        input = inputs[id]
+        if input.tag == "choicegroup":
+
+            for choice in input.choices:
+                option = {
+                    "id": input.input_id + "_" + choice[0],
+                    "parent_id": component.location.url(),
+                    "title": choice[1]
+                }
+                options.append(option)
+    options.sort()
+    return options
+
+def get_splitters_and_options(units, request):
+    splitters = []
+    options = []
+
+    for unit in units:
+
+        for component in unit.get_children():
+
+            if component.category == 'problem':
+
+                options += get_problem_options(request, component)
+                splitters.append(
+                    {
+                        "id" : component.location.url(),
+                        "parent_id" : unit.location.name,
+                        "title": component.display_name
+                    }
+                )
+    return (splitters, options)
 
 @require_http_methods(["GET"])
 @login_required
@@ -359,9 +413,20 @@ def unit_handler(request, tag=None, package_id=None, branch=None, version_guid=N
             index=index
         )
 
+
+        units = [unit for unit in containing_subsection.get_children()]
+
+        (splitters, options) = get_splitters_and_options(units, request)
+
+
+        direct_term = json.loads(item.direct_term_with_default)
+        direct_term = check_term(direct_term)
+        direct_term_json = json.dumps(direct_term)
+
         return render_to_response('unit.html', {
             'context_course': course,
             'unit': item,
+            'direct_term': direct_term_json,
             'unit_locator': locator,
             'components': components,
             'component_templates': component_templates,
@@ -379,6 +444,8 @@ def unit_handler(request, tag=None, package_id=None, branch=None, version_guid=N
                 get_default_time_display(item.published_date)
                 if item.published_date is not None else None
             ),
+            'splitters': json.dumps(splitters),
+            'options': json.dumps(options)
         })
     else:
         return HttpResponseBadRequest("Only supports html requests")

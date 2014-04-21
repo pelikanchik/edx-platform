@@ -42,7 +42,7 @@ function create_new_edge(origin_node, target_node, new_edge_data){
         });
 
         var metadata = {}
-        metadata.display_name = names_obj[origin_node]["name"];
+        metadata.display_name = $.grep(names_obj, function(e){ return e.locator == origin_node })[0]["name"];
         var locator_term = edges_arr[origin_node_number]
 
         metadata.locator_term = JSON.stringify(edges_arr[origin_node_number]);
@@ -53,7 +53,50 @@ function create_new_edge(origin_node, target_node, new_edge_data){
         ajax_save_node(origin_node, metadata);
 }
 
+function init_splitters(source_unit_location_name){
+
+    $('#input-splitter option').remove();
+
+    $.each(splitters, function( index, value ) {
+        if(value.parent_id == source_unit_location_name || value.parent_id == ""){
+            $('#input-splitter').append('<option value="'+value.id+'">'+value.title+'</option>');
+        }
+    });
+
+};
+
+function init_options(splitter_id){
+
+    $('#input-option option').remove();
+
+    $.each(options, function( index, value ) {
+        if(value.parent_id == splitter_id){
+           $('#input-option').append('<option parent="'+value.parent_id+'"  value="'+value.id+'">'+value.title+'</option>');
+        };
+    })
+
+    if (splitter_id == "score_rel" || splitter_id == "score_abs"){
+
+        $("#input-value").css("display","inline-block").removeClass("hidden");
+
+    } else {
+
+        $("#input-value").css("display","none").addClass("hidden");
+
+    };
+
+};
+
+
 function bindNewEdgeTo(ellipse, node){
+
+        init_splitters(source_unit_location_name);
+        init_options($("#input-splitter").val());
+
+        $("#input-splitter").change(function(){
+            var splitter_id = $(this).val();
+            init_options(splitter_id);
+        });
 
         if (is_edge_exists(origin_node, node.id)){
             alert("Такое ребро уже есть");
@@ -67,14 +110,15 @@ function bindNewEdgeTo(ellipse, node){
 
                     // "if result > 'Hail Cthulhu'"...
                     // No. Just no.
-                    if( !$.isNumeric($("#input-value").val()) ) return;
+                    if( !$.isNumeric($("#input-value").val()) && !$("#input-value").hasClass("hidden")) return;
 
-                    var new_edge_data = {"direct_element_id" : node.id,
+
+                    var new_edge_data = {"direct_unit" : node.id,
                         "disjunctions" : [{
                                 "conjunctions" : [{
-                                    "source_element_id" : origin_node,
-                                    "field" : $("#input-field").val(),
-                                    "sign" :  $("#input-sign").val(),
+                                    "source_unit" : origin_node,
+                                    "splitter" : $("#input-splitter").val(),
+                                    "option" :  $("#input-option").val(),
                                     "value" :  $("#input-value").val()
                                 }]
                         }]
@@ -128,45 +172,51 @@ function generateEdgeData(disjunctions_array, source){
         // I just feel like I should mention it.
         // parsing JSON is fun.
         var condition = disjunctions_array[0]["conjunctions"][0];
-
         var related_vertex_name;
 
         //condition["source_element_id"] is wrong
 
-        if (condition["source_element_id"] === source) {
+        if (condition["source_unit"] === source) {
             related_vertex_name = "";
             about_source = true;
         } else {
-            related_vertex_name = names_obj[condition["source_element_id"]] ["name"];
+            related_vertex_name = $.grep(names_obj, function(e){ return e.locator == condition["source_unit"]; })[0]["name"];
+
         }
-        var percent_sign = (condition["field"] === "score_rel")? "%" : "";
-        var sign = parseSign(condition["sign"]);
 
-        var target_value = condition["value"];
+        var splitter = $.grep(splitters, function(e){ return e.id == condition["splitter"]})[0]["title"];
+        var option = $.grep(options, function(e){ return e.id == condition["option"]; })[0]["title"];
 
-        details = related_vertex_name + " " + sign + " " + target_value + percent_sign;
+        var percent_sign = (condition["splitter"] === "score_rel")? "%" : "";
+
+        var target_value = "";
+        if (condition["splitter"] === "score_rel" || condition["splitter"] === "score_abs"){
+            target_value = condition["value"];
+        }
+
+        details = related_vertex_name + " " + splitter + ": " + option + " " + target_value + percent_sign;
 
         if (!about_source){
             color = "#008";
         } else if (target_value === "0"){
             // green for correct answer
-            if (condition["sign"]==="more") color = "#0F0";
+            if (condition["option"]==="more") color = "#0F0";
             // red for incorrect
-            if (condition["sign"]==="equals") color = "#F00";
+            if (condition["option"]==="equals") color = "#F00";
             // purple for "I don't care, really"
-            if (condition["sign"]==="more-equals") color = "#808";
+            if (condition["option"]==="more-equals") color = "#808";
         }
     }
     var edge_label = "";
     var full_related_vertex_name = "";
     if (!is_complicated){
-        full_related_vertex_name = names_obj[condition["source_element_id"]]["name"];
+        full_related_vertex_name = $.grep(names_obj, function(e){ return e.locator == condition["source_unit"] })[0]["name"];
     }
     var result = {"label" : edge_label, "color" : color, "details" : details,
                 "description" : {
                     "is_complicated" : is_complicated,
                     "related_vertex_name": full_related_vertex_name,
-                    "sign" : sign,
+                    "option" : option,
                     "value" : target_value,
                     "percent" : percent_sign
                     }
@@ -186,24 +236,21 @@ function createEdgeDeletionCallback( source_node_number, edge_number, string_id)
 
                 var edge = edges_arr[source_node_number][edge_number];
                 var source_id = ids_arr[source_node_number];
-                var target_id = edge.direct_element_id;
+                var target_id = edge.direct_unit;
 
-                console.log(source_id)
-                console.log(target_id)
 
                 if (!is_edge_exists(source_id, target_id)){
                     alert("Такого ребра не существует!");
                     return;
                 }
 
-                edges_arr[source_node_number].splice(edge_number, 1)
+                edges_arr[source_node_number].splice(edge_number, 1);
 
                 g.removeEdge(source_id, target_id);
 
-                var metadata = {}
-                metadata.display_name = names_obj[source_id]["name"];
-                var locator_term = edges_arr[source_node_number]
-                console.log(locator_term)
+                var metadata = {};
+                metadata.display_name = $.grep(names_obj, function(e){ return e.locator == source_id })[0]["name"];
+                var locator_term = edges_arr[source_node_number];
 
                 metadata.locator_term = JSON.stringify(edges_arr[source_node_number]);
                 //metadata.direct_term = JSON.stringify(edges_arr[origin_node_number]);
@@ -226,7 +273,7 @@ function createEdgeDeletionCallback( source_node_number, edge_number, string_id)
 
 function createNodeRenameCallback( node){
   return function(){
-        $("#node-rename-input").val(names_obj[node.id]["name"]);
+        $("#node-rename-input").val($.grep(names_obj, function(e){ return e.locator == node.id })[0]["name"]);
 
         $( "#rename-node" ).dialog({
               modal: true,
@@ -236,16 +283,15 @@ function createNodeRenameCallback( node){
                     // TODO: make a function about metadata or something
 
                     var node_name = $("#node-rename-input").val();
-                    names_obj[node.id]["name"] = node_name;
+                    $.grep(names_obj, function(e){ return e.locator == node.id })[0]["name"] = node_name;
 
-                    var metadata = {}
+                    var metadata = {};
                     metadata.display_name = node_name;
 
-                    var locator_term = names_obj[node.id]["locator"]
+                    var locator_term = $.grep(names_obj, function(e){ return e.locator == node.id })[0]["locator"];
                     ajax_save_node(locator_term, metadata);
 
-                    renderer.renameNode(node, node_name)
-
+                    renderer.renameNode(node, node_name);
                     $( this ).dialog( "close" );
                 },
                 "Отмена": function() {
@@ -272,14 +318,14 @@ function showNodeDetails(node){
     //                            $( "#node-details").append("<p>" + parse_type(data_obj[node.id][number].type) + " - " + data_obj[node.id][number].url +  "</p>");
         }
     });
-    $(".node-name").text(names_obj[node.id]["name"]);
+    $(".node-name").text($.grep(names_obj, function(e){ return e.locator == node.id })[0]["name"]);
 
     var renamer = createNodeRenameCallback(node);
 
     $(".node-name").unbind( "click");
     $(".node-name").bind( "click", renamer );
 
-    $(".node-edit-link").attr("href", "/unit/" + names_obj[node.id]["locator"]);
+    $(".node-edit-link").attr("href", "/unit/" + $.grep(names_obj, function(e){ return e.locator == node.id })[0]["locator"]);
 
     /*
     $(".node-edit-link").
@@ -302,16 +348,15 @@ function showNodeDetails(node){
         */
         var node_number = ids_arr.indexOf(node.id);
         for(var i=0; i<edges_arr[node_number].length; i++) {
-//            console.log(g.nodes[origin_node].edges[i]);
 //            var e = g.nodes[node.id].edges[i];
 //            if (e.source.id == node.id){
             var edge = edges_arr[node_number][i];
-            var target_id = edge.direct_element_id;
+            var target_id = edge.direct_unit;
 
             var string_id = "node-edges-" + i;
             var img_id = "delete-" + string_id;
 //            alert(img_id);
-            S = names_obj[target_id]["name"];
+            S = $.grep(names_obj, function(e){ return e.locator == target_id })[0]["name"];
             var text_description = "Сложное условие";
 
             var data = generateEdgeData(edge.disjunctions, node.id).description;
@@ -371,8 +416,9 @@ function showNodeDetails(node){
 //                origin_x = ellipse.attr('cx');
 //                origin_y = ellipse.attr('cy');
                 origin_node = node.id;
+                source_unit_location_name = node.location_name;
+                source_unit = node.id;
 
-//                console.log(g.nodes[node.id].edges);
                 $( this ).dialog( "close" );
             }
           }

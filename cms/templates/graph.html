@@ -56,6 +56,45 @@
             src='${static.url("js/graph/graph_NodeRender.js" )}'></script>
     <script type="text/javascript"
             src='${static.url("js/graph/graph_NodeDetails.js" )}'></script>
+    <script>
+
+
+          require(['jquery', 'gettext'], function($, gettext) {
+
+
+              options = '${options|h}'.replace(/\&#34;/g, '"');
+              splitters = '${splitters|h}'.replace(/\&#34;/g, '"');
+              names_string = '${names_string|h}'.replace(/\&#34;/g, '"');
+              data_string = '${data_string|h}'.replace(/\&#34;/g, '"');
+              graph_string = '${graph_string|h}'.replace(/\&#34;/g, '"');
+
+              options = $.parseJSON(options);
+              splitters = $.parseJSON(splitters);
+              names_obj = $.parseJSON(names_string);
+              data_obj = $.parseJSON(data_string);
+              edges_arr = $.parseJSON(graph_string);
+
+
+              splitters = [
+                    {id:"score_rel",    parent_id:"",   title:gettext("Score (relative, %)")},
+                    {id:"score_abs",    parent_id:"",   title:gettext("Score (absolute)")
+              }].concat(splitters);
+
+              options = [
+                    {id:"less",         parent_id:"score_rel",   title:gettext("less")},
+                    {id:"less-equals",  parent_id:"score_rel",   title:gettext("less or equals")},
+                    {id:"equals",       parent_id:"score_rel",   title:gettext("equals")},
+                    {id:"more-equals",  parent_id:"score_rel",   title:gettext("more or equals")},
+                    {id:"more",         parent_id:"score_rel",   title:gettext("more")},
+                    {id:"less",         parent_id:"score_abs",   title:gettext("less")},
+                    {id:"less-equals",  parent_id:"score_abs",   title:gettext("less or equals")},
+                    {id:"equals",       parent_id:"score_abs",   title:gettext("equals")},
+                    {id:"more-equals",  parent_id:"score_abs",   title:gettext("more or equals")},
+                    {id:"more",         parent_id:"score_abs",   title:gettext("more")}
+              ].concat(options);
+          });
+
+    </script>
 
 <img id = "Delete-icon-base" style="display:none" src = '${static.url("img/Delete-icon.png")}' />
 
@@ -102,23 +141,18 @@
             <tbody data-bind="foreach: conjunctions">
                 <tr>
                     <td>
-                        <select id="input-field" data-bind='value: field, valueUpdate: "afterkeydown"'>
-                                <option value="score_abs">${_("Score (absolute)")}</option>
-                                <option value="score_rel">${_("Score (relative, %)")}</option>
+                        <select id="input-splitter">
                         </select>
                     </td>
                     <td>
 
-                        <select id="input-sign" data-bind='value: sign, valueUpdate: "afterkeydown"'>
-                            <option value="more">&#62;</option>
-                            <option value="more-equals">&#8805;</option>
-                            <option value="equals">=</option>
-                            <option value="less-equals">&#8804;</option>
-                            <option value="less">&#60;</option>
+                        <select id="input-option">
                         </select>
 
                     </td>
-                    <td><input id="input-value" data-bind='value: value, valueUpdate: "afterkeydown"' class = "value" /></td>
+                    <td>
+                        <input id="input-value" class = "value" />
+                    </td>
                 </tr>
             </tbody>
         </table>

@@ -103,10 +103,9 @@ class VerticalModule(VerticalFields, XModule):
         '''
         Return a direct_term
         '''
-        score = self.direct_term
-        if score is None:
-           score = 0
-        return score
+        if self.direct_term is None:
+           return []
+        return self.direct_term
 
     def random_show(self):
         count = self.random_problem_count
@@ -126,10 +125,10 @@ class VerticalDescriptor(VerticalFields, SequenceDescriptor):
         '''
         Return a direct_term
         '''
-        score = self.direct_term
-        if score is None:
-           score = 0
-        return score
+
+        if self.direct_term is None:
+           return []
+        return self.direct_term
 
     @property
     def random_show(self):
