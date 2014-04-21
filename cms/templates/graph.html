@@ -63,22 +63,22 @@
 
 
               options = '${options|h}'.replace(/\&#34;/g, '"');
-              splitters = '${splitters|h}'.replace(/\&#34;/g, '"');
+              splitters_unfiltered = '${splitters|h}'.replace(/\&#34;/g, '"');
               names_string = '${names_string|h}'.replace(/\&#34;/g, '"');
               data_string = '${data_string|h}'.replace(/\&#34;/g, '"');
               graph_string = '${graph_string|h}'.replace(/\&#34;/g, '"');
 
               options = $.parseJSON(options);
-              splitters = $.parseJSON(splitters);
+              splitters_unfiltered = $.parseJSON(splitters_unfiltered);
               names_obj = $.parseJSON(names_string);
               data_obj = $.parseJSON(data_string);
               edges_arr = $.parseJSON(graph_string);
 
 
-              splitters = [
+              splitters_unfiltered = [
                     {id:"score_rel",    parent_id:"",   title:gettext("Score (relative, %)")},
                     {id:"score_abs",    parent_id:"",   title:gettext("Score (absolute)")
-              }].concat(splitters);
+              }].concat(splitters_unfiltered);
 
               options = [
                     {id:"less",         parent_id:"score_rel",   title:gettext("less")},
@@ -93,12 +93,14 @@
                     {id:"more",         parent_id:"score_abs",   title:gettext("more")}
               ].concat(options);
 
-              $.each(splitters, function(id, value){
+              splitters = [];
 
-                  // Не выводим в списке задания, в которых нет вариантов ответов
+              $.each(splitters_unfiltered, function(id, value){
 
-                  if (!$.grep(options, function(e){ return e.parent_id == value.id})[0]){
-                        splitters.splice(id,1);
+                  // Фильтрация заданий, в которых нет вариантов ответов
+
+                  if ($.grep(options, function(e){ return e.parent_id == value.id})[0]){
+                        splitters.push(value);
                   };
               });
 
