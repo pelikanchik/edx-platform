@@ -7403,11 +7403,7 @@ msgstr "Перерисовать"
 msgid "Load"
 msgstr "Загрузить"
 
-msgid "Resume"
-msgstr "Продолжить"
-
 #django_partial.po
-
 
 #: cms/djangoapps/contentstore/utils.py:22
 msgid "Open Ended Panel"
