@@ -214,16 +214,16 @@ def _save_item(request, usage_loc, item_location, data=None, children=None, meta
                     json_array = json.loads(value)
 
                     for x in json_array:
-                        old_loc = str(loc_mapper().translate_locator_to_location(x["direct_element_id"]))
+                        old_loc = str(loc_mapper().translate_locator_to_location(x["direct_unit"]))
                         i = old_loc.rfind("/")
                         short_name = old_loc[i+1:]
-                        x["direct_element_id"] = short_name
+                        x["direct_unit"] = short_name
                         for every_edge in x["disjunctions"]:
                             for every_cond in every_edge["conjunctions"]:
-                                old_loc = str(loc_mapper().translate_locator_to_location(every_cond["source_element_id"]))
+                                old_loc = str(loc_mapper().translate_locator_to_location(every_cond["source_unit"]))
                                 i = old_loc.rfind("/")
                                 short_name = old_loc[i+1:]
-                                every_cond["source_element_id"] = short_name
+                                every_cond["source_unit"] = short_name
 
                     temp_value = json.dumps(json_array)
 

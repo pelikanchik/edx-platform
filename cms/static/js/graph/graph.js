@@ -21,22 +21,6 @@ function hideRestOfString(S){
     return S;
 }
 
-function parseSign(S){
-    switch(S){
-        case "more":
-          return ">"
-        case "more-equals":
-      return "≥"
-        case "equals":
-      return "="
-        case "less-equals":
-      return "≤"
-        case "less":
-      return "<"
-    default:
-      return S;
-    }
-}
 function parseType(S){
     switch(S){
         case "VideoDescriptor":
@@ -82,7 +66,7 @@ function is_edge_exists(origin_node, target){
 
     for(var i=0; i<edges_arr[origin_node_number].length; i++){
         var e = edges_arr[origin_node_number][i]
-        if (e["direct_element_id"]===target){
+        if (e["direct_unit"]===target){
             exists = true;
             return exists;
         }
@@ -119,10 +103,8 @@ function add_node_here(){
             buttons: {
                 Ok: function() {
                     new_node_name = $("#node-name-input").val();
-                    //console.log($("#node-name-input").val());
                     $.ajax({
                         url: "/xblock",
-//                        url: "/create_item",
                         type: "POST",
                         dataType: "json",
                         contentType: "application/json",
@@ -135,8 +117,7 @@ function add_node_here(){
                             'display_name': new_node_name
                             }),
                         success : function(answer){
-
-                            var node_locator = answer["locator"]
+                            var node_locator = answer["locator"];
                             //var location = answer["id"];
 
                             var i = node_locator.lastIndexOf("/");
@@ -144,17 +125,15 @@ function add_node_here(){
                             g.addNode(node_locator, { label : hideRestOfString(new_node_name), render : customRenderFunction} );
                             ids_arr.push(node_locator);
                             edges_arr.push([]);
-                            names_obj[node_locator] = {
+                            names_obj.push({
                                 "name" : new_node_name,
+                                "location_name": answer["location_name"],
                                 "locator" : node_locator,
                                 "coords_x" : 0,
-                                "coords_y" : 0};
+                                "coords_y" : 0});
                             data_obj[node_locator] = [];
 
-                            //console.log(node_locator)
-                            //console.log(node_loc)
-
-                            renderer.drawNode(renderer.graph.nodes[node_locator])
+                            renderer.drawNode(renderer.graph.nodes[node_locator]);
 
                             raphael_nodes[node_locator].set.translate(new_node_x, new_node_y);
                             renderer.makeDraggable(node_locator);
@@ -236,38 +215,19 @@ function canvasDbClick(e) {
             return set;
 */
 
-    var data_str = $(".data_string").text();
-    var names_str = $(".names_string").text();
-    var graph_str = $(".graph_string").text();
     var dict_str = $(".locators_dict").text();
-    /*
-        Толстый костыль: я не знаю, как сделать так, чтобы последняя (лишняя) запятая не выводилась,
-        поэтому я просто удаляю лишнюю запятую руками.
-    */
 
-    var i = names_str.lastIndexOf(",");
-    names_str = names_str.slice(0, i) + names_str.slice(i+1);
-    i = data_str.lastIndexOf(",");
-    data_str = data_str.slice(0, i) + data_str.slice(i+1);
-    i = graph_str.lastIndexOf(",");
-    graph_str = graph_str.slice(0, i) + graph_str.slice(i+1);
-
-    names_obj = jQuery.parseJSON(names_str);
-    data_obj = jQuery.parseJSON(data_str);
 
     ids_arr = [];
 
     var render = customRenderFunction;
 
-    //console.log(names_obj)
     jQuery.each(names_obj, function(id, obj) {
         var label = hideRestOfString(obj["name"]);
-        g.addNode(id, { label : label, render : render} );
-        ids_arr.push(id);
+        var location_name = obj["location_name"];
+        g.addNode(obj.locator, { label : label, render : render, location_name: location_name} );
+        ids_arr.push(obj.locator);
     });
-
-    edges_arr = jQuery.parseJSON(graph_str );
-    console.log(edges_arr)
 
 
     var source;
@@ -275,8 +235,8 @@ function canvasDbClick(e) {
         jQuery.each(edges_arr[node_number], function(edge_number) {
                 source = ids_arr[node_number];
 
-                var edge_data = generateEdgeData(this["disjunctions"], source)
-                g.addEdge(source, this["direct_element_id"], { directed : true, label: edge_data.label, stroke: edge_data.color, details: edge_data.details });
+                var edge_data = generateEdgeData(this["disjunctions"], source);
+                g.addEdge(source, this["direct_unit"], { directed : true, label: edge_data.label, stroke: edge_data.color, details: edge_data.details });
 
         });
     });
@@ -285,7 +245,6 @@ function canvasDbClick(e) {
     var is_defined = true;
 
         jQuery.each(names_obj, function(id, obj) {
-
             if ((obj["coords_x"]==="None") || (obj["coords_y"]==="None")) {
 
                 x_arr.push(Math.random());
@@ -315,7 +274,8 @@ function canvasDbClick(e) {
 
     /* draw the graph using the RaphaelJS draw implementation */
     renderer = new Graph.Renderer.Raphael('canvas', g, width, height);
-    renderer.enableDragingMode()
+    renderer.enableDragingMode();
+
     redraw = function() {
         var layouter = new Graph.Layout.Spring(g);
         layouter.layout();

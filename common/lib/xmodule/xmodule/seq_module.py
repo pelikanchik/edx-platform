@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import json
 import logging
 
@@ -16,7 +17,6 @@ from .xml_module import XmlDescriptor
 import time
 
 log = logging.getLogger(__name__)
-
 # HACK: This shouldn't be hard-coded to two types
 # OBSOLETE: This obsoletes 'type'
 class_priority = ['video', 'problem']
@@ -56,67 +56,133 @@ def get_unit(unit_id, section):
                 return child
         return None
 
+
+# Проверка формата direct_term: если direct_term старого формата - преобразовать в новый
+# Если формат не соответствует старому или новому - вернуть пустой список
+# alexger, 16.04.2014
+
+def check_term(term):
+    for element_term in term:
+
+        try:
+            element_term["direct_unit"]
+        except:
+            try:
+                element_term["direct_unit"] = element_term.pop("direct_element_id")
+            except Exception:
+                log.exception(u"ERROR: {0}".format(Exception))
+                return []
+
+
+        if element_term["disjunctions"]:
+
+            for disjunction in element_term["disjunctions"]:
+
+                if disjunction["conjunctions"]:
+
+                    for conjunction in disjunction["conjunctions"]:
+
+                        try:
+                            conjunction["source_unit"]
+                        except:
+                            try:
+                                conjunction["source_unit"] = conjunction.pop("source_element_id")
+                            except Exception:
+                                log.exception(u"ERROR: {0}".format(Exception))
+                                return []
+
+                        try:
+                            conjunction["splitter"]
+                        except:
+                            try:
+                                conjunction["splitter"] = conjunction.pop("field")
+                            except Exception:
+                                log.exception(u"ERROR: {0}".format(Exception))
+                                return []
+                        try:
+                            conjunction["option"]
+                        except:
+                            try:
+                                conjunction["option"] = conjunction.pop("sign")
+                            except Exception:
+                                log.exception(u"ERROR: {0}".format(Exception))
+                                return []
+
+    return term
+
 def elementary_conjunction(term, section):
         error_return = True
-        if len(term["source_element_id"]) == 0:
+        if len(term["source_unit"]) == 0:
             return error_return
-        if len(term["field"]) == 0:
+        if len(term["splitter"]) == 0:
             return error_return
-        if len(term["sign"]) == 0:
+        if len(term["option"]) == 0:
             return error_return
-        if len(term["value"]) == 0:
+        if len(term["value"]) == 0 and (term["splitter"] == "score_abs" or term["splitter"] == "score_rel"):
             return error_return
 
-        unit = get_unit(term["source_element_id"], section)
+        unit = get_unit(term["source_unit"], section)
 
         if not unit:
             return error_return
-        value = 0
-        term["value"] = int(term["value"])
-
-        if unit.get_progress():
-
-            progress = unit.get_progress()
-
-            if term["field"]=="score_rel":
-                value = Progress.percent(progress)
 
 
-            if term["field"]=="score_abs":
-                str_value = Progress.frac(progress)
-                value = str_value[0]
+        if term["splitter"] == "score_abs" or term["splitter"] == "score_rel":
+        # Если перенаправление зависит от результата:
 
-        else:
             value = 0
+            term["value"] = int(term["value"])
+
+            if unit.get_progress():
+
+                progress = unit.get_progress()
+
+                if term["splitter"]=="score_rel":
+                    value = Progress.percent(progress)
 
 
-        if term["sign"]== "more":
-            if value > term["value"]:
-                return True
-            else:
-                return False
-        if term["sign"]== "more-equals":
-            if value >= term["value"]:
-                return True
-            else:
-                return False
+                if term["splitter"]=="score_abs":
+                    str_value = Progress.frac(progress)
+                    value = str_value[0]
 
-        if term["sign"]== "less":
-            if value < term["value"]:
-                return True
             else:
-                return False
+                value = 0
 
-        if term["sign"]== "less-equals":
-            if value <= term["value"]:
-                return True
-            else:
-                return False
-        if term["sign"]== "equals":
-            if value == term["value"]:
-                return True
-            else:
-                return False
+            if term["option"]== "more":
+                if value > term["value"]:
+                    return True
+                else:
+                    return False
+            if term["option"]== "more-equals":
+                if value >= term["value"]:
+                    return True
+                else:
+                    return False
+
+            if term["option"]== "less":
+                if value < term["value"]:
+                    return True
+                else:
+                    return False
+
+            if term["option"]== "less-equals":
+                if value <= term["value"]:
+                    return True
+                else:
+                    return False
+            if term["option"]== "equals":
+                if value == term["value"]:
+                    return True
+                else:
+                    return False
+        else:
+        # Если перенаправление зависит от задания с вариантами ответов:
+            for problem in unit._xmodule.get_children():
+                for key in problem.student_answers:
+                    formatted_answer = key + "_" + problem.student_answers[key]
+                    if formatted_answer == term["option"]:
+                        return True
+            return False
 
         return error_return
 
@@ -165,13 +231,16 @@ class SequenceModule(SequenceFields, XModule):
                 if pos == cur_position:
                     term = json.loads(child.direct_term_with_default)
                     print term
+
+                    term = check_term(term)
+
                     for element_term in term:
                         if not element_term["disjunctions"]:
                             print "end"
                             print time.time()
                             return json.dumps({'position': cur_position})
                         for disjunction in element_term["disjunctions"]:
-                            term_result = element_term["direct_element_id"]
+                            term_result = element_term["direct_unit"]
                             if not disjunction["conjunctions"]:
                                 new_position = 1
                                 for check_child in self.get_children():

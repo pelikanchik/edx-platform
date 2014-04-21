@@ -562,9 +562,36 @@ msgstr "Доступность без регистрации"
 msgid "Show In LMS"
 msgstr "Отображать курс в публичной части"
 
+#alexger - словечки для графа
+msgid "Score (absolute)"
+msgstr "Результат (абсолютный)"
+
+msgid "Score (relative, %)"
+msgstr "Результат (относительный, %)"
+
+msgid "more"
+msgstr ">"
+
+msgid "less"
+msgstr "<"
+
+msgid "more or equals"
+msgstr "≥"
+
+msgid "less or equals"
+msgstr "≤"
+
+msgid "equals"
+msgstr "="
+
+
 
 msgid "Processing your account information…"
 msgstr "Отправка формы…"
+
+
+
+
 
 #: cms/templates/js/no-textbooks.underscore:2 
 msgid "Add your first textbook"

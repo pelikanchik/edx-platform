@@ -7338,6 +7338,21 @@ msgstr "Результат (абсолютный)"
 msgid "Score (relative, %)"
 msgstr "Результат (относительный, %)"
 
+msgid "more"
+msgstr ">"
+
+msgid "less"
+msgstr "<"
+
+msgid "more or equals"
+msgstr "≥"
+
+msgid "less or equals"
+msgstr "≤"
+
+msgid "equals"
+msgstr "="
+
 
 #alexger - for Pelic
 msgid "I will respect staff and other students"
@@ -7380,9 +7395,15 @@ msgstr "Допольнительные стили"
 msgid "Additional CSS for view modifications"
 msgstr "Стили, изменяющие стандартный внешний вид: прозрачность фона, позиция полей ввода"
 
+#alexger graph
+
+msgid "Redraw"
+msgstr "Перерисовать"
+
+msgid "Load"
+msgstr "Загрузить"
 
 #django_partial.po
-
 
 #: cms/djangoapps/contentstore/utils.py:22
 msgid "Open Ended Panel"
