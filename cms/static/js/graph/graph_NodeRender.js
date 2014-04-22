@@ -66,6 +66,8 @@
                     var h = node_form.getBBox().height;
                     vertex_text = r.text(0, h/2 + 10, node.label);
                 }
+                var node_box = node_form.getBBox();
+                var node_popup = r.popup(node_box.x + node_box.width, node_box.y, $.grep(names_obj, function(e){ return e.locator == node.id })[0]["name"]);
 
                 var show_details = function(){
                     if (!add_edge_mode) showNodeDetails(node);
@@ -76,28 +78,38 @@
 //                ellipse.node.ondblclick = show_details;
 
                 var shape = r.set().
-//                    r.rect(node.point[0]-30, node.point[1]-13, 60, 44).attr({"fill": "#feb", r : "12px", "stroke-width" : node.distance == 0 ? "3px" : "1px" })).push(
-//                    r.text(node.point[0], node.point[1] + 10, (node.label || n.id)  ));
                     push(node_form).
-                    push(vertex_text);
+                    push(vertex_text).
+                    push(node_popup);
 
                 var renamer = createNodeRenameCallback(node);
-//                vertex_text.node.ondblclick = renamer;
 
                 node_form.node.ondblclick = function(){
                     show_details();
                 }
                 node_form.node.onclick = function(){
                     if (add_edge_mode) bindNewEdgeTo(node_form, node)
-                    // if (!renderer.getDragingMode()) show_details();
                 };
                 vertex_text.node.onclick = function(){
                     if (add_edge_mode) bindNewEdgeTo(node_form, node);
                         else renamer();
                 };
 
+
+                shape.hover(function(){
+                    node_form.animate({"fill": Raphael.getColor()}, 200);
+                    node_popup.attr({"fill-opacity": .9});
+                    node_popup.show()
+                },function(){
+                    node_form.animate({"fill": color}, 200);
+                    node_popup.hide()
+                });
+
+
+                // TODO
+                // FIXME
+                // why do I need this array??
                 raphael_nodes[node.id] = node_form;
-//                console.log(ellipse);
 
                 return shape;
     };

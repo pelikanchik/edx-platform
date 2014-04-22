@@ -7,7 +7,7 @@ var add_edge_mode = false;
 var mouse_x, mouse_y, origin_x, origin_y = null
 
 // adding nodes and edges
-var new_node_x, new_node_y, origin_x, origin_y;
+var new_node_x, new_node_y;
 var origin_node;
 
 var new_edge_line;
@@ -18,6 +18,7 @@ function hideRestOfString(S){
                     // if label is longer tha...
 
     if (S.length > N) S = S.slice(0, N - 3) + "...";
+    //if (S.length > N) S = S.slice(0, N - 3) + "\n" + S.slice(N - 3);
     return S;
 }
 
@@ -29,6 +30,8 @@ function parseType(S){
       return "Задача"
         case "HtmlDescriptor":
       return "Текст"
+        case "DiscussionDescriptor":
+      return "Обсуждение"
     default:
       return S;
     }
@@ -94,7 +97,7 @@ function ajax_save_item(id, metadata){
 
 function add_node_here(){
 
-        var new_node_name = 'Без имени';
+        var new_node_name = 'New Unit';
 
         $("#node-name-input").val(new_node_name);
         $( "#add-new-node" ).dialog({
@@ -214,9 +217,6 @@ function canvasDbClick(e) {
                 r.text(n.point[0], n.point[1] + 10, (n.label || n.id) + "\n(" + (n.distance == undefined ? "Infinity" : n.distance) + ")"));
             return set;
 */
-
-    var dict_str = $(".locators_dict").text();
-
 
     ids_arr = [];
 

@@ -101,20 +101,20 @@
 </head>
 
 <body class="<%block name='bodyclass'/>  b-page b-page__body i-global i-bem" onclick="return {'i-global':{'lang':'ru','tld':'ru','content-region':'ru','click-host':'//clck.yandex.ru','passport-host':'https://passport.yandex.ru','pass-host':'//pass.yandex.ru','social-host':'//social.yandex.ru','export-host':'//export.yandex.ru','login':'','lego-static-host':'//yandex.st/lego/2.10-122'}}">
-
+<div class = "page-wrapper">
   <a class="nav-skip" href="#content">${_("Skip to this view's content")}</a>
 
-  <%include file="mathjax_accessible.html" />
+    <%include file="mathjax_accessible.html" />
 
-% if not suppress_toplevel_navigation:
-  <%include file="${header_file}" />
-%endif
+  % if not suppress_toplevel_navigation:
+    <%include file="${header_file}" />
+  %endif
 
   <section class="content-wrapper" id="content">
     ${self.body()}
     <%block name="bodyextra"/>
   </section>
-
+</div>
   <%include file="yandex_templates/footer.html" />
 
   <script>window.baseUrl = "${settings.STATIC_URL}";</script>

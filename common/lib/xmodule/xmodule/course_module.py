@@ -413,7 +413,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
             # set the due_date_display_format to what would have been shown previously (with no timezone).
             # Then remove show_timezone so that if the user clears out the due_date_display_format,
             # they get the default date display.
-            self.due_date_display_format = u"%b %d, %Y at %H:%M"
+            self.due_date_display_format = u"%d.%m.%Y at %H:%M"
             delattr(self, 'show_timezone')
 
         # NOTE: relies on the modulestore to call set_grading_policy() right after
@@ -835,7 +835,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
                 if result is None:
                     result = text.title()
                 else:
-                    result = result.strftime("%b %d, %Y")
+                    result = result.strftime("%d.%m.%Y")
             except ValueError:
                 result = text.title()
 
@@ -847,7 +847,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
             # TODO this is an impossible state since the init function forces start to have a value
             return 'TBD'
         else:
-            return (self.advertised_start or self.start).strftime("%b %d, %Y")
+            return (self.advertised_start or self.start).strftime("%d.%m.%Y")
 
     @property
     def end_date_text(self):
@@ -856,7 +856,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
 
         If the course does not have an end date set (course.end is None), an empty string will be returned.
         """
-        return '' if self.end is None else self.end.strftime("%b %d, %Y")
+        return '' if self.end is None else self.end.strftime("%d.%m.%Y")
 
     @property
     def forum_posts_allowed(self):

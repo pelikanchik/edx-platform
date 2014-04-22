@@ -5,7 +5,8 @@
 //var j$ = jQuery.noConflict();
 //var $ = jQuery.noConflict();
 
-function ajax_save_node(id, metadata){
+function ajax_save_node(id, metadata, change_status){
+    change_status = (typeof change_status !== 'undefined') ? change_status : false;
     $.ajax({
         //url: "/save_item",
         url: "/xblock/" + id,
@@ -17,11 +18,33 @@ function ajax_save_node(id, metadata){
         },
         data: JSON.stringify({
             'id': id,
-            "state":"public",
+            //"state":"public",
             "data":null,
             "children":null,
             'metadata': metadata
             })
+    });
+    if (!change_status && (states_obj[id] == "public")){
+            ajax_publish_node(id);
+    }
+
+}
+
+function ajax_publish_node(id){
+// POST http://0.0.0.0:8001/xblock/JLU.H101.strangeEons%2Fbranch%2Fdraft%2Fblock%2Fverticalf5b
+// {"publish":"make_public"}
+    $.ajax({
+        //url: "/save_item",
+        url: "/xblock/" + id,
+        type: "POST",
+        dataType: "json",
+        contentType: "application/json",
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        data: JSON.stringify({
+            "publish":"make_public"
+        })
     });
 }
 function create_new_edge(origin_node, target_node, new_edge_data){
@@ -181,7 +204,6 @@ function generateEdgeData(disjunctions_array, source){
             about_source = true;
         } else {
             related_vertex_name = $.grep(names_obj, function(e){ return e.locator == condition["source_unit"]; })[0]["name"];
-
         }
 
         var splitter = $.grep(splitters, function(e){ return e.id == condition["splitter"]})[0]["title"];
@@ -277,6 +299,8 @@ function createNodeRenameCallback( node){
 
         $( "#rename-node" ).dialog({
               modal: true,
+              //height: 300,
+              //width: 350,
               buttons: {
                 Ok: function() {
 
@@ -289,9 +313,11 @@ function createNodeRenameCallback( node){
                     metadata.display_name = node_name;
 
                     var locator_term = $.grep(names_obj, function(e){ return e.locator == node.id })[0]["locator"];
-                    ajax_save_node(locator_term, metadata);
+                    ajax_save_node(locator_term, metadata, true);
 
-                    renderer.renameNode(node, node_name);
+                    renderer.renameNode(node, hideRestOfString(node_name))
+                    //renderer.renameNode(node, node_name);
+
                     $( this ).dialog( "close" );
                 },
                 "Отмена": function() {
@@ -360,18 +386,21 @@ function showNodeDetails(node){
             var text_description = "Сложное условие";
 
             var data = generateEdgeData(edge.disjunctions, node.id).description;
-            text_description = "Если набрать в " + data.related_vertex_name + " " + data.sign + " " + data.value + data.percent;
+
+            if (data.is_complicated) text_description = "Сложное условие"
+                else
+                    text_description = "Если набрать в " + data.related_vertex_name + " " + data.sign + " " + data.value + data.percent;
 
 
             // TODO:
             // make a normal function generating this string
-
+//                + "<img class = \"close\" src = \"/static/img/Delete-icon.png\" data-bind='click: $root.removeDisjunction'/>"
+//<abbr
             var img_src = $("#Delete-icon-base").attr("src");
             $( "#node-edges-list").append(
-                "<p class=\"node-data " + string_id + "\" title=\"" + text_description + "\">"
-//                + "<img class = \"close\" src = \"/static/img/Delete-icon.png\" data-bind='click: $root.removeDisjunction'/>"
+                "<p class=\"node-data " + string_id + "\"><abbr title=\"" + text_description + "\">" + S + "</abbr>"
                 + "<img class = \"close " + string_id + "\" src = \"" + img_src + "\" id = \"" + img_id + "\"/>"
-                + S + "</p>"
+                + "</p>"
             );
 
 //            var handler = createEdgeDeletionCallback(edge, node.id);

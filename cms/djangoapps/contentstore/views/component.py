@@ -71,6 +71,12 @@ def is_section_exist(section_id, sections):
 @login_required
 def show_graph(request, tag=None, package_id=None, branch=None, version_guid=None, block=None):
 
+    print ("packis")
+    print (package_id)
+    print (branch)
+    print (version_guid)
+    print (block)
+
     locator = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
     try:
         old_location, course, item, lms_link = _get_item_in_course(request, locator)
@@ -81,15 +87,33 @@ def show_graph(request, tag=None, package_id=None, branch=None, version_guid=Non
     if item.location.category != 'sequential':
         return HttpResponseBadRequest()
 
+
     names = []
     data = {}
     graph = []
+    states_dict = {}
+
     locators_dict = {}
     for every_unit in item.get_children():
 
         every_unit_locator = loc_mapper().translate_location(None, every_unit.location)
 
+        # layout position is stored in item.
+        # there are two branches where the items are stored: 'draft' and 'published'.
+        # The existence of 'draft' version is required.
+        # Change in layout position are saved into both branches,
+        # but just in case I force it to use the data from 'draft' branch,
+        # because I expect various bad things to happen if I don't.
+        draft_locator = loc_mapper().translate_location(None, every_unit.location, published=False)
+        try:
+            old_location, course, draft_unit_item, lms_link = _get_item_in_course(request, draft_locator)
+        except ItemNotFoundError:
+            return HttpResponseBadRequest()
+
         current_locator = str(every_unit_locator)
+
+        state = compute_unit_state(every_unit)
+        states_dict[current_locator] = state
 
         names.append({
             "name": every_unit.display_name_with_default,
@@ -119,15 +143,15 @@ def show_graph(request, tag=None, package_id=None, branch=None, version_guid=Non
         for x in edge:
             #print()
 
-            #try:
-            x["direct_unit"] = locators_dict[x["direct_unit"]]
-            for every_edge in x["disjunctions"]:
-                for every_cond in every_edge["conjunctions"]:
-                    every_cond["source_unit"] = locators_dict[every_cond["source_unit"]]
-            #except KeyError:
-            #    # we are dealing with a ghost of removed node
-            #    print(x)
-            #    del x
+            try:
+                x["direct_unit"] = locators_dict[x["direct_unit"]]
+                for every_edge in x["disjunctions"]:
+                    for every_cond in every_edge["conjunctions"]:
+                        every_cond["source_unit"] = locators_dict[every_cond["source_unit"]]
+            except KeyError:
+                # we are dealing with a ghost of removed node
+                print(x)
+                del x
 
         graph.append(edge)
 
@@ -143,6 +167,7 @@ def show_graph(request, tag=None, package_id=None, branch=None, version_guid=Non
                                'graph_string': json.dumps(graph),
                                'splitters': json.dumps(splitters),
                                'options': json.dumps(options),
+                               'states': json.dumps(states_dict),
                                'locators_dict': locators_dict})
 
 

@@ -213,7 +213,11 @@ Graph.Renderer.Raphael = function(element, graph, width, height) {
         }
     };
     d.onmouseup = function () {
-        selfRef.isDrag && selfRef.isDrag.set.animate({"fill-opacity": .6}, 500);
+        //selfRef.isDrag && selfRef.isDrag.set.animate({"fill-opacity": .6}, 500);
+        selfRef.isDrag && selfRef.isDrag.set.forEach(function(x){
+            if (x.type == "set") x.animate({"fill-opacity": .9}, 500)
+                else x.animate({"fill-opacity": .6}, 500)
+        })
         selfRef.isDrag = false;
         update_hover_area(selfRef);
     };
@@ -244,7 +248,7 @@ function initialize_hover_area(selfRef, edge){
             connection.attr({"stroke": "#000"});
     //            console.log(popup);
               // XXX ?
-              if (popup != undefined){
+              if (popup != undefined && popup.removed != true){
                 popup.hide();
                 popup.remove();
               }
@@ -335,14 +339,19 @@ Graph.Renderer.Raphael.prototype = {
         /* re-reference to the node an element belongs to, needed for dragging all elements of a node */
         shape.items.forEach(function(item){
             item.set = shape;
-            item.node.style.cursor = "pointer";
+
+            // TODO if {exist}...
+            if (item.node != undefined){
+                item.node.style.cursor = "pointer";
+            }
+            if (!node.hidden && item.type != "set"){
+                item.show()
+            }
         });
 //        shape.mousedown(this.dragger);
 
         var box = shape.getBBox();
         shape.translate(Math.round(point[0]-(box.x+box.width/2)),Math.round(point[1]-(box.y+box.height/2)))
-        //console.log(box,point);
-        node.hidden || shape.show();
         node.shape = shape;
     },
     drawEdge: function(edge) {
@@ -374,12 +383,13 @@ Graph.Renderer.Raphael.prototype = {
     },
 
     makeDraggable: function(id){
-        console.log(id)
-        console.log(this.graph.nodes)
         var shape = this.graph.nodes[id].shape;
         shape.mousedown(this.dragger);
         shape.items.forEach(function(item){
-            item.node.style.cursor = "move";
+            // TODO if {exist}...
+            if (item.node != undefined){
+                item.node.style.cursor = "move";
+            }
         });
     },
 
