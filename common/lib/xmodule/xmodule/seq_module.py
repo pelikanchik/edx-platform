@@ -179,9 +179,10 @@ def elementary_conjunction(term, section):
         # Если перенаправление зависит от задания с вариантами ответов:
             for problem in unit._xmodule.get_children():
                 for key in problem.student_answers:
-                    formatted_answer = key + "_" + problem.student_answers[key]
-                    if formatted_answer == term["option"]:
-                        return True
+                    if isinstance(problem.student_answers[key], unicode):
+                        formatted_answer = key + "_" + problem.student_answers[key]
+                        if formatted_answer == term["option"]:
+                            return True
             return False
 
         return error_return
