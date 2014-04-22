@@ -282,8 +282,13 @@ define ["jquery", "jquery.ui", "gettext", "backbone",
       disabled = @model.get('state') == 'public'
       if disabled
         @$('.unit-direct-term-input').attr('disabled', true)
+        $('.save-term, .termConstructor, .termConstructor select, .termConstructor input').attr('disabled', true)
+        $('img.close, img.add, img.del').css("display","none");
+
       else
         @$('.unit-direct-term-input').removeAttr('disabled')
+        $('.save-term, .termConstructor, .termConstructor select, .termConstructor input').removeAttr('disabled')
+        $('img.close, img.add, img.del').css("display","inline-block");
 
     saveTerm: =>
       # Saving a term
@@ -294,9 +299,9 @@ define ["jquery", "jquery.ui", "gettext", "backbone",
       metadata = $.extend({}, @model.get('metadata'))
       metadata.display_name = $('.unit-display-name-input').val()
       metadata.direct_term = $('.unit-direct-term-input').val()
-      @model.save(metadata: metadata)
-
-      setTimeout('$(".save-term").val(gettext("Save")); $(".save-term").removeClass("save-term-active");', 500)
+      @model.save(metadata: metadata).done( =>
+        $(".save-term").val(gettext("Save"));
+      );
       # Update term
       $('.unit-location .editing .unit-term').html(metadata.direct_term)
       analytics.track "Edited Unit Term",

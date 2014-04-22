@@ -911,9 +911,14 @@ body.hide-wip {
     td input { font-size:0.8em!important;padding: 1px 4px;}
 
 }
+.save-term {
+        display: inline-block;
+        font-size: 1.2rem;
+        font-weight: 700;
+        padding: 4px 20px 5px;
+}
 
-
-.save-subsection-button, .save-term {
+.save-subsection-button{
 
         background-color: #009FE6;
         background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0));
@@ -929,7 +934,7 @@ body.hide-wip {
         width: 200px!important;
 }
 
-.save-subsection-button-active, .save-term-active {
+.save-subsection-button-active {
         background-color: #007Fc6;
         background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.3));
 }
