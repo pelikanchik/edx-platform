@@ -233,6 +233,10 @@ function update_hover_area(selfRef){
         }
         selfRef.graph.edges[i].hover_area = initialize_hover_area(selfRef, selfRef.graph.edges[i]);
     }
+    for (i in selfRef.graph.nodes) {
+        selfRef.graph.nodes[i].shape.toFront();
+    }
+
 };
 
 
@@ -243,6 +247,9 @@ function initialize_hover_area(selfRef, edge){
 //    console.log(selfRef.getCanvas());
 
     result.attr({"stroke-width": 20, "stroke-opacity" : HOVER_AREA_OPACITY, "stroke": "#F00"});
+    //result.insertBefore(selfRef.graph.nodes)
+    //result.toBack();
+
     result.hover(
         function(){
             connection.attr({"stroke": "#000"});

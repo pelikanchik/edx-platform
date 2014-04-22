@@ -172,7 +172,13 @@ function generateEdgeData(disjunctions_array, source){
         details = related_vertex_name + " " + sign + " " + target_value + percent_sign;
 
         if (!about_source){
-            color = "#008";
+            //color = "#008";
+
+            // those three lines added by request
+            // otherwise there is an additional type of edge, 'almost complicated' one.
+            color = "#00F";
+            details = "сложно";
+            is_complicated = true;
         } else if (target_value === "0"){
             // green for correct answer
             if (condition["sign"]==="more") color = "#0F0";
@@ -212,9 +218,6 @@ function createEdgeDeletionCallback( source_node_number, edge_number, string_id)
                 var edge = edges_arr[source_node_number][edge_number];
                 var source_id = ids_arr[source_node_number];
                 var target_id = edge.direct_element_id;
-
-                console.log(source_id)
-                console.log(target_id)
 
                 if (!is_edge_exists(source_id, target_id)){
                     alert("Такого ребра не существует!");

@@ -97,11 +97,11 @@
 
 
                 shape.hover(function(){
-                    node_form.animate({"fill": Raphael.getColor()}, 200);
+                    //node_form.animate({"fill": Raphael.getColor()}, 200);
                     node_popup.attr({"fill-opacity": .9});
                     node_popup.show()
                 },function(){
-                    node_form.animate({"fill": color}, 200);
+                    //node_form.animate({"fill": color}, 200);
                     node_popup.hide()
                 });
 
