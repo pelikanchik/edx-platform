@@ -590,7 +590,16 @@ msgid "Processing your account information…"
 msgstr "Отправка формы…"
 
 
+msgid "Dependencies as source unit:"
+msgstr "Указан как источник:"
 
+
+msgid "Dependencies as direct unit:"
+msgstr "Указан как пункт назначения:"
+
+
+msgid "Direct terms in depended units will be cleaned"
+msgstr "Условия перенаправления в зависимых элементах будут исправлены"
 
 
 #: cms/templates/js/no-textbooks.underscore:2 

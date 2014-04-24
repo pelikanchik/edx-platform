@@ -272,23 +272,50 @@ function createNewUnit(e) {
 
 function deleteUnit(e) {
     e.preventDefault();
-    _deleteItem($(this).parents('li.courseware-unit'), 'Unit');
+    var as_source_unit = $(this).parents('li.courseware-unit').data("dependent_units")["as_source_unit"];
+    var as_direct_unit = $(this).parents('li.courseware-unit').data("dependent_units")["as_direct_unit"];
+    var as_source_unit_list = "";
+    var as_direct_unit_list = "";
+    var additional_html = "";
+
+    $.each(as_direct_unit,function(id,value){
+        as_direct_unit_list += "<li><a href = '" + value.url + "'>" + value.name + "</a></li>";
+    });
+
+    $.each(as_source_unit,function(id,value){
+        as_source_unit_list += "<li><a href = '" + value.url + "'>" + value.name + "</a></li>";
+    });
+
+    if (as_direct_unit_list){
+        additional_html += "<h3>" + gettext("Dependencies as direct unit:") +
+            "</h3><ul>" + as_direct_unit_list + "</ul>";
+    }
+    if (as_source_unit_list){
+        additional_html += "<h3>" + gettext("Dependencies as source unit:") +
+            "</h3><ul>" + as_source_unit_list + "</ul>";
+    }
+
+    if (as_source_unit_list || as_direct_unit_list){
+        additional_html += "<p>" + gettext("Direct terms in depended units will be cleaned") + "</p>";
+    }
+
+    _deleteItem($(this).parents('li.courseware-unit'), 'Unit', additional_html);
 }
 
 function deleteSubsection(e) {
     e.preventDefault();
-    _deleteItem($(this).parents('li.courseware-subsection'), 'Subsection');
+    _deleteItem($(this).parents('li.courseware-subsection'), 'Subsection', "");
 }
 
 function deleteSection(e) {
     e.preventDefault();
-    _deleteItem($(this).parents('section.courseware-section'), 'Section');
+    _deleteItem($(this).parents('section.courseware-section'), 'Section', "");
 }
 
-function _deleteItem($el, type) {
+function _deleteItem($el, type, additional_html) {
     var confirm = new PromptView.Warning({
         title: gettext('Delete this ' + type + '?'),
-        message: gettext('Deleting this ' + type + ' is permanent and cannot be undone.'),
+        message: gettext('Deleting this ' + type + ' is permanent and cannot be undone.') + additional_html,
         actions: {
             primary: {
                 text: gettext('Yes, delete this ' + type),

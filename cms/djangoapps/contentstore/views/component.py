@@ -56,6 +56,57 @@ ADVANCED_COMPONENT_CATEGORY = 'advanced'
 ADVANCED_COMPONENT_POLICY_KEY = 'advanced_modules'
 
 
+def clean_term_of_dependencies(input_term, url_name):
+    output_term = []
+    input_term = check_term(json.loads(str(input_term)))
+    for element_term in input_term:
+        if element_term["direct_unit"] != url_name:
+
+            output_element_term = {"direct_unit": element_term["direct_unit"], "disjunctions":[] }
+
+            for disjunction in element_term["disjunctions"]:
+
+                output_disjunction = {"conjunctions":[]}
+                for conjunction in disjunction["conjunctions"]:
+                    if conjunction["source_unit"] != url_name:
+                        output_disjunction["conjunctions"].append(conjunction)
+
+                if (output_disjunction["conjunctions"]):
+                    output_element_term["disjunctions"].append(output_disjunction)
+            if (output_element_term["disjunctions"]):
+                output_term.append(output_element_term)
+
+    return json.dumps(output_term)
+
+def get_dependent_units(unit_id, units, course_id):
+
+    as_direct_unit = []
+    as_source_unit = []
+    as_direct_unit_filtered = []
+    as_source_unit_filtered = []
+
+    for unit in units:
+        term = check_term(json.loads(str(unit.direct_term_with_default)))
+        for element_term in term:
+
+            if element_term["direct_unit"] == unit_id and unit.url_name != unit_id:
+                as_direct_unit.append({"name": unit.display_name, "url": loc_mapper().translate_location(course_id, unit.location, False, True).url_reverse('unit')})
+
+            for disjunction in element_term["disjunctions"]:
+                for conjunction in disjunction["conjunctions"]:
+                    if conjunction["source_unit"] == unit_id and unit.url_name != unit_id:
+                       as_source_unit.append({"name": unit.display_name, "url": loc_mapper().translate_location(course_id, unit.location, False, True).url_reverse('unit')})
+
+    for element in as_direct_unit:
+        if element not in as_direct_unit_filtered:
+            as_direct_unit_filtered.append(element)
+
+    for element in as_source_unit:
+      if element not in as_source_unit_filtered:
+        as_source_unit_filtered.append(element)
+
+    return {"as_direct_unit": as_direct_unit_filtered, "as_source_unit":as_source_unit_filtered}
+
 # checking if section with id = section_id doesn't exist in sections
 def is_section_exist(section_id, sections):
     for section in sections:
@@ -224,11 +275,12 @@ def subsection_handler(request, tag=None, package_id=None, branch=None, version_
 
         can_view_live = False
         subsection_units = item.get_children()
+
         for unit in subsection_units:
             state = compute_unit_state(unit)
+
             if state == UnitState.public or state == UnitState.draft:
                 can_view_live = True
-                break
 
         course_locator = loc_mapper().translate_location(
             course.location.course_id, course.location, False, True
