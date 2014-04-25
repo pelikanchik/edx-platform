@@ -591,15 +591,15 @@ msgstr "Отправка формы…"
 
 
 msgid "Dependencies as source unit:"
-msgstr "Указан как источник:"
+msgstr "Зависимые условия в элементах:"
 
 
 msgid "Dependencies as direct unit:"
-msgstr "Указан как пункт назначения:"
+msgstr "Входящие переходы из элементов:"
 
 
 msgid "Direct terms in depended units will be cleaned"
-msgstr "Условия перенаправления в зависимых элементах будут исправлены"
+msgstr "Внимание! Все входящие, исходящие переходы и зависимые фрагменты условий будут удалены. Это может повлечь за собой изменение логики прохождения урока."
 
 
 #: cms/templates/js/no-textbooks.underscore:2 
