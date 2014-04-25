@@ -333,14 +333,18 @@ def _delete_item_at_location(item_location, delete_children=False, delete_all_ve
     item = store.get_item(item_location)
     parent_locs = modulestore('direct').get_parent_locations(item_location, None)
     # Если имеем дело с юнитом, перебираем соседей и очищаем их direct_term от зависимостей
-    if item.category == 'vertical':
+    if item.category == 'vertical' and delete_all_versions:
         for parent_loc in parent_locs:
             parent = modulestore('direct').get_item(parent_loc)
             for brother_item_location in parent.children:
                 brother_item = store.get_item(brother_item_location)
                 brother_item.direct_term = clean_term_of_dependencies(brother_item.direct_term, item.url_name)
                 brother_item.save()
-                store.update_metadata(brother_item_location, own_metadata(brother_item))
+
+                if brother_item.is_draft:
+                    store.update_metadata(brother_item_location, own_metadata(brother_item))
+
+                modulestore('direct').update_metadata(brother_item_location, own_metadata(brother_item))
 
     if delete_children:
         _xmodule_recurse(item, lambda i: store.delete_item(i.location, delete_all_versions))

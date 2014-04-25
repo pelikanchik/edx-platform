@@ -77,11 +77,20 @@ def clean_term_of_dependencies(input_term, url_name):
                 output_term.append(output_element_term)
 
     return json.dumps(output_term)
+def get_unit_by_url_name(units, url_name):
+
+    for unit in units:
+        if unit.url_name == url_name:
+            return unit
+
+    return None
 
 def get_dependent_units(unit_id, units, course_id):
 
     as_direct_unit = []
     as_source_unit = []
+    direct_units = []
+    direct_units_filtered = []
     as_direct_unit_filtered = []
     as_source_unit_filtered = []
 
@@ -89,13 +98,19 @@ def get_dependent_units(unit_id, units, course_id):
         term = check_term(json.loads(str(unit.direct_term_with_default)))
         for element_term in term:
 
-            if element_term["direct_unit"] == unit_id and unit.url_name != unit_id:
-                as_direct_unit.append({"name": unit.display_name, "url": loc_mapper().translate_location(course_id, unit.location, False, True).url_reverse('unit')})
+            if unit.url_name == unit_id:
+                direct_unit = get_unit_by_url_name(units, element_term["direct_unit"])
+                if direct_unit:
+                    direct_units.append({"name": direct_unit.display_name, "url": loc_mapper().translate_location(course_id, direct_unit.location, False, True).url_reverse('unit')})
 
-            for disjunction in element_term["disjunctions"]:
-                for conjunction in disjunction["conjunctions"]:
-                    if conjunction["source_unit"] == unit_id and unit.url_name != unit_id:
-                       as_source_unit.append({"name": unit.display_name, "url": loc_mapper().translate_location(course_id, unit.location, False, True).url_reverse('unit')})
+            else:
+                if element_term["direct_unit"] == unit_id:
+                    as_direct_unit.append({"name": unit.display_name, "url": loc_mapper().translate_location(course_id, unit.location, False, True).url_reverse('unit')})
+
+                for disjunction in element_term["disjunctions"]:
+                    for conjunction in disjunction["conjunctions"]:
+                        if conjunction["source_unit"] == unit_id and unit.url_name != unit_id:
+                           as_source_unit.append({"name": unit.display_name, "url": loc_mapper().translate_location(course_id, unit.location, False, True).url_reverse('unit')})
 
     for element in as_direct_unit:
         if element not in as_direct_unit_filtered:
@@ -105,7 +120,11 @@ def get_dependent_units(unit_id, units, course_id):
       if element not in as_source_unit_filtered:
         as_source_unit_filtered.append(element)
 
-    return {"as_direct_unit": as_direct_unit_filtered, "as_source_unit":as_source_unit_filtered}
+    for element in direct_units:
+      if element not in direct_units_filtered:
+        direct_units_filtered.append(element)
+
+    return {"as_direct_unit": as_direct_unit_filtered, "as_source_unit": as_source_unit_filtered, "direct_units": direct_units_filtered}
 
 # checking if section with id = section_id doesn't exist in sections
 def is_section_exist(section_id, sections):

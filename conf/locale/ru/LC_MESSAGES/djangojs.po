@@ -597,6 +597,9 @@ msgstr "Зависимые условия в элементах:"
 msgid "Dependencies as direct unit:"
 msgstr "Входящие переходы из элементов:"
 
+msgid "Direct units are:"
+msgstr "Исходящие переходы в элементы:"
+
 
 msgid "Direct terms in depended units will be cleaned"
 msgstr "Внимание! Все входящие, исходящие переходы и зависимые фрагменты условий будут удалены. Это может повлечь за собой изменение логики прохождения урока."
