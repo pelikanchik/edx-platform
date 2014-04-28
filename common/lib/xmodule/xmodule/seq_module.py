@@ -13,6 +13,7 @@ from .mako_module import MakoModuleDescriptor
 from .progress import Progress
 from .x_module import XModule
 from .xml_module import XmlDescriptor
+from collections import OrderedDict
 import time
 
 log = logging.getLogger(__name__)
@@ -40,6 +41,7 @@ class SequenceFields(object):
     # NOTE: Position is 1-indexed.  This is silly, but there are now student
     # positions saved on prod, so it's not easy to fix.
     position = Integer(help="Last tab viewed in this sequence", scope=Scope.user_state)
+    history_position = Integer(help="Last tab from the progress history viewed in this sequence", scope=Scope.user_state)
     due = Date(help="Date that this problem is due by", scope=Scope.settings)
     extended_due = Date(
         help="Date that this problem is due by for a particular student. This "
@@ -179,7 +181,7 @@ class SequenceModule(SequenceFields, XModule):
                                         self.position = new_position
                                         print "end"
                                         print time.time()
-                                        return json.dumps({'position': new_position})
+                                        return json.dumps({'position': new_position, 'item_id': check_child.id[(check_child.id.rfind('/')+1):]})
                                     new_position += 1
                             conjunctions_result = True
                             for conjunction in disjunction["conjunctions"]:
@@ -191,17 +193,20 @@ class SequenceModule(SequenceFields, XModule):
                                         self.position = new_position
                                         print "end"
                                         print time.time()
-                                        return json.dumps({'position': new_position})
+                                        return json.dumps({'position': new_position, 'item_id': check_child.id[(check_child.id.rfind('/')+1):]})
                                     new_position += 1
                 pos += 1
             print "end"
             print time.time()
             return json.dumps({'position': cur_position})
+
         if dispatch == 'goto_position':
-            print int(data['position'])
             self.position = int(data['position'])
-            print self.position
+            if 'history_position' in data:
+                self.history_position = int(data['history_position'])
+
             return json.dumps({'success': True})
+        
         raise NotFoundError('Unexpected dispatch type')
 
     def student_view(self, context):
@@ -209,9 +214,11 @@ class SequenceModule(SequenceFields, XModule):
         # default the position to the first element
         if self.position is None:
             self.position = 1
+        if self.history_position is None:
+            self.history_position = 1
 
         ## Returns a set of all types of all sub-children
-        contents = []
+        contents = OrderedDict()
 
         fragment = Fragment()
 
@@ -235,7 +242,7 @@ class SequenceModule(SequenceFields, XModule):
             }
             if childinfo['title'] == '':
                 childinfo['title'] = child.display_name_with_default
-            contents.append(childinfo)
+            contents[child.id] = childinfo
 
         params = {'items': contents,
                   'element_id': self.location.html_id(),
@@ -245,8 +252,12 @@ class SequenceModule(SequenceFields, XModule):
                   'tag': self.location.category,
                   'ajax_url': self.system.ajax_url,
                   'staff_access': context['staff_access'],
+                  'masquerade': context['masquerade'],
+                  'history_position': self.history_position,
                   }
 
+        if 'progress_history' in context:
+            params['progress_history'] = context['progress_history']
         fragment.add_content(self.system.render_template('seq_module.html', params))
 
         return fragment

@@ -660,11 +660,66 @@ class CourseEnrollmentAllowed(models.Model):
 
     class Meta:
         unique_together = (('email', 'course_id'),)
-
+        
     def __unicode__(self):
         return "[CourseEnrollmentAllowed] %s: %s (%s)" % (self.email, self.course_id, self.created)
 
 # cache_relation(User.profile)
+
+class ProgressHistory(models.Model):
+    """
+    This is where we store the progress history of the user for each subsection.
+    It is used for navigation in dynamic graph courses in lms.
+    The history is consists of units ids and is stored in JSON array.
+    """
+    user = models.ForeignKey(User, db_index=True)
+    course_id = models.CharField(max_length=255, db_index=True)
+    subsection_id = models.CharField(max_length=255, db_index=True)
+    units_chain = models.TextField(default="[]")
+
+    def update(self, next_unit, cur_position=None):
+        """
+        Adds a new unit to the units_chain.
+        If current position is given adds the new unit after this position.
+        If the unit after the current position isnt the same as the new unit
+        removes all units after the current and adds the new one.
+        """
+        history_arr = json.loads(self.units_chain)
+        
+        if cur_position is not None:
+            # if current position is the last in the chain, just add a new unit
+            if cur_position == len(history_arr) - 1: 
+                history_arr.append(next_unit)
+            else:
+                # else check if a transition isnt the same, remove units 
+                # after the current and add a new one
+                if history_arr[cur_position+1] != next_unit:
+                    history_arr = history_arr[0:cur_position+1] + [next_unit]
+        else:
+            # append a new unit to the end
+            history_arr.append(next_unit)
+
+        self.units_chain = json.dumps(history_arr)
+        self.save()
+
+    def get_prev_unit(self, cur_position):
+        """
+        Returns id of the previous unit for current position.
+        """
+        history_arr = json.loads(self.units_chain)
+        try:
+            prev_unit_id = history_arr[cur_position-1]
+            return prev_unit_id
+        except IndexError as e:
+            raise e
+
+    def clear(self):
+        """
+        Fully clears the progress history.
+        """
+        self.units_chain = json.dumps([])
+        self.save()
+
 
 #### Helper methods for use from python manage.py shell and other classes.
 
