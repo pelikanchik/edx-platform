@@ -275,8 +275,7 @@ function createNodeRenameCallback( node){
                     ajax_save_node(locator_term, metadata, true);
                     // renaming a node leads to drafting it.
 
-                    renderer.renameNode(node, hideRestOfString(node_name))
-
+                    renderer.renameNode(node, node_name)
                     $( this ).dialog( "close" );
                 },
                 "Отмена": function() {

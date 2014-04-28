@@ -363,8 +363,15 @@ function canvasDbClick(e) {
 
             var bBox = raphael_nodes[node_id].getBBox();
 
-            metadata.coords_x = (bBox.x + bBox.width / 2) / width;
-            metadata.coords_y = (bBox.y + bBox.height / 2) / height;
+            var node = g.nodes[node_id];
+            console.log(node.layoutPosX);
+            console.log(node.layoutPosY);
+            console.log(node.point);
+            console.log((bBox.x + bBox.width / 2 + 20));
+            console.log((bBox.y + bBox.height / 2 + 6));
+
+            metadata.coords_x = (bBox.x + bBox.width / 2 + 20) / width;
+            metadata.coords_y = (bBox.y + bBox.height / 2 + 6) / height;
 
             // what if they are undefined?
             // no, they were initialized by random
@@ -380,6 +387,7 @@ function canvasDbClick(e) {
 
     };
     load_layout = function() {
+        //var layouter = new Graph.Layout.Saved(g, x_arr, y_arr, bounds);
         var layouter = new Graph.Layout.Saved(g, x_arr, y_arr);
         renderer.draw();
     };
