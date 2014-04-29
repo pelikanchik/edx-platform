@@ -44,8 +44,7 @@
                     var cx = x + node_form.getBBox().width/2;
                     var cy = y + node_form.getBBox().height;
                     vertex_text = r.text(cx, cy + 10, node.label);
-                }
-                if (has_text){
+                } else if (has_text){
                   //Raphael.fn.hexagon = function(radius, cx, cy) {
                   var path = ""
                   var radius = 30*0.5*node_size;
