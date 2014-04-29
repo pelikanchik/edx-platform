@@ -289,27 +289,28 @@ function canvasDbClick(e) {
 
     var x_arr = [], y_arr = [];
     var is_defined = true;
+    var bad_nodes = 0;
+    jQuery.each(names_obj, function(id, obj) {
 
-        jQuery.each(names_obj, function(id, obj) {
+        if ((obj["coords_x"]==="None") || (obj["coords_y"]==="None")) {
+            x_arr.push(Math.random());
+            y_arr.push(Math.random());
+            bad_nodes++;
+        } else {
+            x_arr.push(obj["coords_x"]);
+            y_arr.push(obj["coords_y"]);
+        }
+    });
+    // if too many nodes are bad, try to use Layout.Spring instead.
+    if (1.0*bad_nodes/ids_arr.length > 0.25){
+          is_defined=false;
+    }
 
-            if ((obj["coords_x"]==="None") || (obj["coords_y"]==="None")) {
-
-                x_arr.push(Math.random());
-                y_arr.push(Math.random());
-    //          is_defined=false;
-            } else {
-                x_arr.push(obj["coords_x"]);
-                y_arr.push(obj["coords_y"]);
-            }
-        });
-
-//    for( var edge in obj) {
-
-    /* layout the graph using the Spring layout implementation */
     var layouter;
     if (is_defined) {
         layouter = new Graph.Layout.Saved(g, x_arr, y_arr);
     } else {
+    /* layout the graph using the Spring layout implementation */
         layouter = new Graph.Layout.Spring(g);
     }
 
@@ -363,8 +364,15 @@ function canvasDbClick(e) {
 
             var bBox = raphael_nodes[node_id].getBBox();
 
-            metadata.coords_x = (bBox.x + bBox.width / 2) / width;
-            metadata.coords_y = (bBox.y + bBox.height / 2) / height;
+            var node = g.nodes[node_id];
+            console.log(node.layoutPosX);
+            console.log(node.layoutPosY);
+            console.log(node.point);
+            console.log((bBox.x + bBox.width / 2 + 20));
+            console.log((bBox.y + bBox.height / 2 + 6));
+
+            metadata.coords_x = (bBox.x + bBox.width / 2 + 20) / width;
+            metadata.coords_y = (bBox.y + bBox.height / 2 + 6) / height;
 
             // what if they are undefined?
             // no, they were initialized by random
@@ -380,6 +388,7 @@ function canvasDbClick(e) {
 
     };
     load_layout = function() {
+        //var layouter = new Graph.Layout.Saved(g, x_arr, y_arr, bounds);
         var layouter = new Graph.Layout.Saved(g, x_arr, y_arr);
         renderer.draw();
     };

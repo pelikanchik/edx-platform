@@ -67,7 +67,8 @@
                     vertex_text = r.text(0, h/2 + 10, node.label);
                 }
                 var node_box = node_form.getBBox();
-                var node_popup = r.popup(node_box.x + node_box.width, node_box.y, names_obj[node.id]["name"]);
+                //var node_popup = r.popup(node_box.x + node_box.width, node_box.y, names_obj[node.id]["name"]);
+
 
                 var show_details = function(){
                     if (!add_edge_mode) showNodeDetails(node);
@@ -79,8 +80,9 @@
 
                 var shape = r.set().
                     push(node_form).
-                    push(vertex_text).
-                    push(node_popup);
+                    push(vertex_text);
+                    //push(node_popup);
+                shape.name_popup = r.popup(node_box.x + node_box.width, node_box.y, names_obj[node.id]["name"]);
 
                 var renamer = createNodeRenameCallback(node);
 
@@ -97,14 +99,16 @@
 
 
                 shape.hover(function(){
-                    node_form.animate({"fill": Raphael.getColor()}, 200);
-                    node_popup.attr({"fill-opacity": .9});
-                    node_popup.show()
+                    //node_form.animate({"fill": Raphael.getColor()}, 200);
+                    shape.name_popup.attr({"fill-opacity": .9});
+                    shape.name_popup.toFront();
+                    shape.name_popup.show();
                 },function(){
-                    node_form.animate({"fill": color}, 200);
-                    node_popup.hide()
+                    //node_form.animate({"fill": color}, 200);
+                    shape.name_popup.hide()
                 });
 
+                //console.log(shape.name_popup)
 
                 // TODO
                 // FIXME

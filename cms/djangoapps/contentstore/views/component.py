@@ -91,6 +91,16 @@ def show_graph(request, tag=None, package_id=None, branch=None, version_guid=Non
     data_string = "{"
     names_string = "{"
     locators_dict = {}
+    print "!!!!!"
+    print "!!!!!"
+    print "!!!!!"
+    print "!!!!!"
+    print item
+    print "!!!!!"
+    print "!!!!!"
+    print "!!!!!"
+    print "!!!!!"
+    print "!!!!!"
     for every_unit in item.get_children():
 
         every_unit_locator = loc_mapper().translate_location(None, every_unit.location)
