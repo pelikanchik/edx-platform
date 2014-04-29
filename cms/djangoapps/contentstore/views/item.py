@@ -349,11 +349,12 @@ def _delete_item_at_location(item_location, delete_children=False, delete_all_ve
             print(parent_loc["name"])
             parent = modulestore('direct').get_item(parent_loc)
             item_url = item_location.url()
+            """
             print(item_url)
             print(parent)
             course_locator = loc_mapper().translate_location(None, parent_loc["name"])
             print(course_locator)
-            """
+
                     temp_key = "direct_term"
                     json_array = json.loads(value)
 
