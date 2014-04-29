@@ -101,7 +101,8 @@
                 shape.hover(function(){
                     //node_form.animate({"fill": Raphael.getColor()}, 200);
                     shape.name_popup.attr({"fill-opacity": .9});
-                    shape.name_popup.show()
+                    shape.name_popup.toFront();
+                    shape.name_popup.show();
                 },function(){
                     //node_form.animate({"fill": color}, 200);
                     shape.name_popup.hide()
