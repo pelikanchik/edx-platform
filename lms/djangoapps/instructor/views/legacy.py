@@ -165,6 +165,7 @@ def instructor_dashboard(request, course_id):
         Color.Correct = 'def0d8'
         Color.Incorrect = 'f2dedf'
         Color.Header = 'f5f59e'
+        Color.Default = 'ffffff'
 
         if fp is None:
             response = HttpResponse(mimetype='text/csv')
@@ -202,6 +203,8 @@ def instructor_dashboard(request, course_id):
                                 c.style.fill.start_color.index = openpyxl.style.Color.Correct
                             elif item[1] == 'incorrect':
                                 c.style.fill.start_color.index = openpyxl.style.Color.Incorrect
+                            else:
+                                c.style.fill.start_color.index = openpyxl.style.Color.Default
                         else:
                             c.value = ' '
                 else:
@@ -260,7 +263,7 @@ def instructor_dashboard(request, course_id):
 
     # returns OrderedDict(), where a key is question id and a value is None
     # if problem type sorting or choisegroup the value will be dict of answers' ids and answers' texts
-    def get_questions_id(problem_html):
+    def get_questions_id(problem_html, problem_id):
         beg_ind = 0
         end_ind = 0
         question_num = problem_html.count('name=\"input_') # total questions count
@@ -271,13 +274,13 @@ def instructor_dashboard(request, course_id):
             beg_ind = problem_html.find('name=\"input_', beg_ind) + len('name=\"input_')
             span_ind = problem_html.rfind('<span>', 0, beg_ind)
             if problem_html.find('class=\"text-input-dynamath', span_ind, beg_ind) > 0:
-                end_ind = problem_html.find('_', beg_ind)
+                end_ind = problem_html.find(problem_id, beg_ind) + len(problem_id) + 1
                 end_ind = problem_html.find('_', end_ind + 1)
                 q = problem_html[beg_ind:end_ind]
                 questions_id[q] = None
 
             elif problem_html.find('class=\"sorting', span_ind, beg_ind) > 0:
-                end_ind = problem_html.find('_', beg_ind)
+                end_ind = problem_html.find(problem_id, beg_ind) + len(problem_id) + 1
                 end_ind = problem_html.find('_', end_ind + 1)
                 q = problem_html[beg_ind:end_ind]
                 end_ind = problem_html.find('\"', beg_ind)
@@ -293,7 +296,7 @@ def instructor_dashboard(request, course_id):
                 end_ind = problem_html.find('</section>', beg_ind)
 
             elif problem_html.find('class=\"choicegroup', span_ind, beg_ind) > 0:
-                end_ind = problem_html.find('_', beg_ind)
+                end_ind = problem_html.find(problem_id, beg_ind) + len(problem_id) + 1
                 end_ind = problem_html.find('_', end_ind + 1)
                 q = problem_html[beg_ind:end_ind]
                 beg_ind = problem_html.find('value=\"', end_ind) + len('value=\"')
@@ -309,7 +312,7 @@ def instructor_dashboard(request, course_id):
                     questions_id[q]['choicegroup'] = True
 
             else:
-                end_ind = problem_html.find('_', beg_ind)
+                end_ind = problem_html.find(problem_id, beg_ind) + len(problem_id) + 1
                 end_ind = problem_html.find('_', end_ind + 1)
                 q = problem_html[beg_ind:end_ind]
                 questions_id[q] = None
@@ -716,9 +719,8 @@ def instructor_dashboard(request, course_id):
                 problem_html = problem.lcp.get_html()
             except Exception as err:
                 problem_html = ''
-
             datatable['col_size'] = [1] * (len(datatable['header']) - 1)
-            questions_id = get_questions_id(problem_html)
+            questions_id = get_questions_id(problem_html, problem_to_dump)
             datatable['col_size'].append(len(questions_id))
 
             for i in smdat:
@@ -741,14 +743,14 @@ def instructor_dashboard(request, course_id):
                     for j in data['student_answers'].keys():
                         found = j.find('_dynamath')
                         if found > 0:
-                            tmp = j.find('_')
+                            tmp = j.find(problem_to_dump) + len(problem_to_dump) + 1
                             key = j[:j.find('_', tmp + 1)]
                             if 'Dump of all responses to problem' in action:
                                 correctness = data['correct_map'][j[:found]]['correctness']
                                 answers[key] = {j[:found]:[data['student_answers'][j].encode('utf-8'), correctness]}
                                 answers['dynamath'] = True
                         else:
-                            tmp = j.find('_')
+                            tmp = j.find(problem_to_dump) + len(problem_to_dump) + 1
                             key = j[:j.find('_', tmp + 1)]
                             if key not in answers:
                                 if data['student_answers'][j] == '':
@@ -826,9 +828,9 @@ def instructor_dashboard(request, course_id):
                     problems_urls.append(component.location.url())
 
         datatable = {'header': ['ID', 'Demo', 'Username', 'Full Name', 'E-mail'], 'data':[], 'col_size':[]}
-        datatable['header'] += ["Task %d" % num for num in range(1, len(problems_urls) + 1)]
         datatable['col_size'] = [1] * len(datatable['header'])
-
+        datatable['header'] += ["Task %d" % num for num in range(1, len(problems_urls) + 1)]
+        
         enrolled_students = User.objects.filter(
             courseenrollment__course_id=course_id,
             courseenrollment__is_active=1,
@@ -862,8 +864,8 @@ def instructor_dashboard(request, course_id):
                 problems_html[problem_url] = problem.lcp.get_html()
             except Exception as err:
                 problems_html[problem_url] = ''
-
-            questions_id_for_problem[problem_url] = get_questions_id(problems_html[problem_url])
+            problem_id = problem_url[(problem_url.rfind('/')+1):]
+            questions_id_for_problem[problem_url] = get_questions_id(problems_html[problem_url], problem_id)
             datatable['col_size'].append(len(questions_id_for_problem[problem_url]))
 
         for student in enrolled_students:
@@ -883,16 +885,17 @@ def instructor_dashboard(request, course_id):
                     data = json.loads(smdat.state)
                     try: #trying to get sudent's answers if there are
                         answers = {}
+                        problem_id = problem_url[(problem_url.rfind('/')+1):]
                         for j in data['student_answers'].keys():
                             found = j.find('_dynamath')
                             if found > 0:
-                                tmp = j.find('_')
+                                tmp = j.find(problem_id) + len(problem_id) + 1
                                 key = j[:j.find('_', tmp + 1)]
                                 if _u('Dump of section results') in action:
                                     correctness = data['correct_map'][j[:found]]['correctness']
                                     answers[key] = {j[:found]:[data['student_answers'][j].encode('utf-8'), correctness]}
                             else:
-                                tmp = j.find('_')
+                                tmp = j.find(problem_id) + len(problem_id) + 1
                                 key = j[:j.find('_', tmp + 1)]
                                 if key not in answers:
                                     if data['student_answers'][j] == '':
