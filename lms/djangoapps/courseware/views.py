@@ -300,7 +300,8 @@ def index(request, course_id, chapter=None, section=None,
             'fragment': Fragment(),
             'staff_access': staff_access,
             'masquerade': masq,
-            'xqa_server': settings.FEATURES.get('USE_XQA_SERVER', 'http://xqa:server@content-qa.mitx.mit.edu/xqa')
+            'xqa_server': settings.FEATURES.get('USE_XQA_SERVER', 'http://xqa:server@content-qa.mitx.mit.edu/xqa'),
+            'from_link': position != None
             }
 
         # Only show the chat if it's enabled by the course and in the

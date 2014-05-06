@@ -14,9 +14,24 @@ class @Sequence
     # If this is a course with dynamic graph and the user is a student
     if has_dynamic_graph and (not staff_access or masquerade)
       @dynamic_sequence_list = true
-      history_position = parseInt(@el.data('historyPosition'))
-      position = parseInt($("#sequence-list a[data-history-position=#{history_position}]", @el).data('element'))
-      @render position, history_position # renders a current unit according to the history position
+      # If load page from link
+      if @el.data('fromLink') == "True"
+        position = parseInt(@el.data('position')) 
+        history_position = parseInt($('#history_length').val())
+        tmp = parseInt(@$('#sequence-list a').last().data('element'))
+        # If a new position isnt the same as the last position in the history
+        if position !=  parseInt(@$('#sequence-list a').last().data('element'))
+          history_position = history_position + 1
+          subsection_id = @id.substr(@id.indexOf('sequential/') + 'sequential/'.length)
+          update_history_url = @ajaxUrl.substr(0, @ajaxUrl.indexOf('/xblock')) + '/update_history/' + subsection_id + '/' + parseInt($('#history_length').val()) + '/' + position
+          $.postWithPrefix update_history_url, (responce) =>
+
+        modx_full_url = @ajaxUrl + '/goto_position'
+        $.postWithPrefix modx_full_url, history_position: history_position
+      else
+        history_position = parseInt(@el.data('historyPosition'))
+        position = parseInt($("#sequence-list a[data-history-position=#{history_position}]", @el).data('element'))
+      @render position, history_position
     else
       @dynamic_sequence_list = false
       @render parseInt(@el.data('position'))      
@@ -229,7 +244,7 @@ class @Sequence
 
       if new_position != @position
         subsection_id = @id.substr(@id.indexOf('sequential/') + 'sequential/'.length)
-        update_history_url = modx_full_url.substr(0, modx_full_url.indexOf('/xblock')) + '/update_history/' + subsection_id + '/' + @history_position + '/' + new_position
+        update_history_url = @ajaxUrl.substr(0, @ajaxUrl.indexOf('/xblock')) + '/update_history/' + subsection_id + '/' + @history_position + '/' + new_position
         $.postWithPrefix update_history_url, (responce) =>
         Logger.log "seq_godynamo", old: @position, new: new_position, id: @id
 
