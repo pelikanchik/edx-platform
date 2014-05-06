@@ -169,6 +169,7 @@ def show_graph(request, tag=None, package_id=None, branch=None, version_guid=Non
     return render_to_response('graph.html',
                               {'subsection': item,
                                'locator': locator,
+                               'context_graph': True,
                                'data_string': data_string,
                                'names_string': names_string,
                                'graph_string': graph_string,

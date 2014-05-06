@@ -266,7 +266,15 @@
 
     <!-- view -->
     <div class="wrapper wrapper-view">
-      <%include file="widgets/header.html" />
+      % if not context_graph:
+          <%include file="widgets/header.html" />
+      % endif
+      % if context_graph:
+          <%include file="widgets/graph_header.html" />
+          <%include file="widgets/graph_help.html" />
+          <script type="text/javascript" src="${static.url('js/graph/help.js')}"></script>
+      % endif
+
 
       <div id="page-alert"></div>
 

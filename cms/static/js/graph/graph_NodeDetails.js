@@ -262,6 +262,7 @@ function createEdgeDeletionCallback( source_node_number, edge_number, string_id)
 function createNodeRenameCallback( node){
   return function(){
         $("#node-rename-input").val(names_obj[node.id]["name"]);
+        node.shape.name_popup.hide()
 
         $( "#rename-node" ).dialog({
               modal: true,

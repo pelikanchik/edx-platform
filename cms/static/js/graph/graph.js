@@ -110,6 +110,33 @@ function ajax_save_item(id, metadata){
     });
 }
 
+$("#graph-help").click(function (e) {
+
+    /*
+    var $dialog = $('<div></div>').
+        css({height:"350px", overflow:"auto"}).
+        html($( "#graph-help-text").text()).
+        dialog({
+    */
+        //css({height:"350px", overflow:"auto", max-height:"400px"}).
+    $( "#graph-help-text" ).
+        dialog({
+          position:
+            { my: "top", at: "center top+100", of: window},
+            //{ my: "top", at: "center bottom+50", of: "#view-top"},
+          modal: true,
+          //height: 300,
+          width: 800,
+          //width:'auto',
+          buttons: {
+            Ok: function() {
+                $( this ).dialog( "close" );
+            }
+          }
+    });
+
+});
+
 
 function add_node_here(){
 
