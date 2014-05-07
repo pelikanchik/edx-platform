@@ -91,6 +91,9 @@
       % endif
     </ul>
   </nav>
+  % if get_course(course_id).has_dynamic_graph and (not staff_access or masquerade == "student"):
+    <input class="resethistory" style="position: absolute; right: 0; margin-right: 48px;" type="button" value="${_('Start over')}">
+  % endif
 </div>
 
 

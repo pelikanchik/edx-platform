@@ -720,6 +720,18 @@ class ProgressHistory(models.Model):
         self.units_chain = json.dumps([])
         self.save()
 
+    def reset(self):
+        """
+        Removes all units from the progress history except the first unit.
+        """
+        history_arr = json.loads(self.units_chain)
+        try:
+            self.units_chain = json.dumps([history_arr[0]])
+            self.save()
+        except IndexError as e:
+            raise e
+
+
 
 #### Helper methods for use from python manage.py shell and other classes.
 

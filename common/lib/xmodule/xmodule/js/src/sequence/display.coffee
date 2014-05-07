@@ -95,6 +95,7 @@ class @Sequence
     @$('.sequence-nav-buttons a').unbind('click')
     @$('.sequence-nav-buttons .godynamo a').removeClass('disabled').click(@godynamo)
     @$('.sequence-nav-buttons .gobackdynamo a').removeClass('disabled').click(@gobackdynamo)
+    $('.resethistory').click(@reset_history)
 
     if @contents.length == 0
       @$('.sequence-nav-buttons .godynamo a').addClass('disabled')
@@ -271,7 +272,7 @@ class @Sequence
 
       if not jQuery.isEmptyObject(response)
         new_position = response.position
-        Logger.log "seq_godynamo", old: @position, new: new_position, id: @id
+        Logger.log "seq_gobackdynamo", old: @position, new: new_position, id: @id
 
         analytics.pageview @id
 
@@ -286,6 +287,26 @@ class @Sequence
           @render new_position, @history_position - 1
         else
           @render new_position
+
+  reset_history: (event) =>
+    event.preventDefault()
+    subsection_id = @id.substr(@id.indexOf('sequential/') + 'sequential/'.length)
+    modx_full_url = @ajaxUrl.substr(0, @ajaxUrl.indexOf('/xblock')) + '/reset_history/' + subsection_id
+    $.postWithPrefix modx_full_url, (response) =>
+      @$("#sequence-list").children().first().nextAll().remove()
+
+      Logger.log "seq_reset_history"
+
+      analytics.pageview @id
+
+      analytics.track "Reset Progress History",
+        sequence_id: @id
+        current_sequential: @position
+        target_sequential: 1
+        current_history_position: @history_position
+        target_history_position: 1
+
+      @render 1, 1
 
   # if the second argument is given and true, the function will use position in the progress history
   link_for: (position, history=false) ->

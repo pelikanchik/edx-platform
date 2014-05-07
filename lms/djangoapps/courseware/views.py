@@ -807,6 +807,19 @@ def update_progress_history(request, course_id, subsection_id, history_position,
 
     return HttpResponse()
 
+def reset_progress_history(request, course_id, subsection_id):
+    """
+    AJAX handler for the reset progress history button.
+    """
+    user = request.user
+
+    try:
+        progress_history = ProgressHistory.objects.get(user=user, course_id=course_id, subsection_id=subsection_id)
+        progress_history.reset()
+    except Exception:
+        raise Http404
+
+    return HttpResponse()
 
 def gobackdynamo(request, course_id, subsection_id, history_position):
     """
