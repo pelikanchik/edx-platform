@@ -3778,6 +3778,10 @@ msgstr "Предыдущее"
 msgid "Next"
 msgstr "Следующее"
 
+#: lms/templates/seq_module.html:92
+msgid "Start over"
+msgstr "Начать сначала"
+
 #: lms/templates/signup_modal.html:14
 msgid "Sign Up for {span_start}{platform_name}{span_end}"
 msgstr "Регистрация"

@@ -14,9 +14,24 @@ class @Sequence
     # If this is a course with dynamic graph and the user is a student
     if has_dynamic_graph and (not staff_access or masquerade)
       @dynamic_sequence_list = true
-      history_position = parseInt(@el.data('historyPosition'))
-      position = parseInt($("#sequence-list a[data-history-position=#{history_position}]", @el).data('element'))
-      @render position, history_position # renders a current unit according to the history position
+      # If load page from link
+      if @el.data('fromLink') == "True"
+        position = parseInt(@el.data('position')) 
+        history_position = parseInt($('#history_length').val())
+        tmp = parseInt(@$('#sequence-list a').last().data('element'))
+        # If a new position isnt the same as the last position in the history
+        if position !=  parseInt(@$('#sequence-list a').last().data('element'))
+          history_position = history_position + 1
+          subsection_id = @id.substr(@id.indexOf('sequential/') + 'sequential/'.length)
+          update_history_url = @ajaxUrl.substr(0, @ajaxUrl.indexOf('/xblock')) + '/update_history/' + subsection_id + '/' + parseInt($('#history_length').val()) + '/' + position
+          $.postWithPrefix update_history_url, (responce) =>
+
+        modx_full_url = @ajaxUrl + '/goto_position'
+        $.postWithPrefix modx_full_url, history_position: history_position
+      else
+        history_position = parseInt(@el.data('historyPosition'))
+        position = parseInt($("#sequence-list a[data-history-position=#{history_position}]", @el).data('element'))
+      @render position, history_position
     else
       @dynamic_sequence_list = false
       @render parseInt(@el.data('position'))      
@@ -80,6 +95,7 @@ class @Sequence
     @$('.sequence-nav-buttons a').unbind('click')
     @$('.sequence-nav-buttons .godynamo a').removeClass('disabled').click(@godynamo)
     @$('.sequence-nav-buttons .gobackdynamo a').removeClass('disabled').click(@gobackdynamo)
+    $('.resethistory').click(@reset_history)
 
     if @contents.length == 0
       @$('.sequence-nav-buttons .godynamo a').addClass('disabled')
@@ -229,7 +245,7 @@ class @Sequence
 
       if new_position != @position
         subsection_id = @id.substr(@id.indexOf('sequential/') + 'sequential/'.length)
-        update_history_url = modx_full_url.substr(0, modx_full_url.indexOf('/xblock')) + '/update_history/' + subsection_id + '/' + @history_position + '/' + new_position
+        update_history_url = @ajaxUrl.substr(0, @ajaxUrl.indexOf('/xblock')) + '/update_history/' + subsection_id + '/' + @history_position + '/' + new_position
         $.postWithPrefix update_history_url, (responce) =>
         Logger.log "seq_godynamo", old: @position, new: new_position, id: @id
 
@@ -256,7 +272,7 @@ class @Sequence
 
       if not jQuery.isEmptyObject(response)
         new_position = response.position
-        Logger.log "seq_godynamo", old: @position, new: new_position, id: @id
+        Logger.log "seq_gobackdynamo", old: @position, new: new_position, id: @id
 
         analytics.pageview @id
 
@@ -271,6 +287,26 @@ class @Sequence
           @render new_position, @history_position - 1
         else
           @render new_position
+
+  reset_history: (event) =>
+    event.preventDefault()
+    subsection_id = @id.substr(@id.indexOf('sequential/') + 'sequential/'.length)
+    modx_full_url = @ajaxUrl.substr(0, @ajaxUrl.indexOf('/xblock')) + '/reset_history/' + subsection_id
+    $.postWithPrefix modx_full_url, (response) =>
+      @$("#sequence-list").children().first().nextAll().remove()
+
+      Logger.log "seq_reset_history"
+
+      analytics.pageview @id
+
+      analytics.track "Reset Progress History",
+        sequence_id: @id
+        current_sequential: @position
+        target_sequential: 1
+        current_history_position: @history_position
+        target_history_position: 1
+
+      @render 1, 1
 
   # if the second argument is given and true, the function will use position in the progress history
   link_for: (position, history=false) ->

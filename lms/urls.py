@@ -184,6 +184,8 @@ if settings.COURSEWARE_ENABLED:
             name='xblock_handler'),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/update_history/(?P<subsection_id>.*)/(?P<history_position>[0-9]+)/(?P<new_position>[0-9]+)$',
             'courseware.views.update_progress_history'),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/reset_history/(?P<subsection_id>.*)$',
+            'courseware.views.reset_progress_history'),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/gobackdynamo/(?P<subsection_id>.*)/(?P<history_position>[0-9]+)$',
             'courseware.views.gobackdynamo'),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/xblock/(?P<usage_id>[^/]*)/handler_noauth/(?P<handler>[^/]*)(?:/(?P<suffix>.*))?$',

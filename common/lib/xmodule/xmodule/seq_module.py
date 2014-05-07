@@ -201,7 +201,8 @@ class SequenceModule(SequenceFields, XModule):
             return json.dumps({'position': cur_position})
 
         if dispatch == 'goto_position':
-            self.position = int(data['position'])
+            if 'position' in data:
+                self.position = int(data['position'])
             if 'history_position' in data:
                 self.history_position = int(data['history_position'])
 
@@ -253,6 +254,7 @@ class SequenceModule(SequenceFields, XModule):
                   'ajax_url': self.system.ajax_url,
                   'staff_access': context['staff_access'],
                   'masquerade': context['masquerade'],
+                  'from_link': context['from_link'],
                   'history_position': self.history_position,
                   }
 
