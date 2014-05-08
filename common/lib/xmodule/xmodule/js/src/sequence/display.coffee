@@ -244,9 +244,6 @@ class @Sequence
       new_position = response.position
 
       if new_position != @position
-        subsection_id = @id.substr(@id.indexOf('sequential/') + 'sequential/'.length)
-        update_history_url = @ajaxUrl.substr(0, @ajaxUrl.indexOf('/xblock')) + '/update_history/' + subsection_id + '/' + @history_position + '/' + new_position
-        $.postWithPrefix update_history_url, (responce) =>
         Logger.log "seq_godynamo", old: @position, new: new_position, id: @id
 
         analytics.pageview @id
@@ -259,6 +256,9 @@ class @Sequence
           target_history_position: @history_position + 1
 
         if @dynamic_sequence_list and @history_position?
+          subsection_id = @id.substr(@id.indexOf('sequential/') + 'sequential/'.length)
+          update_history_url = @ajaxUrl.substr(0, @ajaxUrl.indexOf('/xblock')) + '/update_history/' + subsection_id + '/' + @history_position + '/' + new_position
+          $.postWithPrefix update_history_url, (responce) =>
           @render new_position, @history_position + 1
         else
           @render new_position
@@ -295,7 +295,7 @@ class @Sequence
     $.postWithPrefix modx_full_url, (response) =>
       @$("#sequence-list").children().first().nextAll().remove()
 
-      Logger.log "seq_reset_history"
+      Logger.log "seq_reset_history", old: @position, new: 1, id: @id
 
       analytics.pageview @id
 
