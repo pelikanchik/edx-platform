@@ -108,7 +108,9 @@
 <input type="hidden" id="has_dynamic_graph" value="${get_course(course_id).has_dynamic_graph}">
 <input type="hidden" id="staff_access" value="${staff_access}">
 <input type="hidden" id="masquerade" value="${masquerade}">
-<input type="hidden" id="history_length" value="${len(progress_history)}">
+% if get_course(course_id).has_dynamic_graph and (not staff_access or masquerade == "student"):
+  <input type="hidden" id="history_length" value="${len(progress_history)}">
+% endif
 
 <div style="display: none;" id="hidden_seq_buttons">
   % for idx, key in enumerate(items.keys()):
