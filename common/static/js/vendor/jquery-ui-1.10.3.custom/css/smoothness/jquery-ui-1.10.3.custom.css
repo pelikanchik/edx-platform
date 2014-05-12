@@ -466,6 +466,7 @@ button.ui-button::-moz-focus-inner {
 	border-left-width: 1px;
 }
 .ui-dialog {
+    z-index: 1001;  /* to be in front of header */
 	position: absolute;
 	top: 0;
 	left: 0;

@@ -124,7 +124,7 @@ $("#graph-help").click(function (e) {
           position:
             { my: "top", at: "center top+100", of: window},
             //{ my: "top", at: "center bottom+50", of: "#view-top"},
-          modal: true,
+          //modal: true,
           //height: 300,
           width: 800,
           //width:'auto',
