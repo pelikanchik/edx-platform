@@ -18,10 +18,10 @@ from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
 from django.db import transaction
 from markupsafe import escape
-from student.models import UserProfile
+from student.models import UserProfile, ProgressHistory
 from courseware import grades
 from courseware.access import has_access
-from courseware.courses import (get_courses, get_course_with_access,
+from courseware.courses import (get_course, get_courses, get_course_with_access,
                                 get_courses_by_university, sort_by_announcement)
 import courseware.tabs as tabs
 from courseware.masquerade import setup_masquerade
@@ -290,6 +290,7 @@ def index(request, course_id, chapter=None, section=None,
         if chapter is None:
             return redirect_to_course_position(course_module)
 
+
         context = {
             'csrf': csrf(request)['csrf_token'],
             'accordion': render_accordion(request, course, chapter, section, field_data_cache),
@@ -299,7 +300,8 @@ def index(request, course_id, chapter=None, section=None,
             'fragment': Fragment(),
             'staff_access': staff_access,
             'masquerade': masq,
-            'xqa_server': settings.FEATURES.get('USE_XQA_SERVER', 'http://xqa:server@content-qa.mitx.mit.edu/xqa')
+            'xqa_server': settings.FEATURES.get('USE_XQA_SERVER', 'http://xqa:server@content-qa.mitx.mit.edu/xqa'),
+            'from_link': position != None
             }
 
         # Only show the chat if it's enabled by the course and in the
@@ -358,6 +360,21 @@ def index(request, course_id, chapter=None, section=None,
                 # User may be trying to be clever and access something
                 # they don't have access to.
                 raise Http404
+
+            if get_course(course_id).has_dynamic_graph:
+                progress_history, created = ProgressHistory.objects.get_or_create(user=user, course_id=course_id, subsection_id=section)
+                # Will add the first record to the history, if it is recently created
+                if created:
+                    units = get_units_of_subsection(course_id, section)
+                    try:
+                        if section_module.position is None:
+                            progress_history.update(units[0])
+                        else:
+                            progress_history.update(units[int(section_module.position)-1])
+                    except Exception as e:
+                        raise e
+
+                context['progress_history']  = json.loads(progress_history.units_chain)
 
             # model_data_cache_for_check = ModelDataCache.cache_for_descriptor_descendents(course_id, user, course, depth=None)
 
@@ -755,3 +772,72 @@ def submission_history(request, course_id, student_username, location):
     }
 
     return render_to_response('courseware/submission_history.html', context)
+
+
+def get_units_of_subsection(course_id, subsection_id):
+    """
+    Returns an array of units' ids from the subsection with subsection_id of 
+    the course with course_id.
+    """
+    course_location = CourseDescriptor.id_to_location(course_id)
+    subsection = modulestore().get_items(
+        Location('i4x', course_location.org, course_location.course, None, subsection_id),
+        course_id=course_id
+    )[0]
+    units = [unit.id for unit in subsection.get_children()]
+
+    return units
+
+
+def update_progress_history(request, course_id, subsection_id, history_position, new_position):
+    """
+    AJAX handler for the history update call.
+    The function updates the progress history of the user for the current 
+    subsection.
+    """
+    user = request.user
+
+    try:
+        progress_history = ProgressHistory.objects.get(user=user, course_id=course_id, subsection_id=subsection_id)
+    except Exception:
+        raise Http404
+
+    units = get_units_of_subsection(course_id, subsection_id)
+    progress_history.update(units[int(new_position)-1], int(history_position)-1)
+
+    return HttpResponse()
+
+def reset_progress_history(request, course_id, subsection_id):
+    """
+    AJAX handler for the reset progress history button.
+    """
+    user = request.user
+
+    try:
+        progress_history = ProgressHistory.objects.get(user=user, course_id=course_id, subsection_id=subsection_id)
+        progress_history.reset()
+    except Exception:
+        raise Http404
+
+    return HttpResponse()
+
+def gobackdynamo(request, course_id, subsection_id, history_position):
+    """
+    AJAX handler for the gobackdynamo button.
+    """
+    user = request.user
+
+    if int(history_position) > 1:
+        try:
+            progress_history = ProgressHistory.objects.get(user=user, course_id=course_id, subsection_id=subsection_id)
+        except Exception:
+            raise Http404
+
+        units = get_units_of_subsection(course_id, subsection_id)
+
+        prev_unit = progress_history.get_prev_unit(int(history_position)-1)
+        prev_position = units.index(prev_unit) + 1
+
+        return HttpResponse(json.dumps({'position': prev_position}), mimetype="application/json")
+    else:
+        return HttpResponse()

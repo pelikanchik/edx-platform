@@ -27,7 +27,7 @@ domReady(function() {
 
     $('.unit .item-actions .delete-unit-button').bind('click', deleteUnit);
     $('.new-unit-item').bind('click', createNewUnit);
-    $('.show-graph-item').bind('click', graphPopUpWindow);
+    //$('.show-graph-item').bind('click', graphPopUpWindow);
 
     // lean/simple modal
     $('a[rel*=modal]').leanModal({

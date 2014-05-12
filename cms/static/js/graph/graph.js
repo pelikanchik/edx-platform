@@ -242,20 +242,25 @@ function canvasDbClick(e) {
     });
 
     var x_arr = [], y_arr = [];
-    var is_defined = true;
-
+    var is_defined = true;    
+    var bad_nodes = 0;
         jQuery.each(names_obj, function(id, obj) {
+
             if ((obj["coords_x"]==="None") || (obj["coords_y"]==="None")) {
 
                 x_arr.push(Math.random());
                 y_arr.push(Math.random());
+                bad_nodes++;
     //          is_defined=false;
             } else {
                 x_arr.push(obj["coords_x"]);
                 y_arr.push(obj["coords_y"]);
             }
         });
-
+    
+        if (1.0*bad_nodes/ids_arr.length > 0.25){
+              is_defined=false;
+        }
 //    for( var edge in obj) {
 
     /* layout the graph using the Spring layout implementation */
@@ -263,6 +268,7 @@ function canvasDbClick(e) {
     if (is_defined) {
         layouter = new Graph.Layout.Saved(g, x_arr, y_arr);
     } else {
+    /* layout the graph using the Spring layout implementation */
         layouter = new Graph.Layout.Spring(g);
     }
 
@@ -318,8 +324,8 @@ function canvasDbClick(e) {
 
             var bBox = raphael_nodes[node_id].getBBox();
 
-            metadata.coords_x = (bBox.x + bBox.width / 2) / width;
-            metadata.coords_y = (bBox.y + bBox.height / 2) / height;
+            metadata.coords_x = (bBox.x + bBox.width / 2 + 20) / width;
+            metadata.coords_y = (bBox.y + bBox.height / 2 + 6) / height;
 
             // what if they are undefined?
             // no, they were initialized by random
@@ -337,6 +343,7 @@ function canvasDbClick(e) {
 
     };
     load_layout = function() {
+        //var layouter = new Graph.Layout.Saved(g, x_arr, y_arr, bounds);
         var layouter = new Graph.Layout.Saved(g, x_arr, y_arr);
         renderer.draw();
     };
