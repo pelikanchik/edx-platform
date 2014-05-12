@@ -17,6 +17,11 @@ This def will enumerate through a passed in subsection and list all of the units
   <%
     subsection_locator = loc_mapper().translate_location(context_course.location.course_id, subsection.location, False, True)
   %>
+
+  % if context_course.has_dynamic_graph:
+    <a href="${'/graph/subsection/' + str(subsection_locator)}" class="courseware-unit show-graph-item" data-category="${new_unit_category}" data-parent="${subsection_locator}"> ${_("Graph")} </a>
+  % endif
+
   % for unit in subsection_units:
   <%
     unit_locator = loc_mapper().translate_location(context_course.location.course_id, unit.location, False, True)
@@ -67,10 +72,6 @@ This def will enumerate through a passed in subsection and list all of the units
     </a>
   </li>
 </ol>
-
-    % if context_course.has_dynamic_graph:
-    ##<a href="#" class="courseware-unit show-graph-item" data-category="${new_unit_category}" data-parent="${subsection_locator}"> ${_("Graph")} (${_("beta")})</a>
-    % endif
 
 
 </%def>
