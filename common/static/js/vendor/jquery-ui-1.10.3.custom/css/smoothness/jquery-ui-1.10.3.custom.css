@@ -903,14 +903,16 @@ body .ui-tooltip {
 .ui-priority-primary,
 .ui-widget-content .ui-priority-primary,
 .ui-widget-header .ui-priority-primary {
+    line-height: 2;
 	font-weight: bold;
+    font-size: larger;
 }
 .ui-priority-secondary,
 .ui-widget-content .ui-priority-secondary,
 .ui-widget-header .ui-priority-secondary {
 	opacity: .7;
 	filter:Alpha(Opacity=70);
-	font-weight: normal;
+	font-weight: bold;
 }
 .ui-state-disabled,
 .ui-widget-content .ui-state-disabled,
