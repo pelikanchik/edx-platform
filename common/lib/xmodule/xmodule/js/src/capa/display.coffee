@@ -24,7 +24,7 @@ class @Problem
     @$('section.action input:button').click @refreshAnswers
     @$('section.action input.check').click @check_fd
     # XXX
-    $('.check-all').unbind('click').click @check_all
+    $('.check-all').bind('checkAll', @check_all)
     @$('section.action input.reset').click @reset
     @$('section.action button.show').click @show
     @$('section.action input.save').click @save
@@ -202,9 +202,8 @@ class @Problem
 
   check_all: (event) =>
     event.preventDefault()
-    if (responsesBeingProcessedCount == 0)
-      $('.check').click()
-
+    if responsesBeingProcessedCount is 0
+      @$('.check').click()
 
   ###
 # 'check_fd' uses FormData to allow file submissions in the 'problem_check' dispatch,
@@ -299,9 +298,6 @@ class @Problem
 
     Logger.log 'problem_check', @answers
 
-    if( responsesBeingProcessedCount == 0)
-      $('.check-all').html(gettext('Wait...')).addClass('check-all-disabled')
-
     $("#" + @element_id + " .check").val(gettext('Wait...')).prop('disabled', true)
     responsesBeingProcessedCount++
 
@@ -311,21 +307,26 @@ class @Problem
       problem_id: @id
       answers: @answers
 
-    $.postWithPrefix "#{@url}/problem_check", @answers, (response) =>
-      switch response.success
-        when 'incorrect', 'correct'
-          @render(response.contents)
-          @updateProgress response
-          if @el.hasClass 'showed'
-            @el.removeClass 'showed'
-        else
-          @gentle_alert response.success
-      $("#" + @element_id + " .check").val(gettext('Check')).prop('disabled', false)
-      responsesBeingProcessedCount--
-      if( responsesBeingProcessedCount == 0)
-        $('.check-all').html(gettext('Check all')).removeClass('check-all-disabled')
+    settings = 
+      type: "POST"
+      url: "" + @url + "/problem_check"
+      async: false
+      data: @answers
+      success: (response) =>
+        switch response.success
+          when 'incorrect', 'correct'
+            @render(response.contents)
+            @updateProgress response
+            if @el.hasClass 'showed'
+              @el.removeClass 'showed'
+          else
+            @gentle_alert response.success
+        $("#" + @element_id + " .check").val(gettext('Check')).prop('disabled', false)
+        responsesBeingProcessedCount--
 
-      Logger.log 'problem_graded', [@answers, response.contents], @id
+        Logger.log 'problem_graded', [@answers, response.contents], @id
+
+    $.ajaxWithPrefix(settings)
 
   reset: =>
     Logger.log 'problem_reset', @answers

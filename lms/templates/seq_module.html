@@ -57,9 +57,17 @@
     </div>
     <ul class="sequence-nav-buttons">
       % if get_course(course_id).has_dynamic_graph:
-        <li class="godynamo"><a href="#">${_("Next")}</a></li>
+        % if get_course(course_id).check_all:
+            <li class="godynamo check-all"><a href="#">${_("Next")}</a></li>
+          % else:
+            <li class="godynamo"><a href="#">${_("Next")}</a></li>
+          % endif
       % else:
-        <li class="next"><a href="#">${_("Next")}</a></li>
+        % if get_course(course_id).check_all:
+          <li class="next check-all"><a href="#">${_("Next")}</a></li>
+        % else:
+          <li class="next"><a href="#">${_("Next")}</a></li>
+        % endif
       % endif
     </ul>
 
@@ -84,10 +92,18 @@
         % else:
           <li class="gobackdynamo"><a href="#">${_("Previous")}</a></li>
         % endif
-        <li class = "godynamo"><a href= "#">${_("Next")}</a></li>
+        % if get_course(course_id).check_all:
+          <li class="godynamo check-all"><a href="#">${_("Next")}</a></li>
+        % else:
+          <li class="godynamo"><a href="#">${_("Next")}</a></li>
+        % endif
       % else:
         <li class="prev"><a href="#">${_("Previous")}</a></li>
-        <li class="next"><a href="#">${_("Next")}</a></li>
+        % if get_course(course_id).check_all:
+          <li class="next check-all"><a href="#">${_("Next")}</a></li>
+        % else:
+          <li class="next"><a href="#">${_("Next")}</a></li>
+        % endif
       % endif
     </ul>
   </nav>

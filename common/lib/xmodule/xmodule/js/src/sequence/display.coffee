@@ -93,7 +93,13 @@ class @Sequence
 
   toggleArrows: =>
     @$('.sequence-nav-buttons a').unbind('click')
-    @$('.sequence-nav-buttons .godynamo a').removeClass('disabled').click(@godynamo)
+    # if check-all option is on
+    if $('.check-all').length > 0
+      @$('.sequence-nav-buttons .godynamo a').removeClass('disabled').click((event) => 
+        $(event.target).trigger('checkAll')
+        setTimeout(@godynamo(event), 0))
+    else
+      @$('.sequence-nav-buttons .godynamo a').removeClass('disabled').click(@godynamo)
     @$('.sequence-nav-buttons .gobackdynamo a').removeClass('disabled').click(@gobackdynamo)
     $('.resethistory').click(@reset_history)
 
@@ -112,7 +118,11 @@ class @Sequence
     if @position == @contents.length
       @$('.sequence-nav-buttons .next a').addClass('disabled')
     else
-      @$('.sequence-nav-buttons .next a').removeClass('disabled').click(@next)
+      # if check-all option is on
+      if $('.check-all').length > 0
+        @$('.sequence-nav-buttons .next a').removeClass('disabled').click((event) => 
+          $(event.target).trigger('checkAll')
+          setTimeout(@next(event), 0))
 
   render: (new_position, new_history_position) ->
     if @position != new_position or (new_history_position? and @history_position != new_history_position)

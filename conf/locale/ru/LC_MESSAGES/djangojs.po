@@ -657,6 +657,10 @@ msgstr "Дата:"
 msgid "Has Locked Subsections"
 msgstr "Можно ли блокировать доступ к подразделам"
 
+#: cms/templates/js/advanced_entry.underscore:26
+msgid "Check the unit before the transition to the next"
+msgstr "Проверять элемент перед переходом к следуещему"
+
 #: cms/static/coffee/src/views/unit.js:224  
 msgid "Delete this component?"
 msgstr "Удалить этот компонент?"

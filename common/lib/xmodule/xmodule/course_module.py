@@ -209,6 +209,7 @@ class CourseFields(object):
     has_dynamic_graph = Boolean(help="Has this course dynamic graph or not", default=False, scope=Scope.settings)
     enrollment_is_closed_msg = String(help="Message will be shown, when enrollment for a course is closed", default="Enrollment is closed", scope=Scope.settings)
     locked_subsections = Boolean(help="Whether available to lock subsections this course", default=True, scope=Scope.settings)
+    check_all = Boolean(help="Whether to check a unit when click next/godynamo button", default=False, scope=Scope.settings)
     show_calculator = Boolean(help="Whether to show the calculator in this course", default=False, scope=Scope.settings)
     display_name = String(help="Display name for this module", default="Empty", display_name="Display Name", scope=Scope.settings)
     subject = String(help="Subject for this course", default="Empty", scope=Scope.settings)
