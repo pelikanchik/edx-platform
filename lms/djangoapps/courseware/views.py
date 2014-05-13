@@ -366,14 +366,12 @@ def index(request, course_id, chapter=None, section=None,
                 # Will add the first record to the history, if it is recently created
                 if created:
                     units = get_units_of_subsection(course_id, section)
-                    try:
+                    if len(units) > 0:
                         if section_module.position is None:
                             progress_history.update(units[0])
                         else:
                             progress_history.update(units[int(section_module.position)-1])
-                    except Exception as e:
-                        raise e
-
+                            
                 context['progress_history']  = json.loads(progress_history.units_chain)
 
             # model_data_cache_for_check = ModelDataCache.cache_for_descriptor_descendents(course_id, user, course, depth=None)
