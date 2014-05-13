@@ -151,11 +151,18 @@ function bindNewEdgeTo(ellipse, node){
 
                     //save_layout();
                     //load_layout();
-                    renderer.draw();
+                    //renderer.draw();
+                    //renderer.drawEdge()
+                    /*
 
-            //        for (var i = 0; i < g.edges.length; i++) {
-            //            g.drawEdge(g.edges[i]);
-            //        }
+                    for (var i = 0; i < this.graph.edges.length; i++) {
+                        this.drawEdge(this.graph.edges[i]);
+                    }
+                    */
+                    renderer.drawEdge(g.edges[g.edges.length - 1]);
+                    for (var i = 0; i < g.edges.length; i++) {
+                        renderer.drawEdge(g.edges[i]);
+                    }
 
 
                     $( this ).dialog( "close" );
@@ -219,7 +226,13 @@ function generateEdgeData(disjunctions_array, source){
         details = related_vertex_name + " " + splitter + ": " + option + " " + target_value + percent_sign;
 
         if (!about_source){
-            color = "#008";
+            //color = "#008";
+
+            // those three lines added by request
+            // otherwise there is an additional type of edge, 'almost complicated' one.
+            color = "#00F";
+            details = "сложно";
+            is_complicated = true;
         } else if (target_value === "0"){
             // green for correct answer
             if (condition["option"]==="more") color = "#0F0";
@@ -332,6 +345,8 @@ function createNodeRenameCallback( node){
 
 
 function showNodeDetails(node){
+    node.shape.name_popup.hide()
+
     var S;
 //    var message = names_obj[node.id]["name"];
     $(".node-data").remove();

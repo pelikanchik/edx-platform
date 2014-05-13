@@ -51,15 +51,7 @@ body.cs188 {
         }
       }
     }
-    li.next {
-      border-bottom: 2px solid $blue;
-      .assignment, .due_date {
-        &, a {
-          font-weight: bold;
-        }
-      }
-    }
-    li.godynamo {
+    li.next, li.godynamo {
       border-bottom: 2px solid $blue;
       .assignment, .due_date {
         &, a {

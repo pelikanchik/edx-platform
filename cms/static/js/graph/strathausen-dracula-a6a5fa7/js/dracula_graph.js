@@ -203,7 +203,10 @@ Graph.Renderer.Raphael = function(element, graph, width, height) {
             var clientX = e.clientX - (newX < 20 ? newX - 20 : newX > selfRef.width - 20 ? newX - selfRef.width + 20 : 0);
             var clientY = e.clientY - (newY < 20 ? newY - 20 : newY > selfRef.height - 20 ? newY - selfRef.height + 20 : 0);
             selfRef.isDrag.set.translate(clientX - Math.round(selfRef.isDrag.dx), clientY - Math.round(selfRef.isDrag.dy));
-            //            console.log(clientX - Math.round(selfRef.isDrag.dx), clientY - Math.round(selfRef.isDrag.dy));
+
+            selfRef.isDrag.set.name_popup.translate(clientX - Math.round(selfRef.isDrag.dx), clientY - Math.round(selfRef.isDrag.dy));
+
+            //console.log(Math.round(selfRef.isDrag.dx), Math.round(selfRef.isDrag.dy));
             for (var i in selfRef.graph.edges) {
                 selfRef.graph.edges[i].connection && selfRef.graph.edges[i].connection.draw();
             }
@@ -215,8 +218,9 @@ Graph.Renderer.Raphael = function(element, graph, width, height) {
     d.onmouseup = function () {
         //selfRef.isDrag && selfRef.isDrag.set.animate({"fill-opacity": .6}, 500);
         selfRef.isDrag && selfRef.isDrag.set.forEach(function(x){
-            if (x.type == "set") x.animate({"fill-opacity": .9}, 500)
-                else x.animate({"fill-opacity": .6}, 500)
+//            if (x.type == "set") x.animate({"fill-opacity": .9}, 500)
+//                else x.animate({"fill-opacity": .6}, 500)
+                x.animate({"fill-opacity": .6}, 500)
         })
         selfRef.isDrag = false;
         update_hover_area(selfRef);
@@ -233,6 +237,10 @@ function update_hover_area(selfRef){
         }
         selfRef.graph.edges[i].hover_area = initialize_hover_area(selfRef, selfRef.graph.edges[i]);
     }
+    for (i in selfRef.graph.nodes) {
+        selfRef.graph.nodes[i].shape.toFront();
+    }
+
 };
 
 
@@ -243,6 +251,9 @@ function initialize_hover_area(selfRef, edge){
 //    console.log(selfRef.getCanvas());
 
     result.attr({"stroke-width": 20, "stroke-opacity" : HOVER_AREA_OPACITY, "stroke": "#F00"});
+    //result.insertBefore(selfRef.graph.nodes)
+    //result.toBack();
+
     result.hover(
         function(){
             connection.attr({"stroke": "#000"});
@@ -293,12 +304,29 @@ Graph.Renderer.Raphael.prototype = {
     },
 
     renameNode: function(node, name) {
-        node.shape[1].attr({text: name});
+        // change vertex text
+        node.shape[1].attr({text: hideRestOfString(name)});
+
+        //shape.name_popup
+        //node.shape[2][1].attr({text: name});
+        node.shape.name_popup.remove();
+        var box = node.shape[0].getBBox()
+        node.shape.name_popup = this.r.popup(box.x + box.width, box.y, name);
+        /*
+        var box = node.shape[0].getBBox()
+        node.shape[2].remove();
+        node.shape[2] = this.r.popup(box.x + box.width, box.y, name);
+        */
+        //    [1].attr({text: node_name});
+        //node.shape[2][0].attr({text: node_name});
     },
 
     drawNode: function(node) {
 //        console.log("drawing node")
 //        console.log(node)
+//        console.log(node.layoutPosX);
+//        console.log(node.layoutPosY);
+        //var point = this.translate([node.layoutPosX*0.5 + 0.25, node.layoutPosY*0.5 + 0.25]);
         var point = this.translate([node.layoutPosX, node.layoutPosY]);
         node.point = point;
 
@@ -334,6 +362,7 @@ Graph.Renderer.Raphael.prototype = {
         }
 
         shape = node.render(this.r, node).hide();
+        shape.name_popup.hide()
 
         shape.attr({"fill-opacity": .6});
         /* re-reference to the node an element belongs to, needed for dragging all elements of a node */
@@ -344,7 +373,8 @@ Graph.Renderer.Raphael.prototype = {
             if (item.node != undefined){
                 item.node.style.cursor = "pointer";
             }
-            if (!node.hidden && item.type != "set"){
+            //if (!node.hidden && item.type != "set"){
+            if (!node.hidden){
                 item.show()
             }
         });
@@ -352,7 +382,9 @@ Graph.Renderer.Raphael.prototype = {
 
         var box = shape.getBBox();
         shape.translate(Math.round(point[0]-(box.x+box.width/2)),Math.round(point[1]-(box.y+box.height/2)))
+        shape.name_popup.translate(Math.round(point[0]-(box.x+box.width/2)),Math.round(point[1]-(box.y+box.height/2)))
         node.shape = shape;
+
     },
     drawEdge: function(edge) {
         /* if this edge already exists the other way around and is undirected */
@@ -447,22 +479,12 @@ Graph.Layout.Spring.prototype = {
     },
     
     layoutCalcBounds: function() {
-        var minx = Infinity, maxx = -Infinity, miny = Infinity, maxy = -Infinity;
+        var b = calcBounds(this.graph.nodes)
+        this.graph.layoutMinX = b.minx;
+        this.graph.layoutMaxX = b.maxx;
 
-        for (i in this.graph.nodes) {
-            var x = this.graph.nodes[i].layoutPosX;
-            var y = this.graph.nodes[i].layoutPosY;
-            
-            if(x > maxx) maxx = x;
-            if(x < minx) minx = x;
-            if(y > maxy) maxy = y;
-            if(y < miny) miny = y;
-        }
-
-        this.graph.layoutMinX = minx;
-        this.graph.layoutMaxX = maxx;
-        this.graph.layoutMinY = miny;
-        this.graph.layoutMaxY = maxy;
+        this.graph.layoutMinY = b.miny;
+        this.graph.layoutMaxY = b.maxy;
     },
     
     layoutIteration: function() {
@@ -576,7 +598,7 @@ Graph.Layout.Ordered.prototype = {
             node.layoutPosY = 0;
         }
             var counter = 0;
-            for (i in this.order) {
+            for (var i in this.order) {
                 var node = this.order[i];
                 node.layoutPosX = counter;
                 node.layoutPosY = Math.random();
@@ -585,23 +607,12 @@ Graph.Layout.Ordered.prototype = {
     },
     
     layoutCalcBounds: function() {
-        var minx = Infinity, maxx = -Infinity, miny = Infinity, maxy = -Infinity;
+        var b = calcBounds(this.graph.nodes)
+        this.graph.layoutMinX = b.minx;
+        this.graph.layoutMaxX = b.maxx;
 
-        for (i in this.graph.nodes) {
-            var x = this.graph.nodes[i].layoutPosX;
-            var y = this.graph.nodes[i].layoutPosY;
-            
-            if(x > maxx) maxx = x;
-            if(x < minx) minx = x;
-            if(y > maxy) maxy = y;
-            if(y < miny) miny = y;
-        }
-
-        this.graph.layoutMinX = minx;
-        this.graph.layoutMaxX = maxx;
-
-        this.graph.layoutMinY = miny;
-        this.graph.layoutMaxY = maxy;
+        this.graph.layoutMinY = b.miny;
+        this.graph.layoutMaxY = b.maxy;
     }
 };
 
@@ -620,7 +631,15 @@ Graph.Layout.Saved.prototype = {
 
     layoutPrepare: function() {
         var counter = 0;
-        for (i in this.graph.nodes) {
+
+        /*
+        this.graph.layoutMinX = this.b.minx;
+        this.graph.layoutMaxX = this.b.maxx;
+
+        this.graph.layoutMinY = this.b.miny;
+        this.graph.layoutMaxY = this.b.maxy;
+        */
+        for (var i in this.graph.nodes) {
             var node = this.graph.nodes[i];
             node.layoutPosX = this.x[counter];
             node.layoutPosY = this.y[counter];
@@ -629,23 +648,21 @@ Graph.Layout.Saved.prototype = {
     },
 
     layoutCalcBounds: function() {
-        var minx = Infinity, maxx = -Infinity, miny = Infinity, maxy = -Infinity;
+        var b = calcBounds(this.graph.nodes)
+        this.graph.layoutMinX = b.minx;
+        this.graph.layoutMaxX = b.maxx;
 
-        for (i in this.graph.nodes) {
-            var x = this.graph.nodes[i].layoutPosX;
-            var y = this.graph.nodes[i].layoutPosY;
+        this.graph.layoutMinY = b.miny;
+        this.graph.layoutMaxY = b.maxy;
+        console.log(b);
+        /*
+        this.graph.layoutMinX = 0//0.0804416403785;
+        this.graph.layoutMaxX = 1//0.856466876972;
 
-            if(x > maxx) maxx = x;
-            if(x < minx) minx = x;
-            if(y > maxy) maxy = y;
-            if(y < miny) miny = y;
-        }
+        this.graph.layoutMinY = 0//0.262857142857;
+        this.graph.layoutMaxY = 1//0.808571428571;
+        */
 
-        this.graph.layoutMinX = minx;
-        this.graph.layoutMaxX = maxx;
-
-        this.graph.layoutMinY = miny;
-        this.graph.layoutMaxY = maxy;
     }
 };
 
@@ -656,6 +673,21 @@ Graph.Layout.Saved.prototype = {
 
 function log(a) {console.log&&console.log(a);}
 
+function calcBounds(nodes) {
+    var minx = Infinity, maxx = -Infinity, miny = Infinity, maxy = -Infinity;
+
+    for (i in nodes) {
+        var x = nodes[i].layoutPosX;
+        var y = nodes[i].layoutPosY;
+
+        if(x > maxx) maxx = x;
+        if(x < minx) minx = x;
+        if(y > maxy) maxy = y;
+        if(y < miny) miny = y;
+    }
+    var bounds = {"minx" : minx, "miny" : miny, "maxx" : maxx, "maxy" : maxy};
+    return bounds;
+}
 /*
  * Raphael Tooltip Plugin
  * - attaches an element as a tooltip to another element

@@ -268,7 +268,7 @@ nav.sequence-nav {
       box-shadow: 0 1px 0 rgba(255, 255, 255, .7) inset;
       z-index: 1;
 
-      &.prev, &.next, &.godynamo {
+      &.prev, &.next, &.godynamo, &.gobackdynamo {
 
         a {
           background-position: center;
@@ -295,7 +295,7 @@ nav.sequence-nav {
         }
       }
 
-      &.prev {
+      &.prev, &.gobackdynamo {
         left: -10px;
         border-radius: 35px 0 0 35px;
 
@@ -305,18 +305,7 @@ nav.sequence-nav {
         }
       }
 
-      &.next {
-        right: -10px;
-        border-radius: 0 35px 35px 0;
-
-        a {
-          margin-left: 30px;
-          background-image: url('../images/sequence-nav/next-icon.png');
-          background-position: center 15px;
-        }
-      }
-
-      &.godynamo {
+      &.next, &.godynamo {
         right: -10px;
         border-radius: 0 35px 35px 0;
 
@@ -354,7 +343,7 @@ nav.sequence-bottom {
       @include linear-gradient(top, #eee, #ddd);
       box-shadow: 0 1px 0 rgba(255, 255, 255, .7) inset;
 
-      &.prev, &.next, &.godynamo {
+      &.prev, &.next, &.godynamo, &.gobackdynamo {
         margin-bottom: 0;
 
         a {
@@ -382,7 +371,7 @@ nav.sequence-bottom {
         }
       }
 
-      &.prev {
+      &.prev, &.gobackdynamo {
         border-radius: 35px 0 0 35px;
 
         a {
@@ -391,17 +380,7 @@ nav.sequence-bottom {
         }
       }
 
-      &.next {
-        border-radius: 0 35px 35px 0;
-        border-left: none;
-
-        a {
-          background-image: url('../images/sequence-nav/next-icon.png');
-          background-position: center 15px;
-        }
-      }
-
-      &.godynamo {
+      &.next, &.godynamo, {
         border-radius: 0 35px 35px 0;
         border-left: none;
 
