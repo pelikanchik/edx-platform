@@ -318,7 +318,8 @@ function canvasDbClick(e) {
     var is_defined = true;
     var bad_nodes = 0;
     jQuery.each(names_obj, function(id, obj) {
-
+        console.log((obj["coords_x"]))
+        console.log((obj["coords_y"]))
         if ((obj["coords_x"]==="None") || (obj["coords_y"]==="None")) {
             x_arr.push(Math.random());
             y_arr.push(Math.random());

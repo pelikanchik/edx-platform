@@ -1,5 +1,7 @@
+<%! import json %>
 <%! from django.core.urlresolvers import reverse %>
 <%! from contentstore.utils import compute_unit_state %>
+<%! from contentstore.views.component import get_dependent_units %>
 <%! from xmodule.modulestore.django import loc_mapper %>
 <%! from django.utils.translation import ugettext as _ %>
 
@@ -23,9 +25,14 @@ This def will enumerate through a passed in subsection and list all of the units
   % for unit in subsection_units:
   <%
     unit_locator = loc_mapper().translate_location(context_course.location.course_id, unit.location, False, True)
-  %>
+    unit.dependent_units = json.dumps(get_dependent_units(unit.url_name, subsection_units, context_course.location.course_id))
+   %>
   <li class="courseware-unit unit is-draggable" data-locator="${unit_locator}"
-      data-parent="${subsection_locator}">
+      data-parent="${subsection_locator}"
+
+        data-dependent_units="${unit.dependent_units|h}"
+
+          >
 
     <%include file="_ui-dnd-indicator-before.html" />
 

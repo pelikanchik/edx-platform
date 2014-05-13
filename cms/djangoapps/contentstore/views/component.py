@@ -16,6 +16,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.util.date_utils import get_default_time_display
 from xmodule.modulestore.django import loc_mapper
 from xmodule.modulestore.locator import BlockUsageLocator
+#from xmodule.seq_module import check_term
 
 from xblock.fields import Scope
 from util.json_request import expect_json, JsonResponse
@@ -53,6 +54,61 @@ ADVANCED_COMPONENT_CATEGORY = 'advanced'
 ADVANCED_COMPONENT_POLICY_KEY = 'advanced_modules'
 
 
+def clean_term_of_dependencies(input_term, url_name):
+    output_term = []
+    #input_term = check_term(json.loads(str(input_term)))
+    input_term = json.loads(str(input_term))
+    for element_term in input_term:
+        print (element_term)
+        if element_term["direct_element_id"] != url_name:
+
+            output_element_term = {"direct_element_id": element_term["direct_element_id"], "disjunctions":[] }
+
+            for disjunction in element_term["disjunctions"]:
+
+                output_disjunction = {"conjunctions":[]}
+                for conjunction in disjunction["conjunctions"]:
+                    if conjunction["source_element_id"] != url_name:
+                        output_disjunction["conjunctions"].append(conjunction)
+
+                if (output_disjunction["conjunctions"]):
+                    output_element_term["disjunctions"].append(output_disjunction)
+            if (output_element_term["disjunctions"]):
+               output_term.append(output_element_term)
+
+    return json.dumps(output_term)
+
+
+def get_dependent_units(unit_id, units, course_id):
+    as_direct_unit = []
+    as_source_unit = []
+    as_direct_unit_filtered = []
+    as_source_unit_filtered = []
+
+    for unit in units:
+        #term = check_term(json.loads(str(unit.direct_term_with_default)))
+        term = json.loads(str(unit.direct_term_with_default))
+        for element_term in term:
+
+            if element_term["direct_element_id"] == unit_id and unit.url_name != unit_id:
+                as_direct_unit.append({"name": unit.display_name, "url": loc_mapper().translate_location(course_id, unit.location, False, True).url_reverse('unit')})
+
+            for disjunction in element_term["disjunctions"]:
+                for conjunction in disjunction["conjunctions"]:
+                    if conjunction["source_element_id"] == unit_id and unit.url_name != unit_id:
+                       as_source_unit.append({"name": unit.display_name, "url": loc_mapper().translate_location(course_id, unit.location, False, True).url_reverse('unit')})
+
+    for element in as_direct_unit:
+        if element not in as_direct_unit_filtered:
+            as_direct_unit_filtered.append(element)
+
+    for element in as_source_unit:
+      if element not in as_source_unit_filtered:
+        as_source_unit_filtered.append(element)
+
+    return {"as_direct_unit": as_direct_unit_filtered, "as_source_unit":as_source_unit_filtered}
+
+
 # checking if section with id = section_id doesn't exist in sections
 def is_section_exist(section_id, sections):
     for section in sections:
@@ -68,14 +124,7 @@ def is_section_exist(section_id, sections):
 @login_required
 def show_graph(request, tag=None, package_id=None, branch=None, version_guid=None, block=None):
 
-    print ("packis")
-    print (package_id)
-    print (branch)
-    print (version_guid)
-    print (block)
-
     locator = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
-    print (locator)
     try:
         old_location, course, item, lms_link = _get_item_in_course(request, locator)
     except ItemNotFoundError:
@@ -91,16 +140,6 @@ def show_graph(request, tag=None, package_id=None, branch=None, version_guid=Non
     data_string = "{"
     names_string = "{"
     locators_dict = {}
-    print "!!!!!"
-    print "!!!!!"
-    print "!!!!!"
-    print "!!!!!"
-    print item
-    print "!!!!!"
-    print "!!!!!"
-    print "!!!!!"
-    print "!!!!!"
-    print "!!!!!"
     for every_unit in item.get_children():
 
         every_unit_locator = loc_mapper().translate_location(None, every_unit.location)
@@ -234,7 +273,6 @@ def subsection_handler(request, tag=None, package_id=None, branch=None, version_
             state = compute_unit_state(unit)
             if state == UnitState.public or state == UnitState.draft:
                 can_view_live = True
-                break
 
         course_locator = loc_mapper().translate_location(
             course.location.course_id, course.location, False, True

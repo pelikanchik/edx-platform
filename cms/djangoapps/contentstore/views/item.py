@@ -12,6 +12,8 @@ from xmodule_modifiers import wrap_xblock
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.decorators import login_required
 
+from xmodule.modulestore import Location
+
 from xmodule.modulestore.django import modulestore, loc_mapper
 from xmodule.modulestore.inheritance import own_metadata
 from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
@@ -34,6 +36,8 @@ from xblock.fields import Scope
 from preview import handler_prefix, get_preview_html
 from edxmako.shortcuts import render_to_response, render_to_string
 from models.settings.course_grading import CourseGradingModel
+
+from contentstore.views.component import get_dependent_units, clean_term_of_dependencies
 
 __all__ = ['orphan_handler', 'xblock_handler']
 
@@ -330,9 +334,16 @@ def _delete_item_at_location(item_location, delete_children=False, delete_all_ve
     store = get_modulestore(item_location)
 
     item = store.get_item(item_location)
-    print("deleting things now at")
-    print(store)
-    print(item)
+    parent_locs = modulestore('direct').get_parent_locations(item_location, None)
+    # Если имеем дело с юнитом, перебираем соседей и очищаем их direct_term от зависимостей
+    if item.category == 'vertical':
+        for parent_loc in parent_locs:
+            parent = modulestore('direct').get_item(parent_loc)
+            for brother_item_location in parent.children:
+                brother_item = store.get_item(brother_item_location)
+                brother_item.direct_term = clean_term_of_dependencies(brother_item.direct_term, item.url_name)
+                brother_item.save()
+                store.update_metadata(brother_item_location, own_metadata(brother_item))
 
     if delete_children:
         _xmodule_recurse(item, lambda i: store.delete_item(i.location, delete_all_versions))
@@ -342,36 +353,10 @@ def _delete_item_at_location(item_location, delete_children=False, delete_all_ve
     # cdodge: we need to remove our parent's pointer to us so that it is no longer dangling
     if delete_all_versions:
         parent_locs = modulestore('direct').get_parent_locations(item_location, None)
-        print("parent locs:")
-        print(parent_locs)
 
         for parent_loc in parent_locs:
-            print(parent_loc["name"])
             parent = modulestore('direct').get_item(parent_loc)
             item_url = item_location.url()
-            """
-            print(item_url)
-            print(parent)
-            course_locator = loc_mapper().translate_location(None, parent_loc["name"])
-            print(course_locator)
-                    temp_key = "direct_term"
-                    json_array = json.loads(value)
-
-                    for x in json_array:
-                        old_loc = str(loc_mapper().translate_locator_to_location(x["direct_element_id"]))
-                        i = old_loc.rfind("/")
-                        short_name = old_loc[i+1:]
-                        x["direct_element_id"] = short_name
-                        for every_edge in x["disjunctions"]:
-                            for every_cond in every_edge["conjunctions"]:
-                                old_loc = str(loc_mapper().translate_locator_to_location(every_cond["source_element_id"]))
-                                i = old_loc.rfind("/")
-                                short_name = old_loc[i+1:]
-                                every_cond["source_element_id"] = short_name
-
-                    temp_value = json.dumps(json_array)
-            """
-
             if item_url in parent.children:
                 children = parent.children
                 children.remove(item_url)
@@ -379,6 +364,7 @@ def _delete_item_at_location(item_location, delete_children=False, delete_all_ve
                 modulestore('direct').update_children(parent.location, parent.children)
 
     return JsonResponse()
+
 
 
 # pylint: disable=W0613
