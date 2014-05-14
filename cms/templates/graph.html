@@ -96,6 +96,16 @@
         <div id="node-edges-list">
             <p class = "node-edges-message"> ${_('Neighbours List')} </p>
         </div>
+        <!--
+        <a href="#" class="delete-section-button" data-locator="JLU.H101.strangeEons/branch/draft/block/verticale89" data-tooltip="Delete this unit"><i class="icon-trash"></i><span class="sr">Delete unit</span></a>
+        <a href="#" class="delete-unit-button action" data-locator="JLU.H101.strangeEons/branch/draft/block/verticale89" data-tooltip="Delete this unit"><i class="icon-trash"></i><span class="sr">Delete unit</span></a>
+        -->
+        <a href="#" class="delete-node-button" >
+            <i class="icon-trash"></i>
+            <span class="sr">Delete unit</span>
+        </a>
+
+
     </div>
     <div id="add-new-node" title="${_('Adding a new node')}">
         <input id="node-name-input" data-bind='value: value, valueUpdate: "afterkeydown"'/>
@@ -105,6 +115,9 @@
     </div>
     <div id="confirm-edge-deletion" title="${_('Are you sure?')}">
         <p>${_('Are you sure you want this edge removed?')}</p>
+    </div>
+    <div id="delete-node" title="${_('Delete this Unit?')}">
+        <p>${_('Deleting this Section is permanent and cannot be undone.')}</p>
     </div>
     <div id="node-add-condition" title="${_('Direct Term')}">
         <table>

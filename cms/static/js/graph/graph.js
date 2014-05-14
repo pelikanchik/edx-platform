@@ -258,7 +258,9 @@ function canvasDbClick(e) {
 
 
     g = new Graph();
-
+    //$('.unit .item-actions .delete-unit-button').bind('click', deleteUnit);
+    //console.log(exitMode);
+    //console.log(deleteUnit);
 /*
         var set = r.set().push(
                 r.rect(n.point[0]-30, n.point[1]-13, 60, 44).attr({"fill": "#feb", r : "12px", "stroke-width" : n.distance == 0 ? "3px" : "1px" })).push(
@@ -318,8 +320,6 @@ function canvasDbClick(e) {
     var is_defined = true;
     var bad_nodes = 0;
     jQuery.each(names_obj, function(id, obj) {
-        console.log((obj["coords_x"]))
-        console.log((obj["coords_y"]))
         if ((obj["coords_x"]==="None") || (obj["coords_y"]==="None")) {
             x_arr.push(Math.random());
             y_arr.push(Math.random());

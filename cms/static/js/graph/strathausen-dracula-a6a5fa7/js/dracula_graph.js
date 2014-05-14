@@ -106,6 +106,7 @@ Graph.prototype = {
         */
     },
     removeNode: function(id) {
+        this.nodes[id].hide()
         delete this.nodes[id];
         for(var i = 0; i < this.edges.length; i++) {
             if (this.edges[i].source.id == id || this.edges[i].target.id == id) {
@@ -654,7 +655,7 @@ Graph.Layout.Saved.prototype = {
 
         this.graph.layoutMinY = b.miny;
         this.graph.layoutMaxY = b.maxy;
-        console.log(b);
+        //console.log(b);
         /*
         this.graph.layoutMinX = 0//0.0804416403785;
         this.graph.layoutMaxX = 1//0.856466876972;

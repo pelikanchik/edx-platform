@@ -29,6 +29,27 @@ function ajax_save_node(id, metadata, change_status){
     }
 
 }
+function ajax_delete_node(id, recurse, all_versions){
+    recurse = (typeof recurse !== 'undefined') ? recurse : true;
+    all_versions = (typeof all_versions !== 'undefined') ? all_versions : true;
+/*                    var deleting = new NotificationView.Mini({
+                        title: gettext('Deleting&hellip;')
+                    });
+                    deleting.show();
+*/
+    $.ajax({
+        //url: "/save_item",
+        url: "/xblock/" + id +'?'+ $.param({recurse: recurse, all_versions: all_versions}),
+        type: "DELETE",
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        success: function () {
+            $( "#node-details" ).dialog( "close" )
+            g.removeNode(id)
+        }
+    });
+}
 
 function ajax_publish_node(id){
 // POST http://0.0.0.0:8001/xblock/JLU.H101.strangeEons%2Fbranch%2Fdraft%2Fblock%2Fverticalf5b
@@ -129,7 +150,6 @@ function bindNewEdgeTo(ellipse, node){
               }
         });
     }
-
 
 function generateEdgeData(disjunctions_array, source){
     var details;
@@ -238,7 +258,6 @@ function createEdgeDeletionCallback( source_node_number, edge_number, string_id)
                 var metadata = {}
                 metadata.display_name = names_obj[source_id]["name"];
                 var locator_term = edges_arr[source_node_number]
-                console.log(locator_term)
 
                 metadata.locator_term = JSON.stringify(edges_arr[source_node_number]);
                 //metadata.direct_term = JSON.stringify(edges_arr[origin_node_number]);
@@ -271,14 +290,11 @@ function createNodeRenameCallback( node){
               buttons: {
                 Ok: function() {
 
-                    // TODO: make a function about metadata or something
-
                     var node_name = $("#node-rename-input").val();
                     names_obj[node.id]["name"] = node_name;
 
                     var metadata = {}
                     metadata.display_name = node_name;
-
                     var locator_term = names_obj[node.id]["locator"]
                     ajax_save_node(locator_term, metadata, true);
                     // renaming a node leads to drafting it.
@@ -294,6 +310,31 @@ function createNodeRenameCallback( node){
     }
 }
 
+function createNodeDeletionCallback (node){
+    console.log("created callback" + node.id)
+  return function(){
+        // TODO: make this into standard PromptView.Warning (like in base.js), when I get this Require.js stuff
+        console.log("in callback")
+        $( "#delete-node" ).dialog({
+              modal: true,
+              //height: 300,
+              //width: 350,
+              buttons: {
+                Ok: function() {
+
+                    var locator_term = names_obj[node.id]["locator"]
+                    ajax_delete_node(locator_term);
+
+                    //renderer.renameNode(node, node_name)
+                    $( this ).dialog( "close" );
+                },
+                "Отмена": function() {
+                    $( this ).dialog( "close" );
+                }
+              }
+        });
+    }
+}
 
 
 
@@ -301,7 +342,6 @@ function showNodeDetails(node){
     node.shape.name_popup.hide()
 
     var S;
-//    var message = names_obj[node.id]["name"];
     $(".node-data").remove();
     $.each(data_obj[node.id], function(number) {
         if (data_obj[node.id][number].type != undefined){
@@ -321,86 +361,56 @@ function showNodeDetails(node){
 
     $(".node-edit-link").attr("href", "/unit/" + names_obj[node.id]["locator"]);
 
-    /*
-    $(".node-edit-link").
-        attr("href", "/vertex/edit/" + names_obj[node.id]["location"]).
-        fancybox({
-            width         : '75%',
-            height        : '80%',
-            autoScale     : false,
-            autoSize      : false,
-            autoDimensions: false,
-            fitToView     : false,
-            type          : 'iframe',
-    //            hideOnOverlayClick:false,
-    //            hideOnContentClick:false,
-            closeClick: false,
-            helpers     : {
-                overlay : {closeClick: false} // prevents closing when clicking OUTSIDE fancybox
-            }
-        })
+    var node_number = ids_arr.indexOf(node.id);
+    for(var i=0; i<edges_arr[node_number].length; i++) {
+        var edge = edges_arr[node_number][i];
+        var target_id = edge.direct_element_id;
+
+        var string_id = "node-edges-" + i;
+        var img_id = "delete-" + string_id;
+        S = names_obj[target_id]["name"];
+        var text_description = "Сложное условие";
+
+        var data = generateEdgeData(edge.disjunctions, node.id).description;
+        if (data.is_complicated) {
+            text_description = "Сложное условие"
+        } else {
+               text_description = "Если набрать в " + data.related_vertex_name + " " + data.sign + " " + data.value + data.percent;
+        }
+
+        // TODO:
+        // make a normal function generating this string
+        var img_src = $("#Delete-icon-base").attr("src");
+        $( "#node-edges-list").append(
+            "<p class=\"node-data " + string_id + "\"><abbr title=\"" + text_description + "\">" + S + "</abbr>"
+            + "<img class = \"close " + string_id + "\" src = \"" + img_src + "\" id = \"" + img_id + "\"/>"
+            + "</p>"
+        );
+
+        console.log("handlers")
+        var handler = createEdgeDeletionCallback(node_number, i, string_id);
+        console.log(handler)
+
+        $( "#" + img_id ).unbind( "click");
+        $( "#" + img_id ).bind( "click", handler );
+
+        /*
+        $( "#node-edges-list").append(
+            "<p class=\"node-data " + string_id + "\" title=\"" + text_description + "\">"
+            + S + "</p>"
+        );
         */
-        var node_number = ids_arr.indexOf(node.id);
-        for(var i=0; i<edges_arr[node_number].length; i++) {
-//            console.log(g.nodes[origin_node].edges[i]);
-//            var e = g.nodes[node.id].edges[i];
-//            if (e.source.id == node.id){
-            var edge = edges_arr[node_number][i];
-            var target_id = edge.direct_element_id;
 
-            var string_id = "node-edges-" + i;
-            var img_id = "delete-" + string_id;
-//            alert(img_id);
-            S = names_obj[target_id]["name"];
-            var text_description = "Сложное условие";
-
-            var data = generateEdgeData(edge.disjunctions, node.id).description;
-            console.log(data)
-            if (data.is_complicated) text_description = "Сложное условие"
-                else
-                    text_description = "Если набрать в " + data.related_vertex_name + " " + data.sign + " " + data.value + data.percent;
-
-
-            // TODO:
-            // make a normal function generating this string
-//                + "<img class = \"close\" src = \"/static/img/Delete-icon.png\" data-bind='click: $root.removeDisjunction'/>"
-//<abbr
-            var img_src = $("#Delete-icon-base").attr("src");
-            $( "#node-edges-list").append(
-                "<p class=\"node-data " + string_id + "\"><abbr title=\"" + text_description + "\">" + S + "</abbr>"
-                + "<img class = \"close " + string_id + "\" src = \"" + img_src + "\" id = \"" + img_id + "\"/>"
-                + "</p>"
-            );
-
-//            var handler = createEdgeDeletionCallback(edge, node.id);
-            var handler = createEdgeDeletionCallback(node_number, i, string_id);
-
-            $( "#" + img_id ).unbind( "click");
-            $( "#" + img_id ).bind( "click", handler );
-            /*
-            $( "#node-edges-list").append(
-                "<p class=\"node-data " + string_id + "\" title=\"" + text_description + "\">"
-                + S + "</p>"
-            );
-            */
-
-        };
+    };
+    var handler = createNodeDeletionCallback(node);
+    console.log(handler)
+    $('.delete-node-button .icon-trash').unbind('click');
+    $('.delete-node-button .icon-trash').bind('click', handler);
 
     $( "#node-details" ).dialog({
           modal: true,
           buttons: {
             Ok: function() {
-
-/*
-                var node_name = $("#node-name-input").val();
-        var metadata = $.extend({}, unit_edit.model.get('metadata'));
-
-        metadata.display_name = names_obj[origin_node]["name"];
-        metadata.direct_term = JSON.stringify(edges_arr[origin_node_number]);
-
-        $(".graph_string").html(JSON.stringify(edges_arr));
-        ajax_save_item(names_obj[origin_node]["location"], metadata);
-*/
                 $( this ).dialog( "close" );
             },
             "Новое ребро": function() {
