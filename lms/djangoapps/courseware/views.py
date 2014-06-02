@@ -363,14 +363,24 @@ def index(request, course_id, chapter=None, section=None,
 
             if get_course(course_id).has_dynamic_graph:
                 progress_history, created = ProgressHistory.objects.get_or_create(user=user, course_id=course_id, subsection_id=section)
+                units = get_units_of_subsection(course_id, section)
                 # Will add the first record to the history, if it is recently created
                 if created:
-                    units = get_units_of_subsection(course_id, section)
                     if len(units) > 0:
                         if section_module.position is None:
                             progress_history.update(units[0])
                         else:
                             progress_history.update(units[int(section_module.position)-1])
+                else:
+                    # If there are units in the progress history, 
+                    # which are not entered to the subsection, will remove them.
+                    # This is necessary if some units were removed from a subsection of 
+                    # a course, which is in progress.
+                    modified = progress_history.remove_ghost_records(units)
+                    if modified:
+                        # Select current position the first unit of the subsection
+                        context['position'] = 1
+                        context['history_position'] = 1
 
                 context['progress_history']  = json.loads(progress_history.units_chain)
 
@@ -813,7 +823,8 @@ def reset_progress_history(request, course_id, subsection_id):
 
     try:
         progress_history = ProgressHistory.objects.get(user=user, course_id=course_id, subsection_id=subsection_id)
-        progress_history.reset()
+        units = get_units_of_subsection(course_id, subsection_id)
+        progress_history.reset(units[0])
     except Exception:
         raise Http404
 

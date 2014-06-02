@@ -720,17 +720,26 @@ class ProgressHistory(models.Model):
         self.units_chain = json.dumps([])
         self.save()
 
-    def reset(self):
+    def reset(self, first_unit):
         """
-        Removes all units from the progress history except the first unit.
+        Removes all units from the progress history and append first_unit to the new history.
         """
         history_arr = json.loads(self.units_chain)
         try:
-            self.units_chain = json.dumps([history_arr[0]])
+            self.units_chain = json.dumps([first_unit])
             self.save()
         except IndexError as e:
             raise e
 
+    def remove_ghost_records(self, subsection_units):
+        """
+        Removes all units from the history, which are not contained in subsection's units 
+        """
+        history_arr = json.loads(self.units_chain)
+        new_history_arr = filter(lambda unit: unit in subsection_units, history_arr)
+        self.units_chain = json.dumps(new_history_arr)
+        self.save()
+        return len(history_arr) != len(new_history_arr)
 
 
 #### Helper methods for use from python manage.py shell and other classes.

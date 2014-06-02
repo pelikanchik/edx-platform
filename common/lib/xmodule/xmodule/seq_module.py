@@ -245,6 +245,11 @@ class SequenceModule(SequenceFields, XModule):
                 childinfo['title'] = child.display_name_with_default
             contents[child.id] = childinfo
 
+        if 'position' in context:
+            self.position = context['position']
+        if 'history_position' in context:
+            self.history_position = context['history_position']
+            
         params = {'items': contents,
                   'element_id': self.location.html_id(),
                   'course_id': self.course_id,

@@ -93,6 +93,7 @@ class @Sequence
 
   toggleArrows: =>
     @$('.sequence-nav-buttons a').unbind('click')
+    @$('.resethistory').unbind('click')
     @$('.sequence-nav-buttons .godynamo a').removeClass('disabled').click(@godynamo)
     @$('.sequence-nav-buttons .gobackdynamo a').removeClass('disabled').click(@gobackdynamo)
     $('.resethistory').click(@reset_history)
@@ -115,7 +116,7 @@ class @Sequence
       @$('.sequence-nav-buttons .next a').removeClass('disabled').click(@next)
 
   render: (new_position, new_history_position) ->
-    if @position != new_position or (new_history_position? and @history_position != new_history_position)
+    if @position != new_position or (new_history_position? and @history_position != new_history_position) or @$("#sequence-list").children().length == 0
       if @position != undefined
         modx_full_url = @ajaxUrl + '/goto_position'
         post_data = {position: new_position}
@@ -293,7 +294,7 @@ class @Sequence
     subsection_id = @id.substr(@id.indexOf('sequential/') + 'sequential/'.length)
     modx_full_url = @ajaxUrl.substr(0, @ajaxUrl.indexOf('/xblock')) + '/reset_history/' + subsection_id
     $.postWithPrefix modx_full_url, (response) =>
-      @$("#sequence-list").children().first().nextAll().remove()
+      @$("#sequence-list").children().remove()
 
       Logger.log "seq_reset_history", old: @position, new: 1, id: @id
 
