@@ -170,17 +170,27 @@ require(["domReady!", "jquery", "js/models/module_info", "coffee/src/views/unit"
                 }];
                 */
 
+
+
                 var input_json = '${direct_term|h}'.replace(/\&#34;/g, '"');
 
                 var input_data = $.parseJSON(input_json);
-
+                console.log(input_data);
+                console.log('${options|h}');
 
                 options = '${options|h}'.replace(/\&#34;/g, '"');
+                options = options.replace(/\\\(/g,'');
+                options = options.replace(/\\\)/g,'');
+
                 splitters = '${splitters|h}'.replace(/\&#34;/g, '"');
 
+
+                console.log(options);
                 options = $.parseJSON(options);
+                console.log(options);
                 splitters = $.parseJSON(splitters);
 
+                console.log(splitters);
 
                 splitters = [
                     {id:"score_rel",    parent_id:"",   title:gettext("Score (relative, %)")},
