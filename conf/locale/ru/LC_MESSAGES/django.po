@@ -5107,6 +5107,14 @@ msgstr "неизвестно"
 msgid "Course errors"
 msgstr "Ошибки курса"
 
+#: lms/templates/courseware/instructor_dashboard.html:833
+msgid "First attempt"
+msgstr "Первая попытка"
+
+#: lms/templates/courseware/instructor_dashboard.html:834
+msgid "Last attempt"
+msgstr "Последняя попытка"
+
 #: lms/templates/courseware/mktg_coming_soon.html:11
 msgid "About {course_id}"
 msgstr "О курсе {course_id}"
