@@ -37,7 +37,7 @@ from courseware import grades
 from courseware.access import has_access
 from courseware.courses import get_course_with_access, get_cms_course_link
 from courseware.roles import CourseStaffRole, CourseInstructorRole, CourseBetaTesterRole, GlobalStaff
-from courseware.models import StudentModule
+from courseware.models import StudentModule, StudentModuleHistory
 from django_comment_common.models import (Role,
                                           FORUM_ROLE_ADMINISTRATOR,
                                           FORUM_ROLE_MODERATOR,
@@ -175,10 +175,21 @@ def instructor_dashboard(request, course_id):
         wb = Workbook()
         ws = wb.get_active_sheet()
 
-        set_border(ws, len(datatable['data']) + 1, sum(datatable['col_size']), Border.BORDER_THIN)
+        set_border(ws, len(datatable['data']) + 2, sum(datatable['col_size']), Border.BORDER_THIN)
         cur_column = 0
         for i, h in enumerate(datatable['header']):
-            ws.merge_cells(start_row=0, start_column=cur_column, end_row=0, end_column=cur_column+datatable['col_size'][i] - 1)
+            ws.merge_cells(start_row=0, start_column=cur_column, end_row=datatable['row_size'][i] - 1, end_column=cur_column+datatable['col_size'][i] - 1)
+            if cur_column >= datatable['inf_count']:
+                ws.merge_cells(start_row=1, start_column=cur_column, end_row=1, end_column=cur_column+datatable['col_size'][i]/2 - 1)
+                c = ws.cell(row=1, column=cur_column)
+                c.value = _u('First attempt')
+                c.style.fill.fill_type = Fill.FILL_SOLID
+                c.style.fill.start_color.index = openpyxl.style.Color.Header
+                ws.merge_cells(start_row=1, start_column=cur_column+datatable['col_size'][i]/2, end_row=1, end_column=cur_column+datatable['col_size'][i] - 1)
+                c = ws.cell(row=1, column=cur_column+datatable['col_size'][i]/2)
+                c.value = _u('Last attempt')
+                c.style.fill.fill_type = Fill.FILL_SOLID
+                c.style.fill.start_color.index = openpyxl.style.Color.Header
             c = ws.cell(row=0, column=cur_column)
             cur_column += datatable['col_size'][i]
             c.value = h
@@ -186,7 +197,7 @@ def instructor_dashboard(request, course_id):
             c.style.fill.start_color.index = openpyxl.style.Color.Header
 
         signs = set([u'>', u'<', u'='])
-        for i, datarow in enumerate(datatable['data'], start=1):
+        for i, datarow in enumerate(datatable['data'], start=2):
             cur_column = 0
             for j, data in enumerate(datarow):
                 if type(data) == list:
@@ -320,7 +331,59 @@ def instructor_dashboard(request, course_id):
 
         return questions_id
 
+    # Returns a list of student' answers
+    def extract_answers(data, questions_id, problem_id, html_dump):
+        answers = {}
+        for j in data['student_answers'].keys():
+            found = j.find('_dynamath')
+            if found > 0:
+                tmp = j.find(problem_id) + len(problem_id) + 1
+                key = j[:j.find('_', tmp + 1)]
+                if html_dump:
+                    correctness = data['correct_map'][j[:found]]['correctness']
+                    answers[key] = {j[:found]:[data['student_answers'][j].encode('utf-8'), correctness]}
+            else:
+                tmp = j.find(problem_id) + len(problem_id) + 1
+                key = j[:j.find('_', tmp + 1)]
+                if key not in answers:
+                    if data['student_answers'][j] == '':
+                        answers[key] = {j:[]}
+                    else:
+                        correctness = data['correct_map'][j]['correctness']
+                        answers[key] = {j:[data['student_answers'][j], correctness]}
+                elif j not in answers[key]:
+                    answers[key][j] = [data['student_answers'][j], correctness]
 
+        answers = OrderedDict(sorted(answers.items(), key=lambda t: t[0]))
+        answers_list = []
+
+        for q in questions_id.keys():
+            if q in answers:
+                if questions_id[q] != None:
+                    if 'sorting' in questions_id[q]:
+                        sorted_asnwers = {}
+                        for item in answers[q].items():
+                            sorted_asnwers[int(item[1][0])] = questions_id[q][item[0]]
+                        sorted_asnwers = OrderedDict(sorted(sorted_asnwers.items(), key=lambda t: t[0]))
+                        answers_str = ''
+                        for value in sorted_asnwers.values():
+                            answers_str += value + ' | '
+                        answers_list.append([answers_str[:-3], answers[q].values()[0][1]])
+                    elif 'choicegroup' in questions_id[q]:
+                        for value in answers[q].values():
+                            answers_str = ''
+                            if type(value[0]) == list:
+                                for choise in value[0]:
+                                    answers_str += questions_id[q][choise] + ' | '
+                                answers_list.append([answers_str[:-3], value[1]])
+                            else:
+                                answers_list.append([questions_id[q][value[0]], value[1]])
+                else:
+                    for value in answers[q].values():
+                        answers_list.append(value)
+            else:
+                answers_list.append([])
+        return answers_list
 
     # process actions from form POST
     action = request.POST.get('action', '')
@@ -689,23 +752,23 @@ def instructor_dashboard(request, course_id):
 
     elif _u('Dump of all responses to problem') in action or _u('Download XLSX of all responses to problem') in action:
         log.debug(action)
-        problem_to_dump = request.POST.get('problem_to_dump', '')
+        problem_id = request.POST.get('problem_to_dump', '')
 
         try:
             (org, course_name, _) = course_id.split("/")
-            module_state_key = "i4x://" + org + "/" + course_name + "/problem/" + problem_to_dump
-            smdat = StudentModule.objects.filter(course_id=course_id,
+            module_state_key = "i4x://" + org + "/" + course_name + "/problem/" + problem_id
+            student_modules = StudentModule.objects.filter(course_id=course_id,
                                                  module_state_key=module_state_key)
-            smdat = smdat.order_by('student')
+            student_modules = student_modules.order_by('student')
             problem_descriptor = modulestore().get_item(module_state_key, depth=1)
-            msg += "Found %d records to dump " % len(smdat)
+            msg += "Found %d records to dump " % len(student_modules)
         except Exception as err:
             error_msg = 'Failed while getting StudentModule for the course: {0}, the state: {1}'.format(course_id, module_state_key)
             error_msg += 'Error: {0}'.format(err)
             log.debug(error_msg)
-            smdat = []
+            student_modules = []
 
-        if smdat:
+        if student_modules:
             datatable = {'header': ['ID', 'Demo', 'Username', 'Full Name', 'E-mail',
                                     'Tries', 'Seed', 'Student Answer'], 'data':[], 'col_size':[]}
 
@@ -720,84 +783,52 @@ def instructor_dashboard(request, course_id):
             except Exception as err:
                 problem_html = ''
             datatable['col_size'] = [1] * (len(datatable['header']) - 1)
-            questions_id = get_questions_id(problem_html, problem_to_dump)
-            datatable['col_size'].append(len(questions_id))
+            questions_id = get_questions_id(problem_html, problem_id)
+            datatable['col_size'].append(2 * len(questions_id))
+            datatable['inf_count'] = (len(datatable['header']) - 1)
+            datatable['row_size'] = [2] * (len(datatable['header']) - 1) + [1]
 
-            for i in smdat:
-                data = json.loads(i.state)
-                if i.student.profile.is_demo:
-                    datarow = [i.student.id, int(i.student.profile.is_demo), "", i.student.profile.name, ""]
+            for smdat in student_modules:
+                last_attempt_data = json.loads(smdat.state)
+                if smdat.student.profile.is_demo:
+                    datarow = [smdat.student.id, int(smdat.student.profile.is_demo), "", smdat.student.profile.name, ""]
                 else:
-                    datarow = [i.student.id, int(i.student.profile.is_demo), i.student.username, i.student.profile.name, i.student.email]
+                    datarow = [smdat.student.id, int(smdat.student.profile.is_demo), smdat.student.username, smdat.student.profile.name, smdat.student.email]
                 try:
-                    datarow.append(data['attempts'])
+                    datarow.append(last_attempt_data['attempts'])
                 #student didnt answer the question
                 except KeyError:
                     datarow.append(0)
                 try:
-                    datarow.append(data['seed'])
+                    datarow.append(last_attempt_data['seed'])
                 except KeyError:
                     datarow.append('')
+
+                history_entries = StudentModuleHistory.objects.filter(
+                    student_module=smdat
+                ).order_by('created')
+
+                first_attempt_data = {}
+                # searchs the first history entry, which contains not empty student_answers field
+                for entry in history_entries:
+                    state = json.loads(entry.state)
+                    if 'student_answers' in state and state['student_answers']:
+                        first_attempt_data = state
+                        break
+
                 try: #trying to get sudent's answers if there are
-                    answers = {}
-                    for j in data['student_answers'].keys():
-                        found = j.find('_dynamath')
-                        if found > 0:
-                            tmp = j.find(problem_to_dump) + len(problem_to_dump) + 1
-                            key = j[:j.find('_', tmp + 1)]
-                            if 'Dump of all responses to problem' in action:
-                                correctness = data['correct_map'][j[:found]]['correctness']
-                                answers[key] = {j[:found]:[data['student_answers'][j].encode('utf-8'), correctness]}
-                                answers['dynamath'] = True
-                        else:
-                            tmp = j.find(problem_to_dump) + len(problem_to_dump) + 1
-                            key = j[:j.find('_', tmp + 1)]
-                            if key not in answers:
-                                if data['student_answers'][j] == '':
-                                    answers[key] = {j:[]}
-                                else:
-                                    correctness = data['correct_map'][j]['correctness']
-                                    answers[key] = {j:[data['student_answers'][j], correctness]}
-                            elif j not in answers[key]:
-                                answers[key][j] = [data['student_answers'][j], correctness]
-
-                    answers = OrderedDict(sorted(answers.items(), key=lambda t: t[0]))
-                    answers_list = []
-
-                    for q in questions_id.keys():
-                        if q in answers:
-                            if questions_id[q] != None:
-                                if 'sorting' in questions_id[q]:
-                                    sorted_asnwers = {}
-                                    for item in answers[q].items():
-                                        sorted_asnwers[int(item[1][0])] = questions_id[q][item[0]]
-                                    sorted_asnwers = OrderedDict(sorted(sorted_asnwers.items(), key=lambda t: t[0]))
-                                    answers_str = ''
-                                    for value in sorted_asnwers.values():
-                                        answers_str += value + ' | '
-                                    answers_list.append([answers_str[:-3], answers[q].values()[0][1]])
-                                elif 'choicegroup' in questions_id[q]:
-                                    for value in answers[q].values():
-                                        answers_str = ''
-                                        if type(value[0]) == list:
-                                            for choise in value[0]:
-                                                answers_str += questions_id[q][choise] + ' | '
-                                            answers_list.append([answers_str[:-3], value[1]])
-                                        else:
-                                            answers_list.append([questions_id[q][value[0]], value[1]])
-                            else:
-                                for value in answers[q].values():
-                                    answers_list.append(value)
-                        else:
-                            answers_list.append([])
-                    datarow.append(answers_list)
-
+                    html_dump = False
+                    if _u('Dump of all responses to problem') in action:
+                        html_dump = True
+                    answers = extract_answers(last_attempt_data, questions_id, problem_id, html_dump)
+                    first_answers = extract_answers(first_attempt_data, questions_id, problem_id, html_dump)
+                    datarow += [first_answers, answers]
                 except KeyError: #student didnt answer the question
-                    datarow.append([[]] * len(questions_id))
+                    datarow += [ [[]] * len(questions_id) ] * 2
 
                 datatable['data'].append(datarow)
             problem_name = problem_descriptor.display_name_with_default.encode('utf-8')
-            datatable['title'] = 'Student state for problem {0} ({1})'.format(problem_name, problem_to_dump)
+            datatable['title'] = 'Student state for problem {0} ({1})'.format(problem_name, problem_id)
             datatable['data'] = sorted(datatable['data'], key=lambda row: row[1])
 
 
@@ -829,8 +860,11 @@ def instructor_dashboard(request, course_id):
 
         datatable = {'header': ['ID', 'Demo', 'Username', 'Full Name', 'E-mail'], 'data':[], 'col_size':[]}
         datatable['col_size'] = [1] * len(datatable['header'])
+        datatable['row_size'] = [2] * len(datatable['header'])
+        datatable['inf_count'] = len(datatable['header'])
         datatable['header'] += ["Task %d" % num for num in range(1, len(problems_urls) + 1)]
-        
+        datatable['row_size'] += [1] * len(problems_urls)
+
         enrolled_students = User.objects.filter(
             courseenrollment__course_id=course_id,
             courseenrollment__is_active=1,
@@ -864,9 +898,9 @@ def instructor_dashboard(request, course_id):
                 problems_html[problem_url] = problem.lcp.get_html()
             except Exception as err:
                 problems_html[problem_url] = ''
-            problem_id = problem_url[(problem_url.rfind('/')+1):]
+            problem_id = problem_url[(problem_url.rfind('/') + 1):]
             questions_id_for_problem[problem_url] = get_questions_id(problems_html[problem_url], problem_id)
-            datatable['col_size'].append(len(questions_id_for_problem[problem_url]))
+            datatable['col_size'].append(2 * len(questions_id_for_problem[problem_url]))
 
         for student in enrolled_students:
 
@@ -882,72 +916,37 @@ def instructor_dashboard(request, course_id):
                 except Exception as err:
                     smdat = []
                 if smdat:
-                    data = json.loads(smdat.state)
+                    last_attempt_data = json.loads(smdat.state)
+                    history_entries = StudentModuleHistory.objects.filter(
+                        student_module=smdat
+                    ).order_by('created')
+
+                    first_attempt_data = {}
+                    # searchs the first history entry, which contains not empty student_answers field
+                    for entry in history_entries:
+                        state = json.loads(entry.state)
+                        if 'student_answers' in state and state['student_answers']:
+                            first_attempt_data = state
+                            break
+
                     try: #trying to get sudent's answers if there are
-                        answers = {}
                         problem_id = problem_url[(problem_url.rfind('/')+1):]
-                        for j in data['student_answers'].keys():
-                            found = j.find('_dynamath')
-                            if found > 0:
-                                tmp = j.find(problem_id) + len(problem_id) + 1
-                                key = j[:j.find('_', tmp + 1)]
-                                if _u('Dump of section results') in action:
-                                    correctness = data['correct_map'][j[:found]]['correctness']
-                                    answers[key] = {j[:found]:[data['student_answers'][j].encode('utf-8'), correctness]}
-                            else:
-                                tmp = j.find(problem_id) + len(problem_id) + 1
-                                key = j[:j.find('_', tmp + 1)]
-                                if key not in answers:
-                                    if data['student_answers'][j] == '':
-                                        answers[key] = {j:[]}
-                                    else:
-                                        correctness = data['correct_map'][j]['correctness']
-                                        answers[key] = {j:[data['student_answers'][j], correctness]}
-                                elif j not in answers[key]:
-                                    answers[key][j] = [data['student_answers'][j], correctness]
-
-                        answers = OrderedDict(sorted(answers.items(), key=lambda t: t[0]))
-
                         questions_id = questions_id_for_problem[problem_url]
-                        cur_html = problems_html[problem_url]
-                        answers_list = []
-                        for q in questions_id.keys():
-                            if q in answers:
-                                if questions_id[q] != None:
-                                    if 'sorting' in questions_id[q]:
-                                        sorted_asnwers = {}
-                                        for item in answers[q].items():
-                                            sorted_asnwers[int(item[1][0])] = questions_id[q][item[0]]
-                                        sorted_asnwers = OrderedDict(sorted(sorted_asnwers.items(), key=lambda t: t[0]))
-                                        answers_str = ''
-                                        for value in sorted_asnwers.values():
-                                            answers_str += value + ' | '
-                                        answers_list.append([answers_str[:-3], answers[q].values()[0][1]])
-                                    elif 'choicegroup' in questions_id[q]:
-                                        for value in answers[q].values():
-                                            answers_str = ''
-                                            if type(value[0]) == list:
-                                                for choise in value[0]:
-                                                    answers_str += questions_id[q][choise] + ' | '
-                                                answers_list.append([answers_str[:-3], value[1]])
-                                            else:
-                                                answers_list.append([questions_id[q][value[0]], value[1]])
-                                else:
-                                    for value in answers[q].values():
-                                        answers_list.append(value)
-
-                            else:
-                                answers_list.append([])
-                        datarow.append(answers_list)
+                        html_dump = False
+                        if _u('Dump of section results') in action:
+                            html_dump = True                        
+                        answers = extract_answers(last_attempt_data, questions_id, problem_id, html_dump)
+                        first_answers = extract_answers(first_attempt_data, questions_id, problem_id, html_dump)
+                        datarow += [first_answers, answers]
                     except KeyError: #student didnt answer the question
-                        datarow.append([[]] * len(questions_id_for_problem[problem_url]))
+                        datarow += [ [[]] * len(questions_id_for_problem[problem_url]) ] * 2
                 else:
-                    datarow.append([[]] * len(questions_id_for_problem[problem_url]))
+                    datarow += [ [[]] * len(questions_id_for_problem[problem_url]) ] * 2
             datatable['data'].append(datarow)
+
         section_name = section.display_name_with_default.encode('utf-8')
         datatable['title'] = 'Students state for section {0} ({1})'.format(section_name, section_to_dump)
         datatable['data'] = sorted(datatable['data'], key=lambda row: row[1])
-
         if _u('Download XLSX of all responses to section') in action:
             t = datetime.now()
             file_name = '{0}{1}{2}_{3}_{4}_{5}.xlsx'.format(t.year, t.month, t.day, t.hour, t.minute, section_name)

@@ -30,29 +30,29 @@
 
 <style type="text/css">
 table.stat_table {
-	font-family: verdana,arial,sans-serif;
-	font-size:11px;
-	color:#333333;
-	border-width: 1px;
-	border-color: #666666;
-	border-collapse: collapse;
+  font-family: verdana,arial,sans-serif;
+  font-size:11px;
+  color:#333333;
+  border-width: 1px;
+  border-color: #666666;
+  border-collapse: collapse;
 }
 table.stat_table th {
-	border-width: 1px;
-	padding: 8px;
-	border-style: solid;
-	border-color: #666666;
-	background-color: #dedede;
+  border-width: 1px;
+  padding: 8px;
+  border-style: solid;
+  border-color: #666666;
+  background-color: #dedede;
 }
 table.stat_table td {
-	border-width: 1px;
-	padding: 8px;
-	border-style: solid;
-	border-color: #666666;
+  border-width: 1px;
+  padding: 8px;
+  border-style: solid;
+  border-color: #666666;
 }
 .divScroll {
-	height: 200px;
-	overflow: scroll;
+  height: 200px;
+  overflow: scroll;
 }
 
 .td_correct {
@@ -153,7 +153,7 @@ function goto( mode)
           %if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_ANALYTICS'):
              | <a href="#" onclick="goto('Analytics');" class="${modeflag.get('Analytics')}">${_("Analytics")}</a>
           %endif
-	  ]
+    ]
     </h2>
 
     <form name="idashform" method="POST">
@@ -597,9 +597,9 @@ function goto( mode)
         <li class="item">${_("Have you sent the email to yourself first to make sure you're happy with how it's displayed, and that embedded links and images work properly?")}</li>
       </ul>
       <div class="submit-email-warning">
-	<p class="copy"><span style="color: red;"><b>${_("CAUTION!")}</b></span>
-	  ${_("Once the 'Send Email' button is clicked, your email will be queued for sending.")}
-	<b>${_("A queued email CANNOT be cancelled.")}</b></p>
+  <p class="copy"><span style="color: red;"><b>${_("CAUTION!")}</b></span>
+    ${_("Once the 'Send Email' button is clicked, your email will be queued for sending.")}
+  <b>${_("A queued email CANNOT be cancelled.")}</b></p>
       </div>
       <br />
       <input type="submit" name="action" value='${_("Send email")}'>
@@ -812,16 +812,23 @@ function goto( mode)
       <h2>${datatable['title'] | h}</h2>
       <table class="stat_table" cellspacing = "0" cellpadding = "0">
         <tr>
-	  %for i, header in enumerate(datatable['header']):
-          %if 'col_size' in datatable:
-            <th colspan=${datatable['col_size'][i]}}>${header.decode("utf-8") | h}</th>
-          %else:
-            <th>${header.decode("utf-8") | h}</th>
-          %endif
-	  %endfor
-	   </tr>
-        %for row in datatable['data']:
+          %for i, header in enumerate(datatable['header']):
+               %if 'col_size' in datatable:
+                <th colspan=${datatable['col_size'][i]}} rowspan=${datatable['row_size'][i]}>${header.decode("utf-8") | h}</th>
+              %else:
+                <th>${header.decode("utf-8") | h}</th>
+              %endif
+            
+          %endfor
+        </tr>
         <tr>
+        %for i in range(datatable['inf_count'], len(datatable['header'])):
+          <th colspan=${datatable['col_size'][i]/2}>${_('First attempt')}</th>
+          <th colspan=${datatable['col_size'][i]/2}>${_('Last attempt')}</th>
+        %endfor
+    </tr>
+        %for row in datatable['data']:
+          <tr>
           %for value in row:
             %if type(value) == list:
               %for i in value:
@@ -841,7 +848,7 @@ function goto( mode)
               <td class="td_empty">${value}</td>
             %endif
           %endfor
-        </tr>
+          </tr>
         %endfor
       </table>
     </p>
@@ -866,8 +873,8 @@ function goto( mode)
         </tr>
       %for tasknum, instructor_task in enumerate(instructor_tasks):
         <tr id="task-progress-entry-${tasknum}" class="task-progress-entry"
-	    data-task-id="${instructor_task.task_id}"
-	    data-in-progress="true">
+      data-task-id="${instructor_task.task_id}"
+      data-in-progress="true">
           <td class="td_empty">${instructor_task.task_type}</td>
           <td class="td_empty">${instructor_task.task_input}</td>
           <td class="task-id">${instructor_task.task_id}</td>
@@ -895,16 +902,16 @@ function goto( mode)
       <h2>${course_stats['title'] | h}</h2>
       <table class="stat_table">
         <tr>
-	%for hname in course_stats['header']:
-	  <th>${hname | h}</th>
-	%endfor
-	</tr>
+  %for hname in course_stats['header']:
+    <th>${hname | h}</th>
+  %endfor
+  </tr>
         %for row in course_stats['data']:
           <tr>
-	    %for value in row:
-	      <td class="td_empty">${value | h}</td>
-	    %endfor
-	  </tr>
+      %for value in row:
+        <td class="td_empty">${value | h}</td>
+      %endfor
+    </tr>
         %endfor
       </table>
     </p>
