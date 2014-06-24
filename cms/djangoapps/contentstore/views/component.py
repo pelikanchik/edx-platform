@@ -95,7 +95,10 @@ def get_dependent_units(unit_id, units, course_id):
     as_source_unit_filtered = []
 
     for unit in units:
-        term = check_term(json.loads(str(unit.direct_term_with_default)))
+        try:
+            term = check_term(json.loads(str(unit.direct_term_with_default)))
+        except:
+            term = []
         for element_term in term:
 
             if unit.url_name == unit_id:
