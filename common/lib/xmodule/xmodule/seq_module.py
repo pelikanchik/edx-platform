@@ -4,7 +4,7 @@ import logging
 
 from lxml import etree
 
-from xblock.fields import Integer, Scope, String
+from xblock.fields import Integer, Scope, String, List
 from xblock.fragment import Fragment
 from pkg_resources import resource_string
 
@@ -50,6 +50,11 @@ class SequenceFields(object):
              "date.",
         default=None,
         scope=Scope.user_state,
+    )
+    tags = List(
+        display_name="Tags",
+        help="Set tags for the component.",
+        scope=Scope.settings
     )
 
 def get_unit(unit_id, section):

@@ -565,12 +565,18 @@ def advanced_settings_handler(request, package_id=None, branch=None, version_gui
     locator, course_module = _get_locator_and_course(
         package_id, branch, version_guid, block, request.user
     )
+    
+    # temporary solution
+    with open(settings.TEMPLATE_DIRS[0]+'/tags/geometry.json') as json_data:
+        tags = json.load(json_data)
+
     if 'text/html' in request.META.get('HTTP_ACCEPT', '') and request.method == 'GET':
 
         return render_to_response('settings_advanced.html', {
             'context_course': course_module,
             'advanced_dict': json.dumps(CourseMetadata.fetch(course_module)),
-            'advanced_settings_url': locator.url_reverse('settings/advanced')
+            'advanced_settings_url': locator.url_reverse('settings/advanced'),
+            'tags': tags
         })
     elif 'application/json' in request.META.get('HTTP_ACCEPT', ''):
         if request.method == 'GET':

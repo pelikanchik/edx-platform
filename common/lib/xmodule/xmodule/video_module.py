@@ -169,6 +169,11 @@ class VideoFields(object):
         scope=Scope.preferences,
         default=1.0
     )
+    tags = List(
+        display_name="Tags",
+        help="Set tags for the component.",
+        scope=Scope.settings
+    )
 
 
 class VideoModule(VideoFields, XModule):

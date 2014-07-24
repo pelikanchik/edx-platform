@@ -4,6 +4,7 @@
   from xmodule.util.date_utils import get_default_time_display, almost_same_datetime
   from django.utils.translation import ugettext as _
   from django.core.urlresolvers import reverse
+  from collections import OrderedDict
 %>
 <%block name="title">${_("CMS Subsection")}</%block>
 <%block name="bodyclass">is-signedin course view-subsection</%block>
@@ -124,13 +125,78 @@
                 </div>
 
         % endif
-                <p style = "text-align: center;"><input type = "button" class = "save-subsection-button" value='${_("Save")}'/></p>
 
         % if context_course.locked_subsections:
                 <input disabled data-bind='value: term_string' style="font-size: 10px; display:none;" class="subsection-display-name-input" data-metadata-name="unlock_term">
-
+        
+        <div class="tags-input">
+          <label>${_("Tags")}</label>
+            <select id="tags-select" multiple="" style="width:100%" class="populate select2-offscreen" tabindex="-1">
+              % for level1 in tags.items():
+                % if isinstance(level1[1], list):
+                  % if len(level1[1]):
+                    <option disabled>${level1[0]}</option>
+                    % for item1 in level1[1]:
+                      <option value="${item1}">${'&nbsp'*3+item1}</option>
+                    % endfor
+                  % else:
+                    <option value="${level1[0]}">${level1[0]}</option>
+                  % endif
+                % elif isinstance(level1[1], dict):
+                  <option disabled>${level1[0]}</option>
+                  % for level2 in level1[1].items():
+                    % if isinstance(level2[1], list):
+                      % if len(level2[1]):
+                        <option disabled>${'&nbsp'*3+level2[0]}</option>
+                        % for item2 in level2[1]:
+                          <option value="${item2}">${'&nbsp'*6+item2}</option>
+                        % endfor
+                      % else:
+                        <option value="${level2[0]}">${'&nbsp'*3+level2[0]}</option>
+                      % endif
+                    % elif isinstance(level2[1], dict):
+                      <option disabled>${'&nbsp'*3+level2[0]}</option>
+                      % for level3 in level2[1].items():
+                        % if isinstance(level3[1], list):
+                          % if len(level3[1]):
+                            <option disabled>${'&nbsp'*6+level3[0]}</option>
+                            % for item3 in level3[1]:
+                              <option value="${item3}">${'&nbsp'*9+item3}</option>
+                            % endfor
+                          % else:
+                            <option value="${level3[0]}">${'&nbsp'*6+level3[0]}</option>
+                          % endif
+                        % elif isinstance(level3[1], dict):
+                          <option disabled>${'&nbsp'*6+level3[0]}</option>
+                          % for level4 in level3[1].items():
+                            % if isinstance(level4[1], list):
+                              % if len(level4[1]):
+                                <option disabled>${'&nbsp'*9+level4[0]}</option>
+                                % for item4 in level4[1]:
+                                  <option value="${item4}">${'&nbsp'*12+item4}</option>
+                                % endfor
+                              % else:
+                                <option value="${level4[0]}">${'&nbsp'*9+level4[0]}</option>
+                              % endif
+                            % endif
+                          % endfor
+                        % endif
+                      % endfor
+                    % endif
+                  % endfor
+                % endif
+              % endfor
+            </select>
+            <br>
+        </div>
+        <p style = "text-align: center;"><input type = "button" class = "save-subsection-button" value='${_("Save")}'/></p>
         <script>
-            require(['jquery','knockout', 'knockout-mapping', 'numeric'], function($, ko, mapping, numeric) {
+            require(['jquery','knockout', 'knockout-mapping', 'numeric', 'select2'], function($, ko, mapping, numeric, select2) {
+                $("#tags-select").
+                  val(JSON.parse($("#chosen_tags").val())).
+                  select2({formatSelection: function(item) {
+                    return $(item.element).val();}
+                  });
 
                 var unlock_term = '${subsection.unlock_term_with_default|h}'.replace(/\&#34;/g, '"');
                 var dataFromDB = ko.utils.parseJson(unlock_term).disjunctions;
@@ -358,4 +424,5 @@ require(["domReady!", "jquery", "js/models/location", "js/views/overview_assignm
     });
 });
 </script>
+<input type="hidden" id="chosen_tags" value='${chosen_tags}'>
 </%block>

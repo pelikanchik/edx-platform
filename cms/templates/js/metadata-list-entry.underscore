@@ -5,9 +5,36 @@
 
     </ol>
 
-    <a href="#" class="create-action create-setting">
-      <i class="icon-plus"></i><%= gettext("Add") %> <span class="sr"><%= gettext(model.get('display_name')) %></span>
-    </a>
+    <% if (model.getFieldName() != "tags") { %>
+
+      <a href="#" class="create-action create-setting">
+        <i class="icon-plus"></i><%= gettext("Add") %> <span class="sr"><%= gettext(model.get('display_name')) %></span>
+      </a>
+
+    <% } else{ %>
+
+      <select class="tags-select" style="width:190px"> </select>
+
+      <% print("<sc"+"ript>"); %>
+          require(['jquery', 'select2'], function($, select2) {
+            var filterArg = "";
+            $("#<%= uniqueId%> .input").each(function() {
+              filterArg = filterArg + ("[value='" + $(this).val() + "'],");
+            });
+            $("#tags-select-template").children().
+              not($("#tags-select-template").children().filter(filterArg)).
+              clone().appendTo(".tags-select");
+            $("#<%= uniqueId%> .tags-select").select2({
+              placeholder: '<%= gettext("Add") %>', 
+              allowClear: false, 
+              formatSelection:function(item){return $(item.element).val();
+              }});
+            })
+
+      <% print("</sc"+"ript>"); %>
+
+    <% } %> 
+
   </div>
   <button class="action setting-clear inactive" type="button" name="setting-clear" value="<%= gettext("Clear") %>" data-tooltip="<%= gettext("Clear") %>">
     <i class="icon-undo"></i>

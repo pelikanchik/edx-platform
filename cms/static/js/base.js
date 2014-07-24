@@ -1,5 +1,5 @@
 require(["domReady", "jquery", "underscore", "gettext", "js/views/feedback_notification", "js/views/feedback_prompt",
-    "js/utils/get_date", "js/utils/module", "js/utils/handle_iframe_binding", "jquery.ui", "jquery.leanModal", "jquery.form", "jquery.smoothScroll"],
+    "js/utils/get_date", "js/utils/module", "js/utils/handle_iframe_binding", "jquery.ui", "jquery.leanModal", "jquery.form", "jquery.smoothScroll", "select2"],
     function(domReady, $, _, gettext, NotificationView, PromptView, DateUtils, ModuleUtils, IframeUtils) {
 
 var $body;
@@ -217,6 +217,13 @@ function saveSubsection() {
         // its an indication to the server to clear the datetime in the DB
         metadata[name] = datetime;
     });
+
+    var tags = []
+    // extract values from each object in array
+    $("#tags-select").select2("data").forEach(function(item) {
+        tags.push($(item.element).val());
+    });
+    metadata["tags"] = tags;
 
     $.ajax({
         url: ModuleUtils.getUpdateUrl(locator),
