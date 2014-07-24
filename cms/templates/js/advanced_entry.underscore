@@ -1,6 +1,6 @@
 <li class="field-group course-advanced-policy-list-item">
 
-    <% if (key != "available_for_demo" && key != "show_in_lms" && key != "has_dynamic_graph" && key != "locked_subsections"){ %>
+    <% if (key != "available_for_demo" && key != "show_in_lms" && key != "has_dynamic_graph" && key != "locked_subsections" && key != "tags_list"){ %>
 
 
       <div class="field is-not-editable text key" id="<%= key %>">
@@ -11,7 +11,7 @@
     <% } %>
 
   <div class="field text value">
-    <% if(key == "show_in_lms" || key == "available_for_demo" || key == "has_dynamic_graph" || key == "locked_subsections"){ %>
+    <% if(key == "show_in_lms" || key == "available_for_demo" || key == "has_dynamic_graph" || key == "locked_subsections" || key == "tags_list"){ %>
 
     <label for "<%= valueUniqueId %>">
         <% if(key == "show_in_lms"){
@@ -22,13 +22,34 @@
             print (gettext("Has Dynamic Graph"))
          }else if (key == "locked_subsections") {
             print (gettext("Has Locked Subsections"))
+         }else if (key == "tags_list") {
+            print (gettext("Теги"))
          } %>
     </label>
-    <select class="boolean" id="<%= valueUniqueId %>" rel = "<%= key %>">
-        <option value = "True"<% if (value == "true"){%> selected <% } %> ><%=gettext("Yes")%></option>
-        <option value = "False" <% if (value == "false"){%> selected <% } %> ><%=gettext("No")%></option>
-    </select>
+    <% if (key == "tags_list") { %>
 
+      <select multiple="" style="box-sizing: border-box;
+width:100%; display: none" class="tags-select populate select2-offscreen" tabindex="-1"></select>
+      
+      <% print("<sc"+"ript>"); %>
+          require(['jquery', 'select2'], function($, select2) {
+            $("#tags-select-template").children().clone().appendTo(".tags-select");
+            $(".tags-select").css("display", "block");
+            $(".tags-select").parent().css({
+              "-moz-box-sizing" : "border-box", 
+              "box-sizing"      : "border-box", 
+              "width"           : "100%"
+            });
+            $(".tags-select").val(<% print(value) %>).select2({formatSelection:function(item){return $(item.element).val();}});
+            })
+      <% print("</sc"+"ript>"); %>
+
+    <% }else{ %>
+      <select class="boolean" id="<%= valueUniqueId %>" rel = "<%= key %>">
+          <option value = "True"<% if (value == "true"){%> selected <% } %> ><%=gettext("Yes")%></option>
+          <option value = "False" <% if (value == "false"){%> selected <% } %> ><%=gettext("No")%></option>
+      </select>
+    <% } %>
     <% }else{ %>
 
     <label for="<%= valueUniqueId %>"><%=gettext("Value")%></label>

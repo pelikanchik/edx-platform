@@ -21,7 +21,7 @@ from capa.responsetypes import StudentInputError, \
 from capa.util import convert_files_to_filenames
 from .progress import Progress
 from xmodule.exceptions import NotFoundError, ProcessingError
-from xblock.fields import Scope, String, Boolean, Dict, Integer, Float
+from xblock.fields import Scope, String, Boolean, Dict, Integer, Float, List
 from .fields import Timedelta, Date
 from django.utils.timezone import UTC
 from .util.duedate import get_extended_due_date
@@ -194,6 +194,11 @@ class CapaFields(object):
         help="Set time in HH:MM:SS format",
         scope=Scope.settings,
         default=None
+    )
+    tags = List(
+        display_name="Tags",
+        help="Set tags for the component.",
+        scope=Scope.settings
     )
 
 

@@ -1,7 +1,7 @@
 define(
     [
         "js/views/baseview", "underscore", "js/models/metadata", "js/views/abstract_editor",
-        "js/views/transcripts/metadata_videolist", "gettext"
+        "js/views/transcripts/metadata_videolist", "gettext", "select2"
     ],
 function(BaseView, _, MetadataModel, AbstractEditor, VideoList) {
     var Metadata = {};
@@ -292,6 +292,7 @@ function(BaseView, _, MetadataModel, AbstractEditor, VideoList) {
             "change input" : "updateModel",
             "input input" : "enableAdd",
             "click .create-setting" : "addEntry",
+            "change .tags-select": "selectEntry",
             "click .remove-setting" : "removeEntry"
         },
 
@@ -327,12 +328,56 @@ function(BaseView, _, MetadataModel, AbstractEditor, VideoList) {
             this.$el.find('.create-setting').addClass('is-disabled');
         },
 
+        selectEntry: function(event) {
+            event.preventDefault();
+            var list = this.model.get('value') || [];
+            this.setValueInEditor(list.concat([event.val]));
+            // trigger change event to update model
+            $("input[value='"+event.val+"']", this.el).change();
+            // make field non editable
+            $("input[value='"+event.val+"']", this.el).attr("readonly", "readonly");
+            // build a new select2 without selected tag
+            $(".tags-select", this.el).select2("destroy");
+            $("option[value='"+event.val+"']", this.el).remove();
+            $(".tags-select", this.el).select2({
+                placeholder: gettext("Add"), 
+                allowClear:false, 
+                formatSelection: function(item) {
+                    return $(item.element).val();
+                }
+            });
+        },
+
         removeEntry: function(event) {
             event.preventDefault();
             var entry = $(event.currentTarget).siblings().val();
             this.setValueInEditor(_.without(this.model.get('value'), entry));
             this.updateModel();
-            this.$el.find('.create-setting').removeClass('is-disabled');
+            if (this.model.getFieldName() == "tags") {
+                // rebuild select2 with tag, that was removed from selected tags
+                $(".tags-select", this.el).select2("destroy");
+                $(".tags-select", this.el).children().remove();
+                var filterArg = "";
+                // get tags' names, that remain after removing the tag
+                $(".input", this.el).each(function() {
+                    filterArg = filterArg + "[value='" + $(this).val() + "'],";
+                });
+                // append tags to .tags-select except tags, that are currently selected
+                $("#tags-select-template").children().
+                    not($("#tags-select-template").children().filter(filterArg)).
+                    clone().appendTo(".tags-select");
+                // build a new select2 element
+                $(".tags-select", this.el).select2({
+                    placeholder: gettext("Add"), 
+                    allowClear:false, 
+                    formatSelection: function(item) {
+                        return $(item.element).val();
+                        }
+                });
+
+            } else {
+                this.$el.find('.create-setting').removeClass('is-disabled');
+            }
         },
 
         enableAdd: function() {

@@ -34,9 +34,10 @@ var AdvancedView = ValidatingView.extend({
         listEle$.append(self.renderTemplate("show_in_lms", self.model.get("show_in_lms")));
         listEle$.append(self.renderTemplate("has_dynamic_graph", self.model.get("has_dynamic_graph")));
         listEle$.append(self.renderTemplate("locked_subsections", self.model.get("locked_subsections")));
+        listEle$.append(self.renderTemplate("tags_list", self.model.get("tags_list")));
         _.each(_.sortBy(_.keys(this.model.attributes), _.identity),
             function(key) {
-                if (key != "available_for_demo" && key != "show_in_lms" && key != "has_dynamic_graph" && key != "locked_subsections"){
+                if (key != "available_for_demo" && key != "show_in_lms" && key != "has_dynamic_graph" && key != "locked_subsections" && key != "tags_list"){
                     listEle$.append(self.renderTemplate(key, self.model.get(key)));
                 }
             });
@@ -45,6 +46,8 @@ var AdvancedView = ValidatingView.extend({
         _.each(policyValues, this.attachBooleanEditor, this);
         var policyValues = listEle$.find('.json');
         _.each(policyValues, this.attachJSONEditor, this);
+        var policyValues = listEle$.find('.tags-select');
+        _.each(policyValues, this.attachTagsEditor, this);
         return this;
     },
 
@@ -120,6 +123,23 @@ var AdvancedView = ValidatingView.extend({
             }
         });
     },
+
+    attachTagsEditor : function (select) {
+        var self = this;
+        $(select).on("change", function(e){
+            var message = gettext("You have to save your changes for applying.");
+
+            var tags = []
+            $(select).select2("data").forEach(function(item) {
+                tags.push($(item.element).val());
+            });
+            self.model.set("tags_list", tags);
+            self.showNotificationBar(message,
+                                             _.bind(self.saveView, self),
+                                             _.bind(self.revertView, self));
+        });
+    },
+
     saveView : function() {
         // TODO one last verification scan:
         //    call validateKey on each to ensure proper format

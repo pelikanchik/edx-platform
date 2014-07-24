@@ -979,6 +979,14 @@ msgid "Set time in HH:MM:SS format"
 msgstr "Установите времмя в формате HH:MM:SS для задачи, которая будет показана "
 "внутри видео."
 
+#: common/lib/xmodule/xmodule/capa_base.py:205
+msgid "Tags"
+msgstr "Теги"
+
+#: common/lib/xmodule/xmodule/capa_base.py:206
+msgid "Set tags for the component."
+msgstr "Назначьте теги для текущего компонента."
+
 #: common/lib/xmodule/xmodule/discussion_module.py:14
 msgid "Display name for this module."
 msgstr "Отображаемое название для данного модуля"

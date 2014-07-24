@@ -239,6 +239,10 @@ def subsection_handler(request, tag=None, package_id=None, branch=None, version_
             course.location.course_id, course.location, False, True
         )
 
+        # temporary solution
+        with open(settings.TEMPLATE_DIRS[0]+'/tags/geometry.json') as json_data:
+            tags = json.load(json_data)
+
         return render_to_response(
             'edit_subsection.html',
             {
@@ -253,7 +257,9 @@ def subsection_handler(request, tag=None, package_id=None, branch=None, version_
                 'policy_metadata': policy_metadata,
                 'subsection_units': subsection_units,
                 'sections': sections,
-                'can_view_live': can_view_live
+                'can_view_live': can_view_live,
+                'tags': tags,
+                "chosen_tags": json.dumps(item.tags)
             }
         )
     else:
@@ -397,6 +403,10 @@ def unit_handler(request, tag=None, package_id=None, branch=None, version_guid=N
             index=index
         )
 
+        # temporary solution
+        with open(settings.TEMPLATE_DIRS[0]+'/tags/geometry.json') as json_data:
+            tags = json.load(json_data)
+
         return render_to_response('unit.html', {
             'context_course': course,
             'unit': item,
@@ -417,6 +427,7 @@ def unit_handler(request, tag=None, package_id=None, branch=None, version_guid=N
                 get_default_time_display(item.published_date)
                 if item.published_date is not None else None
             ),
+            'tags': tags
         })
     else:
         return HttpResponseBadRequest("Only supports html requests")

@@ -458,6 +458,10 @@ msgstr "Посмотреть черновик"
 msgid "View Live"
 msgstr "Посмотреть публичную версию"
 
+#: cms/templates/edit_subsection.html:134
+msgid "Tags"
+msgstr "Теги"
+
 #: common/lib/xmodule/xmodule/capa_base.py:88 cms/templates/unit.html:167
 msgid "Blank Advanced Problem"
 msgstr "Пустая продвинутая задача"

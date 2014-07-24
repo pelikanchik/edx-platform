@@ -479,5 +479,61 @@ conjunctions: [
       </div>
     </div>
   </div>
-
+<select id="tags-select-template" style="display: none">
+    <option></option>
+      % for level1 in tags.items():
+        % if isinstance(level1[1], list):
+          % if len(level1[1]):
+            <option disabled>${level1[0]}</option>
+            % for item1 in level1[1]:
+              <option value="${item1}">${'&nbsp'*3+item1}</option>
+            % endfor
+          % else:
+            <option value="${level1[0]}">${level1[0]}</option>
+          % endif
+        % elif isinstance(level1[1], dict):
+          <option disabled>${level1[0]}</option>
+          % for level2 in level1[1].items():
+            % if isinstance(level2[1], list):
+              % if len(level2[1]):
+                <option disabled>${'&nbsp'*3+level2[0]}</option>
+                % for item2 in level2[1]:
+                  <option value="${item2}">${'&nbsp'*6+item2}</option>
+                % endfor
+              % else:
+                <option value="${level2[0]}">${'&nbsp'*3+level2[0]}</option>
+              % endif
+            % elif isinstance(level2[1], dict):
+              <option disabled>${'&nbsp'*3+level2[0]}</option>
+              % for level3 in level2[1].items():
+                % if isinstance(level3[1], list):
+                  % if len(level3[1]):
+                    <option disabled>${'&nbsp'*6+level3[0]}</option>
+                    % for item3 in level3[1]:
+                      <option value="${item3}">${'&nbsp'*9+item3}</option>
+                    % endfor
+                  % else:
+                    <option value="${level3[0]}">${'&nbsp'*6+level3[0]}</option>
+                  % endif
+                % elif isinstance(level3[1], dict):
+                  <option disabled>${'&nbsp'*6+level3[0]}</option>
+                  % for level4 in level3[1].items():
+                    % if isinstance(level4[1], list):
+                      % if len(level4[1]):
+                        <option disabled>${'&nbsp'*9+level4[0]}</option>
+                        % for item4 in level4[1]:
+                          <option value="${item4}">${'&nbsp'*12+item4}</option>
+                        % endfor
+                      % else:
+                        <option value="${level4[0]}">${'&nbsp'*9+level4[0]}</option>
+                      % endif
+                    % endif
+                  % endfor
+                % endif
+              % endfor
+            % endif
+          % endfor
+        % endif
+      % endfor
+    </select>
 </%block>
