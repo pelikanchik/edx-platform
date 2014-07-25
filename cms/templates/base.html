@@ -23,7 +23,6 @@
 
     <link rel="stylesheet" type="text/css" href="${static.url('css/dynatree.css')}" />
     <link rel="stylesheet" type="text/css" href="${static.url('js/select2-3.5.0/select2.css')}" />
-    <link rel="stylesheet" type="text/css" href="${static.url('js/select2-3.5.0/select2-bootstrap.css')}" />
 
     <%static:css group='style-vendor'/>
     <%static:css group='style-app'/>
@@ -85,7 +84,7 @@
             "knockout-mapping": "js/knockout-mapping",
             "numeric": "js/numeric",
             "dynatree": "js/dynatree",
-            "select2": "js/select2-3.5.0/select2",
+            "select2": "js/select2-3.5.0/select2_ru",
 
             // externally hosted files
             "tender": "//edxedge.tenderapp.com/tender_widget",
@@ -233,6 +232,10 @@
             "numeric": {
                 deps : [ 'jquery', 'jquery.ui' ],
                 exports : 'numeric'
+            },
+            "select2": {
+                deps: ['js/select2-3.5.0/select2.min', 'js/select2-3.5.0/select2_locale_ru'],
+                exports: 'Select2'
             }
         },
         // load jquery and gettext automatically

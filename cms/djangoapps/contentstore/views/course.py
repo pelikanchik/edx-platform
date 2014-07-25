@@ -16,7 +16,7 @@ from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseBadRequest, HttpResponseNotFound
 from util.json_request import JsonResponse
-from edxmako.shortcuts import render_to_response
+from edxmako.shortcuts import render_to_response, render_to_string
 
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore, loc_mapper
@@ -30,7 +30,7 @@ from xmodule.modulestore import Location
 from contentstore.course_info_model import get_course_updates, update_course_updates, delete_course_update
 from contentstore.utils import (
     get_lms_link_for_item, add_extra_panel_tab, remove_extra_panel_tab,
-    get_modulestore)
+    get_modulestore, tree_to_list)
 from models.settings.course_details import CourseDetails, CourseSettingsEncoder
 
 from models.settings.course_grading import CourseGradingModel
@@ -546,7 +546,6 @@ def _config_course_advanced_components(request, course_module):
 
     return filter_tabs
 
-
 @login_required
 @ensure_csrf_cookie
 @require_http_methods(("GET", "POST", "PUT"))
@@ -566,10 +565,9 @@ def advanced_settings_handler(request, package_id=None, branch=None, version_gui
         package_id, branch, version_guid, block, request.user
     )
     
-    # temporary solution
-    with open(settings.TEMPLATE_DIRS[0]+'/tags/geometry.json') as json_data:
-        tags = json.load(json_data)
-
+    tags = render_to_string('/tags/geometry.json', {})
+    tags = tree_to_list(json.loads(tags), 0)
+    
     if 'text/html' in request.META.get('HTTP_ACCEPT', '') and request.method == 'GET':
 
         return render_to_response('settings_advanced.html', {
