@@ -10,7 +10,7 @@ from django.core.exceptions import PermissionDenied
 from django_future.csrf import ensure_csrf_cookie
 from django.conf import settings
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from edxmako.shortcuts import render_to_response
+from edxmako.shortcuts import render_to_response, render_to_string
 
 from xmodule.modulestore.django import modulestore
 from xmodule.util.date_utils import get_default_time_display
@@ -21,7 +21,7 @@ from xmodule.seq_module import check_term
 from xblock.fields import Scope
 from util.json_request import expect_json, JsonResponse
 
-from contentstore.utils import get_lms_link_for_item, compute_unit_state, UnitState, get_course_for_item
+from contentstore.utils import get_lms_link_for_item, compute_unit_state, UnitState, get_course_for_item, tree_to_list
 
 from models.settings.course_grading import CourseGradingModel
 
@@ -308,9 +308,8 @@ def subsection_handler(request, tag=None, package_id=None, branch=None, version_
             course.location.course_id, course.location, False, True
         )
 
-        # temporary solution
-        with open(settings.TEMPLATE_DIRS[0]+'/tags/geometry.json') as json_data:
-            tags = json.load(json_data)
+        tags = render_to_string('/tags/geometry.json', {})
+        tags = tree_to_list(json.loads(tags), 0)
 
         return render_to_response(
             'edit_subsection.html',
@@ -528,9 +527,8 @@ def unit_handler(request, tag=None, package_id=None, branch=None, version_guid=N
         direct_term = check_term(direct_term)
         direct_term_json = json.dumps(direct_term)
 
-        # temporary solution
-        with open(settings.TEMPLATE_DIRS[0]+'/tags/geometry.json') as json_data:
-            tags = json.load(json_data)
+        tags = render_to_string('/tags/geometry.json', {})
+        tags = tree_to_list(json.loads(tags), 0)
 
         return render_to_response('unit.html', {
             'context_course': course,

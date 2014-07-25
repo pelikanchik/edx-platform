@@ -270,3 +270,18 @@ def remove_extra_panel_tab(tab_type, course):
         course_tabs = [ct for ct in course_tabs if ct != tab_panel]
         changed = True
     return changed, course_tabs
+
+
+def tree_to_list(dictionary, height):
+    """
+    Used to convert a dictionary of dictionaries to list.
+    The list consists of lists, that include 3 elements: value(str), height(int), leaf(boolean).
+    """
+    result = []
+    for item in dictionary.items():
+        if item[1]:
+            result.append([item[0], height, False])
+            result += tree_to_list(item[1], height+1)
+        else:
+            result.append([item[0], height, True])
+    return result
