@@ -272,16 +272,19 @@ def remove_extra_panel_tab(tab_type, course):
     return changed, course_tabs
 
 
-def tree_to_list(dictionary, height):
+def tree_to_list(tree, height):
     """
-    Used to convert a dictionary of dictionaries to list.
-    The list consists of lists, that include 3 elements: value(str), height(int), leaf(boolean).
+    Used to convert an input data from yaml.load to list of dicts.
+    The list consists of dicts, that include 4 keys: name, code, height, is_leaf.
     """
     result = []
-    for item in dictionary.items():
-        if item[1]:
-            result.append([item[0], height, False])
-            result += tree_to_list(item[1], height+1)
-        else:
-            result.append([item[0], height, True])
+    for node in tree:
+        result.append({"height": height, "is_leaf": True})
+        idx = len(result) - 1
+        for item in node.items():
+            if isinstance(item[1], list):
+                result[idx]["is_leaf"] = False
+                result += tree_to_list(item[1], height+1)
+            else:
+                result[idx][item[0]] = item[1]
     return result

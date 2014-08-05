@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import json
 import logging
+import yaml
 from collections import defaultdict
 
 from django.http import HttpResponseBadRequest
@@ -308,8 +309,8 @@ def subsection_handler(request, tag=None, package_id=None, branch=None, version_
             course.location.course_id, course.location, False, True
         )
 
-        tags = render_to_string('/tags/geometry.json', {})
-        tags = tree_to_list(json.loads(tags), 0)
+        tags = render_to_string('/tags/themes.yaml', {})
+        tags = tree_to_list(yaml.load(tags), 0)
 
         return render_to_response(
             'edit_subsection.html',
@@ -327,7 +328,7 @@ def subsection_handler(request, tag=None, package_id=None, branch=None, version_
                 'sections': sections,
                 'can_view_live': can_view_live,
                 'tags': tags,
-                "chosen_tags": json.dumps(item.tags)
+                "selected_tags": json.dumps(item.tags)
             }
         )
     else:
@@ -527,8 +528,8 @@ def unit_handler(request, tag=None, package_id=None, branch=None, version_guid=N
         direct_term = check_term(direct_term)
         direct_term_json = json.dumps(direct_term)
 
-        tags = render_to_string('/tags/geometry.json', {})
-        tags = tree_to_list(json.loads(tags), 0)
+        tags = render_to_string('/tags/themes.yaml', {})
+        tags = tree_to_list(yaml.load(tags), 0)
 
         return render_to_response('unit.html', {
             'context_course': course,

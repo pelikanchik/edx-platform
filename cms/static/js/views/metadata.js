@@ -299,24 +299,68 @@ function(BaseView, _, MetadataModel, AbstractEditor, VideoList) {
         templateName: "metadata-list-entry",
 
         getValueFromEditor: function () {
-            return _.map(
-                this.$el.find('li input'),
-                function (ele) { return ele.value.trim(); }
-            ).filter(_.identity);
+            if (this.model.attributes.field_name == "tags") {
+                return _.map(
+                    this.$el.find('li input'),
+                    function (ele) { return $(ele).data("hidden-value"); }
+                ).filter(_.identity);
+            } else {
+                return _.map(
+                    this.$el.find('li input'),
+                    function (ele) { return ele.value.trim(); }
+                ).filter(_.identity);
+            }
         },
 
         setValueInEditor: function (value) {
             var list = this.$el.find('ol');
             list.empty();
-            _.each(value, function(ele, index) {
-                var template = _.template(
-                    '<li class="list-settings-item">' +
-                        '<input type="text" class="input" value="<%= ele %>">' +
-                        '<a href="#" class="remove-action remove-setting" data-index="<%= index %>"><i class="icon-remove-sign"></i><span class="sr">Remove</span></a>' +
-                    '</li>'
-                );
-                list.append($(template({'ele': ele, 'index': index})));
-            });
+            if (this.model.attributes.field_name == "tags") {
+                var names = [];
+                // value contains the codes of the tags, here get their names 
+                value.forEach(function(curValue) {
+                    names.push($("#tags-select-template").find("option[value='"+curValue+"']").attr("name"));
+                });
+                $(".tags-select", this.el).select2("destroy");
+                $(".tags-select", this.el).children().remove();
+                var filterArg = "";
+                // get tags' names, that remain after the operation
+                value.forEach(function(val) {
+                    filterArg = filterArg + "[value='" + val + "'],";
+                });
+                // copy options to select except already selected
+                $("#tags-select-template").children().
+                    not($("#tags-select-template").children().filter(filterArg)).
+                    clone().appendTo(".tags-select", this.el);
+                // build a new select2 element
+                $(".tags-select", this.el).select2({
+                    placeholder: gettext("Add"), 
+                    allowClear:false, 
+                    formatSelection: function(item) {
+                        return $(item.element).val();
+                        }
+                });
+                // add hidden-value data-field, that contains the tag' code, to tags' input
+                _.each(names, function(ele, index) {
+                    var template = _.template(
+                        '<li class="list-settings-item">' +
+                            '<input type="text" class="input" value="<%= ele %>", data-hidden-value="' + value[index] + '">' +
+                            '<a href="#" class="remove-action remove-setting" data-index="<%= index %>"><i class="icon-remove-sign"></i><span class="sr">Remove</span></a>' +
+                        '</li>'
+                    );
+                    list.append($(template({'ele': ele, 'index': index})));
+                });
+            } else {
+                _.each(value, function(ele, index) {
+                    var template = _.template(
+                        '<li class="list-settings-item">' +
+                            '<input type="text" class="input" value="<%= ele %>">' +
+                            '<a href="#" class="remove-action remove-setting" data-index="<%= index %>"><i class="icon-remove-sign"></i><span class="sr">Remove</span></a>' +
+                        '</li>'
+                    );
+                    list.append($(template({'ele': ele, 'index': index})));
+                });
+            }
         },
 
         addEntry: function(event) {
@@ -333,49 +377,21 @@ function(BaseView, _, MetadataModel, AbstractEditor, VideoList) {
             var list = this.model.get('value') || [];
             this.setValueInEditor(list.concat([event.val]));
             // trigger change event to update model
-            $("input[value='"+event.val+"']", this.el).change();
+            $("input[data-hidden-value='"+event.val+"']", this.el).change();
             // make field non editable
-            $("input[value='"+event.val+"']", this.el).attr("readonly", "readonly");
-            // build a new select2 without selected tag
-            $(".tags-select", this.el).select2("destroy");
-            $("option[value='"+event.val+"']", this.el).remove();
-            $(".tags-select", this.el).select2({
-                placeholder: gettext("Add"), 
-                allowClear:false, 
-                formatSelection: function(item) {
-                    return $(item.element).val();
-                }
-            });
+            $("input[data-hidden-value='"+event.val+"']", this.el).attr("readonly", "readonly");
         },
 
         removeEntry: function(event) {
             event.preventDefault();
-            var entry = $(event.currentTarget).siblings().val();
-            this.setValueInEditor(_.without(this.model.get('value'), entry));
-            this.updateModel();
             if (this.model.getFieldName() == "tags") {
-                // rebuild select2 with tag, that was removed from selected tags
-                $(".tags-select", this.el).select2("destroy");
-                $(".tags-select", this.el).children().remove();
-                var filterArg = "";
-                // get tags' names, that remain after removing the tag
-                $(".input", this.el).each(function() {
-                    filterArg = filterArg + "[value='" + $(this).val() + "'],";
-                });
-                // append tags to .tags-select except tags, that are currently selected
-                $("#tags-select-template").children().
-                    not($("#tags-select-template").children().filter(filterArg)).
-                    clone().appendTo(".tags-select");
-                // build a new select2 element
-                $(".tags-select", this.el).select2({
-                    placeholder: gettext("Add"), 
-                    allowClear:false, 
-                    formatSelection: function(item) {
-                        return $(item.element).val();
-                        }
-                });
-
+                var entry = $(event.currentTarget).siblings().data("hidden-value");
+                this.setValueInEditor(_.without(this.model.get('value'), entry));
+                this.updateModel();
             } else {
+                var entry = $(event.currentTarget).siblings().val();
+                this.setValueInEditor(_.without(this.model.get('value'), entry));
+                this.updateModel();
                 this.$el.find('.create-setting').removeClass('is-disabled');
             }
         },
