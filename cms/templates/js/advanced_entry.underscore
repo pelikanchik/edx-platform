@@ -33,14 +33,17 @@ width:100%; display: none" class="tags-select populate select2-offscreen" tabind
       
       <% print("<sc"+"ript>"); %>
           require(['jquery', 'select2'], function($, select2) {
-            $("#tags-select-template").children().clone().appendTo(".tags-select");
-            $(".tags-select").css("display", "block");
-            $(".tags-select").parent().css({
-              "-moz-box-sizing" : "border-box", 
-              "box-sizing"      : "border-box", 
-              "width"           : "100%"
-            });
-            $(".tags-select").val(<% print(value) %>).select2({formatSelection:function(item){return $(item.element).val();}});
+            // if this script was not already launched
+            if (!$(".tags-select").children().length) {
+              $("#tags-select-template").children().clone().appendTo(".tags-select");
+              $(".tags-select").css("display", "block");
+              $(".tags-select").parent().css({
+                "-moz-box-sizing" : "border-box", 
+                "box-sizing"      : "border-box", 
+                "width"           : "100%"
+              });
+              $(".tags-select").val(<% print(value) %>).select2({formatSelection:function(item){return "<div value='" + $(item.element).val() + "'>" + $(item.element).attr("name") + "</div>";}});
+            }
             })
       <% print("</sc"+"ript>"); %>
 

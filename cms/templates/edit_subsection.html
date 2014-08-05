@@ -133,10 +133,10 @@
           <label>${_("Tags")}</label>
              <select id="tags-select" multiple="" style="width:100%" class="populate select2-offscreen">
               % for item in tags:
-                  % if item[2]:
-                      <option value="${item[0]}">${'&nbsp'*3*item[1]+item[0]}</option>
+                  % if item['is_leaf']:
+                      <option value="${item['code']}" name="${item['name']}">${'&nbsp'*3*item['height']+item['name']}</option>
                   % else:
-                      <option disabled>${'&nbsp'*3*item[1]+item[0]}</option>
+                      <option disabled>${'&nbsp'*3*item['height']+item['name']}</option>
                   % endif
               % endfor
           </select>
@@ -146,9 +146,9 @@
         <script>
             require(['jquery','knockout', 'knockout-mapping', 'numeric', 'select2'], function($, ko, mapping, numeric, select2) {
                 $("#tags-select").
-                  val(JSON.parse($("#chosen_tags").val())).
+                  val(JSON.parse($("#selected_tags").val())).
                   select2({formatSelection: function(item) {
-                    return $(item.element).val();}
+                    return "<div value='" + $(item.element).val() + "'>" + $(item.element).attr("name") + "</div>";}
                   });
 
                 var unlock_term = '${subsection.unlock_term_with_default|h}'.replace(/\&#34;/g, '"');
@@ -377,5 +377,5 @@ require(["domReady!", "jquery", "js/models/location", "js/views/overview_assignm
     });
 });
 </script>
-<input type="hidden" id="chosen_tags" value='${chosen_tags}'>
+<input type="hidden" id="selected_tags" value='${selected_tags}'>
 </%block>

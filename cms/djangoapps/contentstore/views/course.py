@@ -6,6 +6,7 @@ import random
 import string  # pylint: disable=W0402
 import re
 import bson
+import yaml
 
 from django.utils.translation import ugettext as _
 from django.contrib.auth.decorators import login_required
@@ -565,8 +566,8 @@ def advanced_settings_handler(request, package_id=None, branch=None, version_gui
         package_id, branch, version_guid, block, request.user
     )
     
-    tags = render_to_string('/tags/geometry.json', {})
-    tags = tree_to_list(json.loads(tags), 0)
+    tags = render_to_string('/tags/themes.yaml', {})
+    tags = tree_to_list(yaml.load(tags), 0)
     
     if 'text/html' in request.META.get('HTTP_ACCEPT', '') and request.method == 'GET':
 
