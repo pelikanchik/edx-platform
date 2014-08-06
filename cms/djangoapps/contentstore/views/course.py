@@ -6,7 +6,6 @@ import random
 import string  # pylint: disable=W0402
 import re
 import bson
-import yaml
 
 from django.utils.translation import ugettext as _
 from django.contrib.auth.decorators import login_required
@@ -17,7 +16,7 @@ from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseBadRequest, HttpResponseNotFound
 from util.json_request import JsonResponse
-from edxmako.shortcuts import render_to_response, render_to_string
+from edxmako.shortcuts import render_to_response
 
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore, loc_mapper
@@ -31,7 +30,7 @@ from xmodule.modulestore import Location
 from contentstore.course_info_model import get_course_updates, update_course_updates, delete_course_update
 from contentstore.utils import (
     get_lms_link_for_item, add_extra_panel_tab, remove_extra_panel_tab,
-    get_modulestore, tree_to_list)
+    get_modulestore, get_tags)
 from models.settings.course_details import CourseDetails, CourseSettingsEncoder
 
 from models.settings.course_grading import CourseGradingModel
@@ -566,16 +565,13 @@ def advanced_settings_handler(request, package_id=None, branch=None, version_gui
         package_id, branch, version_guid, block, request.user
     )
     
-    tags = render_to_string('/tags/themes.yaml', {})
-    tags = tree_to_list(yaml.load(tags), 0)
-    
     if 'text/html' in request.META.get('HTTP_ACCEPT', '') and request.method == 'GET':
 
         return render_to_response('settings_advanced.html', {
             'context_course': course_module,
             'advanced_dict': json.dumps(CourseMetadata.fetch(course_module)),
             'advanced_settings_url': locator.url_reverse('settings/advanced'),
-            'tags': tags
+            'tags': get_tags('/tags/themes.yaml')
         })
     elif 'application/json' in request.META.get('HTTP_ACCEPT', ''):
         if request.method == 'GET':

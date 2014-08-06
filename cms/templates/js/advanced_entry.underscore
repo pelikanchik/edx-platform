@@ -42,9 +42,13 @@ width:100%; display: none" class="tags-select populate select2-offscreen" tabind
                 "box-sizing"      : "border-box", 
                 "width"           : "100%"
               });
-              $(".tags-select").val(<% print(value) %>).select2({formatSelection:function(item){return "<div value='" + $(item.element).val() + "'>" + $(item.element).attr("name") + "</div>";}});
+              $(".tags-select").val(<%= value %>).select2({
+                formatSelection: function(item) {
+                  return "<div value='" + $(item.element).val() + "'>" + $(item.element).attr("name") + "</div>";
+                }
+              });
             }
-            })
+            });
       <% print("</sc"+"ript>"); %>
 
     <% }else{ %>

@@ -218,7 +218,7 @@ function saveSubsection() {
         metadata[name] = datetime;
     });
 
-    var tags = []
+    var tags = [];
     // extract values from each object in array
     $("#tags-select").select2("data").forEach(function(item) {
         tags.push($(item.element).val());
