@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import json
 import logging
-import yaml
 from collections import defaultdict
 
 from django.http import HttpResponseBadRequest
@@ -11,7 +10,7 @@ from django.core.exceptions import PermissionDenied
 from django_future.csrf import ensure_csrf_cookie
 from django.conf import settings
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from edxmako.shortcuts import render_to_response, render_to_string
+from edxmako.shortcuts import render_to_response
 
 from xmodule.modulestore.django import modulestore
 from xmodule.util.date_utils import get_default_time_display
@@ -21,7 +20,7 @@ from xmodule.modulestore.locator import BlockUsageLocator
 from xblock.fields import Scope
 from util.json_request import expect_json, JsonResponse
 
-from contentstore.utils import get_lms_link_for_item, compute_unit_state, UnitState, get_course_for_item, tree_to_list
+from contentstore.utils import get_lms_link_for_item, compute_unit_state, UnitState, get_course_for_item, get_tags
 
 from models.settings.course_grading import CourseGradingModel
 
@@ -240,9 +239,6 @@ def subsection_handler(request, tag=None, package_id=None, branch=None, version_
             course.location.course_id, course.location, False, True
         )
 
-        tags = render_to_string('/tags/geometry.json', {})
-        tags = tree_to_list(json.loads(tags), 0)
-
         return render_to_response(
             'edit_subsection.html',
             {
@@ -258,8 +254,8 @@ def subsection_handler(request, tag=None, package_id=None, branch=None, version_
                 'subsection_units': subsection_units,
                 'sections': sections,
                 'can_view_live': can_view_live,
-                'tags': tags,
-                "selected_tags": json.dumps(item.tags)
+                'tags': get_tags('/tags/themes.yaml'),
+                'selected_tags': json.dumps(item.tags)
             }
         )
     else:
@@ -402,10 +398,7 @@ def unit_handler(request, tag=None, package_id=None, branch=None, version_guid=N
             subsection=containing_subsection.location.name,
             index=index
         )
-
-        tags = render_to_string('/tags/themes.yaml', {})
-        tags = tree_to_list(yaml.load(tags), 0)
-
+        
         return render_to_response('unit.html', {
             'context_course': course,
             'unit': item,
@@ -426,7 +419,7 @@ def unit_handler(request, tag=None, package_id=None, branch=None, version_guid=N
                 get_default_time_display(item.published_date)
                 if item.published_date is not None else None
             ),
-            'tags': tags
+            'tags': get_tags('/tags/themes.yaml')
         })
     else:
         return HttpResponseBadRequest("Only supports html requests")

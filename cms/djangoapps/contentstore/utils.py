@@ -4,6 +4,7 @@
 import copy
 import logging
 import re
+import yaml
 
 from django.conf import settings
 from django.utils.translation import ugettext as _
@@ -18,6 +19,8 @@ from xmodule.modulestore.store_utilities import delete_course
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.draft import DIRECT_ONLY_CATEGORIES
 from student.roles import CourseInstructorRole, CourseStaffRole
+from edxmako.shortcuts import render_to_response, render_to_string
+
 
 
 log = logging.getLogger(__name__)
@@ -278,15 +281,24 @@ def tree_to_list(tree, height):
     Used to convert an input data from yaml.load to list of dicts.
     The list consists of dicts, that include 4 keys: name, code, height, is_leaf.
     """
-    keys = {"имя": "name", "код": "code"}
+    keys = {u"имя": "name", u"код": "code"}
     result = []
     for node in tree:
         result.append({"height": height, "is_leaf": True})
         idx = len(result) - 1
-        for item in node.items():
-            if isinstance(item[1], list):
+        for (code, value) in node.iteritems():
+            if isinstance(value, list):
                 result[idx]["is_leaf"] = False
-                result += tree_to_list(item[1], height+1)
+                result += tree_to_list(value, height+1)
             else:
-                result[idx][keys[item[0].encode("utf-8")]] = item[1]
+                result[idx][keys[code]] =  value
     return result
+
+
+def get_tags(template):
+    """
+    Used to get a list of tags from template file.
+    """
+    tags = render_to_string(template, {})
+    tags = tree_to_list(yaml.load(tags), 0)
+    return tags
