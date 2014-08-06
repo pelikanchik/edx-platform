@@ -104,10 +104,10 @@ domReady(function() {
     $('.save-subsection-button').bind('click', saveSubsectionOnButton);
     function saveSubsectionOnButton(){
 
-      $('.save-subsection-button').val("Saving...");
+      $('.save-subsection-button').val(gettext("Saving&hellip;"));
       $('.save-subsection-button').addClass("save-subsection-button-active");
       saveSubsection();
-      setTimeout('$(".save-subsection-button").val("Save"); $(".save-subsection-button").removeClass("save-subsection-button-active");', 1500);
+      setTimeout('$(".save-subsection-button").val("' + gettext('Save')+'"); $(".save-subsection-button").removeClass("save-subsection-button-active");', 1500);
 
     }
 
