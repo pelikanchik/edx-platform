@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #pylint: disable=E1103, E1101
 
 import copy
@@ -277,6 +278,7 @@ def tree_to_list(tree, height):
     Used to convert an input data from yaml.load to list of dicts.
     The list consists of dicts, that include 4 keys: name, code, height, is_leaf.
     """
+    keys = {"имя": "name", "код": "code"}
     result = []
     for node in tree:
         result.append({"height": height, "is_leaf": True})
@@ -286,5 +288,5 @@ def tree_to_list(tree, height):
                 result[idx]["is_leaf"] = False
                 result += tree_to_list(item[1], height+1)
             else:
-                result[idx][item[0]] = item[1]
+                result[idx][keys[item[0].encode("utf-8")]] = item[1]
     return result
