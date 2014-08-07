@@ -48,10 +48,10 @@ FEATURES = {
     # email address for studio staff (eg to request course creation)
     'STUDIO_REQUEST_EMAIL': '',
 
-    'STUDIO_NPS_SURVEY': True,
+    'STUDIO_NPS_SURVEY': False,
 
     # Segment.io - must explicitly turn it on for production
-    'SEGMENT_IO': True,
+    'SEGMENT_IO': False,
 
     # Enable URL that shows information about the status of various services
     'ENABLE_SERVICE_STATUS': False,
