@@ -322,22 +322,21 @@ Graph.Renderer.Raphael.prototype = {
         // TODO: will it work when number of nodes is one?
         var width = this.graph.layoutMaxX - this.graph.layoutMinX;
         var height = this.graph.layoutMaxY - this.graph.layoutMinY;
-        console.log(width)
-        console.log(height)
-        if ((width < this.radius)||((height < this.radius))){
-            console.log("stretching...");
+        if ((Object.keys(this.graph.nodes).length == 1)){
             for (i in this.graph.nodes) {
                 var node = this.graph.nodes[i];
-                console.log("X is: " )
-                console.log(node.layoutPosX )
+                node.layoutPosX = this.radius;
+                node.layoutPosY = this.radius;
+            }
+        } else if ((width < this.radius)||((height < this.radius))){
+            for (i in this.graph.nodes) {
+                var node = this.graph.nodes[i];
                 node.layoutPosX -= this.graph.layoutMinX;
                 node.layoutPosX *= this.factorX;
-                console.log(node.layoutPosX )
-                console.log("Y is: " )
-                console.log(node.layoutPosY )
+
                 node.layoutPosY -= this.graph.layoutMinY;
                 node.layoutPosY *= this.factorY;
-                console.log(node.layoutPosX )
+
                 if (node.layoutPosY == 0) node.layoutPosY = this.radius;
                 if (node.layoutPosX == 0) node.layoutPosX = this.radius;
             }
@@ -363,10 +362,7 @@ Graph.Renderer.Raphael.prototype = {
     },
 
     drawNode: function(node) {
-//        console.log("drawing node")
-//        console.log(node)
-//        console.log(node.layoutPosX);
-//        console.log(node.layoutPosY);
+
         //var point = this.translate([node.layoutPosX*0.5 + 0.25, node.layoutPosY*0.5 + 0.25]);
 
         // кажется, translate используется только здесь!!
@@ -380,7 +376,6 @@ Graph.Renderer.Raphael.prototype = {
 
 
             // TODO: more convenient way to retrieve node_form from set.
-            console.log(node.shape)
             var oBBox = node.shape[0].getBBox();
 
             /*
@@ -438,9 +433,6 @@ Graph.Renderer.Raphael.prototype = {
             }
         });
 //        shape.mousedown(this.dragger);
-
-        console.log(shape.getBBox().height)
-        console.log(shape[0].getBBox().height)
 
         // XXX
         // TODO: black magic is happening here.
@@ -756,7 +748,6 @@ function calcBounds(nodes) {
         if(y < miny) miny = y;
     }
     var bounds = {"minx" : minx, "miny" : miny, "maxx" : maxx, "maxy" : maxy};
-    console.log(bounds);
     return bounds;
 }
 /*
