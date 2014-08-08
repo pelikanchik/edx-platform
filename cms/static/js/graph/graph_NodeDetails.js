@@ -311,7 +311,6 @@ function createNodeRenameCallback( node){
 }
 
 function createNodeDeletionCallback (node){
-    console.log("created callback" + node.id)
   return function(){
         // TODO: make this into standard PromptView.Warning (like in base.js), when I get this Require.js stuff
         console.log("in callback")
@@ -353,6 +352,22 @@ function showNodeDetails(node){
         }
     });
     $(".node-name").text(names_obj[node.id]["name"]);
+
+    var bBox = raphael_nodes[node.id].getBBox();
+
+    /*
+    var coords = bBox;
+    var rect = renderer.getCanvas().rect(coords.x, coords.y, coords.width, coords.height)
+                    .attr({fill: "none", stroke: "#aaaaaa", "stroke-width": 1});
+    */
+
+    //$(".node-coords-x").text(node.layoutPosX);
+    //$(".node-coords-y").text(node.layoutPosY);
+
+    $(".node-coords-x").text((bBox.x + bBox.width / 2));
+    $(".node-coords-y").text((bBox.y + bBox.height / 2));
+
+    //$(".node-coords-y").text(node.point);
 
     var renamer = createNodeRenameCallback(node);
 
@@ -403,7 +418,6 @@ function showNodeDetails(node){
 
     };
     var handler = createNodeDeletionCallback(node);
-    console.log(handler)
     $('.delete-node-button .icon-trash').unbind('click');
     $('.delete-node-button .icon-trash').bind('click', handler);
 

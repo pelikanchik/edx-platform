@@ -396,11 +396,13 @@ function canvasDbClick(e) {
             console.log(node.layoutPosX);
             console.log(node.layoutPosY);
             console.log(node.point);
-            console.log((bBox.x + bBox.width / 2 + 20));
-            console.log((bBox.y + bBox.height / 2 + 6));
 
-            metadata.coords_x = (bBox.x + bBox.width / 2 + 20) / width;
-            metadata.coords_y = (bBox.y + bBox.height / 2 + 6) / height;
+                // why +20 and +6??? I don't remember why!
+            //console.log((bBox.x + bBox.width / 2 + 20));
+            //console.log((bBox.y + bBox.height / 2 + 6));
+
+            metadata.coords_x = (bBox.x + bBox.width / 2);// / width;
+            metadata.coords_y = (bBox.y + bBox.height / 2);// / height;
 
             // what if they are undefined?
             // no, they were initialized by random

@@ -283,6 +283,17 @@ Graph.Renderer.Raphael.prototype = {
         return [
             (point[0] - this.graph.layoutMinX) * this.factorX + this.radius,
             (point[1] - this.graph.layoutMinY) * this.factorY + this.radius
+            //(point[0]) * this.factorX + this.radius,
+            //(point[1]) * this.factorY + this.radius
+        ];
+    },
+
+    translate2: function(point) {
+        return [
+            point[0],
+            point[1]
+            //(point[0]) * this.factorX + this.radius,
+            //(point[1]) * this.factorY + this.radius
         ];
     },
 
@@ -295,6 +306,9 @@ Graph.Renderer.Raphael.prototype = {
     draw: function() {
         this.factorX = (this.width - 2 * this.radius) / (this.graph.layoutMaxX - this.graph.layoutMinX);
         this.factorY = (this.height - 2 * this.radius) / (this.graph.layoutMaxY - this.graph.layoutMinY);
+        this.stretch()
+        //this.factorX = (this.width - 2 * this.radius) / (1.1);
+        //this.factorY = (this.height - 2 * this.radius) / (1.1);
         for (i in this.graph.nodes) {
             this.drawNode(this.graph.nodes[i]);
         }
@@ -302,6 +316,32 @@ Graph.Renderer.Raphael.prototype = {
             this.drawEdge(this.graph.edges[i]);
         }
         update_hover_area(this);
+    },
+
+    stretch: function() {
+        // TODO: will it work when number of nodes is one?
+        var width = this.graph.layoutMaxX - this.graph.layoutMinX;
+        var height = this.graph.layoutMaxY - this.graph.layoutMinY;
+        console.log(width)
+        console.log(height)
+        if ((width < this.radius)||((height < this.radius))){
+            console.log("stretching...");
+            for (i in this.graph.nodes) {
+                var node = this.graph.nodes[i];
+                console.log("X is: " )
+                console.log(node.layoutPosX )
+                node.layoutPosX -= this.graph.layoutMinX;
+                node.layoutPosX *= this.factorX;
+                console.log(node.layoutPosX )
+                console.log("Y is: " )
+                console.log(node.layoutPosY )
+                node.layoutPosY -= this.graph.layoutMinY;
+                node.layoutPosY *= this.factorY;
+                console.log(node.layoutPosX )
+                if (node.layoutPosY == 0) node.layoutPosY = this.radius;
+                if (node.layoutPosX == 0) node.layoutPosX = this.radius;
+            }
+        }
     },
 
     renameNode: function(node, name) {
@@ -328,14 +368,32 @@ Graph.Renderer.Raphael.prototype = {
 //        console.log(node.layoutPosX);
 //        console.log(node.layoutPosY);
         //var point = this.translate([node.layoutPosX*0.5 + 0.25, node.layoutPosY*0.5 + 0.25]);
-        var point = this.translate([node.layoutPosX, node.layoutPosY]);
+
+        // кажется, translate используется только здесь!!
+        //var point = this.translate([node.layoutPosX, node.layoutPosY]);
+
+        var point = this.translate2([node.layoutPosX, node.layoutPosY]);
         node.point = point;
 
         /* if node has already been drawn, move the nodes */
         if(node.shape) {
-            var oBBox = node.shape.getBBox();
+
+
+            // TODO: more convenient way to retrieve node_form from set.
+            console.log(node.shape)
+            var oBBox = node.shape[0].getBBox();
+
+            /*
+            var coords = oBBox;
+
+            var rect = this.r.rect(coords.x, coords.y, coords.width, coords.height)
+                            .attr({fill: "none", stroke: "#aaaaaa", "stroke-width": 1});
+            */
             var opoint = { x: oBBox.x + oBBox.width / 2, y: oBBox.y + oBBox.height / 2};
             node.shape.translate(Math.round(point[0] - opoint.x), Math.round(point[1] - opoint.y));
+
+            node.shape.name_popup.translate(Math.round(point[0] - opoint.x), Math.round(point[1] - opoint.y));
+
             this.r.safari();
             return node;
         }/* else, draw new nodes */
@@ -381,9 +439,17 @@ Graph.Renderer.Raphael.prototype = {
         });
 //        shape.mousedown(this.dragger);
 
+        console.log(shape.getBBox().height)
+        console.log(shape[0].getBBox().height)
+
+        // XXX
+        // TODO: black magic is happening here.
+
         var box = shape.getBBox();
-        shape.translate(Math.round(point[0]-(box.x+box.width/2)),Math.round(point[1]-(box.y+box.height/2)))
-        shape.name_popup.translate(Math.round(point[0]-(box.x+box.width/2)),Math.round(point[1]-(box.y+box.height/2)))
+        var node_form_box = shape[0].getBBox();
+        //var box = shape[0].getBBox();
+        shape.translate(Math.round(point[0]-(box.x+box.width/2)),Math.round(point[1]-(box.y+node_form_box.height/2)))
+        shape.name_popup.translate(Math.round(point[0]-(box.x+box.width/2)),Math.round(point[1]-(box.y+node_form_box.height/2)))
         node.shape = shape;
 
     },
@@ -487,7 +553,7 @@ Graph.Layout.Spring.prototype = {
         this.graph.layoutMinY = b.miny;
         this.graph.layoutMaxY = b.maxy;
     },
-    
+
     layoutIteration: function() {
         // Forces on nodes due to node-node repulsions
 
@@ -674,12 +740,15 @@ Graph.Layout.Saved.prototype = {
 
 function log(a) {console.log&&console.log(a);}
 
+
 function calcBounds(nodes) {
     var minx = Infinity, maxx = -Infinity, miny = Infinity, maxy = -Infinity;
 
     for (i in nodes) {
-        var x = nodes[i].layoutPosX;
-        var y = nodes[i].layoutPosY;
+        var x = Number(nodes[i].layoutPosX);
+        var y = Number(nodes[i].layoutPosY);
+
+        //console.log("minX = " + minx + " curX = " + x);
 
         if(x > maxx) maxx = x;
         if(x < minx) minx = x;
@@ -687,6 +756,7 @@ function calcBounds(nodes) {
         if(y < miny) miny = y;
     }
     var bounds = {"minx" : minx, "miny" : miny, "maxx" : maxx, "maxy" : maxy};
+    console.log(bounds);
     return bounds;
 }
 /*
