@@ -7485,7 +7485,7 @@ msgid "Resume"
 msgstr "Продолжить"
 
 msgid "Back"
-msgstr "Вернуться"
+msgstr "Назад"
 
 msgid "Edit View"
 msgstr "Редактировать вид"

@@ -92,10 +92,10 @@ class @Sequence
         when 'done' then element.addClass('progress-done')
 
   toggleArrows: =>
-    @$('.sequence-nav-buttons a').unbind('click')
-    @$('.sequence-nav-buttons .godynamo a').removeClass('disabled').click(@godynamo)
-    @$('.sequence-nav-buttons .gobackdynamo a').removeClass('disabled').click(@gobackdynamo)
-    $('.resethistory').click(@reset_history)
+    @$('.sequence-nav-buttons').find('a, input').unbind('click')
+    @$('.sequence-nav-buttons').find('.gobackdynamo a, input.gobackdynamo').removeClass('disabled').click(@gobackdynamo)
+    @$('.sequence-nav-buttons input.resethistory').click(@reset_history)
+    $('.course-content').bind('godynamo', @godynamo)
 
     if @contents.length == 0
       @$('.sequence-nav-buttons .godynamo a').addClass('disabled')
@@ -133,6 +133,14 @@ class @Sequence
       # Checks whether sequence-list should be created according to the progress history of the user
       if @dynamic_sequence_list and new_history_position?
         seq_length = $('#sequence-list').children().length
+
+        if seq_length == 1 and new_history_position == 1
+          $(".sequence-bottom .sequence-nav-buttons").children().remove()
+        else if not $(".sequence-bottom .sequence-nav-buttons").children().length
+          $(".sequence-bottom .sequence-nav-buttons").append(
+              "<input class='gobackdynamo' type='button' value='" + gettext("Back") + "' style='font-weight: normal' />
+               <input class='resethistory' type='button' value='" + gettext("Start over") + "' style='font-weight: normal' />"
+          )
 
         if new_history_position > seq_length
           new_seq_button = $('<li></li>').append($("#hidden_seq_buttons a[data-element=#{new_position}]").clone(true))

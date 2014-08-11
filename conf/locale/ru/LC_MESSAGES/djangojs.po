@@ -541,6 +541,15 @@ msgstr "Проверить"
 msgid "Forward"
 msgstr "Дальше"
 
+msgid "Back"
+msgstr "Назад"
+
+msgid "Start over"
+msgstr "Начать заново"
+
+msgid "Skip"
+msgstr "Пропустить"
+
 msgid "Yes"
 msgstr "Да"
 
