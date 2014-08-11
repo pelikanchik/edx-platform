@@ -19,6 +19,7 @@
     <input type="hidden" name="problem_id" value="${ problem['name'] }" />
 
     % if check_button:
+      <!-- TODO: handle case when course_id=None (problem hasn't course_id) -->
       % if get_course(course_id).has_dynamic_graph:
         % if attempts_used:
           <input class="next" type="button" value="${_('Forward')}" />
