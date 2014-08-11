@@ -93,9 +93,10 @@ class @Sequence
 
   toggleArrows: =>
     @$('.sequence-nav-buttons').find('a, input').unbind('click')
+    @$('#seq_content').unbind('godynamo')
     @$('.sequence-nav-buttons').find('.gobackdynamo a, input.gobackdynamo').removeClass('disabled').click(@gobackdynamo)
     @$('.sequence-nav-buttons input.resethistory').click(@reset_history)
-    $('.course-content').bind('godynamo', @godynamo)
+    @$('#seq_content').bind('godynamo', @godynamo)
 
     if @contents.length == 0
       @$('.sequence-nav-buttons .godynamo a').addClass('disabled')
@@ -113,6 +114,9 @@ class @Sequence
       @$('.sequence-nav-buttons .next a').addClass('disabled')
     else
       @$('.sequence-nav-buttons .next a').removeClass('disabled').click(@next)
+
+    if @history_position? and @history_position == 1
+      @$('.sequence-nav-buttons .gobackdynamo a').addClass('disabled')
 
   render: (new_position, new_history_position) ->
     if @position != new_position or (new_history_position? and @history_position != new_history_position)
@@ -134,7 +138,7 @@ class @Sequence
       if @dynamic_sequence_list and new_history_position?
         seq_length = $('#sequence-list').children().length
 
-        if seq_length == 1 and new_history_position == 1
+        if new_history_position == 1
           $(".sequence-bottom .sequence-nav-buttons").children().remove()
         else if not $(".sequence-bottom .sequence-nav-buttons").children().length
           $(".sequence-bottom .sequence-nav-buttons").append(

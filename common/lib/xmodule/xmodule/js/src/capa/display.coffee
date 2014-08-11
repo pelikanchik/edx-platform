@@ -25,10 +25,10 @@ class @Problem
     @$('section.action input.check').click @check_fd
     if $('#has_dynamic_graph').val() == "True"
       @$('section.action input.next[value="' + gettext('Skip') + '"]').click
-        callback: -> $('.course-content').trigger('godynamo'),
+        callback: -> $('#seq_content').trigger('godynamo'),
         @check_fd
       @$('section.action input.next[value="' + gettext('Forward') + '"]').click ->
-        $('.course-content').trigger('godynamo')
+        $('#seq_content').trigger('godynamo')
     @$('input').change @show_check_button
     # XXX
     $('.check-all').unbind('click').click @check_all
@@ -350,8 +350,8 @@ class @Problem
         @updateProgress response
 
   show_check_button: =>
-      @$('section.action input.next').css('display', 'none')
-      @$('section.action input.check').css('display', 'inline')
+      @$('section.action input.next').hide()
+      @$('section.action input.check').show()
 
 
   # TODO this needs modification to deal with javascript responses; perhaps we
