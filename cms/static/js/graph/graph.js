@@ -12,6 +12,8 @@ var origin_node;
 
 var new_edge_line;
 
+var WIDTH, HEIGHT;
+
 
 function hideRestOfString(S){
     var N =15;      // maximum label length, in characters
@@ -186,6 +188,17 @@ function add_node_here(){
 
                             renderer.drawNode(renderer.graph.nodes[node_locator])
 
+                            //var newHeight = 100 + 50*ids_arr.length;
+
+                            // TODO something about intrinsicHeight
+
+                            renderer.intrinsicHeight = max(renderer.intrinsicHeight, new_node_y + 50);
+                            if (renderer.height < renderer.intrinsicHeight){
+                                renderer.getCanvas().setSize(WIDTH, renderer.intrinsicHeight);
+                                renderer.height = renderer.intrinsicHeight;
+                            }
+                            //var newHeight = renderer.height + 50;
+
                             raphael_nodes[node_locator].set.translate(new_node_x, new_node_y);
                             renderer.makeDraggable(node_locator);
                             //renderer.enableDragingMode();
@@ -342,13 +355,12 @@ function canvasDbClick(e) {
         layouter = new Graph.Layout.Spring(g);
     }
 
-    var width = $(document).width() - 20;
+    WIDTH = $(document).width() - 20;
 
-    var height = 100 + 50*ids_arr.length;
-
+    HEIGHT = 100 + 50*ids_arr.length;
 
     /* draw the graph using the RaphaelJS draw implementation */
-    renderer = new Graph.Renderer.Raphael('canvas', g, width, height);
+    renderer = new Graph.Renderer.Raphael('canvas', g, WIDTH, HEIGHT);
     renderer.enableDragingMode()
     redraw = function() {
         var layouter = new Graph.Layout.Spring(g);

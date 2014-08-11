@@ -114,6 +114,7 @@ Graph.prototype = {
                 i--;
             }
         }
+        update_intrinsicHeight (selfRef);
     },
 
     removeEdge: function(source_id, target_id){
@@ -161,6 +162,7 @@ Graph.Renderer = {};
  * Renderer implementation using RaphaelJS
  */
 Graph.Renderer.Raphael = function(element, graph, width, height) {
+    this.intrinsicWidth = 100 + Object.keys(graph.nodes).length * 50;
     this.width = width || 400;
     this.height = height || 400;
     var selfRef = this;
@@ -225,6 +227,8 @@ Graph.Renderer.Raphael = function(element, graph, width, height) {
         })
         selfRef.isDrag = false;
         update_hover_area(selfRef);
+        update_intrinsicHeight (selfRef);
+
     };
 
 
@@ -243,6 +247,15 @@ function update_hover_area(selfRef){
     }
 
 };
+
+function update_intrinsicHeight (selfRef){
+        selfRef.intrinsicHeight = 0;
+        for (i in selfRef.graph.nodes) {
+            var oBBox = selfRef.graph.nodes[i].shape[0].getBBox();
+            var node_y = oBBox.y + oBBox.height / 2;
+            selfRef.intrinsicHeight = max(selfRef.intrinsicHeight, node_y + 50);
+        }
+}
 
 
 var popup;
@@ -307,6 +320,7 @@ Graph.Renderer.Raphael.prototype = {
         this.factorX = (this.width - 2 * this.radius) / (this.graph.layoutMaxX - this.graph.layoutMinX);
         this.factorY = (this.height - 2 * this.radius) / (this.graph.layoutMaxY - this.graph.layoutMinY);
         this.stretch()
+
         //this.factorX = (this.width - 2 * this.radius) / (1.1);
         //this.factorY = (this.height - 2 * this.radius) / (1.1);
         for (i in this.graph.nodes) {
@@ -315,11 +329,16 @@ Graph.Renderer.Raphael.prototype = {
         for (var i = 0; i < this.graph.edges.length; i++) {
             this.drawEdge(this.graph.edges[i]);
         }
+        update_intrinsicHeight(this);
+        console.log(this.intrinsicHeight)
+        if (this.height < this.intrinsicHeight){
+            this.getCanvas().setSize(this.width, this.intrinsicHeight);
+            this.height = this.intrinsicHeight;
+        }
         update_hover_area(this);
     },
 
     stretch: function() {
-        // TODO: will it work when number of nodes is one?
         var width = this.graph.layoutMaxX - this.graph.layoutMinX;
         var height = this.graph.layoutMaxY - this.graph.layoutMinY;
         if ((Object.keys(this.graph.nodes).length == 1)){
@@ -780,6 +799,11 @@ Raphael.el.tooltip = function (tp) {
         });
     return this;
 };
+
+max = function(a,b){
+    if (a>b) return a;
+    return b;
+}
 
 /* For IE */
 if (!Array.prototype.forEach)
