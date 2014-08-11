@@ -7462,6 +7462,9 @@ msgstr "Вставить задачу в конец"
 
 msgid "Terms of Service"
 msgstr "Пользовательское соглашение"
+
+msgid "Back"
+msgstr "Назад"
 #django_partial.po
 
 

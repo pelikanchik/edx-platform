@@ -603,6 +603,7 @@ class CapaMixin(CapaFields):
         context = {
             'problem': content,
             'id': self.id,
+            'course_id': self.course_id,
             'check_button': check_button,
             'reset_button': self.should_show_reset_button(),
             'save_button': self.should_show_save_button(),
