@@ -13,6 +13,8 @@ from django.utils.translation import ugettext as _
 
 from pkg_resources import resource_string
 
+from django.conf import settings
+
 from capa.capa_problem import LoncapaProblem, LoncapaSystem
 from capa.responsetypes import StudentInputError, \
     ResponseError, LoncapaProblemError
@@ -599,11 +601,21 @@ class CapaMixin(CapaFields):
             'html': html,
             'weight': self.weight,
         }
+        if "cms" in settings.ROOT_URLCONF:
+            is_studio = True
+        else:
+            is_studio = False
+
+        try:
+            course_id = self.course_id
+        except AttributeError:
+            course_id = None
 
         context = {
+            'is_studio': is_studio,
             'problem': content,
             'id': self.id,
-            'course_id': self.course_id,
+            'course_id': course_id,
             'check_button': check_button,
             'reset_button': self.should_show_reset_button(),
             'save_button': self.should_show_save_button(),
