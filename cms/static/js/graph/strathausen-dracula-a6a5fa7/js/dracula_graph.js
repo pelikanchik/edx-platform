@@ -114,7 +114,6 @@ Graph.prototype = {
                 i--;
             }
         }
-        update_intrinsicHeight (selfRef);
     },
 
     removeEdge: function(source_id, target_id){
@@ -162,9 +161,10 @@ Graph.Renderer = {};
  * Renderer implementation using RaphaelJS
  */
 Graph.Renderer.Raphael = function(element, graph, width, height) {
-    this.intrinsicWidth = 100 + Object.keys(graph.nodes).length * 50;
+    this.intrinsicHeight = 100 + Object.keys(graph.nodes).length * 50;
     this.width = width || 400;
     this.height = height || 400;
+    this.yBound = 100;
     var selfRef = this;
     this.r = Raphael(element, this.width, this.height);
     this.radius = 40; /* max dimension of a node */
@@ -178,7 +178,34 @@ Graph.Renderer.Raphael = function(element, graph, width, height) {
             return;
         }
     }
-    
+
+    this.update_intrinsicHeight = function(){
+            this.intrinsicHeight = 0;
+            for (i in this.graph.nodes) {
+                var oBBox = this.graph.nodes[i].shape[0].getBBox();
+                var node_y = oBBox.y + oBBox.height / 2;
+                this.intrinsicHeight = max(this.intrinsicHeight, node_y + this.yBound);
+            }
+    };
+
+    this.updateHeight = function (){
+        this.getCanvas().setSize(this.width, this.intrinsicHeight);
+        this.height = this.intrinsicHeight;
+    };
+    this.increaseHeight = function (){
+            if (this.height < this.intrinsicHeight){
+                this.updateHeight();
+            }
+    };
+    /*
+    this.decreaseHeight = function (){
+            if (this.height > this.intrinsicHeight){
+                this.getCanvas().setSize(this.width, this.intrinsicHeight);
+                this.height = this.intrinsicHeight;
+            }
+    };
+    */
+
     /*
      * Dragging
      */
@@ -227,8 +254,7 @@ Graph.Renderer.Raphael = function(element, graph, width, height) {
         })
         selfRef.isDrag = false;
         update_hover_area(selfRef);
-        update_intrinsicHeight (selfRef);
-
+        selfRef.update_intrinsicHeight();
     };
 
 
@@ -247,15 +273,6 @@ function update_hover_area(selfRef){
     }
 
 };
-
-function update_intrinsicHeight (selfRef){
-        selfRef.intrinsicHeight = 0;
-        for (i in selfRef.graph.nodes) {
-            var oBBox = selfRef.graph.nodes[i].shape[0].getBBox();
-            var node_y = oBBox.y + oBBox.height / 2;
-            selfRef.intrinsicHeight = max(selfRef.intrinsicHeight, node_y + 50);
-        }
-}
 
 
 var popup;
@@ -329,12 +346,8 @@ Graph.Renderer.Raphael.prototype = {
         for (var i = 0; i < this.graph.edges.length; i++) {
             this.drawEdge(this.graph.edges[i]);
         }
-        update_intrinsicHeight(this);
-        console.log(this.intrinsicHeight)
-        if (this.height < this.intrinsicHeight){
-            this.getCanvas().setSize(this.width, this.intrinsicHeight);
-            this.height = this.intrinsicHeight;
-        }
+        this.update_intrinsicHeight();
+        this.updateHeight();
         update_hover_area(this);
     },
 
@@ -386,6 +399,7 @@ Graph.Renderer.Raphael.prototype = {
 
         // кажется, translate используется только здесь!!
         //var point = this.translate([node.layoutPosX, node.layoutPosY]);
+
 
         var point = this.translate2([node.layoutPosX, node.layoutPosY]);
         node.point = point;
@@ -458,9 +472,9 @@ Graph.Renderer.Raphael.prototype = {
 
         var box = shape.getBBox();
         var node_form_box = shape[0].getBBox();
-        //var box = shape[0].getBBox();
-        shape.translate(Math.round(point[0]-(box.x+box.width/2)),Math.round(point[1]-(box.y+node_form_box.height/2)))
-        shape.name_popup.translate(Math.round(point[0]-(box.x+box.width/2)),Math.round(point[1]-(box.y+node_form_box.height/2)))
+        var to = [Math.round(point[0]-(box.x+box.width/2)),Math.round(point[1]-(box.y+node_form_box.height/2))]
+        shape.translate(to[0], to[1])
+        shape.name_popup.translate(to[0], to[1]);
         node.shape = shape;
 
     },

@@ -179,34 +179,19 @@ function add_node_here(){
                             names_obj[node_locator] = {
                                 "name" : new_node_name,
                                 "locator" : node_locator,
-                                "coords_x" : 0,
-                                "coords_y" : 0};
+                                "coords_x" : new_node_x,
+                                "coords_y" : new_node_y};
                             data_obj[node_locator] = [];
 
-                            //console.log(node_locator)
-                            //console.log(node_loc)
+                            renderer.graph.nodes[node_locator].layoutPosX = new_node_x;
+                            renderer.graph.nodes[node_locator].layoutPosY = new_node_y;
 
                             renderer.drawNode(renderer.graph.nodes[node_locator])
 
-                            //var newHeight = 100 + 50*ids_arr.length;
+                            renderer.intrinsicHeight = max(renderer.intrinsicHeight, new_node_y + renderer.yBound);
+                            renderer.increaseHeight()
 
-                            // TODO something about intrinsicHeight
-
-                            renderer.intrinsicHeight = max(renderer.intrinsicHeight, new_node_y + 50);
-                            if (renderer.height < renderer.intrinsicHeight){
-                                renderer.getCanvas().setSize(WIDTH, renderer.intrinsicHeight);
-                                renderer.height = renderer.intrinsicHeight;
-                            }
-                            //var newHeight = renderer.height + 50;
-
-                            raphael_nodes[node_locator].set.translate(new_node_x, new_node_y);
                             renderer.makeDraggable(node_locator);
-                            //renderer.enableDragingMode();
-                            /*
-                            renderer.enableDragingMode();
-                            renderer.isDrag = raphael_nodes[node_id];
-                            */
-
                         }
                     });
                     $( this ).dialog( "close" );
@@ -405,9 +390,6 @@ function canvasDbClick(e) {
             var bBox = raphael_nodes[node_id].getBBox();
 
             var node = g.nodes[node_id];
-            console.log(node.layoutPosX);
-            console.log(node.layoutPosY);
-            console.log(node.point);
 
                 // why +20 and +6??? I don't remember why!
             //console.log((bBox.x + bBox.width / 2 + 20));

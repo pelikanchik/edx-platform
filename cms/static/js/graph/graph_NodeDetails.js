@@ -47,6 +47,7 @@ function ajax_delete_node(id, recurse, all_versions){
         success: function () {
             $( "#node-details" ).dialog( "close" )
             g.removeNode(id)
+            renderer.update_intrinsicHeight();
         }
     });
 }
@@ -402,9 +403,7 @@ function showNodeDetails(node){
             + "</p>"
         );
 
-        console.log("handlers")
         var handler = createEdgeDeletionCallback(node_number, i, string_id);
-        console.log(handler)
 
         $( "#" + img_id ).unbind( "click");
         $( "#" + img_id ).bind( "click", handler );
