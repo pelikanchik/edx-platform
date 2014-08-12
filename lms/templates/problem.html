@@ -16,7 +16,7 @@
 
     % if check_button:
       <!-- TODO: handle case when course_id=None (problem hasn't course_id) -->
-      % if get_course(course_id).has_dynamic_graph:
+      % if get_course(course_id).has_dynamic_graph and not is_studio:
         % if attempts_used:
           <input class="next" type="button" value="${_('Forward')}" />
         % else:
