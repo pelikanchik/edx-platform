@@ -25,7 +25,7 @@ class @Problem
     @$('section.action input.check').click @check_fd
     if $('#has_dynamic_graph').val() == "True"
       @$('section.action input.next[value="' + gettext('Skip') + '"]').click
-        callback: -> $('#seq_content').trigger('godynamo'),
+        callback: -> $('#seq_content').trigger('godynamo')
         @check_fd
       @$('section.action input.next[value="' + gettext('Forward') + '"]').click ->
         $('#seq_content').trigger('godynamo')
