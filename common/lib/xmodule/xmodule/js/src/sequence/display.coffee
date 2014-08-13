@@ -94,6 +94,7 @@ class @Sequence
   toggleArrows: =>
     @$('.sequence-nav-buttons').find('a, input').unbind('click')
     @$('#seq_content').unbind('godynamo')
+    @$('.sequence-nav-buttons .godynamo a').removeClass('disabled').click(@godynamo)
     @$('.sequence-nav-buttons').find('.gobackdynamo a, input.gobackdynamo').removeClass('disabled').click(@gobackdynamo)
     @$('.sequence-nav-buttons input.resethistory').click(@reset_history)
     @$('#seq_content').bind('godynamo', @godynamo)
