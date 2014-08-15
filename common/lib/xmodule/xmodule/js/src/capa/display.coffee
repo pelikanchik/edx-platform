@@ -29,7 +29,8 @@ class @Problem
         @check_fd
       @$('section.action input.next[value="' + gettext('Forward') + '"]').click ->
         $('#seq_content').trigger('godynamo')
-    @$('input').change @show_check_button
+    @inputs.change @show_check_button
+    @inputs.keyup @show_check_button
     # XXX
     $('.check-all').unbind('click').click @check_all
     @$('section.action input.reset').click @reset
