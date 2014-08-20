@@ -533,7 +533,7 @@ msgid "Wait..."
 msgstr "Ждите..."
 
 msgid "Check"
-msgstr "Проверить"
+msgstr "Ответить"
 
 msgid "Check all"
 msgstr "Проверить"

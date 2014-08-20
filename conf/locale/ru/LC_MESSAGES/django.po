@@ -7753,7 +7753,7 @@ msgstr "Неверный ID"
 
 #: common/lib/xmodule/xmodule/capa_module.py:356
 msgid "Check"
-msgstr "Проверить"
+msgstr "Ответить"
 
 msgid "Check all"
 msgstr "Проверить"

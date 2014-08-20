@@ -30,4 +30,10 @@
         </object>
 
     </div>
+
+    % if not is_studio:
+        <section class="action">
+            <input class="next" type="button" value="${_('Forward')}" />
+        </section>
+    % endif
 </div>
