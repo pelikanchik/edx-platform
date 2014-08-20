@@ -131,7 +131,7 @@ var AdvancedView = ValidatingView.extend({
 
             var tags = []
             $(select).select2("data").forEach(function(item) {
-                tags.push($(item.element).val());
+                tags.push(+$(item.element).val());
             });
             self.model.set("tags_list", tags);
             self.showNotificationBar(message,
