@@ -7489,7 +7489,7 @@ msgid "Resume"
 msgstr "Продолжить"
 
 msgid "Back"
-msgstr "Вернуться"
+msgstr "Назад"
 
 msgid "Edit View"
 msgstr "Редактировать вид"
@@ -7757,7 +7757,7 @@ msgstr "Неверный ID"
 
 #: common/lib/xmodule/xmodule/capa_module.py:356
 msgid "Check"
-msgstr "Проверить"
+msgstr "Ответить"
 
 msgid "Check all"
 msgstr "Проверить"

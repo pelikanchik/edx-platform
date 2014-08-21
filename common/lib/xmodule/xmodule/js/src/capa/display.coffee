@@ -23,6 +23,14 @@ class @Problem
     @inputs = @$("[id^=input_#{problem_prefix}_]")
     @$('section.action input:button').click @refreshAnswers
     @$('section.action input.check').click @check_fd
+    if $('#has_dynamic_graph').val() == "True"
+      @$('section.action input.next[value="' + gettext('Skip') + '"]').click
+        callback: -> $('#seq_content').trigger('godynamo')
+        @check_fd
+      @$('section.action input.next[value="' + gettext('Forward') + '"]').click ->
+        $('#seq_content').trigger('godynamo')
+    @inputs.change @show_check_button
+    @inputs.keyup @show_check_button
     # XXX
     $('.check-all').unbind('click').click @check_all
     @$('section.action input.reset').click @reset
@@ -217,11 +225,14 @@ class @Problem
 # NOTE: The dispatch 'problem_check' is being singled out for the use of FormData;
 # maybe preferable to consolidate all dispatches to use FormData
 ###
-  check_fd: =>
+  check_fd: (event) =>
 
     # If there are no file inputs in the problem, we can fall back on @check
     if $('input:file').length == 0
-      @check()
+      if event.data? and 'callback' of event.data
+        @check(event.data.callback)
+      else
+        @check()
       return
     else
       if $('input:file')[0].accept == ".srt"
@@ -295,11 +306,11 @@ class @Problem
     if not abort_submission
       $.ajaxWithPrefix("#{@url}/problem_check", settings)
 
-  check: =>
+  check: (callback) =>
     if not @check_save_waitfor(@check_internal)
-      @check_internal()
+      @check_internal(callback)
 
-  check_internal: =>
+  check_internal: (callback) =>
 
     Logger.log 'problem_check', @answers
 
@@ -330,12 +341,18 @@ class @Problem
         $('.check-all').html(gettext('Check all')).removeClass('check-all-disabled')
 
       Logger.log 'problem_graded', [@answers, response.contents], @id
+      if callback?
+        callback()
 
   reset: =>
     Logger.log 'problem_reset', @answers
     $.postWithPrefix "#{@url}/problem_reset", id: @id, (response) =>
         @render(response.html)
         @updateProgress response
+
+  show_check_button: =>
+      @$('section.action input.next').hide()
+      @$('section.action input.check').show()
 
 
   # TODO this needs modification to deal with javascript responses; perhaps we

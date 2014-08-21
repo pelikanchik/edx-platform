@@ -77,23 +77,20 @@
   <div id="seq_content"></div>
 
   <nav class="sequence-bottom">
-    <ul aria-label="${_('Section Navigation')}" class="sequence-nav-buttons">
-      % if get_course(course_id).has_dynamic_graph:
-        % if staff_access:
-          <li class="prev"><a href="#">${_("Previous")}</a></li>
-        % else:
-          <li class="gobackdynamo"><a href="#">${_("Previous")}</a></li>
+    % if get_course(course_id).has_dynamic_graph and (not staff_access or masquerade == "student"):
+      <ul aria-label="${_('Section Navigation')}" class="sequence-nav-buttons" style="float: right">
+        % if history_position > 1:
+          <input class="gobackdynamo" type="button" value="${_('Back')}" style="font-weight: normal" />
+          <input class="resethistory" type="button" value="${_('Start over')}" style="font-weight: normal" />
         % endif
-        <li class = "godynamo"><a href= "#">${_("Next")}</a></li>
-      % else:
+       </ul>
+    % else:
+      <ul aria-label="${_('Section Navigation')}" class="sequence-nav-buttons">
         <li class="prev"><a href="#">${_("Previous")}</a></li>
         <li class="next"><a href="#">${_("Next")}</a></li>
-      % endif
-    </ul>
+      </ul>
+    % endif
   </nav>
-  % if get_course(course_id).has_dynamic_graph and (not staff_access or masquerade == "student"):
-    <input class="resethistory" style="" type="button" value="${_('Start over')}">
-  % endif
 </div>
 
 

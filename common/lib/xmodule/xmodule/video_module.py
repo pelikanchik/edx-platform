@@ -290,6 +290,7 @@ class VideoModule(VideoFields, XModule):
                 # configuration setting field.
                 'yt_test_timeout': 1500,
                 'yt_test_url': settings.YOUTUBE_TEST_URL,
+                'is_studio': "cms" in settings.ROOT_URLCONF,
 
             })
 

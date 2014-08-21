@@ -1,4 +1,5 @@
 <%! from django.utils.translation import ugettext as _ %>
+<%! from courseware.courses import get_course %>
 
 <%namespace name='static' file='static_content.html'/>
 <h2 class="problem-header">
@@ -18,7 +19,18 @@
     <input type="hidden" name="problem_id" value="${ problem['name'] }" />
 
     % if check_button:
-    <input class="check ${ check_button }" type="button" value="${ check_button }" />
+      <!-- TODO: handle case when course_id=None (problem hasn't course_id) -->
+      % if get_course(course_id).has_dynamic_graph and not is_studio:
+        % if attempts_used:
+          <input class="next" type="button" value="${_('Forward')}" />
+        % else:
+          <input class="next ${ check_button }" type="button" value="${_('Skip')}" />
+        % endif
+          <input class="check ${ check_button }" type="button" value="${ check_button }" style="display: none"/>
+
+      % else:
+        <input class="check ${ check_button }" type="button" value="${ check_button }" />
+      % endif
     % endif
     % if reset_button:
     <input class="reset" type="button" value="${_('Reset')}" />

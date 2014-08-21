@@ -622,11 +622,16 @@ class CapaMixin(CapaFields):
         else:
             is_studio = False
 
+        try:
+            course_id = self.course_id
+        except AttributeError:
+            course_id = None
 
         context = {
             'is_studio': is_studio,
             'problem': content,
             'id': self.id,
+            'course_id': course_id,
             'check_button': check_button,
             'reset_button': self.should_show_reset_button(),
             'save_button': self.should_show_save_button(),

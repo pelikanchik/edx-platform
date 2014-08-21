@@ -105,6 +105,10 @@ function () {
             GetPlayer().pauseVideo();
             event.preventDefault();
         });
+
+        $('.video  > section > input').click(function() {
+          return $('#seq_content').trigger('godynamo');
+        });
     };
 
 });
